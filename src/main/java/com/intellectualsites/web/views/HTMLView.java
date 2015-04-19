@@ -6,7 +6,6 @@ import com.intellectualsites.web.object.View;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.PrintWriter;
 import java.util.regex.Matcher;
 
 /**
@@ -40,19 +39,20 @@ public class HTMLView extends View {
     }
 
     @Override
-    public void content(PrintWriter out, Request request) {
+    public String content(Request request) {
         File file = new File(folder, request.getMeta("html_file") + ".html");
-
+        StringBuilder document = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = reader.readLine()) != null) {
-                out.println(line);
+                document.append(line).append("\n");
             }
             reader.close();
         } catch(final Exception e) {
             e.printStackTrace();
         }
+        return document.toString();
     }
 
     private boolean foundFile(final String file) {

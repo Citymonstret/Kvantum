@@ -50,7 +50,7 @@ public abstract class View {
          */
     }
 
-    public void content(final PrintWriter out, Request r) {
-        out.println("<h1>Content!</h1>");
+    public String content(Request r) {
+        return "<h1>Content!</h1>";
     }
 }

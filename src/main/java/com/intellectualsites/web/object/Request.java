@@ -1,5 +1,7 @@
 package com.intellectualsites.web.object;
 
+import com.intellectualsites.web.util.CookieManager;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ public class Request {
 
     private Map<String, Object> meta;
     private Map<String, String> headers;
+    private Cookie[] cookies;
     private final String raw;
     private Query query;
 
@@ -57,7 +60,13 @@ public class Request {
 
         getResourceRequest();
 
+        this.cookies = CookieManager.getCookies(this);
+
         this.meta = new HashMap<String, Object>();
+    }
+
+    public Cookie[] getCookies() {
+        return this.cookies;
     }
 
     public String getHeader(final String name) {

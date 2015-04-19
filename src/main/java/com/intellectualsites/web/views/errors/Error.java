@@ -39,7 +39,7 @@ public class Error extends View {
     }
 
     @Override
-    public void content(final PrintWriter out, final Request r) {
-        out.println(String.format("<p><b>Error:</b> %d %s</p>", this.code, this.desc));
+    public String content(final Request r) {
+        return String.format("<p><b>Error:</b> %d %s</p>", this.code, this.desc);
     }
 }
