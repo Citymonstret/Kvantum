@@ -11,7 +11,8 @@ import java.util.Map;
 public class Request {
 
     private Map<String, Object> meta;
-    private final String host, userAgent, requestString, raw;
+    private Map<String, String> headers;
+    private final String raw;
     private Query query;
 
     public static class Query {
@@ -39,19 +40,35 @@ public class Request {
     public Request(final String request) {
         this.raw = request;
         String[] parts = request.split("\\|");
-        if (parts.length < 3) {
-            throw new IllegalArgumentException("Not enough parts (request|user-agent)");
+
+        this.headers = new HashMap<String, String>();
+        for (String part : parts) {
+            String[] subParts = part.split(":");
+            if (subParts.length < 2) {
+                headers.put("query", subParts[0]);
+            } else {
+                headers.put(subParts[0], subParts[1]);
+            }
         }
-        this.requestString = parts[0];
-        this.host = parts[1];
-        this.userAgent = parts[2];
+
+        if (!this.headers.containsKey("query")) {
+            throw new RuntimeException("Couldn't find query header...");
+        }
+
         getResourceRequest();
 
         this.meta = new HashMap<String, Object>();
     }
 
+    public String getHeader(final String name) {
+        if (this.headers.containsKey(name)) {
+            return this.headers.get(name);
+        }
+        return "";
+    }
+
     private void getResourceRequest() {
-        String[] parts = requestString.split(" ");
+        String[] parts = getHeader("query").split(" ");
         if (parts.length < 3) {
             this.query = new Query(Method.GET, "/");
         } else {
@@ -65,7 +82,7 @@ public class Request {
     }
 
     public String buildLog() {
-        return "Request >\n\tUser Agent: " + this.userAgent + "\n\tRequest String: " + requestString + "\n\tHost: " + this.host + "\n\tQuery: " + this.query.buildLog();
+        return "Request >\n\tUser Agent: " + getHeader("User-Agent") + "\n\tRequest String: " + getHeader("query") + "\n\tHost: " + getHeader("Host") + "\n\tQuery: " + this.query.buildLog();
     }
 
     public void addMeta(String name, Object var) {

@@ -29,7 +29,7 @@ public class Error extends View {
     }
 
     @Override
-    public void headers(final PrintWriter out) {
+    public void headers(final PrintWriter out, Request request) {
         out.println(String.format("HTTP/1.1 %d %s", this.code, this.desc)); // HTTP Status Code http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         out.println("Content-Type: text/html"); // Content Type
         out.println("Server: IntellectualServer"); // Server Name

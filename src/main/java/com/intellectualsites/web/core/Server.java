@@ -80,10 +80,10 @@ public class Server {
             }
             Request r = new Request(rRaw.toString());
             log(r.buildLog());
-
+            log(rRaw.toString());
             View view = manager.match(r);
             // Response headers
-            view.headers(out);
+            view.headers(out, r);
             // Empty line indicates that the header response is finished, send content!
             out.println();
             // TODO Actual content

@@ -33,13 +33,21 @@ public abstract class View {
         return this.rawPattern;
     }
 
-    public void headers(final PrintWriter out) {
+    public void headers(final PrintWriter out, Request request) {
         out.println("HTTP/1.1 200 OK"); // HTTP Status Code http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         out.println("Content-Type: text/html"); // Content Type
         out.println("Server: IntellectualServer"); // Server Name
         out.println("Date: " + TimeUtil.getHTTPTimeStamp()); // Date
         out.println("Status: 200 OK"); // Repeated status header
         out.println("X-Powered-By: Java/IntellectualServer 1.0");
+        /*
+         *  String cookie = request.getHeader("Cookie");
+            if (cookie.equals("")) {
+                out.println("Set-Cookie: session=potato");
+            } else {
+                System.out.println("cookie: " + cookie);
+            }
+         */
     }
 
     public void content(final PrintWriter out, Request r) {
