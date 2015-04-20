@@ -1,8 +1,7 @@
 package com.intellectualsites.web.core;
 
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Session;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.util.ServerProvider;
 import com.intellectualsites.web.util.SessionManager;
 import com.intellectualsites.web.util.TimeUtil;
 import com.intellectualsites.web.util.ViewManager;
@@ -13,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,8 @@ public class Server {
 
     public static Pattern variable;
 
+    private Collection<ProviderFactory> providers;
+
     static {
         variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([a-zA-Z0-9]*)\\}\\}");
     }
@@ -47,6 +50,10 @@ public class Server {
 
         // Allow .html Files!
         this.viewManager.add(new HTMLView());
+
+        this.providers = new ArrayList<ProviderFactory>();
+        this.providers.add(this.sessionManager);
+        this.providers.add(new ServerProvider());
     }
 
     public void start() throws RuntimeException {
@@ -96,13 +103,30 @@ public class Server {
             Session session = sessionManager.getSession(r, out);
             // Empty line indicates that the header response is finished, send content!
             out.println();
-            // TODO Actual content
             String content = view.content(r);
             Matcher matcher = Server.variable.matcher(content);
             while (matcher.find()) {
                 String provider = matcher.group(1);
                 String variable = matcher.group(2);
-                content = content.replace(matcher.group(), "Provider=" + provider + ";Variable=" + variable + ";");
+
+                boolean found = false;
+
+                for (final ProviderFactory factory : this.providers) {
+                    if (factory.providerName().equalsIgnoreCase(provider)) {
+                        VariableProvider p = factory.get(r);
+                        if (p != null) {
+                            if (p.contains(variable)) {
+                                Object o = p.get(variable);
+                                content = content.replace(matcher.group(), o.toString());
+                                found = true;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (!found) {
+                     content = content.replace(matcher.group(),  "");
+                }
             }
             for (String s : content.split("\n")) {
                 out.println(s);

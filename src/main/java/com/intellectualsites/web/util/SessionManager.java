@@ -1,9 +1,7 @@
 package com.intellectualsites.web.util;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.Cookie;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Session;
+import com.intellectualsites.web.object.*;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -14,7 +12,7 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class SessionManager {
+public class SessionManager implements ProviderFactory<VariableProvider> {
 
     private Map<String, Session> sessions;
     private Server server;
@@ -33,12 +31,27 @@ public class SessionManager {
                 if (sessions.containsKey(sessionID)) {
                     session = sessions.get(sessionID);
                 } else {
-                    server.log("Deleting invalid session cookie (%s)", cookie.getValue());
-                    out.println("Set-Cookie: session=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+                    if (out != null) {
+                        out.println("Set-Cookie: session=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+                        server.log("Deleting invalid session cookie (%s)", cookie.getValue());
+                    }
                 }
                 break;
             }
         }
         return session;
+    }
+
+    public VariableProvider get(Request r) {
+        return new Session() {
+            {
+                set("username", "guest");
+            }
+        };
+        //return getSession(r, null);
+    }
+
+    public String providerName() {
+        return "session";
     }
 }
