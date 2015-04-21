@@ -15,6 +15,10 @@ public class Bootstrap {
      */
     public static void main(String[] args) {
         // TODO Load configuration options
-        new Server().start();
+        try {
+            new Server().start();
+        } catch(final Exception e) {
+            e.printStackTrace();
+        }
     }
 }

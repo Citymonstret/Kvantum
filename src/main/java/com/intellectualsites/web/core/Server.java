@@ -7,9 +7,7 @@ import com.intellectualsites.web.util.TimeUtil;
 import com.intellectualsites.web.util.ViewManager;
 import com.intellectualsites.web.views.HTMLView;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -34,13 +32,16 @@ public class Server {
 
     public static final String PREFIX = "Web";
 
-    public static Pattern variable, comment;
+    public static Pattern variable, comment, include;
 
     private Collection<ProviderFactory> providers;
 
+    private File coreFolder;
+
     static {
-        variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([a-zA-Z0-9]*)\\}\\}");
-        comment = Pattern.compile("(\\/\\*[\S\s]*?\\*\\/)");
+        variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([A-Za-z0-9\\_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
+        comment = Pattern.compile("(\\/\\*[\\S\\s]*?\\*\\/)");
+        include = Pattern.compile("\\{\\{include:([\\/A-Za-z\\.\\-]*)\\}\\}");
     }
     public Server() {
         this.started = false;
@@ -48,6 +49,7 @@ public class Server {
         this.port = 80; // TODO Make configurable
         this.viewManager = new ViewManager();
         this.sessionManager = new SessionManager(this);
+        this.coreFolder = new File("./");
 
         // Allow .html Files!
         this.viewManager.add(new HTMLView());
@@ -78,72 +80,149 @@ public class Server {
             }
             try {
                 tick();
-            } catch(final RuntimeException e) {
+            } catch(final Exception e) {
                 log("Error in server ticking...");
                 e.printStackTrace();
             }
         }
     }
 
-    protected void tick() throws RuntimeException {
-        try {
-            final Socket remote = socket.accept();
-            log("Connection Accepted! Sending data...");
-            StringBuilder rRaw = new StringBuilder();
-            BufferedReader input = new BufferedReader(new InputStreamReader(remote.getInputStream()));
-            PrintWriter out = new PrintWriter(remote.getOutputStream());
-            String str;
-            while ((str = input.readLine()) != null && !str.equals("")) {
-                rRaw.append(str).append("|");
-            }
-            Request r = new Request(rRaw.toString());
-            log(r.buildLog());
-            View view = viewManager.match(r);
-            // Response headers
-            view.headers(out, r);
-            Session session = sessionManager.getSession(r, out);
-            // Empty line indicates that the header response is finished, send content!
-            out.println();
-            String content = view.content(r);
-            Matcher matcher = Server.comment.matcher(content);
-            
-            // First replace all comments
-            while (matcher.find()) {
-                content = content.replace(matcher.group(1), "");
-            }
-            // Replace all variables
-            matcher = Server.variable.matcher(content);
-            while (matcher.find()) {
-                String provider = matcher.group(1);
-                String variable = matcher.group(2);
+    private void runAsync(final Socket remote) {
+        new Thread() {
+            @Override
+            public void run() {
+                log("Connection Accepted! Sending data...");
+                StringBuilder rRaw = new StringBuilder();
+                PrintWriter out = null;
+                BufferedReader input;
+                try {
+                    input = new BufferedReader(new InputStreamReader(remote.getInputStream()));
+                    out = new PrintWriter(remote.getOutputStream());
+                    String str;
+                    while ((str = input.readLine()) != null && !str.equals("")) {
+                        rRaw.append(str).append("|");
+                    }
+                } catch(final Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+                Request r = new Request(rRaw.toString());
+                log(r.buildLog());
+                View view = viewManager.match(r);
+                Response response = view.generate(r);
+                // Response headers
+                response.getHeader().apply(out);
+                Session session = sessionManager.getSession(r, out);
+                // Empty line indicates that the header response is finished, send content!
+                out.println();
+                String content = response.getContent();
+                Matcher matcher = Server.comment.matcher(content);
 
-                boolean found = false;
-
-                for (final ProviderFactory factory : this.providers) {
-                    if (factory.providerName().equalsIgnoreCase(provider)) {
-                        VariableProvider p = factory.get(r);
-                        if (p != null) {
-                            if (p.contains(variable)) {
-                                Object o = p.get(variable);
-                                content = content.replace(matcher.group(), o.toString());
-                                found = true;
-                            }
+                // First replace all comments
+                while (matcher.find()) {
+                    content = content.replace(matcher.group(1), "");
+                }
+                // Find includes
+                matcher = Server.include.matcher(content);
+                while(matcher.find()) {
+                    File file = new File(coreFolder, matcher.group(1));
+                    if (file.exists()) {
+                        StringBuilder c = new StringBuilder();
+                        String line;
+                        try {
+                            BufferedReader reader = new BufferedReader(new FileReader(file));
+                            while ((line = reader.readLine()) != null)
+                                c.append(line).append("\n");
+                            reader.close();
+                        } catch(final Exception e) {
+                            e.printStackTrace();
                         }
-                        break;
+                        if (file.getName().endsWith(".css")) {
+                            content = content.replace(matcher.group(), "<style>\n" + c + "</style>");
+                        } else {
+                            content = content.replace(matcher.group(), c.toString());
+                        }
+                    } else {
+                        log("Couldn't find file for '%s'", matcher.group());
                     }
                 }
-                if (!found) {
-                     content = content.replace(matcher.group(),  "");
+                // Replace all variables
+                matcher = Server.variable.matcher(content);
+                while (matcher.find()) {
+                    String provider = matcher.group(1);
+                    String variable = matcher.group(2);
+
+                    String filter = "";
+                    if (matcher.group().contains(" || ")) {
+                        filter = matcher.group().split(" \\|\\| ")[1].replace("}}", "");
+                    }
+
+                    boolean found = false;
+
+                    for (final ProviderFactory factory : providers) {
+                        if (factory.providerName().equalsIgnoreCase(provider)) {
+                            VariableProvider p = factory.get(r);
+                            if (p != null) {
+                                if (p.contains(variable)) {
+                                    Object o = p.get(variable);
+                                    if (!filter.equals("")) {
+                                        switch(filter) {
+                                            case "UPPERCASE":
+                                                o = o.toString().toUpperCase();
+                                                break;
+                                            case "LOWERCASE":
+                                                o = o.toString().toLowerCase();
+                                                break;
+                                            case "LIST": {
+                                                StringBuilder s = new StringBuilder();
+                                                s.append("<ul>");
+                                                if (o instanceof Object[]) {
+                                                    for (Object oo : (Object[]) o) {
+                                                        s.append("<li>").append(oo).append("</li>");
+                                                    }
+                                                } else if(o instanceof Collection) {
+                                                    for (Object oo : (Collection) o) {
+                                                        s.append("<li>").append(oo).append("</li>");
+                                                    }
+                                                }
+                                                s.append("</ul>");
+                                                o = s.toString();
+                                            }
+                                            break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                    content = content.replace(matcher.group(), o.toString());
+                                    found = true;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        content = content.replace(matcher.group(),  "");
+                    }
+                }
+                for (String s : content.split("\n")) {
+                    out.println(s);
+                }
+                // Flush<3
+                out.flush();
+                try {
+                    input.close();
+                } catch(final Exception e) {
+                    e.printStackTrace();
                 }
             }
-            for (String s : content.split("\n")) {
-                out.println(s);
-            }
-            // Flush<3
-            out.flush();
-            input.close();
+        }.start();
+    }
+
+    protected void tick() {
+        try {
+            runAsync(socket.accept());
         } catch(final Exception e) {
-            throw new RuntimeException("Ticking error!", e);
+            e.printStackTrace();
         }
     }
 

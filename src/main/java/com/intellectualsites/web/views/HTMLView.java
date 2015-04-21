@@ -1,6 +1,7 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
 
 import java.io.BufferedReader;
@@ -39,8 +40,8 @@ public class HTMLView extends View {
     }
 
     @Override
-    public String content(Request request) {
-        File file = new File(folder, request.getMeta("html_file") + ".html");
+    public Response generate(final Request r) {
+        File file = new File(folder, r.getMeta("html_file") + ".html");
         StringBuilder document = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -52,7 +53,9 @@ public class HTMLView extends View {
         } catch(final Exception e) {
             e.printStackTrace();
         }
-        return document.toString();
+        Response response = new Response(this);
+        response.setContent(document.toString());
+        return response;
     }
 
     private boolean foundFile(final String file) {

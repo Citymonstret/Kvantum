@@ -23,6 +23,8 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
         switch(variable.toLowerCase()) {
             case "time":
                 return true;
+            case "authors":
+                return true;
             default:
                 return false;
         }
@@ -32,6 +34,8 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
         switch (variable.toLowerCase()) {
             case "time":
                 return TimeUtil.getHTTPTimeStamp();
+            case "authors":
+                return new String[] { "Citymonstret", "IntellectualSites" };
             default:
                 return "";
         }
