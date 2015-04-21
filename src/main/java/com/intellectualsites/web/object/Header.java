@@ -35,4 +35,23 @@ public class Header {
     
     return dump;
   }
+  
+  public void redirect(final String newURL) {
+    set("Location", newURL);
+    set("status", "301");
+}
+
+  public void setCookie(final String cookie, final String value) {
+      String value = "";
+      if (this.headers.containsKey("Set-Cookie") {
+          value = this.headers.get("Set-Cookie") + "," + cookie + "=" + value;
+      } else {
+          value = cookie + "=" + value; 
+      }
+      set("Set-Cookie", value);
+  }
+  
+  public void removeCookie(final String cookie){
+      setCookie(cookie, "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+  }
 }
