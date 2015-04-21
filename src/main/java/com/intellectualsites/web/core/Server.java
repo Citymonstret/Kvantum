@@ -34,12 +34,13 @@ public class Server {
 
     public static final String PREFIX = "Web";
 
-    public static Pattern variable;
+    public static Pattern variable, comment;
 
     private Collection<ProviderFactory> providers;
 
     static {
         variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([a-zA-Z0-9]*)\\}\\}");
+        comment = Pattern.compile("(\\/\\*[\S\s]*?\\*\\/)");
     }
     public Server() {
         this.started = false;
@@ -104,7 +105,14 @@ public class Server {
             // Empty line indicates that the header response is finished, send content!
             out.println();
             String content = view.content(r);
-            Matcher matcher = Server.variable.matcher(content);
+            Matcher matcher = Server.comment.matcher(content);
+            
+            // First replace all comments
+            while (matcher.find()) {
+                content = content.replace(matcher.group(1), "");
+            }
+            // Replace all variables
+            matcher = Server.variable.matcher(content);
             while (matcher.find()) {
                 String provider = matcher.group(1);
                 String variable = matcher.group(2);
