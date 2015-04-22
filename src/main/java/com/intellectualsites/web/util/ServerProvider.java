@@ -21,9 +21,9 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
 
     public boolean contains(String variable) {
         switch(variable.toLowerCase()) {
-            case "time":
-                return true;
             case "authors":
+            case "filters":
+            case "time":
                 return true;
             default:
                 return false;
@@ -36,6 +36,8 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
                 return TimeUtil.getHTTPTimeStamp();
             case "authors":
                 return new String[] { "Citymonstret", "IntellectualSites" };
+            case "filters":
+                return new String[] { "LIST", "UPPERCASE", "LOWERCASE" };
             default:
                 return "";
         }

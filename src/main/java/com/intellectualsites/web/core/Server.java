@@ -1,5 +1,6 @@
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.object.*;
@@ -9,6 +10,8 @@ import com.intellectualsites.web.util.TimeUtil;
 import com.intellectualsites.web.util.ViewManager;
 import com.intellectualsites.web.views.CSSView;
 import com.intellectualsites.web.views.HTMLView;
+import com.intellectualsites.web.views.JSView;
+import com.intellectualsites.web.views.LessView;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -48,7 +51,7 @@ public class Server {
     private ConfigurationFile configServer, configViews;
 
     static {
-        variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([A-Za-z0-9\\_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
+        variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9\\_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
         comment = Pattern.compile("(\\/\\*[\\S\\s]*?\\*\\/)");
         include = Pattern.compile("\\{\\{include:([\\/A-Za-z\\.\\-]*)\\}\\}");
     }
@@ -57,7 +60,7 @@ public class Server {
         this.coreFolder = new File("./");
 
         try {
-            configServer = new YamlConfiguration(new File(new File(coreFolder, "config"), "server.yml"));
+            configServer = new YamlConfiguration("server", new File(new File(coreFolder, "config"), "server.yml"));
             configServer.loadFile();
             configServer.setIfNotExists("port", 80);
             configServer.setIfNotExists("hostname", "localhost");
@@ -76,7 +79,7 @@ public class Server {
         this.sessionManager = new SessionManager(this);
 
         try {
-            configViews = new YamlConfiguration(new File(new File(coreFolder, "config"), "views.yml"));
+            configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
             configViews.loadFile();
 
             Map<String, Object> views = new HashMap<>();
@@ -111,6 +114,12 @@ public class Server {
                 case "css":
                     this.viewManager.add(new CSSView(filter));
                     break;
+                case "less":
+                    this.viewManager.add(new LessView(filter));
+                    break;
+                case "javascript":
+                    this.viewManager.add(new JSView(filter));
+                    break;
                 default:
                     break;
             }
@@ -125,6 +134,7 @@ public class Server {
         this.providers = new ArrayList<ProviderFactory>();
         this.providers.add(this.sessionManager);
         this.providers.add(new ServerProvider());
+        this.providers.add(ConfigVariableProvider.getInstance());
     }
 
     public void start() throws RuntimeException {

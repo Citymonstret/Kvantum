@@ -1,7 +1,13 @@
 views:
+  less:
+    filter: (\/assets\/less\/)([A-Za-z0-9]*)(.css|.less)?
+    type: less
   css:
     filter: (\/style\/)([A-Za-z0-9]*)(.css)?
     type: css
   html:
     filter: (\/)([A-Za-z0-9]*)(.html)?
     type: html
+  javscript:
+    filter: (\/assets\/js\/)([A-Za-z0-9]*)(.js)?
+    type: javascript

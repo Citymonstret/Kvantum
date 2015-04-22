@@ -12,13 +12,14 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class YamlConfiguration implements ConfigurationFile {
+public class YamlConfiguration extends ConfigProvider implements ConfigurationFile {
 
     private File file;
     private Map<String, Object> map;
     private Yaml yaml;
 
-    public YamlConfiguration(File file) throws Exception {
+    public YamlConfiguration(String name, File file) throws Exception {
+        super(name);
         this.file = file;
         if (!file.getParentFile().exists()) {
             if (!file.getParentFile().mkdirs()) {
