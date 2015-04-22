@@ -44,7 +44,8 @@ public class Header {
 
     public void redirect(final String newURL) {
         set("Location", newURL);
-        set("status", "301 Moved Temporarily");
+        set("Status", "307 Temporary Redirect");
+        setStatus("307 Temporary Redirect");
     }
 
     public void setCookie(final String cookie, final String value) {

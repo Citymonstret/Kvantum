@@ -1,0 +1,7 @@
+views:
+  css:
+    filter: (\/style\/)([A-Za-z0-9]*)(.css)?
+    type: css
+  html:
+    filter: (\/)([A-Za-z0-9]*)(.html)?
+    type: html

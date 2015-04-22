@@ -1,5 +1,6 @@
 package com.intellectualsites.web.util;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.View;
 import com.intellectualsites.web.views.errors.View404;
@@ -36,5 +37,11 @@ public class ViewManager {
             }
         }
         return new View404();
+    }
+
+    public void dump(final Server server) {
+        for (View view : views) {
+            server.log("> View - Class '%s', Regex: '%s'", view.getClass().getSimpleName(), view.toString());
+        }
     }
 }

@@ -21,6 +21,7 @@ public class Response {
                 .set("Date", TimeUtil.getHTTPTimeStamp())
                 .set("Status", "200 OK")
                 .set("X-Powered-By", "Java/IntellectualServer 1.0");
+        this.content = "";
     }
 
     public void setContent(final String content) {
@@ -38,5 +39,4 @@ public class Response {
     public String getContent() {
         return this.content;
     }
-
 }

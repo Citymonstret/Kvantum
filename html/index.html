@@ -3,13 +3,10 @@
 */
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>Index! :D</title>
-        {{include:/css/stylesheet.css}}
-    </head>
+    {{include:/html/header.html}}
     <body>
         <p>
-            Hello {{session.username || UPPERCASE}}! It's currently {{system.time || LOWERCASE}}
+            Hello {{session.username || UPPERCASE}}! It's currently {{system.time || LOWERCASE}} and this file is named {{document.name}}
         </p>
         <p>
             This Program is made by {{system.authors || LIST}} /* Will generate a list! :D */

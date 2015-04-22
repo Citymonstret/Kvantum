@@ -1,12 +1,12 @@
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.object.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -18,8 +18,8 @@ public class HTMLView extends View {
 
     private final File folder;
 
-    public HTMLView() {
-        super("(\\/)([A-Za-z0-9]*)(.html)?");
+    public HTMLView(String filter) {
+        super(filter);
 
         this.folder = new File("./html");
         if (!folder.exists()) {
@@ -54,11 +54,45 @@ public class HTMLView extends View {
             e.printStackTrace();
         }
         Response response = new Response(this);
+        response.getHeader().set("Content-Type", "text/html; charset=utf-8");
         response.setContent(document.toString());
         return response;
     }
 
     private boolean foundFile(final String file) {
         return new File(folder, file + ".html").exists();
+    }
+
+    @Override
+    public HTMLProvider getFactory(final Request r) {
+        return new HTMLProvider(r);
+    }
+
+    public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider {
+
+        private Map<String, String> storage = new HashMap<>();
+        public HTMLProvider(final Request r) {
+            storage.put("name", r.getMeta("html_file") + ".html");
+        }
+
+        @Override
+        public HTMLProvider get(Request r) {
+            return this;
+        }
+
+        @Override
+        public String providerName() {
+            return "document";
+        }
+
+        @Override
+        public boolean contains(String variable) {
+            return storage.containsKey(variable);
+        }
+
+        @Override
+        public Object get(String variable) {
+            return storage.get(variable);
+        }
     }
 }

@@ -17,6 +17,7 @@ public class Request {
     private Cookie[] cookies;
     private final String raw;
     private Query query;
+    private PostRequest postRequest;
 
     public static class Query {
         private final Method method;

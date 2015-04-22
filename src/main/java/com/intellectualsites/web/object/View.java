@@ -35,4 +35,9 @@ public abstract class View {
         response.setContent("<h1>Content!</h1>");
         return response;
     }
+
+    public ProviderFactory getFactory(final Request r) {
+        return null;
+    }
+
 }
