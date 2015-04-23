@@ -1,24 +1,81 @@
+<!DOCTYPE HTML>
 /*
     @copyright The document is written by Sauilitired
 */
-<!DOCTYPE HTML>
 <html>
     {{include:/views/html/header.html}}
-    <body>
-        <p>
-            Hello {{session.username || UPPERCASE}}! It's currently {{system.time || LOWERCASE}} and this file is named {{document.name}} - We are currently running on {{cfg.server@port}} and the hostname is
-            {{cfg.server@hostname}}
-        </p>
-        <p>
-            This Program is made by {{system.authors || LIST}} /* Will generate a list! :D */
-            You an use the following filters as of now: {{system.filters || LIST}}
-        </p>
-        {#if system.true}
-            IT WAS TRUE
-        {/if}
-        {#if !system.false}
-            IT WURKS
-        {/if}
+    <br>
+        <div class="container">
+            <h1>
+                IntellectualServer &amp; CrushTemplate
+            </h1>
+            <p>
+                CrushTemplate is our very own unique template engine; it's shipped natively with IntellectualServer!
+                <br><br>
+                <b>
+                    So... what can it do?
+                </b>
+                <br><br>
+                Well, it has the ability to:
+                <ul>
+                    <li>Include files</li>
+                    <li>Access variables &amp; and config files</li>
+                    <li>Use filters on those variables</li>
+                    <li>Use if statements with the variables</li>
+                </ul>
+
+                <div id="crush-test">
+                    <div class="example">
+                        Hello {{session.username || UPPERCASE}},
+                        <br>
+                        It's currently {{system.time || LOWERCASE}} and the document is named {{document.name}}!
+                        <br>
+                        The server is running on port {{cfg.server@port}} and the hostname is {{cfg.server@hostname}}
+                        <br>
+                        At the time of reading this we support these filters:
+                        {{system.filters || LIST}} and the one used was LIST!
+                    </div>
+                    <div class="code">
+                        <code id="explanation">
+                            Hello &#123;&#123;session.username || UPPERCASE&#125;&#125;,
+                            <br>
+                            It's currently &#123;&#123;system.time || LOWERCASE&#125;&#125; and the document is named &#123;&#123;document.name&#125;&#125;!
+                            <br>
+                            The server is running on port &#123;&#123;cfg.server@port&#125;&#125; and the hostname is &#123;&#123;cfg.server@hostname&#125;&#125;
+                            <br>
+                            At the time of rading this we support these filters:
+                            &#123;&#123;system.filters || LIST&#125;&#125; and the one used was LIST!
+                        </code>
+                    </div>
+                </div>
+                <div id="if-test">
+                    <div class="example">
+                        {#if system.true}
+                            True was true
+                        {/if}
+                        <br>
+                        {#if !system.false}
+                            !False was true
+                        {/if}
+                    </div>
+                    <div class="code">
+                        <code>
+                            &#123;#if system.true&#125;
+                                True was true
+                            &#123;/if&#125;
+                            <br>
+                            &#123;#if !system.false&#125;
+                                !False was true
+                            &#123;/if&#125;
+                        </code>
+                    </div>
+                </div>
+            </p>
+
+            <div id="copyright">
+                Copyright &copy; IntellectualSites 2015
+            </div>
+        </div>
     </body>
 </html>
 

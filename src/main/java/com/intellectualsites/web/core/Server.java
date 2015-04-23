@@ -13,14 +13,13 @@ import com.intellectualsites.web.views.HTMLView;
 import com.intellectualsites.web.views.JSView;
 import com.intellectualsites.web.views.LessView;
 import org.apache.commons.io.output.TeeOutputStream;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +30,8 @@ import java.util.regex.Pattern;
  */
 public class Server {
 
-    private boolean started, stopping;
+    private boolean started;
+    public boolean stopping;
     private ServerSocket socket;
 
     private final int port;
@@ -62,6 +62,29 @@ public class Server {
 
     public Server() {
         this.coreFolder = new File("./");
+
+        /*
+        Signal.handle(new Signal("INT"), new SignalHandler() {
+      // Signal handler method
+      public void handle(Signal signal) {
+        System.out.println("Got signal" + signal);
+      }
+    });
+         */
+
+        {
+            Signal.handle(new Signal("INT"), new SignalHandler() {
+                @Override
+                public void handle(Signal signal) {
+                    if (signal.toString().equals("SIGINT")) {
+                        stop();
+                    }
+                }
+            });
+
+            InputThread thread = new InputThread(this);
+            thread.start();
+        }
 
         File logFolder = new File(coreFolder, "log");
         if (!logFolder.exists()) {
@@ -374,5 +397,10 @@ public class Server {
             message = message.replaceFirst("%s", a.toString());
         }
         System.out.printf("[%s][%s] %s\n", PREFIX, TimeUtil.getTimeStamp(), message);
+    }
+
+    public synchronized void stop() {
+        log("Shutting down!");
+        System.exit(0);
     }
 }
