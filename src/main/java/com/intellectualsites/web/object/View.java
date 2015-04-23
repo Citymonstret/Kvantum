@@ -1,5 +1,7 @@
 package com.intellectualsites.web.object;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,8 +14,34 @@ public abstract class View {
 
     private final Pattern pattern;
     private final String rawPattern;
+    private final Map<String, Object> options;
 
     public View(String pattern) {
+        this(pattern, null);
+    }
+
+    public <T> T getOption(final String s) {
+        return (T) options.get(s);
+    }
+
+    public String getOptionString() {
+        StringBuilder b = new StringBuilder();
+        for (Map.Entry<String, Object> e : options.entrySet()) {
+            b.append(";").append(e.getKey()).append("=").append(e.getValue().toString());
+        }
+        return b.toString();
+    }
+
+    public boolean containsOption(final String s) {
+        return options.containsKey(s);
+    }
+
+    public View(String pattern, Map<String, Object> options) {
+        if (options == null) {
+            this.options = new HashMap<>();
+        } else {
+            this.options = options;
+        }
         this.pattern = Pattern.compile(pattern);
         this.rawPattern = pattern;
     }

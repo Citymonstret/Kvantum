@@ -18,10 +18,15 @@ public class HTMLView extends View {
 
     private final File folder;
 
-    public HTMLView(String filter) {
-        super(filter);
+    public HTMLView(String filter, Map<String, Object> options) {
+        super(filter, options);
 
-        this.folder = new File("./html");
+        if (containsOption("folder")) {
+            this.folder = new File(getOption("folder").toString());
+        } else {
+            this.folder = new File("./html");
+        }
+
         if (!folder.exists()) {
             if (!folder.mkdirs()) {
                 System.out.println("Couldn't create the html folder...");

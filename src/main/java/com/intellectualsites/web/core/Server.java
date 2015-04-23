@@ -12,6 +12,7 @@ import com.intellectualsites.web.views.CSSView;
 import com.intellectualsites.web.views.HTMLView;
 import com.intellectualsites.web.views.JSView;
 import com.intellectualsites.web.views.LessView;
+import org.apache.commons.io.output.TeeOutputStream;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -40,7 +41,7 @@ public class Server {
 
     public static final String PREFIX = "Web";
 
-    public static Pattern variable, comment, include;
+    public static Pattern variable, comment, include, ifStatement;
 
     private Collection<ProviderFactory> providers;
 
@@ -48,28 +49,46 @@ public class Server {
 
     private String hostName;
 
+    private boolean gzip;
+
     private ConfigurationFile configServer, configViews;
 
     static {
-        variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9\\_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
-        comment = Pattern.compile("(\\/\\*[\\S\\s]*?\\*\\/)");
-        include = Pattern.compile("\\{\\{include:([\\/A-Za-z\\.\\-]*)\\}\\}");
+        variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
+        comment = Pattern.compile("(/\\*[\\S\\s]*?\\*/)");
+        include = Pattern.compile("\\{\\{include:([/A-Za-z\\.\\-]*)\\}\\}");
+        ifStatement = Pattern.compile("\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}");
     }
 
     public Server() {
         this.coreFolder = new File("./");
+
+        File logFolder = new File(coreFolder, "log");
+        if (!logFolder.exists()) {
+            logFolder.mkdirs();
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt"));
+            TeeOutputStream out = new TeeOutputStream(System.out, fos);
+            PrintStream ps = new PrintStream(out);
+            System.setOut(ps);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             configServer = new YamlConfiguration("server", new File(new File(coreFolder, "config"), "server.yml"));
             configServer.loadFile();
             configServer.setIfNotExists("port", 80);
             configServer.setIfNotExists("hostname", "localhost");
+            configServer.setIfNotExists("gzip", false);
             configServer.saveFile();
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't load in the config file...", e);
         }
 
         this.port = configServer.get("port");
+        this.gzip = configServer.get("gzip");
         this.hostName = configServer.get("hostname");
 
         this.started = false;
@@ -107,9 +126,15 @@ public class Server {
             if (view.containsKey("type")) {
                 type = view.get("type").toString();
             }
+            Map<String, Object> options;
+            if (view.containsKey("options")) {
+                options = (HashMap<String, Object>) view.get("options");
+            } else {
+                options = new HashMap<>();
+            }
             switch (type.toLowerCase()) {
                 case "html":
-                    this.viewManager.add(new HTMLView(filter));
+                    this.viewManager.add(new HTMLView(filter, options));
                     break;
                 case "css":
                     this.viewManager.add(new CSSView(filter));
@@ -149,7 +174,11 @@ public class Server {
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't start the server...", e);
         }
-
+        if (gzip) {
+            log("GZIP Is Enabled!");
+        } else {
+            log("GZIP Is Disabled, Enable to save bandwidth!");
+        }
         log("Accepting connections on 'http://%s/'", hostName);
         for (; ; ) {
             if (this.stopping) {
@@ -231,6 +260,40 @@ public class Server {
                 ProviderFactory z = view.getFactory(r);
                 if (z != null) {
                     factories.put(z.providerName().toLowerCase(), z);
+                }
+
+                // If
+                matcher = Server.ifStatement.matcher(content);
+                while (matcher.find()) {
+                    String neg = matcher.group(2), namespace = matcher.group(3), variable = matcher.group(4);
+                    if (factories.containsKey(namespace.toLowerCase())) {
+                        VariableProvider p = factories.get(namespace.toLowerCase()).get(r);
+                        if (p != null) {
+                            if (p.contains(variable)) {
+                                Object o = p.get(variable);
+                                boolean b;
+                                if (o instanceof Boolean) {
+                                    b = (Boolean) o;
+                                } else if(o instanceof String) {
+                                    b = o.toString().toLowerCase().equals("true");
+                                } else if(o instanceof Number) {
+                                    b = ((Number) o).intValue() == 1;
+                                } else {
+                                    b = false;
+                                }
+                                if (neg.contains("!")) {
+                                    b = !b;
+                                }
+
+                                if (b) {
+                                    content = content.replace(matcher.group(), matcher.group(5));
+                                } else {
+                                    content = content.replace(matcher.group(), "");
+                                }
+                            }
+                        }
+                    }
+
                 }
 
                 // Replace all variables

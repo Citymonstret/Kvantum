@@ -41,7 +41,7 @@ public class ViewManager {
 
     public void dump(final Server server) {
         for (View view : views) {
-            server.log("> View - Class '%s', Regex: '%s'", view.getClass().getSimpleName(), view.toString());
+            server.log("> View - Class '%s', Regex: '%s'\n\tOptions: %s", view.getClass().getSimpleName(), view.toString(), view.getOptionString());
         }
     }
 }

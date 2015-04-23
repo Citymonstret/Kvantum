@@ -3,7 +3,7 @@
 */
 <!DOCTYPE HTML>
 <html>
-    {{include:/html/header.html}}
+    {{include:/views/html/header.html}}
     <body>
         <p>
             Hello {{session.username || UPPERCASE}}! It's currently {{system.time || LOWERCASE}} and this file is named {{document.name}} - We are currently running on {{cfg.server@port}} and the hostname is
@@ -13,6 +13,12 @@
             This Program is made by {{system.authors || LIST}} /* Will generate a list! :D */
             You an use the following filters as of now: {{system.filters || LIST}}
         </p>
+        {#if system.true}
+            IT WAS TRUE
+        {/if}
+        {#if !system.false}
+            IT WURKS
+        {/if}
     </body>
 </html>
 

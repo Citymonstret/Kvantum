@@ -24,6 +24,8 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
             case "authors":
             case "filters":
             case "time":
+            case "true":
+            case "false":
                 return true;
             default:
                 return false;
@@ -38,6 +40,10 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
                 return new String[] { "Citymonstret", "IntellectualSites" };
             case "filters":
                 return new String[] { "LIST", "UPPERCASE", "LOWERCASE" };
+            case "true":
+                return true;
+            case "false":
+                return false;
             default:
                 return "";
         }

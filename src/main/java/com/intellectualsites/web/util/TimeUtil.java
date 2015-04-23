@@ -11,10 +11,11 @@ import java.util.Locale;
  */
 public class TimeUtil {
 
-    private static SimpleDateFormat HTTPFormat, LogFormat;
+    public static SimpleDateFormat HTTPFormat, LogFormat, LogFileFormat;
     static {
         HTTPFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.US);
         LogFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);
+        LogFileFormat = new SimpleDateFormat("dd MMM yyyy kk-mm-ss", Locale.US);
     }
 
     public static String getTimeStamp() {

@@ -8,6 +8,8 @@ views:
   html:
     filter: (\/)([A-Za-z0-9]*)(.html)?
     type: html
+    options:
+      folder: ./views/html
   javscript:
     filter: (\/assets\/js\/)([A-Za-z0-9]*)(.js)?
     type: javascript
