@@ -44,4 +44,10 @@ public class ViewManager {
             server.log("> View - Class '%s', Regex: '%s'\n\tOptions: %s", view.getClass().getSimpleName(), view.toString(), view.getOptionString());
         }
     }
+
+    public void remove(View view) {
+        if (views.contains(view)) {
+            views.remove(view);
+        }
+    }
 }

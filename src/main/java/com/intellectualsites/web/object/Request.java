@@ -2,6 +2,7 @@ package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.util.CookieManager;
 
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ public class Request {
     private final String raw;
     private Query query;
     private PostRequest postRequest;
+    private Socket socket;
 
     public static class Query {
         private final Method method;
@@ -41,8 +43,10 @@ public class Request {
         }
     }
 
-    public Request(final String request) {
+    public Request(final String request, final Socket socket) {
         this.raw = request;
+        this.socket = socket;
+
         String[] parts = request.split("\\|");
 
         this.headers = new HashMap<String, String>();
@@ -92,7 +96,7 @@ public class Request {
     }
 
     public String buildLog() {
-        return "Request >\n\tUser Agent: " + getHeader("User-Agent") + "\n\tRequest String: " + getHeader("query") + "\n\tHost: " + getHeader("Host") + "\n\tQuery: " + this.query.buildLog();
+        return "Request >\n\tAddress: " + socket.getRemoteSocketAddress().toString() + "\n\tUser Agent: " + getHeader("User-Agent") + "\n\tRequest String: " + getHeader("query") + "\n\tHost: " + getHeader("Host") + "\n\tQuery: " + this.query.buildLog();
     }
 
     public void addMeta(String name, Object var) {

@@ -4,22 +4,24 @@ import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.object.*;
-import com.intellectualsites.web.util.ServerProvider;
-import com.intellectualsites.web.util.SessionManager;
-import com.intellectualsites.web.util.TimeUtil;
-import com.intellectualsites.web.util.ViewManager;
+import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.CSSView;
 import com.intellectualsites.web.views.HTMLView;
 import com.intellectualsites.web.views.JSView;
 import com.intellectualsites.web.views.LessView;
 import org.apache.commons.io.output.TeeOutputStream;
+import ro.fortsoft.pf4j.DefaultPluginManager;
+import ro.fortsoft.pf4j.PluginManager;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,14 +38,14 @@ public class Server {
 
     private final int port;
 
-    private ViewManager viewManager;
+    protected ViewManager viewManager;
     private SessionManager sessionManager;
 
     public static final String PREFIX = "Web";
 
     public static Pattern variable, comment, include, ifStatement;
 
-    private Collection<ProviderFactory> providers;
+    protected Collection<ProviderFactory> providers;
 
     private File coreFolder;
 
@@ -62,16 +64,6 @@ public class Server {
 
     public Server() {
         this.coreFolder = new File("./");
-
-        /*
-        Signal.handle(new Signal("INT"), new SignalHandler() {
-      // Signal handler method
-      public void handle(Signal signal) {
-        System.out.println("Got signal" + signal);
-      }
-    });
-         */
-
         {
             Signal.handle(new Signal("INT"), new SignalHandler() {
                 @Override
@@ -91,6 +83,12 @@ public class Server {
             logFolder.mkdirs();
         }
         try {
+            FileUtils.addToZip(new File(logFolder, "old.zip"), logFolder.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".txt");
+                }
+            }), true);
             FileOutputStream fos = new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt"));
             TeeOutputStream out = new TeeOutputStream(System.out, fos);
             PrintStream ps = new PrintStream(out);
@@ -142,6 +140,7 @@ public class Server {
             throw new RuntimeException("Couldn't load in views");
         }
 
+        log("Loading views...");
         Map<String, Map<String, Object>> views = configViews.get("views");
         for (final Map.Entry<String, Map<String, Object>> entry : views.entrySet()) {
             Map<String, Object> view = entry.getValue();
@@ -183,6 +182,24 @@ public class Server {
         this.providers.add(this.sessionManager);
         this.providers.add(new ServerProvider());
         this.providers.add(ConfigVariableProvider.getInstance());
+
+        loadPlugins();
+    }
+
+    private PluginManager pluginManager;
+    private void loadPlugins() {
+        File file = new File(coreFolder, "plugins");
+        if (!file.exists()) {
+            if (!file.mkdirs()) {
+                log("Couldn't create %s - No plugins were loaded.", file);
+                return;
+            }
+        }
+
+        pluginManager = new DefaultPluginManager(file);
+        pluginManager.loadPlugins();
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
     }
 
     public void start() throws RuntimeException {
@@ -237,7 +254,7 @@ public class Server {
                     e.printStackTrace();
                     return;
                 }
-                Request r = new Request(rRaw.toString());
+                Request r = new Request(rRaw.toString(), remote);
                 log(r.buildLog());
                 View view = viewManager.match(r);
                 Response response = view.generate(r);
@@ -297,13 +314,10 @@ public class Server {
                                 boolean b;
                                 if (o instanceof Boolean) {
                                     b = (Boolean) o;
-                                } else if(o instanceof String) {
+                                } else if (o instanceof String) {
                                     b = o.toString().toLowerCase().equals("true");
-                                } else if(o instanceof Number) {
-                                    b = ((Number) o).intValue() == 1;
-                                } else {
-                                    b = false;
-                                }
+                                } else
+                                    b = o instanceof Number && ((Number) o).intValue() == 1;
                                 if (neg.contains("!")) {
                                     b = !b;
                                 }
@@ -401,6 +415,7 @@ public class Server {
 
     public synchronized void stop() {
         log("Shutting down!");
+        pluginManager.stopPlugins();
         System.exit(0);
     }
 }
