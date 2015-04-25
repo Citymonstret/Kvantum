@@ -48,6 +48,16 @@
                         </code>
                     </div>
                 </div>
+                <div class="example">
+                    Output: {{post.test}}
+                    <form method="POST" action="#">
+                        <input type="text" name="test" placeholder="TEST" required>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            <div class="code">
+                &#123;&#123;post.test&#125;&#125;
+            </div>
                 <div id="if-test">
                     <div class="example">
                         {#if system.true}
@@ -71,7 +81,6 @@
                     </div>
                 </div>
             </p>
-
             <div id="copyright">
                 Copyright &copy; IntellectualSites 2015
             </div>

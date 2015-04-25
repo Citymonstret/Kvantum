@@ -182,6 +182,7 @@ public class Server {
         this.providers.add(this.sessionManager);
         this.providers.add(new ServerProvider());
         this.providers.add(ConfigVariableProvider.getInstance());
+        this.providers.add(new PostProviderFactory());
 
         loadPlugins();
     }
@@ -243,6 +244,7 @@ public class Server {
                 StringBuilder rRaw = new StringBuilder();
                 PrintWriter out = null;
                 BufferedReader input;
+                Request r;
                 try {
                     input = new BufferedReader(new InputStreamReader(remote.getInputStream()));
                     out = new PrintWriter(remote.getOutputStream());
@@ -250,11 +252,22 @@ public class Server {
                     while ((str = input.readLine()) != null && !str.equals("")) {
                         rRaw.append(str).append("|");
                     }
+                    r = new Request(rRaw.toString(), remote);
+                    if (r.getQuery().getMethod() == Method.POST) {
+                        StringBuilder pR = new StringBuilder();
+                        int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
+                        int c = 0;
+                        for (int i = 0; i < cl; i++) {
+                            c = input.read();
+                            pR.append((char) c);
+                        }
+                        r.setPostRequest(new PostRequest(pR.toString()));
+                    }
                 } catch (final Exception e) {
                     e.printStackTrace();
                     return;
                 }
-                Request r = new Request(rRaw.toString(), remote);
+
                 log(r.buildLog());
                 View view = viewManager.match(r);
                 Response response = view.generate(r);
@@ -379,6 +392,8 @@ public class Server {
                                 }
                                 content = content.replace(matcher.group(), o.toString());
                             }
+                        } else {
+                            content = content.replace(matcher.group(), "");
                         }
                     } else {
                         content = content.replace(matcher.group(), "");

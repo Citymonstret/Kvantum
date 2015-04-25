@@ -21,6 +21,10 @@ public class Request {
     private PostRequest postRequest;
     private Socket socket;
 
+    public void setPostRequest(PostRequest postRequest) {
+        this.postRequest = postRequest;
+    }
+
     public static class Query {
         private final Method method;
         private final String resource;
@@ -41,6 +45,10 @@ public class Request {
         public String buildLog() {
             return "Query >\n\t\tMethod: " + method.toString() + "\n\t\tResource: " + resource;
         }
+    }
+
+    public PostRequest getPostRequest() {
+        return this.postRequest;
     }
 
     public Request(final String request, final Socket socket) {
@@ -96,7 +104,7 @@ public class Request {
     }
 
     public String buildLog() {
-        return "Request >\n\tAddress: " + socket.getRemoteSocketAddress().toString() + "\n\tUser Agent: " + getHeader("User-Agent") + "\n\tRequest String: " + getHeader("query") + "\n\tHost: " + getHeader("Host") + "\n\tQuery: " + this.query.buildLog();
+        return "Request >\n\tAddress: " + socket.getRemoteSocketAddress().toString() + "\n\tUser Agent: " + getHeader("User-Agent") + "\n\tRequest String: " + getHeader("query") + "\n\tHost: " + getHeader("Host") + "\n\tQuery: " + this.query.buildLog() + (postRequest != null ? "\n\tPost: " + postRequest.buildLog() : "");
     }
 
     public void addMeta(String name, Object var) {
