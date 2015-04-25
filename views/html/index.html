@@ -1,8 +1,8 @@
-<!DOCTYPE HTML>
-/*
-    @copyright The document is written by Sauilitired
-*/
-<html>
+<!DOCTYPE HTML>{{:
+    [title: IntellectualServer]
+    [author: Sauilitired/Citymonstret]
+    [copyright: IntellectualSites]
+:}}<html>
     {{include:/views/html/header.html}}
     <br>
         <div class="container">
@@ -23,7 +23,6 @@
                     <li>Use filters on those variables</li>
                     <li>Use if statements with the variables</li>
                 </ul>
-
                 <div id="crush-test">
                     <div class="example">
                         Hello {{session.username || UPPERCASE}},
@@ -43,7 +42,7 @@
                             <br>
                             The server is running on port &#123;&#123;cfg.server@port&#125;&#125; and the hostname is &#123;&#123;cfg.server@hostname&#125;&#125;
                             <br>
-                            At the time of rading this we support these filters:
+                            At the time of reading this we support these filters:
                             &#123;&#123;system.filters || LIST&#125;&#125; and the one used was LIST!
                         </code>
                     </div>
@@ -87,7 +86,3 @@
         </div>
     </body>
 </html>
-
-/*
-    This document is used to display some of the features that IntellectualServer is shipped with!
-*/

@@ -10,13 +10,12 @@ import com.intellectualsites.web.core.Server;
 public class Bootstrap {
 
     /**
-     * Boostrap method
+     * Launcher method
      * @param args arguments
      */
     public static void main(String[] args) {
-        // TODO Load configuration options
         try {
-            new Server().start();
+            new Server(true).start();
         } catch(final Exception e) {
             e.printStackTrace();
         }

@@ -17,8 +17,8 @@ public class PostRequest {
         this.request = request;
         this.vars = new HashMap<>();
         for (String s : request.split("&")) {
-            String[] p = request.split("=");
-            vars.put(p[0], p[1]);
+            String[] p = s.split("=");
+            vars.put(p[0], p[1].replace("+", " "));
         }
     }
 

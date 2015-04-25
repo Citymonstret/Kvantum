@@ -43,7 +43,7 @@ public class Server {
 
     public static final String PREFIX = "Web";
 
-    public static Pattern variable, comment, include, ifStatement;
+    public static Pattern variable, comment, include, ifStatement, metaBlock, metaBlockStmt;
 
     protected Collection<ProviderFactory> providers;
 
@@ -60,9 +60,11 @@ public class Server {
         comment = Pattern.compile("(/\\*[\\S\\s]*?\\*/)");
         include = Pattern.compile("\\{\\{include:([/A-Za-z\\.\\-]*)\\}\\}");
         ifStatement = Pattern.compile("\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}");
+        metaBlock = Pattern.compile("\\{\\{:([\\S\\s]*?):\\}\\}");
+        metaBlockStmt = Pattern.compile("\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]");
     }
 
-    public Server() {
+    public Server(boolean standalone) {
         this.coreFolder = new File("./");
         {
             Signal.handle(new Signal("INT"), new SignalHandler() {
@@ -183,8 +185,11 @@ public class Server {
         this.providers.add(new ServerProvider());
         this.providers.add(ConfigVariableProvider.getInstance());
         this.providers.add(new PostProviderFactory());
+        this.providers.add(new MetaProvider());
 
-        loadPlugins();
+        if (standalone) {
+            loadPlugins();
+        }
     }
 
     private PluginManager pluginManager;
@@ -313,6 +318,21 @@ public class Server {
                 ProviderFactory z = view.getFactory(r);
                 if (z != null) {
                     factories.put(z.providerName().toLowerCase(), z);
+                }
+
+                // Meta block
+                matcher = Server.metaBlock.matcher(content);
+                while (matcher.find()) {
+                    // Found meta block<3
+                    String blockContent = matcher.group(1);
+
+                    Matcher m2 = metaBlockStmt.matcher(blockContent);
+                    while (m2.find()) {
+                        // Document meta :D
+                        r.addMeta("doc." + m2.group(1), m2.group(2));
+                    }
+
+                    content = content.replace(matcher.group(), "");
                 }
 
                 // If
