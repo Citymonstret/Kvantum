@@ -7,6 +7,7 @@ import com.intellectualsites.web.object.View;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -18,11 +19,17 @@ public class JSView extends View {
 
     private File folder;
 
-    public JSView(String filter) {
-        super(filter);
-        this.folder = new File("./assets/js");
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
+    public JSView(String filter, Map<String, Object> options) {
+        super(filter, options);
+
+        if (containsOption("folder")) {
+            this.folder = new File(getOption("folder").toString());
+        } else {
+            this.folder = new File("./assets/js");
+        }
+
+        if (!this.folder.exists()) {
+            if (!this.folder.mkdirs()) {
                 System.out.println("Couldn't create the js folder...");
             }
         }

@@ -8,6 +8,7 @@ import org.lesscss.LessCompiler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -21,12 +22,18 @@ public class LessView extends View {
 
     private File folder;
 
-    public LessView(String filter) {
+    public LessView(String filter, Map<String, Object> options) {
         super(filter);
-        this.folder = new File("./assets/less");
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
-                System.out.println("Couldn't create the css folder...");
+
+        if (containsOption("folder")) {
+            this.folder = new File(getOption("folder").toString());
+        } else {
+            this.folder = new File("./assets/less");
+        }
+
+        if (!this.folder.exists()) {
+            if (!this.folder.mkdirs()) {
+                System.out.println("Couldn't create the less folder...");
             }
         }
     }

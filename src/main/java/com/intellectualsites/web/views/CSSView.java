@@ -7,6 +7,7 @@ import com.intellectualsites.web.object.View;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -18,9 +19,15 @@ public class CSSView extends View {
 
     private File folder;
 
-    public CSSView(String filter) {
-        super(filter);
-        this.folder = new File("./assets/css");
+    public CSSView(String filter, Map<String, Object> options) {
+        super(filter, options);
+
+        if (containsOption("folder")) {
+            this.folder = new File(getOption("folder").toString());
+        } else {
+            this.folder = new File("./assets/css");
+        }
+
         if (!folder.exists()) {
             if (!folder.mkdirs()) {
                 System.out.println("Couldn't create the css folder...");

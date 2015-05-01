@@ -3,7 +3,7 @@ package com.intellectualsites.web.util;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.*;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
         this.server = server;
     }
 
-    public Session getSession(final Request r, PrintWriter out) {
+    public Session getSession(final Request r, OutputStream out) {
         Cookie[] cookies = r.getCookies();
         Session session = null;
         for (Cookie cookie : cookies) {
@@ -32,7 +32,11 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
                     session = sessions.get(sessionID);
                 } else {
                     if (out != null) {
-                        out.println("Set-Cookie: session=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+                        try {
+                            out.write(("Set-Cookie: session=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT\n").getBytes());
+                        } catch(final Exception e) {
+                            e.printStackTrace();
+                        }
                         server.log("Deleting invalid session cookie (%s)", cookie.getValue());
                     }
                 }

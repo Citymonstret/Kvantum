@@ -5,10 +5,7 @@ import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.util.*;
-import com.intellectualsites.web.views.CSSView;
-import com.intellectualsites.web.views.HTMLView;
-import com.intellectualsites.web.views.JSView;
-import com.intellectualsites.web.views.LessView;
+import com.intellectualsites.web.views.*;
 import org.apache.commons.io.output.TeeOutputStream;
 import ro.fortsoft.pf4j.DefaultPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
@@ -18,10 +15,7 @@ import sun.misc.SignalHandler;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,9 +45,9 @@ public class Server {
 
     private String hostName;
 
-    private boolean gzip;
-
     private ConfigurationFile configServer, configViews;
+
+    private Map<String, Class<? extends View>> viewBindings;
 
     static {
         variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
@@ -64,7 +58,32 @@ public class Server {
         metaBlockStmt = Pattern.compile("\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]");
     }
 
-    public Server(boolean standalone) {
+    protected Server(boolean standalone) {
+        viewBindings = new HashMap<>();
+        viewBindings.put("html", HTMLView.class);
+        viewBindings.put("css", CSSView.class);
+        viewBindings.put("javascript", JSView.class);
+        viewBindings.put("less", LessView.class);
+        viewBindings.put("img", ImgView.class);
+        viewBindings.put("download", DownloadView.class);
+
+        // Make sure the views are valid :D
+        {
+            List<String> toRemove = new ArrayList<>();
+            for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
+                Class<? extends View> vc = e.getValue();
+                try {
+                    vc.getDeclaredConstructor(String.class, Map.class);
+                } catch(final Exception ex) {
+                    log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
+                    toRemove.add(e.getKey());
+                }
+            }
+            for (String s : toRemove) {
+                viewBindings.remove(s);
+            }
+        }
+
         this.coreFolder = new File("./");
         {
             Signal.handle(new Signal("INT"), new SignalHandler() {
@@ -104,14 +123,12 @@ public class Server {
             configServer.loadFile();
             configServer.setIfNotExists("port", 80);
             configServer.setIfNotExists("hostname", "localhost");
-            configServer.setIfNotExists("gzip", false);
             configServer.saveFile();
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't load in the config file...", e);
         }
 
         this.port = configServer.get("port");
-        this.gzip = configServer.get("gzip");
         this.hostName = configServer.get("hostname");
 
         this.started = false;
@@ -156,21 +173,16 @@ public class Server {
             } else {
                 options = new HashMap<>();
             }
-            switch (type.toLowerCase()) {
-                case "html":
-                    this.viewManager.add(new HTMLView(filter, options));
-                    break;
-                case "css":
-                    this.viewManager.add(new CSSView(filter));
-                    break;
-                case "less":
-                    this.viewManager.add(new LessView(filter));
-                    break;
-                case "javascript":
-                    this.viewManager.add(new JSView(filter));
-                    break;
-                default:
-                    break;
+
+            if (viewBindings.containsKey(type.toLowerCase())) {
+                // Exists :d
+                Class<? extends View> vc = viewBindings.get(type.toLowerCase());
+                try {
+                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
+                    this.viewManager.add(vv);
+                } catch(final Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -220,11 +232,6 @@ public class Server {
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't start the server...", e);
         }
-        if (gzip) {
-            log("GZIP Is Enabled!");
-        } else {
-            log("GZIP Is Disabled, Enable to save bandwidth!");
-        }
         log("Accepting connections on 'http://%s/'", hostName);
         for (; ; ) {
             if (this.stopping) {
@@ -247,12 +254,12 @@ public class Server {
             public void run() {
                 log("Connection Accepted! Sending data...");
                 StringBuilder rRaw = new StringBuilder();
-                PrintWriter out = null;
+                BufferedOutputStream out;
                 BufferedReader input;
                 Request r;
                 try {
                     input = new BufferedReader(new InputStreamReader(remote.getInputStream()));
-                    out = new PrintWriter(remote.getOutputStream());
+                    out = new BufferedOutputStream(remote.getOutputStream());
                     String str;
                     while ((str = input.readLine()) != null && !str.equals("")) {
                         rRaw.append(str).append("|");
@@ -279,151 +286,161 @@ public class Server {
                 // Response headers
                 response.getHeader().apply(out);
                 Session session = sessionManager.getSession(r, out);
-                String content = response.getContent();
-                Matcher matcher;
 
-                // Find includes
-                matcher = Server.include.matcher(content);
-                while (matcher.find()) {
-                    File file = new File(coreFolder, matcher.group(1));
-                    if (file.exists()) {
-                        StringBuilder c = new StringBuilder();
-                        String line;
-                        try {
-                            BufferedReader reader = new BufferedReader(new FileReader(file));
-                            while ((line = reader.readLine()) != null)
-                                c.append(line).append("\n");
-                            reader.close();
-                        } catch (final Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (file.getName().endsWith(".css")) {
-                            content = content.replace(matcher.group(), "<style>\n" + c + "</style>");
+                byte[] bytes;
+
+                if (response.isText()) {
+                    String content = response.getContent();
+                    Matcher matcher;
+
+                    // Find includes
+                    matcher = Server.include.matcher(content);
+                    while (matcher.find()) {
+                        File file = new File(coreFolder, matcher.group(1));
+                        if (file.exists()) {
+                            StringBuilder c = new StringBuilder();
+                            String line;
+                            try {
+                                BufferedReader reader = new BufferedReader(new FileReader(file));
+                                while ((line = reader.readLine()) != null)
+                                    c.append(line).append("\n");
+                                reader.close();
+                            } catch (final Exception e) {
+                                e.printStackTrace();
+                            }
+                            if (file.getName().endsWith(".css")) {
+                                content = content.replace(matcher.group(), "<style>\n" + c + "</style>");
+                            } else {
+                                content = content.replace(matcher.group(), c.toString());
+                            }
                         } else {
-                            content = content.replace(matcher.group(), c.toString());
+                            log("Couldn't find file for '%s'", matcher.group());
                         }
-                    } else {
-                        log("Couldn't find file for '%s'", matcher.group());
                     }
-                }
-                matcher = Server.comment.matcher(content);
-                while (matcher.find()) {
-                    content = content.replace(matcher.group(1), "");
-                }
-
-                Map<String, ProviderFactory> factories = new HashMap<String, ProviderFactory>();
-                for (final ProviderFactory factory : providers) {
-                    factories.put(factory.providerName().toLowerCase(), factory);
-                }
-                ProviderFactory z = view.getFactory(r);
-                if (z != null) {
-                    factories.put(z.providerName().toLowerCase(), z);
-                }
-
-                // Meta block
-                matcher = Server.metaBlock.matcher(content);
-                while (matcher.find()) {
-                    // Found meta block<3
-                    String blockContent = matcher.group(1);
-
-                    Matcher m2 = metaBlockStmt.matcher(blockContent);
-                    while (m2.find()) {
-                        // Document meta :D
-                        r.addMeta("doc." + m2.group(1), m2.group(2));
+                    matcher = Server.comment.matcher(content);
+                    while (matcher.find()) {
+                        content = content.replace(matcher.group(1), "");
                     }
 
-                    content = content.replace(matcher.group(), "");
-                }
+                    Map<String, ProviderFactory> factories = new HashMap<String, ProviderFactory>();
+                    for (final ProviderFactory factory : providers) {
+                        factories.put(factory.providerName().toLowerCase(), factory);
+                    }
+                    ProviderFactory z = view.getFactory(r);
+                    if (z != null) {
+                        factories.put(z.providerName().toLowerCase(), z);
+                    }
 
-                // If
-                matcher = Server.ifStatement.matcher(content);
-                while (matcher.find()) {
-                    String neg = matcher.group(2), namespace = matcher.group(3), variable = matcher.group(4);
-                    if (factories.containsKey(namespace.toLowerCase())) {
-                        VariableProvider p = factories.get(namespace.toLowerCase()).get(r);
-                        if (p != null) {
-                            if (p.contains(variable)) {
-                                Object o = p.get(variable);
-                                boolean b;
-                                if (o instanceof Boolean) {
-                                    b = (Boolean) o;
-                                } else if (o instanceof String) {
-                                    b = o.toString().toLowerCase().equals("true");
-                                } else
-                                    b = o instanceof Number && ((Number) o).intValue() == 1;
-                                if (neg.contains("!")) {
-                                    b = !b;
-                                }
+                    // Meta block
+                    matcher = Server.metaBlock.matcher(content);
+                    while (matcher.find()) {
+                        // Found meta block<3
+                        String blockContent = matcher.group(1);
 
-                                if (b) {
-                                    content = content.replace(matcher.group(), matcher.group(5));
-                                } else {
-                                    content = content.replace(matcher.group(), "");
+                        Matcher m2 = metaBlockStmt.matcher(blockContent);
+                        while (m2.find()) {
+                            // Document meta :D
+                            r.addMeta("doc." + m2.group(1), m2.group(2));
+                        }
+
+                        content = content.replace(matcher.group(), "");
+                    }
+
+                    // If
+                    matcher = Server.ifStatement.matcher(content);
+                    while (matcher.find()) {
+                        String neg = matcher.group(2), namespace = matcher.group(3), variable = matcher.group(4);
+                        if (factories.containsKey(namespace.toLowerCase())) {
+                            VariableProvider p = factories.get(namespace.toLowerCase()).get(r);
+                            if (p != null) {
+                                if (p.contains(variable)) {
+                                    Object o = p.get(variable);
+                                    boolean b;
+                                    if (o instanceof Boolean) {
+                                        b = (Boolean) o;
+                                    } else if (o instanceof String) {
+                                        b = o.toString().toLowerCase().equals("true");
+                                    } else
+                                        b = o instanceof Number && ((Number) o).intValue() == 1;
+                                    if (neg.contains("!")) {
+                                        b = !b;
+                                    }
+
+                                    if (b) {
+                                        content = content.replace(matcher.group(), matcher.group(5));
+                                    } else {
+                                        content = content.replace(matcher.group(), "");
+                                    }
                                 }
                             }
                         }
+
                     }
 
-                }
+                    // Replace all variables
+                    matcher = Server.variable.matcher(content);
+                    while (matcher.find()) {
+                        String provider = matcher.group(1);
+                        String variable = matcher.group(2);
 
-                // Replace all variables
-                matcher = Server.variable.matcher(content);
-                while (matcher.find()) {
-                    String provider = matcher.group(1);
-                    String variable = matcher.group(2);
+                        String filter = "";
+                        if (matcher.group().contains(" || ")) {
+                            filter = matcher.group().split(" \\|\\| ")[1].replace("}}", "");
+                        }
 
-                    String filter = "";
-                    if (matcher.group().contains(" || ")) {
-                        filter = matcher.group().split(" \\|\\| ")[1].replace("}}", "");
-                    }
-
-                    if (factories.containsKey(provider.toLowerCase())) {
-                        VariableProvider p = factories.get(provider.toLowerCase()).get(r);
-                        if (p != null) {
-                            if (p.contains(variable)) {
-                                Object o = p.get(variable);
-                                if (!filter.equals("")) {
-                                    switch (filter) {
-                                        case "UPPERCASE":
-                                            o = o.toString().toUpperCase();
-                                            break;
-                                        case "LOWERCASE":
-                                            o = o.toString().toLowerCase();
-                                            break;
-                                        case "LIST": {
-                                            StringBuilder s = new StringBuilder();
-                                            s.append("<ul>");
-                                            if (o instanceof Object[]) {
-                                                for (Object oo : (Object[]) o) {
-                                                    s.append("<li>").append(oo).append("</li>");
+                        if (factories.containsKey(provider.toLowerCase())) {
+                            VariableProvider p = factories.get(provider.toLowerCase()).get(r);
+                            if (p != null) {
+                                if (p.contains(variable)) {
+                                    Object o = p.get(variable);
+                                    if (!filter.equals("")) {
+                                        switch (filter) {
+                                            case "UPPERCASE":
+                                                o = o.toString().toUpperCase();
+                                                break;
+                                            case "LOWERCASE":
+                                                o = o.toString().toLowerCase();
+                                                break;
+                                            case "LIST": {
+                                                StringBuilder s = new StringBuilder();
+                                                s.append("<ul>");
+                                                if (o instanceof Object[]) {
+                                                    for (Object oo : (Object[]) o) {
+                                                        s.append("<li>").append(oo).append("</li>");
+                                                    }
+                                                } else if (o instanceof Collection) {
+                                                    for (Object oo : (Collection) o) {
+                                                        s.append("<li>").append(oo).append("</li>");
+                                                    }
                                                 }
-                                            } else if (o instanceof Collection) {
-                                                for (Object oo : (Collection) o) {
-                                                    s.append("<li>").append(oo).append("</li>");
-                                                }
+                                                s.append("</ul>");
+                                                o = s.toString();
                                             }
-                                            s.append("</ul>");
-                                            o = s.toString();
-                                        }
-                                        break;
-                                        default:
                                             break;
+                                            default:
+                                                break;
+                                        }
                                     }
+                                    content = content.replace(matcher.group(), o.toString());
                                 }
-                                content = content.replace(matcher.group(), o.toString());
+                            } else {
+                                content = content.replace(matcher.group(), "");
                             }
                         } else {
                             content = content.replace(matcher.group(), "");
                         }
-                    } else {
-                        content = content.replace(matcher.group(), "");
                     }
+                    bytes = content.getBytes();
+                } else {
+                    bytes = response.getBytes();
                 }
-                for (String s : content.split("\n")) {
-                    out.println(s);
+                try {
+                    out.write(bytes);
+                    out.flush();
+                } catch(final Exception e) {
+                    e.printStackTrace();
                 }
-                // Flush<3
-                out.flush();
+
                 try {
                     input.close();
                 } catch (final Exception e) {

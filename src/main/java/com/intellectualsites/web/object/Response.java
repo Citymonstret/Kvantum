@@ -12,6 +12,8 @@ public class Response {
     private Header header;
     private String content;
     private final View parent;
+    private boolean isText;
+    private byte[] bytes;
 
     public Response(final View parent) {
         this.parent = parent;
@@ -22,10 +24,21 @@ public class Response {
                 .set("Status", "200 OK")
                 .set("X-Powered-By", "Java/IntellectualServer 1.0");
         this.content = "";
+        this.bytes = new byte[0];
+    }
+
+    public void setBytes(final byte[] bytes) {
+        this.bytes = bytes;
+        this.isText = false;
+    }
+
+    public byte[] getBytes() {
+        return this.bytes;
     }
 
     public void setContent(final String content) {
         this.content = content;
+        this.isText = true;
     }
 
     public void setHeader(final Header header) {
@@ -38,5 +51,9 @@ public class Response {
 
     public String getContent() {
         return this.content;
+    }
+
+    public boolean isText() {
+        return isText;
     }
 }

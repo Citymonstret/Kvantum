@@ -1,6 +1,6 @@
 package com.intellectualsites.web.object;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,15 +19,19 @@ public class Header {
         return this;
     }
 
-    public void apply(final PrintWriter out) {
-        // We need to show that we are sending real content! :D
-        out.println("HTTP/1.1 " + this.status);
-        for (final Map.Entry<String, String> entry : this.headers.entrySet()) {
-            out.println(entry.getKey() + ": " + entry.getValue());
+    public void apply(final OutputStream out) {
+        try {
+            // We need to show that we are sending real content! :D
+            out.write(("HTTP/1.1 " + this.status + "\n").getBytes());
+            for (final Map.Entry<String, String> entry : this.headers.entrySet()) {
+                out.write((entry.getKey() + ": " + entry.getValue() + "\n").getBytes());
+            }
+            // Print one empty line to indicate that the header sending is finished, this is important as the content would otherwise
+            // be classed as headers, which really isn't optimal <3
+            out.write("\n".getBytes());
+        } catch(final Exception e) {
+            e.printStackTrace();
         }
-        // Print one empty line to indicate that the header sending is finished, this is important as the content would otherwise
-        // be classed as headers, which really isn't optimal <3
-        out.println();
     }
 
     public String[] dump() {

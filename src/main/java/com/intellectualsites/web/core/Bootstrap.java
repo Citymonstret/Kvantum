@@ -1,6 +1,4 @@
-package com.intellectualsites.web;
-
-import com.intellectualsites.web.core.Server;
+package com.intellectualsites.web.core;
 
 /**
  * Created 2015-04-19 for IntellectualServer
@@ -14,8 +12,12 @@ public class Bootstrap {
      * @param args arguments
      */
     public static void main(String[] args) {
+        startServer(true);
+    }
+
+    public static void startServer(boolean standalone) {
         try {
-            new Server(true).start();
+            new Server(standalone).start();
         } catch(final Exception e) {
             e.printStackTrace();
         }
