@@ -21,10 +21,16 @@ public class LessView extends View {
     public static LessCompiler compiler;
 
     private File folder;
+    private int buffer;
 
     public LessView(String filter, Map<String, Object> options) {
         super(filter);
 
+        if (containsOption("buffer")) {
+            this.buffer = getOption("buffer");
+        } else {
+            this.buffer = 1024 * 64;
+        }
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
@@ -53,7 +59,7 @@ public class LessView extends View {
         File file = new File(folder, r.getMeta("less_file").toString());
         StringBuilder document = new StringBuilder();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line).append("\n");

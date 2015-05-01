@@ -17,10 +17,16 @@ import java.util.regex.Matcher;
 public class HTMLView extends View {
 
     private final File folder;
+    private final int buffer;
 
     public HTMLView(String filter, Map<String, Object> options) {
         super(filter, options);
 
+        if (containsOption("buffer")) {
+            this.buffer = getOption("buffer");
+        } else {
+            this.buffer = 1024 * 64;
+        }
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
@@ -49,7 +55,7 @@ public class HTMLView extends View {
         File file = new File(folder, r.getMeta("html_file") + ".html");
         StringBuilder document = new StringBuilder();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line).append("\n");

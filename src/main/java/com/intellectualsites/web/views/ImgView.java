@@ -17,10 +17,16 @@ import java.util.regex.Matcher;
 public class ImgView extends View {
 
     private File folder;
+    private int buffer;
 
     public ImgView(String filter, Map<String, Object> options) {
         super(filter, options);
 
+        if (containsOption("buffer")) {
+            this.buffer = getOption("buffer");
+        } else {
+            this.buffer = 1024 * 64;
+        }
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
@@ -59,7 +65,7 @@ public class ImgView extends View {
         File file = new File(folder, r.getMeta("img_file").toString());
         byte[] bytes = new byte[0];
         try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), buffer);
             bytes = IOUtils.toByteArray(stream);
             stream.close();
         } catch(final Exception e) {

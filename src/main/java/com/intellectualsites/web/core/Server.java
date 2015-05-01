@@ -45,6 +45,8 @@ public class Server {
 
     private String hostName;
 
+    private int bufferIn, bufferOut;
+
     private ConfigurationFile configServer, configViews;
 
     private Map<String, Class<? extends View>> viewBindings;
@@ -123,6 +125,8 @@ public class Server {
             configServer.loadFile();
             configServer.setIfNotExists("port", 80);
             configServer.setIfNotExists("hostname", "localhost");
+            configServer.setIfNotExists("buffer.in", 1024 * 1024); // 16 mb
+            configServer.setIfNotExists("buffer.out", 1024 * 1024);
             configServer.saveFile();
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't load in the config file...", e);
@@ -130,6 +134,8 @@ public class Server {
 
         this.port = configServer.get("port");
         this.hostName = configServer.get("hostname");
+        this.bufferIn = configServer.get("buffer.in");
+        this.bufferOut = configServer.get("buffer.out");
 
         this.started = false;
         this.stopping = false;
@@ -233,6 +239,9 @@ public class Server {
             throw new RuntimeException("Couldn't start the server...", e);
         }
         log("Accepting connections on 'http://%s/'", hostName);
+        {
+            log("Output buffer size: %skb | Input buffer size: %skb", bufferOut / 1024, bufferIn / 1024);
+        }
         for (; ; ) {
             if (this.stopping) {
                 // Stop the server gracefully :D
@@ -258,8 +267,8 @@ public class Server {
                 BufferedReader input;
                 Request r;
                 try {
-                    input = new BufferedReader(new InputStreamReader(remote.getInputStream()));
-                    out = new BufferedOutputStream(remote.getOutputStream());
+                    input = new BufferedReader(new InputStreamReader(remote.getInputStream()), bufferIn);
+                    out = new BufferedOutputStream(remote.getOutputStream(), bufferOut);
                     String str;
                     while ((str = input.readLine()) != null && !str.equals("")) {
                         rRaw.append(str).append("|");
