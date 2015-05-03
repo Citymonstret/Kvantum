@@ -3,6 +3,9 @@ package com.intellectualsites.web.core;
 import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.YamlConfiguration;
+import com.intellectualsites.web.events.EventManager;
+import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
+import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
@@ -60,31 +63,47 @@ public class Server {
         metaBlockStmt = Pattern.compile("\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]");
     }
 
-    protected Server(boolean standalone) {
+    {
         viewBindings = new HashMap<>();
-        viewBindings.put("html", HTMLView.class);
-        viewBindings.put("css", CSSView.class);
-        viewBindings.put("javascript", JSView.class);
-        viewBindings.put("less", LessView.class);
-        viewBindings.put("img", ImgView.class);
-        viewBindings.put("download", DownloadView.class);
+        providers = new ArrayList<>();
+    }
 
-        // Make sure the views are valid :D
-        {
-            List<String> toRemove = new ArrayList<>();
-            for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
-                Class<? extends View> vc = e.getValue();
-                try {
-                    vc.getDeclaredConstructor(String.class, Map.class);
-                } catch(final Exception ex) {
-                    log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
-                    toRemove.add(e.getKey());
-                }
-            }
-            for (String s : toRemove) {
-                viewBindings.remove(s);
+    public void addViewbinding(final String key, final Class<? extends View> c) {
+        viewBindings.put(key, c);
+    }
+
+    private void validateViews() {
+        List<String> toRemove = new ArrayList<>();
+        for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
+            Class<? extends View> vc = e.getValue();
+            try {
+                vc.getDeclaredConstructor(String.class, Map.class);
+            } catch(final Exception ex) {
+                log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
+                toRemove.add(e.getKey());
             }
         }
+        for (String s : toRemove) {
+            viewBindings.remove(s);
+        }
+    }
+
+    protected Server(boolean standalone) {
+        addViewbinding("html", HTMLView.class);
+        addViewbinding("css", CSSView.class);
+        addViewbinding("javascript", JSView.class);
+        addViewbinding("less", LessView.class);
+        addViewbinding("img", ImgView.class);
+        addViewbinding("download", DownloadView.class);
+
+        if (standalone) {
+            loadPlugins();
+        }
+        EventManager.getInstance().bake();
+        EventManager.getInstance().handle(new StartupEvent(this));
+
+
+        validateViews();
 
         this.coreFolder = new File("./");
         {
@@ -194,20 +213,15 @@ public class Server {
 
         viewManager.dump(this);
 
-        // Allow .html Files!
-        // this.viewManager.add(new CSSView());
-        // this.viewManager.add(new HTMLView("(\\/)([A-Za-z0-9]*)(.html)?"));
-
-        this.providers = new ArrayList<ProviderFactory>();
         this.providers.add(this.sessionManager);
         this.providers.add(new ServerProvider());
         this.providers.add(ConfigVariableProvider.getInstance());
         this.providers.add(new PostProviderFactory());
         this.providers.add(new MetaProvider());
+    }
 
-        if (standalone) {
-            loadPlugins();
-        }
+    public void addProviderFactory(final ProviderFactory factory) {
+        this.providers.add(factory);
     }
 
     private PluginManager pluginManager;
@@ -476,6 +490,7 @@ public class Server {
 
     public synchronized void stop() {
         log("Shutting down!");
+        EventManager.getInstance().handle(new ShutdownEvent(this));
         pluginManager.stopPlugins();
         System.exit(0);
     }
