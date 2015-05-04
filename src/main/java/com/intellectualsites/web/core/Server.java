@@ -3,6 +3,7 @@ package com.intellectualsites.web.core;
 import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.YamlConfiguration;
+import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
@@ -29,7 +30,7 @@ import java.util.regex.Pattern;
  */
 public class Server {
 
-    private boolean started;
+    private boolean started, standalone;
     public boolean stopping;
     private ServerSocket socket;
 
@@ -40,7 +41,7 @@ public class Server {
 
     public static final String PREFIX = "Web";
 
-    public static Pattern variable, comment, include, ifStatement, metaBlock, metaBlockStmt;
+    public static Pattern variable, comment, include, ifStatement, metaBlock, metaBlockStmt, foreachBlock;
 
     protected Collection<ProviderFactory> providers;
 
@@ -54,6 +55,8 @@ public class Server {
 
     private Map<String, Class<? extends View>> viewBindings;
 
+    private EventCaller eventCaller;
+
     static {
         variable = Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}");
         comment = Pattern.compile("(/\\*[\\S\\s]*?\\*/)");
@@ -61,6 +64,7 @@ public class Server {
         ifStatement = Pattern.compile("\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}");
         metaBlock = Pattern.compile("\\{\\{:([\\S\\s]*?):\\}\\}");
         metaBlockStmt = Pattern.compile("\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]");
+        foreachBlock = Pattern.compile("\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([\\s\\S]*)\\{/foreach\\}");
     }
 
     {
@@ -88,22 +92,30 @@ public class Server {
         }
     }
 
+    protected void handleEvent(final Event event) {
+        if (standalone) {
+            EventManager.getInstance().handle(event);
+        } else {
+            if (eventCaller != null) {
+                eventCaller.callEvent(event);
+            } else {
+                log("STANDALONE = TRUE; but there is no alternate event caller set");
+            }
+        }
+    }
+
+    public void setEventCaller(final EventCaller caller) {
+        this.eventCaller = caller;
+    }
+
     protected Server(boolean standalone) {
+        this.standalone = standalone;
         addViewbinding("html", HTMLView.class);
         addViewbinding("css", CSSView.class);
         addViewbinding("javascript", JSView.class);
         addViewbinding("less", LessView.class);
         addViewbinding("img", ImgView.class);
         addViewbinding("download", DownloadView.class);
-
-        if (standalone) {
-            loadPlugins();
-        }
-        EventManager.getInstance().bake();
-        EventManager.getInstance().handle(new StartupEvent(this));
-
-
-        validateViews();
 
         this.coreFolder = new File("./");
         {
@@ -184,35 +196,6 @@ public class Server {
             throw new RuntimeException("Couldn't load in views");
         }
 
-        log("Loading views...");
-        Map<String, Map<String, Object>> views = configViews.get("views");
-        for (final Map.Entry<String, Map<String, Object>> entry : views.entrySet()) {
-            Map<String, Object> view = entry.getValue();
-            String type = "html", filter = view.get("filter").toString();
-            if (view.containsKey("type")) {
-                type = view.get("type").toString();
-            }
-            Map<String, Object> options;
-            if (view.containsKey("options")) {
-                options = (HashMap<String, Object>) view.get("options");
-            } else {
-                options = new HashMap<>();
-            }
-
-            if (viewBindings.containsKey(type.toLowerCase())) {
-                // Exists :d
-                Class<? extends View> vc = viewBindings.get(type.toLowerCase());
-                try {
-                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
-                    this.viewManager.add(vv);
-                } catch(final Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        viewManager.dump(this);
-
         this.providers.add(this.sessionManager);
         this.providers.add(new ServerProvider());
         this.providers.add(ConfigVariableProvider.getInstance());
@@ -244,6 +227,42 @@ public class Server {
         if (this.started) {
             throw new RuntimeException("Cannot start the server when it's already started...");
         }
+
+        if (standalone) {
+            loadPlugins();
+            EventManager.getInstance().bake();
+        }
+        handleEvent(new StartupEvent(this));
+        validateViews();
+        log("Loading views...");
+        Map<String, Map<String, Object>> views = configViews.get("views");
+        for (final Map.Entry<String, Map<String, Object>> entry : views.entrySet()) {
+            Map<String, Object> view = entry.getValue();
+            String type = "html", filter = view.get("filter").toString();
+            if (view.containsKey("type")) {
+                type = view.get("type").toString();
+            }
+            Map<String, Object> options;
+            if (view.containsKey("options")) {
+                options = (HashMap<String, Object>) view.get("options");
+            } else {
+                options = new HashMap<>();
+            }
+
+            if (viewBindings.containsKey(type.toLowerCase())) {
+                // Exists :d
+                Class<? extends View> vc = viewBindings.get(type.toLowerCase());
+                try {
+                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
+                    this.viewManager.add(vv);
+                } catch(final Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        viewManager.dump(this);
+
         this.started = true;
         log("Starting the web server on port %s", this.port);
         try {
@@ -398,6 +417,42 @@ public class Server {
                             }
                         }
 
+                    }
+
+                    // \{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\}([\s\S]*)\{\/foreach\}
+                    matcher = Server.foreachBlock.matcher(content);
+                    while (matcher.find()) {
+                        String provider = matcher.group(1);
+                        String variable = matcher.group(2);
+                        String variableName = matcher.group(3);
+                        String forContent = matcher.group(4);
+
+                        if (factories.containsKey(provider.toLowerCase())) {
+                            VariableProvider p = factories.get(provider.toLowerCase()).get(r);
+                            if (p != null) {
+                                if (!p.contains(variable)) {
+                                    content = content.replace(matcher.group(), "");
+                                } else {
+                                    Object o = p.get(variable);
+
+                                    StringBuilder totalContent = new StringBuilder();
+                                    if (o instanceof Object[]) {
+                                        for (Object oo : (Object[]) o) {
+                                            totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                                        }
+                                    } else if (o instanceof Collection) {
+                                        for (Object oo : (Collection) o) {
+                                            totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                                        }
+                                    }
+                                    content = content.replace(matcher.group(), totalContent.toString());
+                                }
+                            } else {
+                                content = content.replace(matcher.group(), "");
+                            }
+                        }  else {
+                            content = content.replace(matcher.group(), "");
+                        }
                     }
 
                     // Replace all variables

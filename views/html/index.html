@@ -33,6 +33,17 @@
                         <br>
                         At the time of reading this we support these filters:
                         {{system.filters || LIST}} and the one used was LIST!
+                        <br>
+                        <br>
+                        FOREACH ATTEMPT
+                        <br>
+
+                        <ol>
+                        {#foreach system.filters -> filter}
+                            <li>{{filter}}</li>
+                        {/foreach}
+                        </ol>
+
                     </div>
                     <div class="code">
                         <code id="explanation">

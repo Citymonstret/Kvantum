@@ -15,11 +15,14 @@ public class Bootstrap {
         startServer(true);
     }
 
-    public static void startServer(boolean standalone) {
+    public static Server startServer(boolean standalone) {
         try {
-            new Server(standalone).start();
+            Server server = new Server(standalone);
+            server.start();
+            return server;
         } catch(final Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

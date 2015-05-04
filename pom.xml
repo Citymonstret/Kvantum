@@ -45,7 +45,18 @@
     <modules>
         <module>ServerPluginText</module>
     </modules>
+    <repositories>
+        <repository>
+            <id>techcable-repo</id> <!-- Just leave the repositories section alone or bukkit won't work -->
+            <url>http://repo.techcable.net/content/groups/public/</url>
+        </repository>
+    </repositories>
     <dependencies>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.7.10-R0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>ro.fortsoft.pf4j</groupId>
             <artifactId>pf4j</artifactId>
