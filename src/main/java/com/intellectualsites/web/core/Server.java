@@ -49,6 +49,8 @@ public class Server {
 
     private String hostName;
 
+    private boolean ipv4;
+
     private int bufferIn, bufferOut;
 
     private ConfigurationFile configServer, configViews;
@@ -158,6 +160,7 @@ public class Server {
             configServer.setIfNotExists("hostname", "localhost");
             configServer.setIfNotExists("buffer.in", 1024 * 1024); // 16 mb
             configServer.setIfNotExists("buffer.out", 1024 * 1024);
+            configServer.setIfNotExists("ipv4", false);
             configServer.saveFile();
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't load in the config file...", e);
@@ -167,6 +170,7 @@ public class Server {
         this.hostName = configServer.get("hostname");
         this.bufferIn = configServer.get("buffer.in");
         this.bufferOut = configServer.get("buffer.out");
+        this.ipv4 = configServer.get("ipv4");
 
         this.started = false;
         this.stopping = false;
@@ -262,6 +266,11 @@ public class Server {
         }
 
         viewManager.dump(this);
+
+        if (this.ipv4) {
+            log("ipv4 is enabled - Using IPv4 stack");
+            System.setProperty("java.net.preferIPv4Stack" , "true");
+        }
 
         this.started = true;
         log("Starting the web server on port %s", this.port);

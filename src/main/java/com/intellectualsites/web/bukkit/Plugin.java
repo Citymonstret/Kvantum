@@ -26,6 +26,8 @@ public class Plugin extends JavaPlugin implements Listener {
         server = Bootstrap.startServer(true);
         server.setEventCaller(new BukkitEventCaller());
 
+        Bukkit.getPluginManager().registerEvents(this, this);
+
         getLogger().log(Level.INFO, "The web server is starting in 15 seconds...");
 
         final Server finalized = this.server;
@@ -35,6 +37,7 @@ public class Plugin extends JavaPlugin implements Listener {
                 finalized.start();
             }
         }, 20l * 15);
+
     }
 
     protected class BukkitEventCaller extends EventCaller {

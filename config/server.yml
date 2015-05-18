@@ -1,5 +1,7 @@
+authbind: true
 hostname: localhost
-port: 80
+ipv4: false
+port: 8080
 gzip: true
 buffer.in: 1048576
 buffer: 134217728
