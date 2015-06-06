@@ -13,6 +13,12 @@ import ro.fortsoft.pf4j.Plugin;
 public class ServerAPI {
 
     private static ServerAPI instance;
+
+    /**
+     * Get the server api instance
+     *
+     * @return WebServer API instance
+     */
     public static ServerAPI instance() {
         return instance;
     }

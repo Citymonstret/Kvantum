@@ -61,6 +61,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         }
     }
 
+    @SuppressWarnings("ALL")
     @Override
     public void loadFile() {
         try {
@@ -80,6 +81,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         this.map.put(key, value);
     }
 
+    @SuppressWarnings("ALL")
     @Override
     public <T> T get(String key) {
         if (map.containsKey(key)) {

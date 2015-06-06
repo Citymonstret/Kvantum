@@ -22,3 +22,6 @@ views:
   download:
     filter: (\/assets\/download\/)([A-Za-z0-9]*)(.zip|.txt|.pdf)?
     type: download
+  redirect:
+    filter: \/redirect\/([A-Za-z0-9]*)
+    type: redirect
