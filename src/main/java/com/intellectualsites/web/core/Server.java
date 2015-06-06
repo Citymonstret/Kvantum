@@ -21,23 +21,34 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * The core web server
+ * The core server
+ * <p>
+ * TODO: Make an interface implementation
  *
  * @author Citymonstret
  */
 public class Server {
 
     private static Server instance;
+
+    /**
+     * Get THE instance of the server
+     *
+     * @return this, literally... this!
+     */
     public static Server getInstance() {
         return instance;
     }
 
     private boolean started, standalone;
+
+    /**
+     * Is the server stopping?
+     */
     public boolean stopping;
+
     private ServerSocket socket;
 
     private final int port;
@@ -45,12 +56,21 @@ public class Server {
     protected ViewManager viewManager;
     private SessionManager sessionManager;
 
+    /**
+     * The logging prefix
+     */
     public static final String PREFIX = "Web";
 
+    /**
+     * The Crush syntax particles
+     */
     public Set<Syntax> syntaxes;
 
     protected Collection<ProviderFactory> providers;
 
+    /**
+     * The folder from which everything is based
+     */
     public File coreFolder;
 
     private String hostName;
@@ -70,6 +90,13 @@ public class Server {
         providers = new ArrayList<>();
     }
 
+    /**
+     * Add a view binding to the engine
+     *
+     * @param key Binding Key
+     * @param c   The View Class
+     * @see #validateViews()
+     */
     public void addViewbinding(final String key, final Class<? extends View> c) {
         viewBindings.put(key, c);
     }
@@ -80,7 +107,7 @@ public class Server {
             Class<? extends View> vc = e.getValue();
             try {
                 vc.getDeclaredConstructor(String.class, Map.class);
-            } catch(final Exception ex) {
+            } catch (final Exception ex) {
                 log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
                 toRemove.add(e.getKey());
             }
@@ -92,16 +119,24 @@ public class Server {
 
     protected void handleEvent(final Event event) {
         if (standalone) {
+            // Use the internal event handler only
+            // when running as a standalone app
             EventManager.getInstance().handle(event);
         } else {
             if (eventCaller != null) {
                 eventCaller.callEvent(event);
             } else {
+                // Oi... This ain't supposed to happen!
                 log("STANDALONE = TRUE; but there is no alternate event caller set");
             }
         }
     }
 
+    /**
+     * Set the engine event caller
+     *
+     * @param caller New Event Caller
+     */
     public void setEventCaller(final EventCaller caller) {
         this.eventCaller = caller;
     }
@@ -140,7 +175,7 @@ public class Server {
 
         File logFolder = new File(coreFolder, "log");
         if (!logFolder.exists()) {
-            if(!logFolder.mkdirs()) {
+            if (!logFolder.mkdirs()) {
                 log("Couldn't create the log folder");
             }
         }
@@ -261,7 +296,6 @@ public class Server {
         if (this.started) {
             throw new RuntimeException("Cannot start the server when it's already started...");
         }
-
         if (standalone) {
             loadPlugins();
             EventManager.getInstance().bake();
@@ -289,7 +323,7 @@ public class Server {
                 try {
                     View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
                     this.viewManager.add(vv);
-                } catch(final Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -299,7 +333,7 @@ public class Server {
 
         if (this.ipv4) {
             log("ipv4 is enabled - Using IPv4 stack");
-            System.setProperty("java.net.preferIPv4Stack" , "true");
+            System.setProperty("java.net.preferIPv4Stack", "true");
         }
 
         this.started = true;
@@ -338,19 +372,25 @@ public class Server {
         new Thread() {
             @Override
             public void run() {
+                // TODO Make configurable
+                // Might get overly spammy
                 log("Connection Accepted! Sending data...");
                 StringBuilder rRaw = new StringBuilder();
                 BufferedOutputStream out;
                 BufferedReader input;
                 Request r;
                 try {
+                    // Let's read from the socket :D
                     input = new BufferedReader(new InputStreamReader(remote.getInputStream()), bufferIn);
+                    // And... write!
                     out = new BufferedOutputStream(remote.getOutputStream(), bufferOut);
                     String str;
                     while ((str = input.readLine()) != null && !str.equals("")) {
                         rRaw.append(str).append("|");
                     }
                     r = new Request(rRaw.toString(), remote);
+                    // This is horrible, and it has to be redone!
+                    // TODO: Remake!
                     if (r.getQuery().getMethod() == Method.POST) {
                         StringBuilder pR = new StringBuilder();
                         int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
@@ -365,38 +405,42 @@ public class Server {
                     e.printStackTrace();
                     return;
                 }
-
+                // TODO: Make configurable
                 log(r.buildLog());
+                // Get the view
                 View view = viewManager.match(r);
+                // And generate the response
                 Response response = view.generate(r);
                 // Response headers
                 response.getHeader().apply(out);
-
                 Session session = sessionManager.getSession(r, out);
                 if (session != null) {
                     // TODO: Session stuff
                     session.set("existing", "true");
                 }
-
                 byte[] bytes;
-
                 if (response.isText()) {
+                    // Let's make a copy of the content before
+                    // getting the bytes
                     String content = response.getContent();
-
+                    // Provider factories are fun, and so is the
+                    // global map. But we also need the view
+                    // specific ones!
                     Map<String, ProviderFactory> factories = new HashMap<>();
                     for (final ProviderFactory factory : providers) {
                         factories.put(factory.providerName().toLowerCase(), factory);
                     }
+                    // Now make use of the view specific ProviderFactory
                     ProviderFactory z = view.getFactory(r);
                     if (z != null) {
                         factories.put(z.providerName().toLowerCase(), z);
                     }
-
-                    for(Syntax syntax : syntaxes) {
+                    // This is how the crush engine works.
+                    // Quite simple, yet powerful!
+                    for (Syntax syntax : syntaxes) {
                         content = syntax.handle(content, r, factories);
-                        log("Currently handling %s", syntax);
                     }
-
+                    // Now, finally, let's get the bytes.
                     bytes = content.getBytes();
                 } else {
                     bytes = response.getBytes();
@@ -404,7 +448,7 @@ public class Server {
                 try {
                     out.write(bytes);
                     out.flush();
-                } catch(final Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
                 }
 
@@ -419,7 +463,7 @@ public class Server {
 
     /**
      * The core tick method
-     *
+     * <p>
      * (runs the async socket accept)
      *
      * @see #runAsync(Socket)
@@ -436,7 +480,7 @@ public class Server {
      * Log a message
      *
      * @param message String message to log
-     * @param args Arguments to be sent (replaces %s with arg#toString)
+     * @param args    Arguments to be sent (replaces %s with arg#toString)
      */
     public void log(String message, final Object... args) {
         for (final Object a : args) {
