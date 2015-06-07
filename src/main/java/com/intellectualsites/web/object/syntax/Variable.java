@@ -1,19 +1,31 @@
 package com.intellectualsites.web.object.syntax;
 
-import com.intellectualsites.web.object.ProviderFactory;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Syntax;
-import com.intellectualsites.web.object.VariableProvider;
+import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.object.filter.List;
+import com.intellectualsites.web.object.filter.Lowercase;
+import com.intellectualsites.web.object.filter.Uppercase;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Variable extends Syntax {
 
+    private Map<String, Filter> filters;
+
     public Variable() {
         super(Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}"));
+        filters = new HashMap<>();
+        Set<Filter> preFilters = new LinkedHashSet<>();
+        preFilters.add(new Uppercase());
+        preFilters.add(new Lowercase());
+        preFilters.add(new List());
+        for (final Filter filter : preFilters) {
+            filters.put(filter.toString(), filter);
+        }
     }
 
     @Override
@@ -33,32 +45,7 @@ public class Variable extends Syntax {
                     if (p.contains(variable)) {
                         Object o = p.get(variable);
                         if (!filter.equals("")) {
-                            switch (filter) {
-                                case "UPPERCASE":
-                                    o = o.toString().toUpperCase();
-                                    break;
-                                case "LOWERCASE":
-                                    o = o.toString().toLowerCase();
-                                    break;
-                                case "LIST": {
-                                    StringBuilder s = new StringBuilder();
-                                    s.append("<ul>");
-                                    if (o instanceof Object[]) {
-                                        for (Object oo : (Object[]) o) {
-                                            s.append("<li>").append(oo).append("</li>");
-                                        }
-                                    } else if (o instanceof Collection) {
-                                        for (Object oo : (Collection) o) {
-                                            s.append("<li>").append(oo).append("</li>");
-                                        }
-                                    }
-                                    s.append("</ul>");
-                                    o = s.toString();
-                                }
-                                break;
-                                default:
-                                    break;
-                            }
+                            o = filters.get(filter.toUpperCase()).handle(o);
                         }
                         content = content.replace(matcher.group(), o.toString());
                     }
