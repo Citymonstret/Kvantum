@@ -13,7 +13,7 @@ public class Session implements VariableProvider {
     private Map<String, Object> sessionStorage;
 
     public Session() {
-        sessionStorage = new HashMap<String, Object>();
+        sessionStorage = new HashMap<>();
     }
 
     public boolean contains(String variable) {

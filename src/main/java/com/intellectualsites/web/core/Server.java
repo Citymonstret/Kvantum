@@ -31,114 +31,40 @@ import java.util.*;
  */
 public class Server {
 
-    private static Server instance;
-
-    /**
-     * Get THE instance of the server
-     *
-     * @return this, literally... this!
-     */
-    public static Server getInstance() {
-        return instance;
-    }
-
-    private boolean started, standalone;
-
-    /**
-     * Is the server stopping?
-     */
-    public boolean stopping;
-
-    private ServerSocket socket;
-
-    private final int port;
-
-    protected ViewManager viewManager;
-    private SessionManager sessionManager;
-
     /**
      * The logging prefix
      */
     public static final String PREFIX = "Web";
-
+    private static Server instance;
+    private final int port;
+    /**
+     * Is the server stopping?
+     */
+    public boolean stopping;
     /**
      * The Crush syntax particles
      */
     public Set<Syntax> syntaxes;
-
-    protected Collection<ProviderFactory> providers;
-
     /**
      * The folder from which everything is based
      */
     public File coreFolder;
-
+    protected ViewManager viewManager;
+    protected Collection<ProviderFactory> providers;
+    private boolean started, standalone;
+    private ServerSocket socket;
+    private SessionManager sessionManager;
     private String hostName;
-
     private boolean ipv4;
-
     private int bufferIn, bufferOut;
-
     private ConfigurationFile configViews;
-
     private Map<String, Class<? extends View>> viewBindings;
-
     private EventCaller eventCaller;
+    private PluginManager pluginManager;
 
     {
         viewBindings = new HashMap<>();
         providers = new ArrayList<>();
-    }
-
-    /**
-     * Add a view binding to the engine
-     *
-     * @param key Binding Key
-     * @param c   The View Class
-     * @see #validateViews()
-     */
-    public void addViewbinding(final String key, final Class<? extends View> c) {
-        viewBindings.put(key, c);
-    }
-
-    private void validateViews() {
-        List<String> toRemove = new ArrayList<>();
-        for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
-            Class<? extends View> vc = e.getValue();
-            try {
-                vc.getDeclaredConstructor(String.class, Map.class);
-            } catch (final Exception ex) {
-                log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
-                toRemove.add(e.getKey());
-            }
-        }
-        for (String s : toRemove) {
-            viewBindings.remove(s);
-        }
-    }
-
-    protected void handleEvent(final Event event) {
-        if (standalone) {
-            // Use the internal event handler only
-            // when running as a standalone app
-            EventManager.getInstance().handle(event);
-        } else {
-            if (eventCaller != null) {
-                eventCaller.callEvent(event);
-            } else {
-                // Oi... This ain't supposed to happen!
-                log("STANDALONE = TRUE; but there is no alternate event caller set");
-            }
-        }
-    }
-
-    /**
-     * Set the engine event caller
-     *
-     * @param caller New Event Caller
-     */
-    public void setEventCaller(final EventCaller caller) {
-        this.eventCaller = caller;
     }
 
     /**
@@ -194,6 +120,8 @@ public class Server {
             e.printStackTrace();
         }
 
+        // The configuration files that handles
+        // the server settings, quite clear.
         ConfigurationFile configServer;
         try {
             configServer = new YamlConfiguration("server", new File(new File(coreFolder, "config"), "server.yml"));
@@ -223,7 +151,7 @@ public class Server {
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
             configViews.loadFile();
-
+            // These are the default views
             Map<String, Object> views = new HashMap<>();
             // HTML View
             Map<String, Object> view = new HashMap<>();
@@ -235,19 +163,20 @@ public class Server {
             view.put("filter", "(\\/style\\/)([A-Za-z0-9]*)(.css)?");
             view.put("type", "css");
             views.put("css", view);
-
             configViews.setIfNotExists("views", views);
             configViews.saveFile();
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't load in views");
         }
 
+        // Setup the provider factories
         this.providers.add(this.sessionManager);
         this.providers.add(new ServerProvider());
         this.providers.add(ConfigVariableProvider.getInstance());
         this.providers.add(new PostProviderFactory());
         this.providers.add(new MetaProvider());
 
+        // Setup the crush syntaxes
         this.syntaxes = new LinkedHashSet<>();
         syntaxes.add(new Include());
         syntaxes.add(new Comment());
@@ -258,6 +187,66 @@ public class Server {
     }
 
     /**
+     * Get THE instance of the server
+     *
+     * @return this, literally... this!
+     */
+    public static Server getInstance() {
+        return instance;
+    }
+
+    /**
+     * Add a view binding to the engine
+     *
+     * @param key Binding Key
+     * @param c   The View Class
+     * @see #validateViews()
+     */
+    public void addViewbinding(final String key, final Class<? extends View> c) {
+        viewBindings.put(key, c);
+    }
+
+    private void validateViews() {
+        List<String> toRemove = new ArrayList<>();
+        for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
+            Class<? extends View> vc = e.getValue();
+            try {
+                vc.getDeclaredConstructor(String.class, Map.class);
+            } catch (final Exception ex) {
+                log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
+                toRemove.add(e.getKey());
+            }
+        }
+        for (String s : toRemove) {
+            viewBindings.remove(s);
+        }
+    }
+
+    protected void handleEvent(final Event event) {
+        if (standalone) {
+            // Use the internal event handler only
+            // when running as a standalone app
+            EventManager.getInstance().handle(event);
+        } else {
+            if (eventCaller != null) {
+                eventCaller.callEvent(event);
+            } else {
+                // Oi... This ain't supposed to happen!
+                log("STANDALONE = TRUE; but there is no alternate event caller set");
+            }
+        }
+    }
+
+    /**
+     * Set the engine event caller
+     *
+     * @param caller New Event Caller
+     */
+    public void setEventCaller(final EventCaller caller) {
+        this.eventCaller = caller;
+    }
+
+    /**
      * Add a provider factory to the core provider
      *
      * @param factory Factory to add
@@ -265,8 +254,6 @@ public class Server {
     public void addProviderFactory(final ProviderFactory factory) {
         this.providers.add(factory);
     }
-
-    private PluginManager pluginManager;
 
     /**
      * Load the plugins
@@ -279,7 +266,9 @@ public class Server {
                 return;
             }
         }
-
+        // The plugin manager is quite awesome... #proud
+        // Anyhow, we should actually make it so it doesn't
+        // automatically use the DefaultPluginManager
         pluginManager = new DefaultPluginManager(file);
         pluginManager.loadPlugins();
         pluginManager.loadPlugins();
@@ -296,11 +285,15 @@ public class Server {
         if (this.started) {
             throw new RuntimeException("Cannot start the server when it's already started...");
         }
+        // Standalone = The server isn't intergrated
+        // Thus we have to handle our own events
         if (standalone) {
             loadPlugins();
             EventManager.getInstance().bake();
         }
         handleEvent(new StartupEvent(this));
+        // Let's make sure the views are valid
+        // (Has the right constructor)
         validateViews();
         log("Loading views...");
         Map<String, Map<String, Object>> views = configViews.get("views");
@@ -328,14 +321,15 @@ public class Server {
                 }
             }
         }
-
+        // This dumps useless information into
+        // this class :_:
         viewManager.dump(this);
-
+        // IPv4 enabled - Should actually do something?
         if (this.ipv4) {
             log("ipv4 is enabled - Using IPv4 stack");
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
-
+        // This is where we start the web server
         this.started = true;
         log("Starting the web server on port %s", this.port);
         try {
@@ -344,11 +338,13 @@ public class Server {
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't start the server...", e);
         }
+        // Some basic information
         log("Accepting connections on 'http://%s/'", hostName);
-        {
-            log("Output buffer size: %skb | Input buffer size: %skb", bufferOut / 1024, bufferIn / 1024);
-        }
+        log("Output buffer size: %skb | Input buffer size: %skb", bufferOut / 1024, bufferIn / 1024);
+        // The main loop
+        // "for (;;) {}" is faster than "while(true) {}"
         for (; ; ) {
+            // This really isn't the proper way to do it :_:
             if (this.stopping) {
                 // Stop the server gracefully :D
                 log("Shutting down...");
@@ -438,7 +434,9 @@ public class Server {
                     // This is how the crush engine works.
                     // Quite simple, yet powerful!
                     for (Syntax syntax : syntaxes) {
-                        content = syntax.handle(content, r, factories);
+                        if (syntax.matches(content)) {
+                            content = syntax.handle(content, r, factories);
+                        }
                     }
                     // Now, finally, let's get the bytes.
                     bytes = content.getBytes();
