@@ -73,4 +73,52 @@ public class FileUtils {
         }
     }
 
+
+    /**
+     * Copy a file from one location to another
+     *
+     * @param in   Ingoing File
+     * @param out  Outgoing File
+     * @param size Byte Buffer Size (in bytes)
+     */
+    public static void copyFile(final InputStream in, final OutputStream out,
+                                final int size) {
+        try {
+            final byte[] buffer = new byte[size];
+            int length;
+            while ((length = in.read(buffer)) > 0)
+                out.write(buffer, 0, length);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Get the size of a file or directory
+     *
+     * @param file File
+     * @return Size of file
+     */
+    public static long getSize(final File file) {
+        long size = 0;
+        if (file.isDirectory()) {
+            final File[] files = file.listFiles();
+            if (files == null)
+                return size;
+            for (final File f : files)
+                if (f.isFile())
+                    size += f.length();
+                else
+                    size += getSize(file);
+        } else if (file.isFile())
+            size += file.length();
+        return size;
+    }
 }

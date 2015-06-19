@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 /**
- * Created 2015-04-23 for IntellectualServer
+ * The thread which handles command inputs, when ran as a standalone
+ * applications.
  *
  * @author Citymonstret
  */
@@ -26,6 +27,7 @@ public class InputThread extends Thread {
                     // This is a command :D
                     switch(line.replace("/", "").toLowerCase()) {
                         case "stop":
+                            stop = true;
                             server.stop();
                             break;
                         default:
@@ -35,7 +37,7 @@ public class InputThread extends Thread {
                 }
             }
             in.close();
-        } catch(final Exception e) {
+        } catch (final Exception ignored) {
         }
     }
 }

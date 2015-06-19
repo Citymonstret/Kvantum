@@ -7,8 +7,8 @@ package com.intellectualsites.web.object;
  */
 public interface ProviderFactory<T extends VariableProvider> {
 
-    public T get(final Request r);
+    T get(final Request r);
 
-    public String providerName();
+    String providerName();
 
 }

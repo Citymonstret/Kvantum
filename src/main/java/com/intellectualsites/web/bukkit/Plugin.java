@@ -5,6 +5,7 @@ import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.object.EventCaller;
+import com.intellectualsites.web.object.IntellectualServerStartException;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,7 +35,11 @@ public class Plugin extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTaskLater(this, new Runnable() {
             @Override
             public void run() {
-                finalized.start();
+                try {
+                    finalized.start();
+                } catch (IntellectualServerStartException e) {
+                    e.printStackTrace();
+                }
             }
         }, 20l * 15);
 

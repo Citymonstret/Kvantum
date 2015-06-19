@@ -9,11 +9,11 @@ import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.syntax.*;
+import com.intellectualsites.web.plugin.PluginLoader;
+import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
 import org.apache.commons.io.output.TeeOutputStream;
-import ro.fortsoft.pf4j.DefaultPluginManager;
-import ro.fortsoft.pf4j.PluginManager;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -60,7 +60,7 @@ public class Server {
     private ConfigurationFile configViews;
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
-    private PluginManager pluginManager;
+    private PluginLoader pluginLoader;
 
     {
         viewBindings = new HashMap<>();
@@ -72,7 +72,7 @@ public class Server {
      *
      * @param standalone Should the server run async?
      */
-    protected Server(boolean standalone) {
+    protected Server(boolean standalone) throws IntellectualServerInitializationException {
         instance = this;
 
         this.standalone = standalone;
@@ -133,7 +133,7 @@ public class Server {
             configServer.setIfNotExists("ipv4", false);
             configServer.saveFile();
         } catch (final Exception e) {
-            throw new RuntimeException("Couldn't load in the config file...", e);
+            throw new IntellectualServerInitializationException("Couldd't load in the configuration file", e);
         }
 
         this.port = configServer.get("port");
@@ -269,10 +269,9 @@ public class Server {
         // The plugin manager is quite awesome... #proud
         // Anyhow, we should actually make it so it doesn't
         // automatically use the DefaultPluginManager
-        pluginManager = new DefaultPluginManager(file);
-        pluginManager.loadPlugins();
-        pluginManager.loadPlugins();
-        pluginManager.startPlugins();
+        pluginLoader = new PluginLoader(new PluginManager());
+        pluginLoader.loadAllPlugins(file);
+        pluginLoader.enableAllPlugins();
     }
 
     /**
@@ -281,9 +280,9 @@ public class Server {
      * @throws RuntimeException If anything goes wrong
      */
     @SuppressWarnings("ALL")
-    public void start() throws RuntimeException {
+    public void start() throws IntellectualServerStartException {
         if (this.started) {
-            throw new RuntimeException("Cannot start the server when it's already started...");
+            throw new IntellectualServerStartException("Cannot start the server, when it's already started", new RuntimeException("Cannot restart server singleton"));
         }
         // Standalone = The server isn't intergrated
         // Thus we have to handle our own events
@@ -493,7 +492,7 @@ public class Server {
     public synchronized void stop() {
         log("Shutting down!");
         EventManager.getInstance().handle(new ShutdownEvent(this));
-        pluginManager.stopPlugins();
+        pluginLoader.disableAllPlugins();
         System.exit(0);
     }
 }
