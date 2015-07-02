@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
  *
  * @author Citymonstret
  */
-public class HTMLView extends View {
+public class HTMLView extends View implements CacheApplicable {
 
     private final File folder;
     private final int buffer;
@@ -77,6 +77,11 @@ public class HTMLView extends View {
     @Override
     public HTMLProvider getFactory(final Request r) {
         return new HTMLProvider(r);
+    }
+
+    @Override
+    public boolean isApplicable(Request r) {
+        return true;
     }
 
     public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider {

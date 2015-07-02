@@ -61,6 +61,7 @@ public class Server {
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
+    private CacheManager cacheManager;
 
     {
         viewBindings = new HashMap<>();
@@ -147,6 +148,7 @@ public class Server {
 
         this.viewManager = new ViewManager();
         this.sessionManager = new SessionManager(this);
+        this.cacheManager = new CacheManager();
 
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
@@ -404,8 +406,17 @@ public class Server {
                 log(r.buildLog());
                 // Get the view
                 View view = viewManager.match(r);
-                // And generate the response
-                Response response = view.generate(r);
+                Response response;
+                if (view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
+                    if (cacheManager.hasCache(view)) {
+                        response = cacheManager.getCache(view);
+                    } else {
+                        response = view.generate(r);
+                        cacheManager.setCache(view, response);
+                    }
+                } else {
+                    response = view.generate(r);
+                }
                 // Response headers
                 response.getHeader().apply(out);
                 Session session = sessionManager.getSession(r, out);
