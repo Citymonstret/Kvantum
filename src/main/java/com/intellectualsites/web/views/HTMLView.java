@@ -1,6 +1,7 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.util.Context;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +31,7 @@ public class HTMLView extends View implements CacheApplicable {
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
-            this.folder = new File("./html");
+            this.folder = new File(Context.coreFolder, "/html");
         }
 
         if (!folder.exists()) {

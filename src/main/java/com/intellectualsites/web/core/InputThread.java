@@ -12,7 +12,8 @@ import java.io.InputStreamReader;
 public class InputThread extends Thread {
 
     private Server server;
-    public InputThread(Server server) {
+    protected
+    InputThread(Server server) {
         this.server = server;
     }
 

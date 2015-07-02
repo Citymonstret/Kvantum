@@ -3,6 +3,7 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.util.Context;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -32,7 +33,7 @@ public class DownloadView extends View {
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
-            this.folder = new File("./assets/downloads");
+            this.folder = new File(Context.coreFolder, "/assets/downloads");
         }
 
         if (!folder.exists()) {

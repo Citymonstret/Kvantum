@@ -3,6 +3,7 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.util.Context;
 import org.lesscss.LessCompiler;
 
 import java.io.BufferedReader;
@@ -34,7 +35,7 @@ public class LessView extends View {
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
-            this.folder = new File("./assets/less");
+            this.folder = new File(Context.coreFolder, "/assets/less");
         }
 
         if (!this.folder.exists()) {

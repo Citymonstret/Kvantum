@@ -7,7 +7,6 @@ import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.object.EventCaller;
 import com.intellectualsites.web.object.IntellectualServerStartException;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,8 +23,9 @@ public class Plugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        server = Bootstrap.startServer(true);
+        server = Bootstrap.startServer(true, getDataFolder());
         server.setEventCaller(new BukkitEventCaller());
+        server.addProviderFactory(new BukkitVariableProvider());
 
         Bukkit.getPluginManager().registerEvents(this, this);
 
@@ -53,12 +53,6 @@ public class Plugin extends JavaPlugin implements Listener {
                 Bukkit.getPluginManager().callEvent(new com.intellectualsites.web.bukkit.events.StartupEvent(((StartupEvent) event).getServer()));
             }
         }
-
-    }
-
-    @EventHandler
-    public void onStartup(final com.intellectualsites.web.bukkit.events.StartupEvent event) {
-        event.getServer().addProviderFactory(new BukkitVariableProvider());
     }
 
 }

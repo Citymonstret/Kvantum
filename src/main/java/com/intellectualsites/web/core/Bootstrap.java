@@ -20,13 +20,13 @@ public class Bootstrap {
      * @return the started server | null
      */
     public static Server startServer(boolean standalone) {
+        Server server = null;
         try {
-            Server server = new Server(standalone);
+            server = new Server(standalone);
             server.start();
-            return server;
         } catch(final Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return server;
     }
 }

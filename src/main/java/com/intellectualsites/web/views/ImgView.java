@@ -3,9 +3,12 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.util.Context;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -30,7 +33,7 @@ public class ImgView extends View {
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
-            this.folder = new File("./assets/img");
+            this.folder = new File(Context.coreFolder, "/assets/img");
         }
 
         if (!folder.exists()) {
