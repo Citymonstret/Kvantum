@@ -1,8 +1,12 @@
 package com.intellectualsites.web.events;
 
 /**
- * Created 2015-05-03 for IntellectualServer
+ * This is an event, in other words:
+ * <br/>
+ * Something that happens, that can be captured
+ * using code
  *
+ * @see com.intellectualsites.web.object.IntellectualServer#handleEvent(Event) To call the event
  * @author Citymonstret
  */
 public abstract class Event {
@@ -10,6 +14,12 @@ public abstract class Event {
     private final String name;
     private final int accessor;
 
+    /**
+     * The name which will be used
+     * to identity this event
+     *
+     * @param name Event Name
+     */
     public Event(final String name) {
         this.name = name;
         this.accessor = getClass().getName().hashCode();
@@ -20,6 +30,11 @@ public abstract class Event {
         return this.getClass().getName();
     }
 
+    /**
+     * Get the specified event name
+     *
+     * @return Event name
+     */
     public final String getName() {
         return this.name;
     }

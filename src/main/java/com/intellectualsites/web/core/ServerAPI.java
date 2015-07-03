@@ -2,8 +2,6 @@ package com.intellectualsites.web.core;
 
 import com.intellectualsites.web.object.ProviderFactory;
 import com.intellectualsites.web.object.View;
-import com.intellectualsites.web.plugin.Plugin;
-import com.intellectualsites.web.util.TimeUtil;
 
 /**
  * Created 2015-04-23 for IntellectualServer
@@ -42,9 +40,5 @@ public class ServerAPI {
 
     public void addProviderFactory(final ProviderFactory factory) {
         server.providers.add(factory);
-    }
-
-    public void log(final Plugin plugin, final String message) {
-        System.out.println(String.format("[%s][%s] %s", plugin.getName(), TimeUtil.getTimeStamp(TimeUtil.LogFormat), message)); // TODO Use custom logger
     }
 }

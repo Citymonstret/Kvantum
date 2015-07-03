@@ -1,5 +1,6 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.object.CacheApplicable;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
@@ -17,7 +18,7 @@ import java.util.regex.Matcher;
  *
  * @author Citymonstret
  */
-public class LessView extends View {
+public class LessView extends View implements CacheApplicable {
 
     public static LessCompiler compiler;
 
@@ -51,7 +52,7 @@ public class LessView extends View {
         if (!file.endsWith(".less"))
             file = file + ".less";
         request.addMeta("less_file", file);
-        return matcher.matches() && (new  File(folder, file)).exists();
+        return matcher.matches() && (new File(folder, file)).exists();
     }
 
 
@@ -83,5 +84,10 @@ public class LessView extends View {
         }
 
         return response;
+    }
+
+    @Override
+    public boolean isApplicable(Request r) {
+        return true;
     }
 }

@@ -1,11 +1,12 @@
 package com.intellectualsites.web.plugin;
 
+import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.util.Assert;
 import com.intellectualsites.web.util.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 import sun.misc.JarFilter;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -121,19 +122,16 @@ public class PluginLoader {
             throw new FileNotFoundException(file.getPath()
                     + " does not exist");
         final PluginFile desc = getPluginFile(file);
+        Assert.equals(isTaken(desc.name), false);
         final File parent = file.getParentFile(), data = new File(parent,
                 desc.name);
         if (!data.exists())
             if (!data.mkdir()) {
-                // TODO Do something
+                throw new RuntimeException("Couldn't create the data folder for " + desc.name);
             }
         copyConfigIfExists(file, data);
         PluginClassLoader loader;
-        try {
-            loader = new PluginClassLoader(this, desc, file);
-        } catch (final MalformedURLException e) {
-            throw e;
-        }
+        loader = new PluginClassLoader(this, desc, file);
         loaders.put(desc.name, loader);
         return loader;
     }
@@ -193,8 +191,8 @@ public class PluginLoader {
             if (!loaders.containsKey(name))
                 loaders.put(name, plugin.getClassLoader());
             manager.enablePlugin(plugin);
+            plugin.log(plugin.getName() + " is enabled!");
             // TODO Replace this
-            // plugin.getLogger().log(plugin.getName() + " is enabled");
             // final PluginEnableEvent loadEvent = new PluginEnableEvent(plugin);
             // Marine.getServer().callEvent(loadEvent);
         }
@@ -216,7 +214,7 @@ public class PluginLoader {
             // TODO Replace this
             // EventManager.getInstance().removeAll(plugin);
             // Marine.getServer().getScheduler().removeAll(plugin);
-            // Logging.getLogger().info("Disabled " + plugin);
+            Server.getInstance().log("Disabled %s", plugin);
         } else
             throw new UnsupportedOperationException(
                     "Cannot disable an already disabled plugin");
@@ -231,11 +229,7 @@ public class PluginLoader {
      */
     private void copyConfigIfExists(final File file, final File destination) throws IOException {
         JarFile jar;
-        try {
-            jar = new JarFile(file);
-        } catch (final IOException ioe) {
-            throw ioe;
-        }
+        jar = new JarFile(file);
         final Enumeration<JarEntry> entries = jar.entries();
         JarEntry entry;
         final List<JarEntry> entryList = new ArrayList<>();
@@ -299,26 +293,14 @@ public class PluginLoader {
      */
     private PluginFile getPluginFile(final File file) throws Exception {
         JarFile jar;
-        try {
-            jar = new JarFile(file);
-        } catch (final IOException ioe) {
-            throw ioe;
-        }
+        jar = new JarFile(file);
         final JarEntry desc = jar.getJarEntry("desc.json");
         if (desc == null)
             throw new RuntimeException("Couldn't find desc for " + file);
         InputStream stream;
-        try {
-            stream = jar.getInputStream(desc);
-        } catch (final IOException ioe) {
-            throw ioe;
-        }
+        stream = jar.getInputStream(desc);
         PluginFile f;
-        try {
-            f = new PluginFile(stream, getYaml());
-        } catch (final Exception e) {
-            throw e;
-        }
+        f = new PluginFile(stream, getYaml());
         try {
             jar.close();
         } catch (final Exception e) {

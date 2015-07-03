@@ -1,5 +1,7 @@
 package com.intellectualsites.web.events;
 
+import com.intellectualsites.web.util.Assert;
+
 import java.util.*;
 
 /**
@@ -104,6 +106,7 @@ public class EventManager {
 
     @SuppressWarnings("ALL")
     private void call(final Event event) throws NullPointerException {
+        Assert.notNull(event);
         if (bakedListeners == null
                 || !bakedListeners.containsKey(event.hashCode()))
             return;

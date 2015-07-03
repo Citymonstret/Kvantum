@@ -3,7 +3,7 @@ package com.intellectualsites.web.events;
 import com.intellectualsites.web.object.EventCaller;
 
 /**
- * Created 2015-05-04 for IntellectualServer
+ * This is the default event caller
  *
  * @author Citymonstret
  */

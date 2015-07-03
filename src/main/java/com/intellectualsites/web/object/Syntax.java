@@ -61,6 +61,15 @@ public abstract class Syntax {
      * @return True if the regex matches
      */
     public final boolean matches(String in) {
-        return pattern.matcher(in).matches();
+        return this.pattern.matcher(in).find();
+    }
+
+    /**
+     * Get the identifier pattern object
+     *
+     * @return Pattern
+     */
+    public Pattern getPattern() {
+        return this.pattern;
     }
 }

@@ -13,6 +13,7 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -25,11 +26,10 @@ import java.util.*;
 /**
  * The core server
  * <p>
- * TODO: Make an interface implementation
  *
  * @author Citymonstret
  */
-public class Server {
+public class Server implements IntellectualServer {
 
     /**
      * The logging prefix
@@ -37,6 +37,8 @@ public class Server {
     public static final String PREFIX = "Web";
     private static Server instance;
     private final int port;
+    private final boolean verbose;
+
     /**
      * Is the server stopping?
      */
@@ -77,13 +79,13 @@ public class Server {
         instance = this;
 
         this.standalone = standalone;
-        addViewbinding("html", HTMLView.class);
-        addViewbinding("css", CSSView.class);
-        addViewbinding("javascript", JSView.class);
-        addViewbinding("less", LessView.class);
-        addViewbinding("img", ImgView.class);
-        addViewbinding("download", DownloadView.class);
-        addViewbinding("redirect", RedirectView.class);
+        addViewBinding("html", HTMLView.class);
+        addViewBinding("css", CSSView.class);
+        addViewBinding("javascript", JSView.class);
+        addViewBinding("less", LessView.class);
+        addViewBinding("img", ImgView.class);
+        addViewBinding("download", DownloadView.class);
+        addViewBinding("redirect", RedirectView.class);
 
         this.coreFolder = new File("./");
         {
@@ -96,8 +98,7 @@ public class Server {
                 }
             });
 
-            InputThread thread = new InputThread(this);
-            thread.start();
+            new InputThread(this).start();
         }
 
         File logFolder = new File(coreFolder, "log");
@@ -113,16 +114,11 @@ public class Server {
                     return name.endsWith(".txt");
                 }
             }), true);
-            FileOutputStream fos = new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt"));
-            TeeOutputStream out = new TeeOutputStream(System.out, fos);
-            PrintStream ps = new PrintStream(out);
-            System.setOut(ps);
+            System.setOut(new PrintStream(new TeeOutputStream(System.out, new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt")))));
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
-        // The configuration files that handles
-        // the server settings, quite clear.
         ConfigurationFile configServer;
         try {
             configServer = new YamlConfiguration("server", new File(new File(coreFolder, "config"), "server.yml"));
@@ -131,10 +127,11 @@ public class Server {
             configServer.setIfNotExists("hostname", "localhost");
             configServer.setIfNotExists("buffer.in", 1024 * 1024); // 16 mb
             configServer.setIfNotExists("buffer.out", 1024 * 1024);
+            configServer.setIfNotExists("verbose", false);
             configServer.setIfNotExists("ipv4", false);
             configServer.saveFile();
         } catch (final Exception e) {
-            throw new IntellectualServerInitializationException("Couldd't load in the configuration file", e);
+            throw new IntellectualServerInitializationException("Couldn't load in the configuration file", e);
         }
 
         this.port = configServer.get("port");
@@ -142,6 +139,7 @@ public class Server {
         this.bufferIn = configServer.get("buffer.in");
         this.bufferOut = configServer.get("buffer.out");
         this.ipv4 = configServer.get("ipv4");
+        this.verbose = configServer.get("verbose");
 
         this.started = false;
         this.stopping = false;
@@ -178,7 +176,7 @@ public class Server {
         this.providers.add(new PostProviderFactory());
         this.providers.add(new MetaProvider());
 
-        // Setup the crush syntaxes
+        // Setup the crush syntax-particles
         this.syntaxes = new LinkedHashSet<>();
         syntaxes.add(new Include());
         syntaxes.add(new Comment());
@@ -197,18 +195,13 @@ public class Server {
         return instance;
     }
 
-    /**
-     * Add a view binding to the engine
-     *
-     * @param key Binding Key
-     * @param c   The View Class
-     * @see #validateViews()
-     */
-    public void addViewbinding(final String key, final Class<? extends View> c) {
+    @Override
+    public void addViewBinding(@NotNull final String key, @NotNull final Class<? extends View> c) {
         viewBindings.put(key, c);
     }
 
-    private void validateViews() {
+    @Override
+    public void validateViews() {
         List<String> toRemove = new ArrayList<>();
         for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
             Class<? extends View> vc = e.getValue();
@@ -224,36 +217,29 @@ public class Server {
         }
     }
 
-    protected void handleEvent(final Event event) {
+    @Override
+    public void handleEvent(@NotNull final Event event) {
+        Assert.notNull(event);
         if (standalone) {
-            // Use the internal event handler only
-            // when running as a standalone app
             EventManager.getInstance().handle(event);
         } else {
             if (eventCaller != null) {
                 eventCaller.callEvent(event);
             } else {
-                // Oi... This ain't supposed to happen!
                 log("STANDALONE = TRUE; but there is no alternate event caller set");
             }
         }
     }
 
-    /**
-     * Set the engine event caller
-     *
-     * @param caller New Event Caller
-     */
-    public void setEventCaller(final EventCaller caller) {
+    @Override
+    public void setEventCaller(@NotNull final EventCaller caller) {
+        Assert.notNull(caller);
         this.eventCaller = caller;
     }
 
-    /**
-     * Add a provider factory to the core provider
-     *
-     * @param factory Factory to add
-     */
-    public void addProviderFactory(final ProviderFactory factory) {
+    @Override
+    public void addProviderFactory(@NotNull final ProviderFactory factory) {
+        Assert.notNull(factory);
         this.providers.add(factory);
     }
 
@@ -268,34 +254,27 @@ public class Server {
                 return;
             }
         }
-        // The plugin manager is quite awesome... #proud
-        // Anyhow, we should actually make it so it doesn't
-        // automatically use the DefaultPluginManager
         pluginLoader = new PluginLoader(new PluginManager());
         pluginLoader.loadAllPlugins(file);
         pluginLoader.enableAllPlugins();
     }
 
-    /**
-     * Start the web server
-     *
-     * @throws RuntimeException If anything goes wrong
-     */
     @SuppressWarnings("ALL")
+    @Override
     public void start() throws IntellectualServerStartException {
-        if (this.started) {
-            throw new IntellectualServerStartException("Cannot start the server, when it's already started", new RuntimeException("Cannot restart server singleton"));
-        }
-        // Standalone = The server isn't intergrated
-        // Thus we have to handle our own events
+        Assert.equals(this.started, false, new IntellectualServerStartException("Cannot start the server, it is already started", new RuntimeException("Cannot restart server singleton")));
+        //
         if (standalone) {
             loadPlugins();
             EventManager.getInstance().bake();
         }
+        //
+        log("Calling the startup event...");
         handleEvent(new StartupEvent(this));
-        // Let's make sure the views are valid
-        // (Has the right constructor)
+        //
+        log("Validating views...");
         validateViews();
+        //
         log("Loading views...");
         Map<String, Map<String, Object>> views = configViews.get("views");
         for (final Map.Entry<String, Map<String, Object>> entry : views.entrySet()) {
@@ -312,7 +291,6 @@ public class Server {
             }
 
             if (viewBindings.containsKey(type.toLowerCase())) {
-                // Exists :d
                 Class<? extends View> vc = viewBindings.get(type.toLowerCase());
                 try {
                     View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
@@ -322,32 +300,27 @@ public class Server {
                 }
             }
         }
-        // This dumps useless information into
-        // this class :_:
         viewManager.dump(this);
-        // IPv4 enabled - Should actually do something?
+        //
         if (this.ipv4) {
-            log("ipv4 is enabled - Using IPv4 stack");
+            log("ipv4 is true - Using IPv4 stack");
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
-        // This is where we start the web server
-        this.started = true;
+        //
         log("Starting the web server on port %s", this.port);
+        this.started = true;
         try {
             socket = new ServerSocket(this.port);
             log("Server started");
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't start the server...", e);
         }
-        // Some basic information
-        log("Accepting connections on 'http://%s/'", hostName);
+        //
+        log("Accepting connections on 'http://%s" + (this.port == 80 ? "" : ":" + port) + "/'", hostName);
         log("Output buffer size: %skb | Input buffer size: %skb", bufferOut / 1024, bufferIn / 1024);
-        // The main loop
-        // "for (;;) {}" is faster than "while(true) {}"
+        // Main Loop
         for (; ; ) {
-            // This really isn't the proper way to do it :_:
             if (this.stopping) {
-                // Stop the server gracefully :D
                 log("Shutting down...");
                 break;
             }
@@ -365,13 +338,13 @@ public class Server {
      *
      * @param remote Socket to send and read from
      */
-    private void runAsync(final Socket remote) {
+    private void runAsync(@NotNull final Socket remote) {
         new Thread() {
             @Override
             public void run() {
-                // TODO Make configurable
-                // Might get overly spammy
-                log("Connection Accepted! Sending data...");
+                if (verbose) {
+                    log("Connection accepted from '%s' - Handling the data!", remote.getInetAddress());
+                }
                 StringBuilder rRaw = new StringBuilder();
                 BufferedOutputStream out;
                 BufferedReader input;
@@ -386,15 +359,11 @@ public class Server {
                         rRaw.append(str).append("|");
                     }
                     r = new Request(rRaw.toString(), remote);
-                    // This is horrible, and it has to be redone!
-                    // TODO: Remake!
                     if (r.getQuery().getMethod() == Method.POST) {
                         StringBuilder pR = new StringBuilder();
                         int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
-                        int c;
                         for (int i = 0; i < cl; i++) {
-                            c = input.read();
-                            pR.append((char) c);
+                            pR.append((char) input.read());
                         }
                         r.setPostRequest(new PostRequest(pR.toString()));
                     }
@@ -402,7 +371,6 @@ public class Server {
                     e.printStackTrace();
                     return;
                 }
-                // TODO: Make configurable
                 log(r.buildLog());
                 // Get the view
                 View view = viewManager.match(r);
@@ -419,11 +387,6 @@ public class Server {
                 }
                 // Response headers
                 response.getHeader().apply(out);
-                Session session = sessionManager.getSession(r, out);
-                if (session != null) {
-                    // TODO: Session stuff
-                    session.set("existing", "true");
-                }
                 byte[] bytes;
                 if (response.isText()) {
                     // Let's make a copy of the content before
@@ -476,7 +439,7 @@ public class Server {
      *
      * @see #runAsync(Socket)
      */
-    protected void tick() {
+    private void tick() {
         try {
             runAsync(socket.accept());
         } catch (final Exception e) {
@@ -484,26 +447,32 @@ public class Server {
         }
     }
 
-    /**
-     * Log a message
-     *
-     * @param message String message to log
-     * @param args    Arguments to be sent (replaces %s with arg#toString)
-     */
-    public void log(String message, final Object... args) {
+    @Override
+    public void log(@NotNull String message, @NotNull final Object... args) {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
         System.out.printf("[%s][%s] %s\n", PREFIX, TimeUtil.getTimeStamp(), message);
     }
 
-    /**
-     * Stop the web server
-     */
+    @Override
+    public void log(@NotNull LogProvider provider, @NotNull String message, @NotNull final Object... args) {
+        for (final Object a : args) {
+            message = message.replaceFirst("%s", a.toString());
+        }
+        System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
+    }
+
+    @Override
     public synchronized void stop() {
         log("Shutting down!");
         EventManager.getInstance().handle(new ShutdownEvent(this));
         pluginLoader.disableAllPlugins();
         System.exit(0);
+    }
+
+    @Override
+    public SessionManager getSessionManager() {
+        return this.sessionManager;
     }
 }

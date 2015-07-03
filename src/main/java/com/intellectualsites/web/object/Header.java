@@ -8,10 +8,16 @@ public class Header {
 
     private Map<String, String> headers;
     private String status;
+    private String format;
+
+    public Header(final String status, final String format) {
+        this.status = status;
+        this.format = format;
+        this.headers = new HashMap<>();
+    }
 
     public Header(final String status) {
-        this.status = status;
-        this.headers = new HashMap<String, String>();
+        this(status, "HTTP/1.1");
     }
 
     public Header set(final String key, final String value) {
@@ -21,8 +27,7 @@ public class Header {
 
     public void apply(final OutputStream out) {
         try {
-            // We need to show that we are sending real content! :D
-            out.write(("HTTP/1.1 " + this.status + "\n").getBytes());
+            out.write((this.format + " " + this.status + "\n").getBytes());
             for (final Map.Entry<String, String> entry : this.headers.entrySet()) {
                 out.write((entry.getKey() + ": " + entry.getValue() + "\n").getBytes());
             }
@@ -59,7 +64,7 @@ public class Header {
         } else {
             v = cookie + "=" + value;
         }
-        set("Set-Cookie", value);
+        set("Set-Cookie", v);
     }
 
     public void removeCookie(final String cookie) {

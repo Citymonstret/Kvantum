@@ -1,5 +1,8 @@
 package com.intellectualsites.web.plugin;
 
+import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.object.LogProvider;
+
 import java.io.File;
 import java.util.UUID;
 
@@ -12,7 +15,7 @@ import java.util.UUID;
  *
  * @author Citymonstret
  */
-public class Plugin {
+public class Plugin implements LogProvider {
 
     private final UUID uuid;
     private boolean enabled;
@@ -179,6 +182,15 @@ public class Plugin {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public String getLogIdentifier() {
+        return this.toString();
+    }
+
+    public void log(String message) {
+        Server.getInstance().log(this, message);
     }
 
 }

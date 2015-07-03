@@ -6,3 +6,4 @@ gzip: true
 buffer.in: 1048576
 buffer: 134217728
 buffer.out: 1048576
+verbose: false

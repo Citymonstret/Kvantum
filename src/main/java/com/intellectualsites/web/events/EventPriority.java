@@ -1,10 +1,27 @@
 package com.intellectualsites.web.events;
 
 /**
- * Created 2015-05-03 for IntellectualServer
+ * This is how we decide what event listeners
+ * that gets to act in what order. This is useful
+ * as it can be used to create a hierarchy for
+ * internal listeners and alike
  *
  * @author Citymonstret
  */
 public enum EventPriority {
-    LOW, MEDIUM, HIGH
+
+    /**
+     * Low Priority
+     */
+    LOW,
+
+    /**
+     * Medium Priority
+     */
+    MEDIUM,
+
+    /**
+     * High Priority
+     */
+    HIGH
 }
