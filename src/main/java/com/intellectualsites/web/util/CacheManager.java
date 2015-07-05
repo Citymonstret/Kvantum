@@ -25,4 +25,8 @@ public class CacheManager {
     public Response getCache(View view) {
         return cachedResponses.get(view.toString());
     }
+
+    public Map<String, Response> getAll() {
+        return this.cachedResponses;
+    }
 }

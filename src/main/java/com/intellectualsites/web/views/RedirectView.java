@@ -1,6 +1,7 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.config.YamlConfiguration;
+import com.intellectualsites.web.object.IgnoreSyntax;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
@@ -9,7 +10,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-public class RedirectView extends View {
+public class RedirectView extends View implements IgnoreSyntax {
 
     private final YamlConfiguration configuration;
 

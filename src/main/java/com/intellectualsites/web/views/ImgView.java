@@ -1,5 +1,6 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.object.CacheApplicable;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
@@ -17,7 +18,7 @@ import java.util.regex.Matcher;
  *
  * @author Citymonstret
  */
-public class ImgView extends View {
+public class ImgView extends View implements CacheApplicable {
 
     private File folder;
     private int buffer;
@@ -78,5 +79,10 @@ public class ImgView extends View {
         response.getHeader().set("Content-Type", "image/" + r.getMeta("img_type") + "; charset=utf-8");
         response.setBytes(bytes);
         return response;
+    }
+
+    @Override
+    public boolean isApplicable(Request r) {
+        return false;
     }
 }

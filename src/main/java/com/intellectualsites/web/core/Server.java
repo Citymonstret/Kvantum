@@ -63,7 +63,7 @@ public class Server implements IntellectualServer {
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
-    private CacheManager cacheManager;
+    CacheManager cacheManager;
 
     {
         viewBindings = new HashMap<>();
@@ -75,7 +75,7 @@ public class Server implements IntellectualServer {
      *
      * @param standalone Should the server run async?
      */
-    protected Server(boolean standalone) throws IntellectualServerInitializationException {
+    protected Server(boolean standalone, File coreFolder) throws IntellectualServerInitializationException {
         instance = this;
 
         this.standalone = standalone;
@@ -87,7 +87,6 @@ public class Server implements IntellectualServer {
         addViewBinding("download", DownloadView.class);
         addViewBinding("redirect", RedirectView.class);
 
-        this.coreFolder = new File("./");
         {
             Signal.handle(new Signal("INT"), new SignalHandler() {
                 @Override
@@ -392,23 +391,27 @@ public class Server implements IntellectualServer {
                     // Let's make a copy of the content before
                     // getting the bytes
                     String content = response.getContent();
-                    // Provider factories are fun, and so is the
-                    // global map. But we also need the view
-                    // specific ones!
-                    Map<String, ProviderFactory> factories = new HashMap<>();
-                    for (final ProviderFactory factory : providers) {
-                        factories.put(factory.providerName().toLowerCase(), factory);
-                    }
-                    // Now make use of the view specific ProviderFactory
-                    ProviderFactory z = view.getFactory(r);
-                    if (z != null) {
-                        factories.put(z.providerName().toLowerCase(), z);
-                    }
-                    // This is how the crush engine works.
-                    // Quite simple, yet powerful!
-                    for (Syntax syntax : syntaxes) {
-                        if (syntax.matches(content)) {
-                            content = syntax.handle(content, r, factories);
+                    // Make sure to not use Crush when
+                    // told not to
+                    if (!(view instanceof IgnoreSyntax)) {
+                        // Provider factories are fun, and so is the
+                        // global map. But we also need the view
+                        // specific ones!
+                        Map<String, ProviderFactory> factories = new HashMap<>();
+                        for (final ProviderFactory factory : providers) {
+                            factories.put(factory.providerName().toLowerCase(), factory);
+                        }
+                        // Now make use of the view specific ProviderFactory
+                        ProviderFactory z = view.getFactory(r);
+                        if (z != null) {
+                            factories.put(z.providerName().toLowerCase(), z);
+                        }
+                        // This is how the crush engine works.
+                        // Quite simple, yet powerful!
+                        for (Syntax syntax : syntaxes) {
+                            if (syntax.matches(content)) {
+                                content = syntax.handle(content, r, factories);
+                            }
                         }
                     }
                     // Now, finally, let's get the bytes.

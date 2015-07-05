@@ -1,7 +1,11 @@
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.util.CacheManager;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 /**
  * The thread which handles command inputs, when ran as a standalone
@@ -30,6 +34,14 @@ public class InputThread extends Thread {
                         case "stop":
                             stop = true;
                             server.stop();
+                            break;
+                        case "cachedump":
+                            CacheManager cacheManager = server.cacheManager;
+                            StringBuilder output = new StringBuilder("Currently Cached: ");
+                            for (Map.Entry<String, Response> e : cacheManager.getAll().entrySet()) {
+                                output.append(e.getKey()).append(" = ").append(e.getValue().isText() ? "text" : "bytes").append(", ");
+                            }
+                            server.log(output.toString());
                             break;
                         default:
                             server.log("Unknown command '%s'", line);

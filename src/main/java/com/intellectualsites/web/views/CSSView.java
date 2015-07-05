@@ -1,5 +1,6 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.object.CacheApplicable;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
@@ -16,7 +17,7 @@ import java.util.regex.Matcher;
  *
  * @author Citymonstret
  */
-public class CSSView extends View {
+public class CSSView extends View implements CacheApplicable {
 
     private File folder;
     private int buffer;
@@ -70,5 +71,10 @@ public class CSSView extends View {
         response.getHeader().set("Content-Type", "text/css; charset=utf-8");
         response.setContent(document.toString());
         return response;
+    }
+
+    @Override
+    public boolean isApplicable(Request r) {
+        return true;
     }
 }
