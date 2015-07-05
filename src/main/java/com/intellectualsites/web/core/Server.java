@@ -366,6 +366,10 @@ public class Server implements IntellectualServer {
                         }
                         r.setPostRequest(new PostRequest(pR.toString()));
                     }
+                    Session session = sessionManager.getSession(r, out);
+                    if (session != null) {
+                        r.setSession(session);
+                    }
                 } catch (final Exception e) {
                     e.printStackTrace();
                     return;

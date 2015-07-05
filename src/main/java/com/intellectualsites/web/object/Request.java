@@ -1,6 +1,7 @@
 package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.util.CookieManager;
+import com.sun.istack.internal.NotNull;
 
 import java.net.Socket;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class Request {
     private Query query;
     private PostRequest postRequest;
     private Socket socket;
+    private Session session;
 
     /**
      * The post request is basically... a POST request.
@@ -203,5 +205,23 @@ public class Request {
             return null;
         }
         return meta.get(name);
+    }
+
+    /**
+     * Set the internal session
+     *
+     * @param session Session
+     */
+    public void setSession(@NotNull final Session session) {
+        this.session = session;
+    }
+
+    /**
+     * Get the internal session
+     *
+     * @return true|null
+     */
+    public Session getSession() {
+        return this.session;
     }
 }
