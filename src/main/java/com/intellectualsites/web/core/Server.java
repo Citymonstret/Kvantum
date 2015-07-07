@@ -2,6 +2,7 @@ package com.intellectualsites.web.core;
 
 import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
+import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventManager;
@@ -22,6 +23,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+
+import static com.intellectualsites.web.object.LogModes.*;
 
 /**
  * The core server
@@ -103,7 +106,7 @@ public class Server implements IntellectualServer {
         File logFolder = new File(coreFolder, "log");
         if (!logFolder.exists()) {
             if (!logFolder.mkdirs()) {
-                log("Couldn't create the log folder");
+                log(Message.COULD_NOT_CREATE_FOLDER, "log");
             }
         }
         try {
@@ -207,7 +210,7 @@ public class Server implements IntellectualServer {
             try {
                 vc.getDeclaredConstructor(String.class, Map.class);
             } catch (final Exception ex) {
-                log("Invalid view '%s' - Constructor has to be #(String.class, Map.class)", e.getKey());
+                log(Message.INVALID_VIEW, e.getKey());
                 toRemove.add(e.getKey());
             }
         }
@@ -225,7 +228,7 @@ public class Server implements IntellectualServer {
             if (eventCaller != null) {
                 eventCaller.callEvent(event);
             } else {
-                log("STANDALONE = TRUE; but there is no alternate event caller set");
+                log(Message.STANDALONE_NO_EVENT_CALLER);
             }
         }
     }
@@ -249,7 +252,7 @@ public class Server implements IntellectualServer {
         File file = new File(coreFolder, "plugins");
         if (!file.exists()) {
             if (!file.mkdirs()) {
-                log("Couldn't create %s - No plugins were loaded.", file);
+                log(Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file);
                 return;
             }
         }
@@ -268,10 +271,10 @@ public class Server implements IntellectualServer {
             EventManager.getInstance().bake();
         }
         //
-        log("Calling the startup event...");
+        log(Message.CALLING_EVENT, "startup");
         handleEvent(new StartupEvent(this));
         //
-        log("Validating views...");
+        log(Message.VALIDATING_VIEWS);
         validateViews();
         //
         log("Loading views...");
@@ -306,27 +309,27 @@ public class Server implements IntellectualServer {
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
         //
-        log("Starting the web server on port %s", this.port);
+        log(Message.STARTING_ON_PORT, this.port);
         this.started = true;
         try {
             socket = new ServerSocket(this.port);
-            log("Server started");
+            log(Message.SERVER_STARTED);
         } catch (final Exception e) {
             throw new RuntimeException("Couldn't start the server...", e);
         }
         //
-        log("Accepting connections on 'http://%s" + (this.port == 80 ? "" : ":" + port) + "/'", hostName);
-        log("Output buffer size: %skb | Input buffer size: %skb", bufferOut / 1024, bufferIn / 1024);
+        log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
+        log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
         // Main Loop
         for (; ; ) {
             if (this.stopping) {
-                log("Shutting down...");
+                log(Message.SHUTTING_DOWN);
                 break;
             }
             try {
                 tick();
             } catch (final Exception e) {
-                log("Error in server ticking...");
+                log(Message.TICK_ERROR);
                 e.printStackTrace();
             }
         }
@@ -342,7 +345,7 @@ public class Server implements IntellectualServer {
             @Override
             public void run() {
                 if (verbose) {
-                    log("Connection accepted from '%s' - Handling the data!", remote.getInetAddress());
+                    log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
                 }
                 StringBuilder rRaw = new StringBuilder();
                 BufferedOutputStream out;
@@ -454,12 +457,38 @@ public class Server implements IntellectualServer {
         }
     }
 
-    @Override
-    public void log(@NotNull String message, @NotNull final Object... args) {
+    public void log(@NotNull Message message, @NotNull final Object... args) {
+        this.log(message.toString(), message.getMode(), args);
+    }
+
+    private void log(@NotNull String message, @NotNull int mode, @NotNull final Object... args) {
+        String prefix;
+        switch (mode) {
+            case MODE_DEBUG:
+                prefix = "Debug";
+                break;
+            case MODE_INFO:
+                prefix = "Info";
+                break;
+            case MODE_ERROR:
+                prefix = "Error";
+                break;
+            case MODE_WARNING:
+                prefix = "Warning";
+                break;
+            default:
+                prefix = "Info";
+                break;
+        }
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        System.out.printf("[%s][%s] %s\n", PREFIX, TimeUtil.getTimeStamp(), message);
+        System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
+    }
+
+    @Override
+    public void log(@NotNull String message, @NotNull final Object... args) {
+        this.log(message, MODE_INFO, args);
     }
 
     @Override
@@ -472,7 +501,7 @@ public class Server implements IntellectualServer {
 
     @Override
     public synchronized void stop() {
-        log("Shutting down!");
+        log(Message.SHUTTING_DOWN);
         EventManager.getInstance().handle(new ShutdownEvent(this));
         pluginLoader.disableAllPlugins();
         System.exit(0);
