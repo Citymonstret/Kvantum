@@ -1,11 +1,11 @@
 authbind: true
-hostname: localhost
 cache:
   enabled: true
+gzip: true
+verbose: false
+hostname: localhost
 ipv4: false
 port: 8080
-gzip: true
 buffer:
   in: 1048576
   out: 1048576
-verbose: false

@@ -1,0 +1,6 @@
+mysql-enabled: true
+mysql-user: changeme
+mysql-port: '3306'
+mysql-db: database
+mysql-pass: password
+mysql-host: localhost
