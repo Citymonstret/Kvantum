@@ -3,7 +3,7 @@ package com.intellectualsites.web.events.defaultEvents;
 import com.intellectualsites.web.core.Server;
 
 /**
- * Created 2015-05-03 for IntellectualServer
+ * Called when the servers starts up
  *
  * @author Citymonstret
  */

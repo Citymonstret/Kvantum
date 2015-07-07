@@ -1,5 +1,7 @@
 package com.intellectualsites.web.object;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +25,16 @@ public class Header {
     public Header set(final String key, final String value) {
         this.headers.put(key, value);
         return this;
+    }
+
+    public byte[] getBytes() {
+        StringBuilder temporary = new StringBuilder();
+        temporary.append(this.format).append(" ").append(this.status).append("\n");
+        for (final Map.Entry<String, String> entry : this.headers.entrySet()) {
+            temporary.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        temporary.append("\n");
+        return temporary.toString().getBytes();
     }
 
     public void apply(final OutputStream out) {

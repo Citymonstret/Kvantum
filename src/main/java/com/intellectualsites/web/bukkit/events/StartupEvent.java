@@ -9,29 +9,10 @@ import org.bukkit.event.HandlerList;
  *
  * @author Citymonstret
  */
-public class StartupEvent extends Event {
+public class StartupEvent extends BukkitEventHook {
 
-
-    public static HandlerList handlers;
-    static {
-        handlers = new HandlerList();
+    public StartupEvent() {
+        super(com.intellectualsites.web.events.defaultEvents.StartupEvent.class);
     }
 
-    private final Server server;
-    public StartupEvent(final Server server) {
-        this.server = server;
-    }
-
-    public Server getServer() {
-        return this.server;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return null;
-    }
 }

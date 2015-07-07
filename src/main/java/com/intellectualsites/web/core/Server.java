@@ -67,7 +67,7 @@ public class Server implements IntellectualServer {
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
-    CacheManager cacheManager;
+    volatile CacheManager cacheManager;
 
     {
         viewBindings = new HashMap<>();
@@ -429,24 +429,44 @@ public class Server implements IntellectualServer {
                 log(r.buildLog());
                 // Get the view
                 View view = viewManager.match(r);
-                Response response;
+
+                boolean isText;
+                String content = "";
+                byte[] bytes = null;
+
                 if (enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
                     if (cacheManager.hasCache(view)) {
-                        response = cacheManager.getCache(view);
+                        CachedResponse response = cacheManager.getCache(view);
+                        if ((isText = response.isText)) {
+                            content = new String(response.bodyBytes);
+                        } else {
+                            bytes = response.bodyBytes;
+                        }
+                        try {
+                            out.write(response.headerBytes);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     } else {
-                        response = view.generate(r);
+                        Response response = view.generate(r);
                         cacheManager.setCache(view, response);
+                        if ((isText = response.isText())) {
+                            content = response.getContent();
+                        } else {
+                            bytes = response.getBytes();
+                        }
                     }
                 } else {
-                    response = view.generate(r);
+                    Response response = view.generate(r);
+                    response.getHeader().apply(out);
+                    if ((isText = response.isText())) {
+                        content = response.getContent();
+                    } else {
+                        bytes = response.getBytes();
+                    }
                 }
-                // Response headers
-                response.getHeader().apply(out);
-                byte[] bytes;
-                if (response.isText()) {
-                    // Let's make a copy of the content before
-                    // getting the bytes
-                    String content = response.getContent();
+
+                if (isText) {
                     // Make sure to not use Crush when
                     // told not to
                     if (!(view instanceof IgnoreSyntax)) {
@@ -472,9 +492,8 @@ public class Server implements IntellectualServer {
                     }
                     // Now, finally, let's get the bytes.
                     bytes = content.getBytes();
-                } else {
-                    bytes = response.getBytes();
                 }
+
                 try {
                     out.write(bytes);
                     out.flush();
@@ -510,7 +529,7 @@ public class Server implements IntellectualServer {
         this.log(message.toString(), message.getMode(), args);
     }
 
-    private void log(@NotNull String message, @NotNull int mode, @NotNull final Object... args) {
+    private synchronized void log(@NotNull String message, @NotNull int mode, @NotNull final Object... args) {
         String prefix;
         switch (mode) {
             case MODE_DEBUG:
@@ -536,7 +555,7 @@ public class Server implements IntellectualServer {
     }
 
     @Override
-    public void log(@NotNull String message, @NotNull final Object... args) {
+    public synchronized void log(@NotNull String message, @NotNull final Object... args) {
         this.log(message, MODE_INFO, args);
     }
 
@@ -559,5 +578,10 @@ public class Server implements IntellectualServer {
     @Override
     public SessionManager getSessionManager() {
         return this.sessionManager;
+    }
+
+    @Override
+    public ViewManager getViewManager() {
+        return viewManager;
     }
 }

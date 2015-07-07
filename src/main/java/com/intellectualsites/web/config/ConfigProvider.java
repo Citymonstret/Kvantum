@@ -1,7 +1,8 @@
 package com.intellectualsites.web.config;
 
 /**
- * Created 2015-04-22 for IntellectualServer
+ * This is the configuration file that allows
+ * us to access configuration file variables
  *
  * @author Citymonstret
  */
@@ -9,6 +10,11 @@ public abstract class ConfigProvider implements ConfigurationFile {
 
     private String name;
 
+    /**
+     * Constructor, duh
+     *
+     * @param name Configuration file name
+     */
     public ConfigProvider(final String name) {
         this.name = name;
         ConfigVariableProvider.getInstance().add(this);

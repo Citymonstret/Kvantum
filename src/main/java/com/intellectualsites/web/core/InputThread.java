@@ -1,5 +1,6 @@
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.web.object.CachedResponse;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.util.CacheManager;
 
@@ -38,8 +39,8 @@ public class InputThread extends Thread {
                         case "cachedump":
                             CacheManager cacheManager = server.cacheManager;
                             StringBuilder output = new StringBuilder("Currently Cached: ");
-                            for (Map.Entry<String, Response> e : cacheManager.getAll().entrySet()) {
-                                output.append(e.getKey()).append(" = ").append(e.getValue().isText() ? "text" : "bytes").append(", ");
+                            for (Map.Entry<String, CachedResponse> e : cacheManager.getAll().entrySet()) {
+                                output.append(e.getKey()).append(" = ").append(e.getValue().isText ? "text" : "bytes").append(", ");
                             }
                             server.log(output.toString());
                             break;

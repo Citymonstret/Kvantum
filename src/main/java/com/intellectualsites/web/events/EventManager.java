@@ -54,6 +54,7 @@ public class EventManager {
     }
 
     public void removeListener(final EventListener listener) {
+        Assert.notNull(listener);
         synchronized (listeners) {
             for (final Deque<EventListener> ll : listeners.values())
                 ll.remove(listener);

@@ -13,7 +13,7 @@ public class Response {
 
     private Header header;
     private String content;
-    private final View parent;
+    public final View parent;
     private boolean isText;
     private byte[] bytes;
 

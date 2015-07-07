@@ -1,4 +1,4 @@
 name: IntellectualServerBukkit
 version: ${project.version}
 author: [Citymonstret]
-main: com.intellectualsites.web.bukkit.Plugin
+main: com.intellectualsites.web.bukkit.IntellectualServerPlugin

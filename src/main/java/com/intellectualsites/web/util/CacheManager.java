@@ -1,5 +1,6 @@
 package com.intellectualsites.web.util;
 
+import com.intellectualsites.web.object.CachedResponse;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
 
@@ -8,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CacheManager {
 
-    private final Map<String, Response> cachedResponses;
+    private final Map<String, CachedResponse> cachedResponses;
 
     public CacheManager() {
         this.cachedResponses = new ConcurrentHashMap<>();
@@ -19,14 +20,14 @@ public class CacheManager {
     }
 
     public void setCache(View view, Response response) {
-        cachedResponses.put(view.toString(), response);
+        cachedResponses.put(view.toString(), new CachedResponse(response));
     }
 
-    public Response getCache(View view) {
+    public CachedResponse getCache(View view) {
         return cachedResponses.get(view.toString());
     }
 
-    public Map<String, Response> getAll() {
+    public Map<String, CachedResponse> getAll() {
         return this.cachedResponses;
     }
 }

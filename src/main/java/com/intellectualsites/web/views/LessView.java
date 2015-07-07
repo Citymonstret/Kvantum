@@ -1,5 +1,6 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.CacheApplicable;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;

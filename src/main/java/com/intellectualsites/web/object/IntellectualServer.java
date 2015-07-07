@@ -2,6 +2,7 @@ package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.util.SessionManager;
+import com.intellectualsites.web.util.ViewManager;
 import com.sun.istack.internal.NotNull;
 
 public interface IntellectualServer {
@@ -61,4 +62,6 @@ public interface IntellectualServer {
      * @return Session Manager;
      */
     SessionManager getSessionManager();
+
+    ViewManager getViewManager();
 }
