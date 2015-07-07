@@ -62,12 +62,20 @@ public class Server implements IntellectualServer {
     private String hostName;
     private boolean ipv4;
     private int bufferIn, bufferOut;
+    private boolean mysqlEnabled;
+    private String mysqlHost;
+    private Integer mysqlPort;
+    private String mysqlUser;
+    private String mysqlPass;
+    private String mysqlDB;
     private ConfigurationFile configViews;
     public ConfigurationFile translations;
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
     volatile CacheManager cacheManager;
+    private MySQLConnManager mysqlConnManager;
+    CacheManager cacheManager;
 
     {
         viewBindings = new HashMap<>();
@@ -167,6 +175,12 @@ public class Server implements IntellectualServer {
             configServer.setIfNotExists("verbose", false);
             configServer.setIfNotExists("ipv4", false);
             configServer.setIfNotExists("cache.enabled", true);
+            configServer.setIfNotExists("mysql-enabled", false);
+            configServer.setIfNotExists("mysql-host", "localhost");
+            configServer.setIfNotExists("mysql-port", "3306");
+            configServer.setIfNotExists("mysql-db", "database");
+            configServer.setIfNotExists("mysql-user", "changeme");
+            configServer.setIfNotExists("mysql-pass", "password");
             configServer.saveFile();
         } catch (final Exception e) {
             throw new IntellectualServerInitializationException("Couldn't load in the configuration file", e);
@@ -186,6 +200,7 @@ public class Server implements IntellectualServer {
         this.viewManager = new ViewManager();
         this.sessionManager = new SessionManager(this);
         this.cacheManager = new CacheManager();
+        this.mysqlConnManager = new MySQLConnManager(mysqlHost, mysqlPort, mysqlDB, mysqlUser, mysqlPass);
 
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
@@ -313,6 +328,12 @@ public class Server implements IntellectualServer {
         log(Message.CALLING_EVENT, "startup");
         handleEvent(new StartupEvent(this));
         //
+        if (mysqlEnabled) {
+            log("Initalizing MySQL Connection");
+            mysqlConnManager.init();
+        } else {
+            log("MySQL disabled, not creating connection.");
+        }
         log(Message.VALIDATING_VIEWS);
         validateViews();
         //
