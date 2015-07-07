@@ -1,5 +1,7 @@
 package com.intellectualsites.web.config;
 
+import com.intellectualsites.web.core.Server;
+
 import static com.intellectualsites.web.object.LogModes.*;
 
 public enum Message {
@@ -16,7 +18,7 @@ public enum Message {
     SERVER_STARTED("The server is started", MODE_INFO),
     TICK_ERROR("Error in server ticking...", MODE_ERROR),
     CONNECTION_ACCEPTED("Connection accepted from '%s' - Handling the data!", MODE_DEBUG),
-    DEBUG(">> Debug <<", MODE_DEBUG);
+    DEBUG(">> Debug - Ignore <<", MODE_DEBUG);
 
     private final String message;
     private final int mode;
@@ -36,6 +38,29 @@ public enum Message {
 
     @Override
     public String toString() {
+        if (Server.getInstance() != null && Server.getInstance().translations != null) {
+            String nameSpace;
+            switch (this.getMode()) {
+                case MODE_DEBUG:
+                    nameSpace = "debug";
+                    break;
+                case MODE_INFO:
+                    nameSpace = "info";
+                    break;
+                case MODE_ERROR:
+                    nameSpace = "error";
+                    break;
+                case MODE_WARNING:
+                    nameSpace = "warning";
+                    break;
+                default:
+                    nameSpace = "info";
+                    break;
+            }
+            if (Server.getInstance().translations.contains(nameSpace + "." + this.name().toLowerCase())) {
+                return Server.getInstance().translations.get(nameSpace + "." + this.name().toLowerCase());
+            }
+        }
         return this.message;
     }
 }

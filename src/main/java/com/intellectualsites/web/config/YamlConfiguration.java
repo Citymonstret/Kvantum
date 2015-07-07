@@ -39,6 +39,8 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setAllowReadOnlyProperties(true);
+            options.setAllowUnicode(true);
+            options.setPrettyFlow(true);
             this.yaml = new Yaml(options);
         }
         return yaml;
@@ -78,7 +80,37 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
 
     @Override
     public <T> void set(String key, T value) {
-        this.map.put(key, value);
+        if (key.contains(".")) {
+            convertToMap(key, value);
+        } else {
+            this.map.put(key, value);
+        }
+    }
+
+    private void convertToMap(String in, Object value) {
+        if (in.contains(".")) {
+            Map<String, Object> lastMap = this.map;
+            while (in.contains(".")) {
+                String[] parts = in.split("\\.");
+                if (lastMap.containsKey(parts[0])) {
+                    Object o = lastMap.get(parts[0]);
+                    if (o instanceof Map) {
+                        lastMap = (Map) o;
+                    }
+                } else {
+                    lastMap.put(parts[0], new HashMap<>());
+                    lastMap = (Map) lastMap.get(parts[0]);
+                }
+                StringBuilder b = new StringBuilder();
+                for (int i = 1; i < parts.length; i++) {
+                    b.append(".").append(parts[i]);
+                }
+                in = b.toString().replaceFirst("\\.", "");
+            }
+            if (!lastMap.containsKey(in)) {
+                lastMap.put(in, value);
+            }
+        }
     }
 
     @SuppressWarnings("ALL")
@@ -87,13 +119,45 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         if (map.containsKey(key)) {
             return (T) map.get(key);
         } else {
-            return null;
+            if (key.contains(".")) {
+                String[] parts = key.split("\\.");
+                Map<String, Object> lastMap = this.map;
+                for (String p : parts) {
+                    if (lastMap.containsKey(p)) {
+                        Object o = lastMap.get(p);
+                        if (o instanceof Map) {
+                            lastMap = (Map) o;
+                        } else {
+                            return (T) o;
+                        }
+                    }
+                }
+            }
         }
+        return null;
     }
 
     @Override
     public boolean contains(String key) {
-        return map.containsKey(key);
+        if (map.containsKey(key)) {
+            return true;
+        } else {
+            if (key.contains(".")) {
+                String[] parts = key.split("\\.");
+                Map<String, Object> lastMap = this.map;
+                for (String p : parts) {
+                    if (lastMap.containsKey(p)) {
+                        Object o = lastMap.get(p);
+                        if (o instanceof Map) {
+                            lastMap = (Map) o;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override

@@ -63,6 +63,7 @@ public class Server implements IntellectualServer {
     private boolean ipv4;
     private int bufferIn, bufferOut;
     private ConfigurationFile configViews;
+    public ConfigurationFile translations;
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
@@ -120,6 +121,38 @@ public class Server implements IntellectualServer {
         } catch (final Exception e) {
             e.printStackTrace();
         }
+
+        try {
+            this.translations = new YamlConfiguration("translations", new File(new File(coreFolder, "config"), "translations.yml"));
+            this.translations.loadFile();
+            for (final Message message : Message.values()) {
+                String nameSpace;
+                switch (message.getMode()) {
+                    case MODE_DEBUG:
+                        nameSpace = "debug";
+                        break;
+                    case MODE_INFO:
+                        nameSpace = "info";
+                        break;
+                    case MODE_ERROR:
+                        nameSpace = "error";
+                        break;
+                    case MODE_WARNING:
+                        nameSpace = "warning";
+                        break;
+                    default:
+                        nameSpace = "info";
+                        break;
+                }
+                this.translations.setIfNotExists(nameSpace + "." + message.name().toLowerCase(), message.toString());
+            }
+            this.translations.saveFile();
+        } catch (final Exception e) {
+            log("Cannot load the translations file");
+            e.printStackTrace();
+        }
+
+        log(Message.DEBUG);
 
         ConfigurationFile configServer;
         try {
