@@ -56,7 +56,7 @@ public class Server implements IntellectualServer {
     public File coreFolder;
     protected ViewManager viewManager;
     protected Collection<ProviderFactory> providers;
-    private boolean started, standalone;
+    private boolean started, standalone, enableCaching;
     private ServerSocket socket;
     private SessionManager sessionManager;
     private String hostName;
@@ -81,6 +81,8 @@ public class Server implements IntellectualServer {
      */
     protected Server(boolean standalone, File coreFolder) throws IntellectualServerInitializationException {
         instance = this;
+
+        Assert.notNull(coreFolder);
 
         this.standalone = standalone;
         addViewBinding("html", HTMLView.class);
@@ -164,6 +166,7 @@ public class Server implements IntellectualServer {
             configServer.setIfNotExists("buffer.out", 1024 * 1024);
             configServer.setIfNotExists("verbose", false);
             configServer.setIfNotExists("ipv4", false);
+            configServer.setIfNotExists("cache.enabled", true);
             configServer.saveFile();
         } catch (final Exception e) {
             throw new IntellectualServerInitializationException("Couldn't load in the configuration file", e);
@@ -175,6 +178,7 @@ public class Server implements IntellectualServer {
         this.bufferOut = configServer.get("buffer.out");
         this.ipv4 = configServer.get("ipv4");
         this.verbose = configServer.get("verbose");
+        this.enableCaching = configServer.get("cache.enabled");
 
         this.started = false;
         this.stopping = false;
@@ -232,6 +236,8 @@ public class Server implements IntellectualServer {
 
     @Override
     public void addViewBinding(@NotNull final String key, @NotNull final Class<? extends View> c) {
+        Assert.notNull(c);
+        Assert.notEmpty(key);
         viewBindings.put(key, c);
     }
 
@@ -341,6 +347,11 @@ public class Server implements IntellectualServer {
             log("ipv4 is true - Using IPv4 stack");
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
+        if (!this.enableCaching) {
+            log("Caching is not enabled, this can reduce load times on bigger files!");
+        } else {
+            log("Caching is enabled, beware that this increases memory usage - So keep an eye on it");
+        }
         //
         log(Message.STARTING_ON_PORT, this.port);
         this.started = true;
@@ -354,6 +365,11 @@ public class Server implements IntellectualServer {
         log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
         log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
         // Main Loop
+
+        long lastExecution = System.currentTimeMillis();
+        long placeholder = System.currentTimeMillis();
+        int loops = 0;
+
         for (; ; ) {
             if (this.stopping) {
                 log(Message.SHUTTING_DOWN);
@@ -414,7 +430,7 @@ public class Server implements IntellectualServer {
                 // Get the view
                 View view = viewManager.match(r);
                 Response response;
-                if (view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
+                if (enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
                     if (cacheManager.hasCache(view)) {
                         response = cacheManager.getCache(view);
                     } else {

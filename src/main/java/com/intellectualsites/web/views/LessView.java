@@ -36,7 +36,7 @@ public class LessView extends View implements CacheApplicable {
         if (containsOption("folder")) {
             this.folder = new File(getOption("folder").toString());
         } else {
-            this.folder = new File(Context.coreFolder, "/assets/less");
+            this.folder = new File(Context.coreFolder, "./assets/less");
         }
 
         if (!this.folder.exists()) {

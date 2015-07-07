@@ -2,6 +2,7 @@ package com.intellectualsites.web.plugin;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.LogProvider;
+import com.intellectualsites.web.util.Assert;
 
 import java.io.File;
 import java.util.UUID;
@@ -46,6 +47,7 @@ public class Plugin implements LogProvider {
                              final PluginClassLoader classLoader) {
         if (this.desc != null)
             throw new RuntimeException("Plugin already created: " + desc.name);
+        Assert.notNull(desc, data, classLoader);
         this.desc = desc;
         this.classLoader = classLoader;
         name = desc.name;
@@ -69,8 +71,8 @@ public class Plugin implements LogProvider {
      * @throws RuntimeException If the plugin is already enabled, or if couldn't be enabled
      */
     final public void enable() {
-        if (enabled)
-            throw new RuntimeException("Plugin is already enabled");
+        Assert.equals(enabled, false);
+
         try {
             enabled = true;
             onEnable();
@@ -84,9 +86,8 @@ public class Plugin implements LogProvider {
      * Used to disable the plugin
      */
     final public void disable() {
-        if (!enabled) {
-            return;
-        }
+        Assert.equals(enabled, true);
+
         enabled = false;
         onDisable();
     }

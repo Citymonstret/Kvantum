@@ -22,6 +22,8 @@ public class ViewManager {
     }
 
     public void add(final View view) {
+        Assert.notNull(view);
+
         for (View v : views) {
             if (v.toString().equalsIgnoreCase(view.toString())) {
                 throw new IllegalArgumentException("Duplicate view pattern!");

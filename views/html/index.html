@@ -3,7 +3,7 @@
     [author: Sauilitired/Citymonstret]
     [copyright: IntellectualSites]
 :}}<html>
-    {{include:/views/html/header.html}}
+{{include:./views/html/header.html}}
     <br>
         <div class="container">
             <h1>
@@ -30,6 +30,8 @@
                         It's currently {{system.time || LOWERCASE}} and the document is named {{document.name}}!
                         <br>
                         The server is running on port {{cfg.server@port}} and the hostname is {{cfg.server@hostname}}
+                        <br>
+                        The server is using {{system.usedram}}mb/{{system.totalram}}mb ({{system.freeram}}mb free!)
                         <br>
                         At the time of reading this we support these filters:
                         {{system.filters || LIST}} and the one used was LIST!

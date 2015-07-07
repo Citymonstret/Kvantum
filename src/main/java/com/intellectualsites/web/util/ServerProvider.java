@@ -26,6 +26,9 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
             case "time":
             case "true":
             case "false":
+            case "totalram":
+            case "usedram":
+            case "freeram":
                 return true;
             default:
                 return false;
@@ -44,6 +47,12 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
                 return true;
             case "false":
                 return false;
+            case "totalram":
+                return (Runtime.getRuntime().totalMemory() / 1024) / 1024;
+            case "usedram":
+                return ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024) / 1024;
+            case "freeram":
+                return (Runtime.getRuntime().freeMemory() / 1024) / 1024;
             default:
                 return "";
         }

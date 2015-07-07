@@ -1,5 +1,7 @@
 authbind: true
 hostname: localhost
+cache:
+  enabled: true
 ipv4: false
 port: 8080
 gzip: true

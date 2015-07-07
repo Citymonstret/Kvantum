@@ -13,6 +13,8 @@ import java.util.zip.ZipOutputStream;
 public class FileUtils {
 
     public static void addToZip(File zipFile, File[] files, boolean delete) throws Exception {
+        Assert.notNull(zipFile, files);
+
         if (!zipFile.exists()) {
             zipFile.createNewFile();
         }
@@ -83,6 +85,7 @@ public class FileUtils {
      */
     public static void copyFile(final InputStream in, final OutputStream out,
                                 final int size) {
+        Assert.notNull(in, out, size);
         try {
             final byte[] buffer = new byte[size];
             int length;

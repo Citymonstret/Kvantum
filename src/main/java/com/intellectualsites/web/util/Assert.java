@@ -4,6 +4,20 @@ import com.intellectualsites.web.object.AssertionError;
 
 public class Assert {
 
+    public static <T> void notEmpty(String s) {
+        try {
+            equals(s == null || s.isEmpty(), false);
+        } catch (final AssertionError a) {
+            throw new AssertionError(s, "was empty");
+        }
+    }
+
+    public static void notNull(Object... in) {
+        for (Object i : in) {
+            notNull(i);
+        }
+    }
+
     public static <T> void notNull(T t) {
         try {
             equals(t == null, false);

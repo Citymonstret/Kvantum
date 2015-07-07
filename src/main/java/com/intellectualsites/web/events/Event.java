@@ -1,5 +1,7 @@
 package com.intellectualsites.web.events;
 
+import com.intellectualsites.web.util.Assert;
+
 /**
  * This is an event, in other words:
  * <br/>
@@ -21,6 +23,8 @@ public abstract class Event {
      * @param name Event Name
      */
     public Event(final String name) {
+        Assert.notEmpty(name);
+
         this.name = name;
         this.accessor = getClass().getName().hashCode();
     }
