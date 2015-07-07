@@ -199,7 +199,7 @@ public class Server implements IntellectualServer {
         this.viewManager = new ViewManager();
         this.sessionManager = new SessionManager(this);
         this.cacheManager = new CacheManager();
-        this.mysqlConnManager = new MySQLConnectionManager(mysqlHost, mysqlPort, mysqlDB, mysqlUser, mysqlPass)
+        this.mysqlConnManager = new MySQLConnManager(mysqlHost, mysqlPort, mysqlDB, mysqlUser, mysqlPass);
 
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
@@ -331,7 +331,7 @@ public class Server implements IntellectualServer {
             log("Initalizing MySQL Connection");
             mysqlConnManager.init();
         } else {
-            log("MySQL disabled, not creating connection.")
+            log("MySQL disabled, not creating connection.");
         }
         log(Message.VALIDATING_VIEWS);
         validateViews();
