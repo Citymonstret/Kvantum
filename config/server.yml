@@ -9,3 +9,4 @@ port: 8080
 buffer:
   in: 1048576
   out: 1048576
+mysql-enabled: false
