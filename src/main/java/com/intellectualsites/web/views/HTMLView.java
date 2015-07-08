@@ -2,10 +2,9 @@ package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.util.Context;
+import com.intellectualsites.web.util.FileUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -54,20 +53,9 @@ public class HTMLView extends View implements CacheApplicable {
     @Override
     public Response generate(final Request r) {
         File file = new File(folder, r.getMeta("html_file") + ".html");
-        StringBuilder document = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                document.append(line).append("\n");
-            }
-            reader.close();
-        } catch(final Exception e) {
-            e.printStackTrace();
-        }
         Response response = new Response(this);
         response.getHeader().set("Content-Type", "text/html; charset=utf-8");
-        response.setContent(document.toString());
+        response.setContent(FileUtils.getDocument(file, buffer));
         return response;
     }
 

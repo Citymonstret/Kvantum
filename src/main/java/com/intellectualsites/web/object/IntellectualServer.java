@@ -7,6 +7,11 @@ import com.sun.istack.internal.NotNull;
 
 public interface IntellectualServer {
 
+    /**
+     * Check if mysql is enabled
+     *
+     * @return true|false
+     */
     boolean isMysqlEnabled();
 
     /**
@@ -18,8 +23,17 @@ public interface IntellectualServer {
      */
     void addViewBinding(@NotNull String key, @NotNull Class<? extends View> c);
 
+    /**
+     * Validate the views, and make sure they
+     * contain the right constructor
+     */
     void validateViews();
 
+    /**
+     * Handle an event
+     *
+     * @param event Event to handle
+     */
     void handleEvent(@NotNull Event event);
 
     /**
@@ -65,5 +79,10 @@ public interface IntellectualServer {
      */
     SessionManager getSessionManager();
 
+    /**
+     * Get the view manager
+     *
+     * @return view manager
+     */
     ViewManager getViewManager();
 }

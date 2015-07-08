@@ -103,6 +103,21 @@ public class FileUtils {
         }
     }
 
+    public static String getDocument(final File file, int buffer) {
+        StringBuilder document = new StringBuilder();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                document.append(line).append("\n");
+            }
+            reader.close();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return document.toString();
+    }
+
     /**
      * Get the size of a file or directory
      *
