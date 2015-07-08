@@ -7,6 +7,8 @@ import com.sun.istack.internal.NotNull;
 
 public interface IntellectualServer {
 
+    boolean isMysqlEnabled();
+
     /**
      * Add a view binding to the engine
      *

@@ -1,12 +1,13 @@
 authbind: true
 cache:
   enabled: true
-gzip: true
-verbose: false
 hostname: localhost
 ipv4: false
 port: 8080
+gzip: true
+mysql:
+  enabled: false
 buffer:
   in: 1048576
   out: 1048576
-mysql-enabled: false
+verbose: false

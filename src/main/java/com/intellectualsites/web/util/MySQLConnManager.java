@@ -1,7 +1,9 @@
 package com.intellectualsites.web.util;
 
+import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.core.Server;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,19 +13,27 @@ import java.sql.SQLException;
  */
 public class MySQLConnManager {
     private String host;
-    private Integer port;
+    private int port;
     private String db;
     private String user;
     private String pass;
 
     private Connection conn;
 
-    public MySQLConnManager(String host, Integer port, String db, String user, String pass) {
-        this.host = host;
-        this.port = port;
-        this.db = db;
-        this.user = user;
-        this.pass = pass;
+    public MySQLConnManager() {
+        try {
+            YamlConfiguration config = new YamlConfiguration("mysql", new File(new File(Server.getInstance().coreFolder, "config"), "mysql.yml"));
+            config.loadFile();
+            this.host = config.get("mysql.host", "127.0.0.1");
+            this.pass = config.get("mysql.pass", "password");
+            this.user = config.get("mysql.user", "root");
+            this.port = config.get("mysql.port", 3306);
+            this.db = config.get("mysql.db", "database");
+            config.saveFile();
+        } catch (final Exception e) {
+            throw new MySQLInitiationException("Could not load mysql.yml", e);
+        }
+        log("MySQL manager is created!");
     }
 
     public Connection getConnection() {
@@ -36,7 +46,8 @@ public class MySQLConnManager {
             conn = DriverManager.getConnection(connUrl, user, pass);
             log("Connection established.");
         } catch (SQLException ex) {
-            log("MySQL threw error: ", ex.getMessage() + ex.getErrorCode());
+            ex.printStackTrace();
+            // log("MySQL threw error: ", ex.getMessage() + ex.getErrorCode());
         }
     }
 
@@ -45,5 +56,13 @@ public class MySQLConnManager {
             message = message.replaceFirst("%s", a.toString());
         }
         System.out.printf("[%s][%s] %s\n", Server.PREFIX + "-MySQL", TimeUtil.getTimeStamp(), message);
+    }
+
+    private class MySQLInitiationException extends RuntimeException {
+
+        public MySQLInitiationException(final String issue, final Exception cause) {
+            super(issue, cause);
+        }
+
     }
 }

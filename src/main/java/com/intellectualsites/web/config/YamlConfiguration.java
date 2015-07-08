@@ -113,6 +113,14 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         }
     }
 
+    public <T> T get(String key, T def) {
+        if (!contains(key)) {
+            setIfNotExists(key, def);
+            return def;
+        }
+        return get(key);
+    }
+
     @SuppressWarnings("ALL")
     @Override
     public <T> T get(String key) {

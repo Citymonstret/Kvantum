@@ -62,12 +62,6 @@ public class Server implements IntellectualServer {
     private String hostName;
     private boolean ipv4;
     private int bufferIn, bufferOut;
-    private boolean mysqlEnabled;
-    private String mysqlHost;
-    private Integer mysqlPort;
-    private String mysqlUser;
-    private String mysqlPass;
-    private String mysqlDB;
     private ConfigurationFile configViews;
     public ConfigurationFile translations;
     private Map<String, Class<? extends View>> viewBindings;
@@ -75,10 +69,16 @@ public class Server implements IntellectualServer {
     private PluginLoader pluginLoader;
     volatile CacheManager cacheManager;
     private MySQLConnManager mysqlConnManager;
+    private boolean mysqlEnabled;
 
     {
         viewBindings = new HashMap<>();
         providers = new ArrayList<>();
+    }
+
+    @Override
+    public boolean isMysqlEnabled() {
+        return this.mysqlEnabled;
     }
 
     /**
@@ -174,12 +174,7 @@ public class Server implements IntellectualServer {
             configServer.setIfNotExists("verbose", false);
             configServer.setIfNotExists("ipv4", false);
             configServer.setIfNotExists("cache.enabled", true);
-            configServer.setIfNotExists("mysql-enabled", false);
-            configServer.setIfNotExists("mysql-host", "localhost");
-            configServer.setIfNotExists("mysql-port", "3306");
-            configServer.setIfNotExists("mysql-db", "database");
-            configServer.setIfNotExists("mysql-user", "changeme");
-            configServer.setIfNotExists("mysql-pass", "password");
+            configServer.setIfNotExists("mysql.enabled", false);
             configServer.saveFile();
         } catch (final Exception e) {
             throw new IntellectualServerInitializationException("Couldn't load in the configuration file", e);
@@ -192,6 +187,7 @@ public class Server implements IntellectualServer {
         this.ipv4 = configServer.get("ipv4");
         this.verbose = configServer.get("verbose");
         this.enableCaching = configServer.get("cache.enabled");
+        this.mysqlEnabled = configServer.get("mysql.enabled");
 
         this.started = false;
         this.stopping = false;
@@ -199,7 +195,10 @@ public class Server implements IntellectualServer {
         this.viewManager = new ViewManager();
         this.sessionManager = new SessionManager(this);
         this.cacheManager = new CacheManager();
-        this.mysqlConnManager = new MySQLConnManager(mysqlHost, mysqlPort, mysqlDB, mysqlUser, mysqlPass);
+
+        if (mysqlEnabled) {
+            this.mysqlConnManager = new MySQLConnManager();
+        }
 
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
@@ -330,8 +329,6 @@ public class Server implements IntellectualServer {
         if (mysqlEnabled) {
             log("Initalizing MySQL Connection");
             mysqlConnManager.init();
-        } else {
-            log("MySQL disabled, not creating connection.");
         }
         log(Message.VALIDATING_VIEWS);
         validateViews();
