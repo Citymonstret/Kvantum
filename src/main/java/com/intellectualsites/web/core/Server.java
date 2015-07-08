@@ -75,7 +75,6 @@ public class Server implements IntellectualServer {
     private PluginLoader pluginLoader;
     volatile CacheManager cacheManager;
     private MySQLConnManager mysqlConnManager;
-    CacheManager cacheManager;
 
     {
         viewBindings = new HashMap<>();
