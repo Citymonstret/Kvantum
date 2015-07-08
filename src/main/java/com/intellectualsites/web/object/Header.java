@@ -1,12 +1,33 @@
 package com.intellectualsites.web.object;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Header {
+
+    public static final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
+    public static final String CONTENT_TYPE_OCTET_STREAM = "application/octet-stream; charset=utf-8";
+    public static final String CONTENT_TYPE_HTML = "text/html; charset=utf-8";
+    public static final String CONTENT_TYPE_JAVASCRIPT = "text/javascript; charset=utf-8";
+
+    public static final String POWERED_BY = "IntellectualServer";
+    public static final String X_POWERED_BY = "Java/IntellectualServer 1.0";
+
+    public static final String STATUS_TEMPORARY_REDIRECT = "307 Temporary Redirect";
+    public static final String STATUS_OK = "200 OK";
+
+    public static final String COOKIE_DELETED = "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    public static final String HEADER_CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
+    public static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+    public static final String HEADER_LOCATION = "Location";
+    public static final String HEADER_X_POWERED_BY = "X-Powered-By";
+    public static final String HEADER_CONTENT_TYPE = "Content-Type";
+    public static final String HEADER_STATUS = "Status";
+    public static final String HEADER_DATE = "Date";
+    public static final String HEADER_SERVER = "Server";
+    public static final String HEADER_CONTENT_LENGTH = "Content-Length";
 
     private Map<String, String> headers;
     private String status;
@@ -64,9 +85,9 @@ public class Header {
     }
 
     public void redirect(final String newURL) {
-        set("Location", newURL);
-        set("Status", "307 Temporary Redirect");
-        setStatus("307 Temporary Redirect");
+        set(Header.HEADER_LOCATION, newURL);
+        set(Header.HEADER_STATUS, Header.STATUS_TEMPORARY_REDIRECT);
+        setStatus(Header.STATUS_TEMPORARY_REDIRECT);
     }
 
     public void setCookie(final String cookie, final String value) {
@@ -80,7 +101,7 @@ public class Header {
     }
 
     public void removeCookie(final String cookie) {
-        setCookie(cookie, "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+        setCookie(cookie, Header.COOKIE_DELETED);
     }
 
     public Header setStatus(final String status) {

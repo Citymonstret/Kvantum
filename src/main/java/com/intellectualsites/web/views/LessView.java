@@ -1,10 +1,6 @@
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.CacheApplicable;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.util.Context;
 import org.lesscss.LessCompiler;
 
@@ -72,7 +68,7 @@ public class LessView extends View implements CacheApplicable {
             e.printStackTrace();
         }
         Response response = new Response(this);
-        response.getHeader().set("Content-Type", "text/css; charset=utf-8");
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
 
         if (compiler == null) {
             compiler = new LessCompiler();

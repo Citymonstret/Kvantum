@@ -1,9 +1,6 @@
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.object.CacheApplicable;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.util.Context;
 import com.intellectualsites.web.util.FileUtils;
 
@@ -56,7 +53,7 @@ public class JSView extends View implements CacheApplicable {
     public Response generate(final Request r) {
         File file = new File(folder, r.getMeta("js_file").toString());
         Response response = new Response(this);
-        response.getHeader().set("Content-Type", "text/javascript; charset=utf-8");
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT);
         response.setContent(FileUtils.getDocument(file, buffer));
         return response;
     }

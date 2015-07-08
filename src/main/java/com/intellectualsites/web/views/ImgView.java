@@ -1,9 +1,6 @@
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.object.CacheApplicable;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.util.Context;
 import org.apache.commons.io.IOUtils;
 
@@ -76,7 +73,7 @@ public class ImgView extends View implements CacheApplicable {
             e.printStackTrace();
         }
         Response response = new Response(this);
-        response.getHeader().set("Content-Type", "image/" + r.getMeta("img_type") + "; charset=utf-8");
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, "image/" + r.getMeta("img_type") + "; charset=utf-8");
         response.setBytes(bytes);
         return response;
     }

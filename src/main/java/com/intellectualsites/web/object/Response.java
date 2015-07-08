@@ -24,12 +24,12 @@ public class Response {
      */
     public Response(final View parent) {
         this.parent = parent;
-        this.header = new Header("200 OK")
-                .set("Content-Type", "text/html")
-                .set("Server", "IntellectualServer")
-                .set("Date", TimeUtil.getHTTPTimeStamp())
-                .set("Status", "200 OK")
-                .set("X-Powered-By", "Java/IntellectualServer 1.0");
+        this.header = new Header(Header.STATUS_OK)
+                .set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML)
+                .set(Header.HEADER_SERVER, Header.POWERED_BY)
+                .set(Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp())
+                .set(Header.HEADER_STATUS, Header.STATUS_OK)
+                .set(Header.HEADER_X_POWERED_BY, Header.X_POWERED_BY);
         this.content = "";
         this.bytes = new byte[0];
     }

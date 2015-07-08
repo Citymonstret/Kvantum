@@ -1,5 +1,6 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.View;
@@ -73,10 +74,10 @@ public class DownloadView extends View {
             e.printStackTrace();
         }
         Response response = new Response(this);
-        response.getHeader().set("Content-Type", "application/octet-stream; charset=utf-8");
-        response.getHeader().set("Content-Disposition", "attachment; filename=\"" + r.getMeta("zip_file").toString() + "\"");
-        response.getHeader().set("Content-Transfer-Encoding", "binary");
-        response.getHeader().set("Content-Length", "" + file.length());
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_OCTET_STREAM);
+        response.getHeader().set(Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + r.getMeta("zip_file").toString() + "\"");
+        response.getHeader().set(Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary");
+        response.getHeader().set(Header.HEADER_CONTENT_LENGTH, "" + file.length());
         response.setBytes(bytes);
         return response;
     }

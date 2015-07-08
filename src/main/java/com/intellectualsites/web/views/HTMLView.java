@@ -54,7 +54,7 @@ public class HTMLView extends View implements CacheApplicable {
     public Response generate(final Request r) {
         File file = new File(folder, r.getMeta("html_file") + ".html");
         Response response = new Response(this);
-        response.getHeader().set("Content-Type", "text/html; charset=utf-8");
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
         response.setContent(FileUtils.getDocument(file, buffer));
         return response;
     }
