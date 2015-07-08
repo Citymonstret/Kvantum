@@ -154,8 +154,7 @@ public class Request {
         if (parts.length < 3) {
             this.query = new Query(Method.GET, "/");
         } else {
-            Method method = parts[0].equalsIgnoreCase("GET") ? Method.GET : Method.POST;
-            this.query = new Query(method, parts[1]);
+            this.query = new Query(parts[0].equalsIgnoreCase("GET") ? Method.GET : Method.POST, parts[1]);
         }
     }
 

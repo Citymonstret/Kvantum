@@ -67,7 +67,7 @@ public class Server implements IntellectualServer {
     private Map<String, Class<? extends View>> viewBindings;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
-    volatile CacheManager cacheManager;
+    public volatile CacheManager cacheManager;
     private MySQLConnManager mysqlConnManager;
     private boolean mysqlEnabled;
 
@@ -547,6 +547,12 @@ public class Server implements IntellectualServer {
     }
 
     private synchronized void log(@NotNull String message, @NotNull int mode, @NotNull final Object... args) {
+        // This allows us to customize what messages are
+        // sent to the logging screen, and thus we're able
+        // to limit to only error messages or such
+        if (mode < lowestLevel || mode > highestLevel) {
+            return;
+        }
         String prefix;
         switch (mode) {
             case MODE_DEBUG:

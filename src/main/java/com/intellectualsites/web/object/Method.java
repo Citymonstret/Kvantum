@@ -6,5 +6,21 @@ package com.intellectualsites.web.object;
  * @author Citymonstret
  */
 public enum Method {
-    POST, GET, PUT;
+
+    /**
+     * Post requests are used
+     * to handle data
+     */
+    POST,
+
+    /**
+     * Get requests are handled
+     * for getting resources
+     */
+    GET,
+
+    /**
+     *
+     */
+    PUT;
 }
