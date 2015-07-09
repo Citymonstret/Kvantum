@@ -1,4 +1,6 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.object.cache;
+
+import com.intellectualsites.web.object.Response;
 
 public class CachedResponse {
 

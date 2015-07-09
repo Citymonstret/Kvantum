@@ -2,6 +2,8 @@ package com.intellectualsites.web.util;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 
 import java.io.OutputStream;
 import java.util.HashMap;

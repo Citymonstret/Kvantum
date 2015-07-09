@@ -1,4 +1,6 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.object.error;
+
+import com.intellectualsites.web.object.error.IntellectualServerException;
 
 public class IntellectualServerStartException extends IntellectualServerException {
 

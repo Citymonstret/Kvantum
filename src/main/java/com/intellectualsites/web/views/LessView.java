@@ -1,7 +1,7 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.object.*;
-import com.intellectualsites.web.util.Context;
+import com.intellectualsites.web.object.cache.CacheApplicable;
 import org.lesscss.LessCompiler;
 
 import java.io.BufferedReader;
@@ -19,28 +19,9 @@ public class LessView extends View implements CacheApplicable {
 
     public static LessCompiler compiler;
 
-    private File folder;
-    private int buffer;
-
     public LessView(String filter, Map<String, Object> options) {
-        super(filter);
-
-        if (containsOption("buffer")) {
-            this.buffer = getOption("buffer");
-        } else {
-            this.buffer = 1024 * 64;
-        }
-        if (containsOption("folder")) {
-            this.folder = new File(getOption("folder").toString());
-        } else {
-            this.folder = new File(Context.coreFolder, "./assets/less");
-        }
-
-        if (!this.folder.exists()) {
-            if (!this.folder.mkdirs()) {
-                System.out.println("Couldn't create the less folder...");
-            }
-        }
+        super(filter, "less", options);
+        super.relatedFolderPath = "/assets/less";
     }
 
     @Override
@@ -49,16 +30,16 @@ public class LessView extends View implements CacheApplicable {
         if (!file.endsWith(".less"))
             file = file + ".less";
         request.addMeta("less_file", file);
-        return matcher.matches() && (new File(folder, file)).exists();
+        return matcher.matches() && (new File(getFolder(), file)).exists();
     }
 
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(folder, r.getMeta("less_file").toString());
+        File file = new File(getFolder(), r.getMeta("less_file").toString());
         StringBuilder document = new StringBuilder();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
+            BufferedReader reader = new BufferedReader(new FileReader(file), getBuffer());
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line).append("\n");

@@ -1,7 +1,7 @@
 package com.intellectualsites.web.plugin;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.LogProvider;
+import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.util.Assert;
 
 import java.io.File;
@@ -72,7 +72,6 @@ public class Plugin implements LogProvider {
      */
     final public void enable() {
         Assert.equals(enabled, false);
-
         try {
             enabled = true;
             onEnable();

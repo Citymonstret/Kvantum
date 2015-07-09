@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Created 2015-04-19 for IntellectualServer
+ * A time utility class
  *
  * @author Citymonstret
  */
@@ -22,6 +22,12 @@ public class TimeUtil {
         return getTimeStamp(LogFormat);
     }
 
+    /**
+     * Returns a string with date formatted with
+     * HTTP-date format as defined by RFC 7231
+     *
+     * @return RFC 7231 formatted timestamp
+     */
     public static String getHTTPTimeStamp() {
         return getTimeStamp(HTTPFormat);
     }

@@ -1,10 +1,19 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.core;
 
 import com.intellectualsites.web.events.Event;
+import com.intellectualsites.web.events.EventCaller;
+import com.intellectualsites.web.logging.LogProvider;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.SessionManager;
 import com.intellectualsites.web.util.ViewManager;
+import com.intellectualsites.web.views.View;
 import com.sun.istack.internal.NotNull;
 
+/**
+ * Core server interface, contains
+ * all methods that are required
+ * for the server to work
+ */
 public interface IntellectualServer {
 
     /**

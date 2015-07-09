@@ -1,14 +1,15 @@
 package com.intellectualsites.web.config;
 
-import com.intellectualsites.web.object.ProviderFactory;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.VariableProvider;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created 2015-04-22 for IntellectualServer
+ * This allows you to access configuration
+ * variables through the variable syntax
  *
  * @author Citymonstret
  */

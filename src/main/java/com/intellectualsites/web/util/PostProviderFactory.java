@@ -1,9 +1,9 @@
 package com.intellectualsites.web.util;
 
 import com.intellectualsites.web.object.PostRequest;
-import com.intellectualsites.web.object.ProviderFactory;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.VariableProvider;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 
 /**
  * Created 2015-04-25 for IntellectualServer

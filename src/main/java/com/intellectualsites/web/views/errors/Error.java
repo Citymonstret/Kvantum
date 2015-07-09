@@ -2,7 +2,7 @@ package com.intellectualsites.web.views.errors;
 
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.views.View;
 
 import java.util.regex.Matcher;
 
@@ -17,7 +17,7 @@ public class Error extends View {
     private final String desc;
 
     public Error(final int code, final String desc) {
-        super("");
+        super("", "error");
         this.code = code;
         this.desc = desc;
     }

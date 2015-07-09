@@ -1,4 +1,4 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.logging;
 
 public interface LogProvider {
 

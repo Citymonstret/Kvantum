@@ -1,7 +1,9 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.object.*;
-import com.intellectualsites.web.util.Context;
+import com.intellectualsites.web.object.cache.CacheApplicable;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 
 import java.io.File;
@@ -16,28 +18,8 @@ import java.util.regex.Matcher;
  */
 public class HTMLView extends View implements CacheApplicable {
 
-    private final File folder;
-    private final int buffer;
-
     public HTMLView(String filter, Map<String, Object> options) {
-        super(filter, options);
-
-        if (containsOption("buffer")) {
-            this.buffer = getOption("buffer");
-        } else {
-            this.buffer = 1024 * 64;
-        }
-        if (containsOption("folder")) {
-            this.folder = new File(getOption("folder").toString());
-        } else {
-            this.folder = new File(Context.coreFolder, "/html");
-        }
-
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
-                System.out.println("Couldn't create the html folder...");
-            }
-        }
+        super(filter, "html", options);
     }
 
     @Override
@@ -52,15 +34,15 @@ public class HTMLView extends View implements CacheApplicable {
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(folder, r.getMeta("html_file") + ".html");
+        File file = new File(getFolder(), r.getMeta("html_file") + ".html");
         Response response = new Response(this);
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
-        response.setContent(FileUtils.getDocument(file, buffer));
+        response.setContent(FileUtils.getDocument(file, getBuffer()));
         return response;
     }
 
     private boolean foundFile(final String file) {
-        return new File(folder, file + ".html").exists();
+        return new File(getFolder(), file + ".html").exists();
     }
 
     @Override

@@ -1,14 +1,19 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.events;
 
 import com.intellectualsites.web.events.Event;
 
 /**
- * Created 2015-05-04 for IntellectualServer
+ * This handles calling
  *
  * @author Citymonstret
  */
 public abstract class EventCaller {
 
+    /**
+     * Call an event
+     *
+     * @param event Event to call
+     */
     public abstract void callEvent(final Event event);
 
 }

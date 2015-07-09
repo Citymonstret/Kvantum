@@ -1,7 +1,5 @@
 package com.intellectualsites.web.events;
 
-import com.intellectualsites.web.object.EventCaller;
-
 /**
  * This is the default event caller
  *

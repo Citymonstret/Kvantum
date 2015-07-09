@@ -1,10 +1,7 @@
 package com.intellectualsites.web.object.syntax;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.core.ServerAPI;
-import com.intellectualsites.web.object.ProviderFactory;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Syntax;
 
 import java.io.BufferedReader;
 import java.io.File;

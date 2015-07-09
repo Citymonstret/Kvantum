@@ -1,6 +1,7 @@
 package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.util.TimeUtil;
+import com.intellectualsites.web.views.View;
 
 /**
  * The HTTP response,
@@ -29,7 +30,6 @@ public class Response {
                 .set(Header.HEADER_SERVER, Header.POWERED_BY)
                 .set(Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp())
                 .set(Header.HEADER_STATUS, Header.STATUS_OK)
-                .set(Header.HEADER_CACHE_CONTROL, Header.CACHE_NO_CACHE)
                 .set(Header.HEADER_X_POWERED_BY, Header.X_POWERED_BY);
         this.content = "";
         this.bytes = new byte[0];

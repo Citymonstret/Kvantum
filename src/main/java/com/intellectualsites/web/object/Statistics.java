@@ -1,5 +1,7 @@
 package com.intellectualsites.web.object;
 
+import com.intellectualsites.web.views.View;
+
 /**
  * Created 2015-04-30 for IntellectualServer
  *

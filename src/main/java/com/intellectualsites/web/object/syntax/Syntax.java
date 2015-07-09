@@ -1,4 +1,7 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.object.syntax;
+
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 
 import java.util.Map;
 import java.util.regex.Matcher;

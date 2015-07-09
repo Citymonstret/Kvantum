@@ -1,5 +1,7 @@
 package com.intellectualsites.web.plugin;
 
+import com.intellectualsites.web.util.Assert;
+
 import java.util.*;
 
 /**
@@ -27,6 +29,7 @@ public class PluginManager {
      * @param plugin Plugin to add
      */
     public void addPlugin(final Plugin plugin) {
+        Assert.notNull(plugin);
         plugins.put(plugin.toString(), plugin);
     }
 
@@ -36,6 +39,7 @@ public class PluginManager {
      * @param plugin Plugin to remove
      */
     public void removePlugin(final Plugin plugin) {
+        Assert.notNull(plugin);
         if (plugins.containsKey(plugin.toString()))
             plugins.remove(plugin.toString());
     }
@@ -52,6 +56,7 @@ public class PluginManager {
      *                                    #addPlugin(com.marine.Plugin)}
      */
     protected void enablePlugin(final Plugin plugin) {
+        Assert.notNull(plugin);
         if (!plugins.containsKey(plugin.toString()))
             throw new RuntimeException("Plugin: " + plugin.getName()
                     + " is not added to the plugin list, can't enable");
@@ -66,6 +71,7 @@ public class PluginManager {
      *                                    #addPlugin(com.marine.Plugin)}
      */
     protected void disablePlugin(final Plugin plugin) {
+        Assert.notNull(plugin);
         if (!plugins.containsKey(plugin.toString()))
             throw new RuntimeException("Plugin: " + plugin.getName()
                     + " is not added to the plugin list, can't disable");

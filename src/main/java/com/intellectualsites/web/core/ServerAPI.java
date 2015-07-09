@@ -1,12 +1,12 @@
 package com.intellectualsites.web.core;
 
-import com.intellectualsites.web.object.ProviderFactory;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.views.View;
 
 /**
- * Created 2015-04-23 for IntellectualServer
+ * Server API
  *
- * @author Citymonstret
+ * @deprecated
  */
 public class ServerAPI {
 

@@ -4,15 +4,13 @@ import com.intellectualsites.web.bukkit.events.BukkitEventHook;
 import com.intellectualsites.web.core.Bootstrap;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.events.Event;
-import com.intellectualsites.web.events.defaultEvents.StartupEvent;
-import com.intellectualsites.web.object.EventCaller;
+import com.intellectualsites.web.events.EventCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Level;
 
 /**
  * Created 2015-05-04 for IntellectualServer

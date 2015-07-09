@@ -3,8 +3,6 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
-import com.intellectualsites.web.util.Context;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -20,28 +18,9 @@ import java.util.regex.Matcher;
  */
 public class DownloadView extends View {
 
-    private File folder;
-    private int buffer;
-
     public DownloadView(String filter, Map<String, Object> options) {
-        super(filter, options);
-
-        if (containsOption("buffer")) {
-            this.buffer = getOption("buffer");
-        } else {
-            this.buffer = 1024 * 64;
-        }
-        if (containsOption("folder")) {
-            this.folder = new File(getOption("folder").toString());
-        } else {
-            this.folder = new File(Context.coreFolder, "/assets/downloads");
-        }
-
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
-                System.out.println("Couldn't create the download folder...");
-            }
-        }
+        super(filter, "download", options);
+        super.relatedFolderPath = "/assets/downloads";
     }
 
     @Override
@@ -58,16 +37,16 @@ public class DownloadView extends View {
             return false;
         }
         request.addMeta("zip_file", file);
-        return matcher.matches() && (new  File(folder, file)).exists();
+        return matcher.matches() && (new  File(getFolder(), file)).exists();
     }
 
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(folder, r.getMeta("zip_file").toString());
+        File file = new File(getFolder(), r.getMeta("zip_file").toString());
         byte[] bytes = new byte[0];
         try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), buffer);
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), getBuffer());
             bytes = IOUtils.toByteArray(stream);
             stream.close();
         } catch(final Exception e) {

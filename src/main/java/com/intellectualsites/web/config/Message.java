@@ -2,8 +2,11 @@ package com.intellectualsites.web.config;
 
 import com.intellectualsites.web.core.Server;
 
-import static com.intellectualsites.web.object.LogModes.*;
+import static com.intellectualsites.web.logging.LogModes.*;
 
+/**
+ * These are logging messages
+ */
 public enum Message {
     COULD_NOT_CREATE_FOLDER("Couldn't create the %s folder", MODE_WARNING),
     INVALID_VIEW("Invalid view ('%s') - - Constructor has to be #(String.class, Map.class)", MODE_WARNING),
