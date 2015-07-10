@@ -11,7 +11,7 @@ public class Stop extends Command {
 
     @Override
     public void handle(String[] args) {
-        Server.getInstance().stop();
+        Server.getInstance().stopServer();
     }
 
 }

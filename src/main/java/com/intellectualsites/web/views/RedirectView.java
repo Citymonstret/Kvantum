@@ -1,9 +1,9 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.config.YamlConfiguration;
-import com.intellectualsites.web.object.syntax.IgnoreSyntax;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.object.syntax.IgnoreSyntax;
 
 import java.io.File;
 import java.util.Map;
@@ -15,7 +15,7 @@ public class RedirectView extends View implements IgnoreSyntax {
 
     public RedirectView(String pattern, Map<String, Object> options) {
         super(pattern, "redirect", options);
-        super.relatedFolderPath = "/redirect";
+        super.relatedFolderPath = "./redirect";
 
         File file = new File(getFolder(), "redirect.yml");
 

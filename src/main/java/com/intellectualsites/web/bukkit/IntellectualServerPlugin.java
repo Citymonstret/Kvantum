@@ -29,15 +29,19 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        server = Bootstrap.startServer(true, getDataFolder(), new LogWrapper() {
+        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
             @Override
-            public void log(String s) {
-                getLogger().log(Level.INFO, s);
+            public void run() {
+                server = Bootstrap.startServer(false, getDataFolder(), new LogWrapper() {
+                    @Override
+                    public void log(String s) {
+                        getLogger().log(Level.INFO, s);
+                    }
+                });
+                server.setEventCaller(new BukkitEventCaller());
+                server.addProviderFactory(new BukkitVariableProvider());
             }
         });
-        server.setEventCaller(new BukkitEventCaller());
-        server.addProviderFactory(new BukkitVariableProvider());
-
         getServer().getPluginManager().registerEvents(this, this);
 
     }

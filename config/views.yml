@@ -16,9 +16,6 @@ views:
     filter: (\/assets\/js\/)([A-Za-z0-9]*)(.js)?
     type: javascript
   img:
-    filter: (\/assets\/img\/)([A-Za-z0-9]*)(.png|.jpg|.jpeg|.ico|.gif)?
-    type: img
-  favicon:
     filter: (\/)(favicon)(.ico)?
     type: img
   download:

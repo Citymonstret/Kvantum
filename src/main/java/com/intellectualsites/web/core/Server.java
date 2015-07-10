@@ -38,7 +38,7 @@ import static com.intellectualsites.web.logging.LogModes.*;
  *
  * @author Citymonstret
  */
-public class Server implements IntellectualServer {
+public class Server extends Thread implements IntellectualServer {
 
     /**
      * The logging prefix
@@ -113,11 +113,10 @@ public class Server implements IntellectualServer {
                 @Override
                 public void handle(Signal signal) {
                     if (signal.toString().equals("SIGINT")) {
-                        stop();
+                        stopServer();
                     }
                 }
             });
-
             new InputThread(this).start();
         }
 
@@ -309,22 +308,31 @@ public class Server implements IntellectualServer {
      * Load the plugins
      */
     private void loadPlugins() {
-        File file = new File(coreFolder, "plugins");
-        if (!file.exists()) {
-            if (!file.mkdirs()) {
-                log(Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file);
-                return;
+        if (standalone) {
+            File file = new File(coreFolder, "plugins");
+            if (!file.exists()) {
+                if (!file.mkdirs()) {
+                    log(Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file);
+                    return;
+                }
             }
+            pluginLoader = new PluginLoader(new PluginManager());
+            pluginLoader.loadAllPlugins(file);
+            pluginLoader.enableAllPlugins();
+        } else {
+            log("Running as standalone, not loading plugins!");
         }
-        pluginLoader = new PluginLoader(new PluginManager());
-        pluginLoader.loadAllPlugins(file);
-        pluginLoader.enableAllPlugins();
     }
 
     @SuppressWarnings("ALL")
     @Override
-    public void start() throws IntellectualServerStartException {
-        Assert.equals(this.started, false, new IntellectualServerStartException("Cannot start the server, it is already started", new RuntimeException("Cannot restart server singleton")));
+    public void start() {
+        try {
+            Assert.equals(this.started, false, new IntellectualServerStartException("Cannot start the server, it is already started", new RuntimeException("Cannot restart server singleton")));
+        } catch (IntellectualServerStartException e) {
+            e.printStackTrace();
+            return;
+        }
         //
         if (standalone) {
             loadPlugins();
@@ -583,7 +591,7 @@ public class Server implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        logWrapper.log(String.format("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator()));
+        logWrapper.log(String.format("[%s][%s][%s] %s", PREFIX, prefix, TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
     }
 
@@ -597,12 +605,12 @@ public class Server implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        logWrapper.log(String.format("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
+        logWrapper.log(String.format("[%s][%s] %s", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
     }
 
     @Override
-    public synchronized void stop() {
+    public synchronized void stopServer() {
         log(Message.SHUTTING_DOWN);
         EventManager.getInstance().handle(new ShutdownEvent(this));
         pluginLoader.disableAllPlugins();

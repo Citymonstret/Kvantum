@@ -29,12 +29,6 @@ public class Bootstrap {
      * @param args arguments
      */
     public static void main(String[] args) {
-        startServer(true, new File("./"), new LogWrapper() {
-            @Override
-            public void log(String s) {
-                System.out.print(s);
-            }
-        });
         Map<String, String> options = getOptions(args);
         File file;
         if (options.containsKey("folder")) {
@@ -48,7 +42,7 @@ public class Bootstrap {
         startServer(true, file, new LogWrapper() {
             @Override
             public void log(String s) {
-                System.out.print(s);
+                System.out.println(s);
             }
         });
     }

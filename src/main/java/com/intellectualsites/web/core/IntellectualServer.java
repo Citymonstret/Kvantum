@@ -59,12 +59,6 @@ public interface IntellectualServer {
      */
     void addProviderFactory(@NotNull final ProviderFactory factory);
 
-    /**
-     * Start the web server
-     *
-     * @throws RuntimeException If anything goes wrong
-     */
-    void start() throws Throwable;
 
     /**
      * Log a message
@@ -79,7 +73,7 @@ public interface IntellectualServer {
     /**
      * Stop the web server
      */
-    void stop();
+    void stopServer();
 
     /**
      * Get the session manager
