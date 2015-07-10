@@ -50,9 +50,6 @@
             </plugin>
         </plugins>
     </build>
-    <modules>
-        <module>ServerPluginText</module>
-    </modules>
     <repositories>
         <repository>
             <id>techcable-repo</id> <!-- Just leave the repositories section alone or bukkit won't work -->

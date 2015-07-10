@@ -1,5 +1,7 @@
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.web.object.LogWrapper;
+
 import java.io.File;
 
 /**
@@ -12,7 +14,12 @@ public class Bootstrap {
      * @param args arguments
      */
     public static void main(String[] args) {
-        startServer(true, new File("./"));
+        startServer(true, new File("./"), new LogWrapper() {
+            @Override
+            public void log(String s) {
+                System.out.print(s);
+            }
+        });
     }
 
     /**
@@ -21,10 +28,10 @@ public class Bootstrap {
      * @param standalone Should it run as a standalone application, or be integrated
      * @return the started server | null
      */
-    public static Server startServer(boolean standalone, File coreFolder) {
+    public static Server startServer(boolean standalone, File coreFolder, LogWrapper wrapper) {
         Server server = null;
         try {
-            server = new Server(standalone, coreFolder);
+            server = new Server(standalone, coreFolder, wrapper);
             server.start();
         } catch(final Exception e) {
             e.printStackTrace();

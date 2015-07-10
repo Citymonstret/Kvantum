@@ -27,12 +27,23 @@ public class BukkitVariableProvider implements ProviderFactory<BukkitVariablePro
 
     @Override
     public boolean contains(String variable) {
-        switch (variable.toLowerCase()) {
+        String v = variable, s = "";
+        if (variable.contains("@")) {
+            String[] parts = variable.split("@");
+            v = parts[0];
+            s = parts[1];
+        }
+        switch (v.toLowerCase()) {
             case "version":
             case "players":
             case "count":
             case "max":
                 return true;
+            case "player": {
+                if (!s.equals("")) {
+                    return Bukkit.getPlayer(s) != null;
+                }
+            }
             default:
                 return false;
         }
@@ -40,7 +51,13 @@ public class BukkitVariableProvider implements ProviderFactory<BukkitVariablePro
 
     @Override
     public Object get(String variable) {
-        switch (variable.toLowerCase()) {
+        String v = variable, s = "";
+        if (variable.contains("@")) {
+            String[] parts = variable.split("@");
+            v = parts[0];
+            s = parts[1];
+        }
+        switch (v.toLowerCase()) {
             case "version":
                 return Bukkit.getVersion();
             case "players":
@@ -49,6 +66,20 @@ public class BukkitVariableProvider implements ProviderFactory<BukkitVariablePro
                 return Bukkit.getOnlinePlayers().size();
             case "max":
                 return Bukkit.getMaxPlayers();
+            case "player": {
+                if (!s.equals("")) {
+                    String[] parts = variable.split("@");
+                    Player p = Bukkit.getPlayer(parts[1]);
+                    if (p != null) {
+                        if (parts.length < 3) {
+                            return p.getName();
+                        }
+                        return new PlayerWrapper(p).get(parts[3]);
+                    } else {
+                        return "[BukkitPlayer:null]";
+                    }
+                }
+            }
             default:
                 return null;
         }

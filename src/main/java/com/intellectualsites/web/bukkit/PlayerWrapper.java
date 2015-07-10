@@ -23,4 +23,14 @@ public class PlayerWrapper {
     public Player getPlayer() {
         return this.player;
     }
+
+    public Object get(String p) {
+        switch (p.toLowerCase()) {
+            case "health":
+                return player.getHealth();
+            case "address":
+                return player.getAddress();
+        }
+        return "[BukkitPlayer:UnknownProperty]";
+    }
 }
