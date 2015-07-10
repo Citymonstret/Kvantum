@@ -45,7 +45,12 @@ public class Bootstrap {
         } else {
             file = new File("./");
         }
-        startServer(true, file);
+        startServer(true, file, new LogWrapper() {
+            @Override
+            public void log(String s) {
+                System.out.print(s);
+            }
+        });
     }
 
     /**

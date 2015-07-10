@@ -5,12 +5,14 @@ import com.intellectualsites.web.core.Bootstrap;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventCaller;
+import com.intellectualsites.web.object.LogWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
 
 /**
  * Created 2015-05-04 for IntellectualServer
@@ -27,7 +29,12 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        server = Bootstrap.startServer(true, getDataFolder());
+        server = Bootstrap.startServer(true, getDataFolder(), new LogWrapper() {
+            @Override
+            public void log(String s) {
+                getLogger().log(Level.INFO, s);
+            }
+        });
         server.setEventCaller(new BukkitEventCaller());
         server.addProviderFactory(new BukkitVariableProvider());
 

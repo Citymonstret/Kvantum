@@ -76,6 +76,7 @@ public class Server implements IntellectualServer {
     public volatile CacheManager cacheManager;
     private MySQLConnManager mysqlConnManager;
     private boolean mysqlEnabled;
+    private LogWrapper logWrapper;
 
     {
         viewBindings = new HashMap<>();
@@ -92,11 +93,12 @@ public class Server implements IntellectualServer {
      *
      * @param standalone Should the server run async?
      */
-    protected Server(boolean standalone, File coreFolder) throws IntellectualServerInitializationException {
+    protected Server(boolean standalone, File coreFolder, LogWrapper logWrapper) throws IntellectualServerInitializationException {
         instance = this;
 
-        Assert.notNull(coreFolder);
+        Assert.notNull(coreFolder, logWrapper);
 
+        this.logWrapper = logWrapper;
         this.standalone = standalone;
         addViewBinding("html", HTMLView.class);
         addViewBinding("css", CSSView.class);
@@ -106,7 +108,7 @@ public class Server implements IntellectualServer {
         addViewBinding("download", DownloadView.class);
         addViewBinding("redirect", RedirectView.class);
 
-        {
+        if (standalone) {
             Signal.handle(new Signal("INT"), new SignalHandler() {
                 @Override
                 public void handle(Signal signal) {
@@ -580,7 +582,8 @@ public class Server implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
+        logWrapper.log(String.format("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator()));
+        // System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
     }
 
     @Override
@@ -593,7 +596,8 @@ public class Server implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
+        logWrapper.log(String.format("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
+        // System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
     }
 
     @Override
