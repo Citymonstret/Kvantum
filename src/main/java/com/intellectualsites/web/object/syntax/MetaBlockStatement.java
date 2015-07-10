@@ -1,8 +1,6 @@
 package com.intellectualsites.web.object.syntax;
 
-import com.intellectualsites.web.object.ProviderFactory;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Syntax;
 
 import java.util.Map;
 import java.util.regex.Matcher;

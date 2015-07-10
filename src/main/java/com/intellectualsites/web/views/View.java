@@ -1,5 +1,11 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.util.Context;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,6 +23,11 @@ public abstract class View {
     private final Pattern pattern;
     private final String rawPattern;
     private final Map<String, Object> options;
+    private final String internalName;
+
+    private int buffer = -1;
+    protected String relatedFolderPath;
+    private File folder;
 
     /**
      * The constructor (Without prestored options)
@@ -24,8 +35,8 @@ public abstract class View {
      * @param pattern used to decide whether or not to use this view
      * @see View(String, Map) - This is an alternate constructor
      */
-    public View(String pattern) {
-        this(pattern, null);
+    public View(String pattern, String internalName) {
+        this(pattern, internalName, null);
     }
 
     /**
@@ -70,14 +81,60 @@ public abstract class View {
      * @param pattern Regex pattern that will decide whether or not to use this view
      * @param options Pre Stored options
      */
-    public View(String pattern, Map<String, Object> options) {
+    public View(String pattern, String internalName, Map<String, Object> options) {
         if (options == null) {
             this.options = new HashMap<>();
         } else {
             this.options = options;
         }
+        this.internalName = internalName;
         this.pattern = Pattern.compile(pattern);
         this.rawPattern = pattern;
+    }
+
+    public final String getName() {
+        return this.internalName;
+    }
+
+    /**
+     * Get the folder used
+     * by this view, doesn't
+     * have to be used
+     *
+     * @return File
+     */
+    protected File getFolder() {
+        if (this.folder == null) {
+            if (relatedFolderPath != null) {
+                this.folder = new File(Context.coreFolder, relatedFolderPath);
+            } else if (containsOption("folder")) {
+                this.folder = new File(getOption("folder").toString());
+            } else {
+                this.folder = new File(Context.coreFolder, "/" + internalName);
+            }
+            if (!folder.exists()) {
+                if (!folder.mkdirs()) {
+                    System.out.println("Couldn't create the " + internalName + " folder...");
+                }
+            }
+        }
+        return this.folder;
+    }
+
+    /**
+     * Get the file buffer (if needed)
+     *
+     * @return file buffer
+     */
+    protected int getBuffer() {
+        if (this.buffer == -1) {
+            if (containsOption("buffer")) {
+                this.buffer = getOption("buffer");
+            } else {
+                this.buffer = 1024 * 64; // 64kb
+            }
+        }
+        return this.buffer;
     }
 
     /**

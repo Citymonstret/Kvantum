@@ -50,6 +50,18 @@ public interface ConfigurationFile {
     boolean contains(String key);
 
     /**
+     * This will get the object, if it
+     * exists, otherwise it returns the
+     * default value (and sets the variable)
+     *
+     * @param key Key to search for
+     * @param def Default Value
+     * @param <T> Value type
+     * @return value|def
+     */
+    <T> T get(String key, T def);
+
+    /**
      * This will set a configuration value,
      * in the case that it doesn't exist.
      * Otherwise it will be ignored.

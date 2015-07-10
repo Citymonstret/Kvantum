@@ -9,7 +9,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Created by Liam on 07/07/2015.
+ * A MySQL Connection utility
+ *
+ * @author peelsh
+ * @author Citymonstret
  */
 public class MySQLConnManager {
     private String host;

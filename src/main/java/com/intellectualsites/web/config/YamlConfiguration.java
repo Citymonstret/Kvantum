@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created 2015-04-22 for IntellectualServer
+ * YAML implementation of
+ * the configuration file
  *
  * @author Citymonstret
  */
@@ -113,6 +114,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         }
     }
 
+    @Override
     public <T> T get(String key, T def) {
         if (!contains(key)) {
             setIfNotExists(key, def);

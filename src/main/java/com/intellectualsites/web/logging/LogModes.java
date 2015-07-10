@@ -1,4 +1,4 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.logging;
 
 /**
  * These are the logging modes

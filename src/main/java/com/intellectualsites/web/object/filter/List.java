@@ -1,6 +1,6 @@
 package com.intellectualsites.web.object.filter;
 
-import com.intellectualsites.web.object.Filter;
+import com.intellectualsites.web.object.syntax.Filter;
 
 import java.util.Collection;
 

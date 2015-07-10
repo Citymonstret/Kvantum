@@ -1,6 +1,6 @@
 package com.intellectualsites.web.util;
 
-import com.intellectualsites.web.object.AssertionError;
+import com.intellectualsites.web.object.error.AssertionError;
 
 public class Assert {
 

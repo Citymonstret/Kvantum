@@ -15,6 +15,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * A plugin loader
+ * I borrwed from my
+ * other project
+ * (MarineStandalone)
+ */
 public class PluginLoader {
 
     private final ConcurrentMap<String, PluginClassLoader> loaders;

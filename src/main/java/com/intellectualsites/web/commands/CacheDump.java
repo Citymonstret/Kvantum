@@ -1,7 +1,7 @@
 package com.intellectualsites.web.commands;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.CachedResponse;
+import com.intellectualsites.web.object.cache.CachedResponse;
 import com.intellectualsites.web.util.CacheManager;
 
 import java.util.Map;

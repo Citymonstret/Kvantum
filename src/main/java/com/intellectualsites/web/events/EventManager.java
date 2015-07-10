@@ -5,7 +5,7 @@ import com.intellectualsites.web.util.Assert;
 import java.util.*;
 
 /**
- * Created 2015-05-03 for IntellectualServer
+ * The event manager
  *
  * @author Citymonstret
  */

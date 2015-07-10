@@ -3,9 +3,6 @@ package com.intellectualsites.web.core;
 import com.intellectualsites.web.commands.CacheDump;
 import com.intellectualsites.web.commands.Command;
 import com.intellectualsites.web.commands.Stop;
-import com.intellectualsites.web.object.CachedResponse;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.util.CacheManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

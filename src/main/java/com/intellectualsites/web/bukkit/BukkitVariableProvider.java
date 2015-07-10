@@ -1,8 +1,8 @@
 package com.intellectualsites.web.bukkit;
 
-import com.intellectualsites.web.object.ProviderFactory;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.VariableProvider;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

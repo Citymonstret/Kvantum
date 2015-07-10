@@ -2,7 +2,7 @@ package com.intellectualsites.web.util;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.views.View;
 import com.intellectualsites.web.views.errors.View404;
 
 import java.util.ArrayList;

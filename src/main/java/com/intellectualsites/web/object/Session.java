@@ -1,5 +1,7 @@
 package com.intellectualsites.web.object;
 
+import com.intellectualsites.web.object.syntax.VariableProvider;
+
 import java.util.HashMap;
 import java.util.Map;
 

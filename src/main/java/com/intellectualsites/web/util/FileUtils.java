@@ -6,12 +6,20 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Created 2015-04-23 for IntellectualServer
+ * File Utilitiy Methods
  *
  * @author Citymonstret
  */
 public class FileUtils {
 
+    /**
+     * Add files to a zip file
+     *
+     * @param zipFile Zip File
+     * @param files Files to add to the zip
+     * @param delete If the original files should be deleted
+     * @throws Exception If anything goes wrong
+     */
     public static void addToZip(File zipFile, File[] files, boolean delete) throws Exception {
         Assert.notNull(zipFile, files);
 
@@ -103,6 +111,13 @@ public class FileUtils {
         }
     }
 
+    /**
+     * Get file contents as a string
+     *
+     * @param file File to read
+     * @param buffer File buffer
+     * @return String
+     */
     public static String getDocument(final File file, int buffer) {
         StringBuilder document = new StringBuilder();
         try {

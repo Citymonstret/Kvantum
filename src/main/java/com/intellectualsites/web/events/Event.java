@@ -1,5 +1,6 @@
 package com.intellectualsites.web.events;
 
+import com.intellectualsites.web.core.IntellectualServer;
 import com.intellectualsites.web.util.Assert;
 
 /**
@@ -8,7 +9,7 @@ import com.intellectualsites.web.util.Assert;
  * Something that happens, that can be captured
  * using code
  *
- * @see com.intellectualsites.web.object.IntellectualServer#handleEvent(Event) To call the event
+ * @see IntellectualServer#handleEvent(Event) To call the event
  * @author Citymonstret
  */
 public abstract class Event {

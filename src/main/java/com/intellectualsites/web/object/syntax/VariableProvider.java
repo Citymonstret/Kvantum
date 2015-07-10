@@ -1,4 +1,4 @@
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.object.syntax;
 
 /**
  * The variable provider class - Can get quite confusing.

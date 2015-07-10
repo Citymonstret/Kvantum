@@ -1,8 +1,8 @@
 package com.intellectualsites.web.util;
 
-import com.intellectualsites.web.object.CachedResponse;
+import com.intellectualsites.web.object.cache.CachedResponse;
 import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.View;
+import com.intellectualsites.web.views.View;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

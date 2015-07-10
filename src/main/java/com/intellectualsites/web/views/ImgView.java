@@ -1,7 +1,7 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.object.*;
-import com.intellectualsites.web.util.Context;
+import com.intellectualsites.web.object.cache.CacheApplicable;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -17,28 +17,9 @@ import java.util.regex.Matcher;
  */
 public class ImgView extends View implements CacheApplicable {
 
-    private File folder;
-    private int buffer;
-
     public ImgView(String filter, Map<String, Object> options) {
-        super(filter, options);
-
-        if (containsOption("buffer")) {
-            this.buffer = getOption("buffer");
-        } else {
-            this.buffer = 1024 * 64;
-        }
-        if (containsOption("folder")) {
-            this.folder = new File(getOption("folder").toString());
-        } else {
-            this.folder = new File(Context.coreFolder, "/assets/img");
-        }
-
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
-                System.out.println("Couldn't create the img folder...");
-            }
-        }
+        super(filter, "img", options);
+        super.relatedFolderPath = "/assets/img";
     }
 
     @Override
@@ -57,16 +38,16 @@ public class ImgView extends View implements CacheApplicable {
             return false;
         }
         request.addMeta("img_file", file);
-        return matcher.matches() && (new  File(folder, file)).exists();
+        return matcher.matches() && (new  File(getFolder(), file)).exists();
     }
 
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(folder, r.getMeta("img_file").toString());
+        File file = new File(getFolder(), r.getMeta("img_file").toString());
         byte[] bytes = new byte[0];
         try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), buffer);
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), getBuffer());
             bytes = IOUtils.toByteArray(stream);
             stream.close();
         } catch(final Exception e) {
