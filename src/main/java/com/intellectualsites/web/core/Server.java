@@ -474,6 +474,7 @@ public class Server implements IntellectualServer {
                         }
                     } else {
                         Response response = view.generate(r);
+                        response.getHeader().apply(out);
                         cacheManager.setCache(view, response);
                         if ((isText = response.isText())) {
                             content = response.getContent();
