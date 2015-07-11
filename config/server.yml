@@ -10,4 +10,4 @@ mysql:
 buffer:
   in: 1048576
   out: 1048576
-verbose: false
+verbose: true

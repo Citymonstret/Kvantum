@@ -3,7 +3,7 @@ views:
     filter: (\/assets\/less\/)([A-Za-z0-9]*)(.css|.less)?
     type: less
     options:
-      folder: ./assets/less
+      folder: ./assets/less/
   css:
     filter: (\/style\/)([A-Za-z0-9]*)(.css)?
     type: css

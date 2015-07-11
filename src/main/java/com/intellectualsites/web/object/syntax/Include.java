@@ -2,6 +2,7 @@ package com.intellectualsites.web.object.syntax;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.util.CacheManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +20,18 @@ public class Include extends Syntax {
     @Override
     public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories) {
         while (matcher.find()) {
+            boolean setCache = false;
+            if (Server.getInstance().enableCaching) {
+                CacheManager manager = Server.getInstance().cacheManager;
+                String s = manager.getCachedInclude(matcher.group());
+                if (s != null) {
+                    in = in.replace(matcher.group(), s);
+                    continue;
+                } else {
+                    setCache = true;
+                }
+            }
+            
             File file = new File(Server.getInstance().coreFolder, matcher.group(1));
             if (file.exists()) {
                 StringBuilder c = new StringBuilder();
@@ -31,6 +44,11 @@ public class Include extends Syntax {
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
+
+                if (setCache) {
+                    Server.getInstance().cacheManager.setCachedInclude(matcher.group(), file.getName().endsWith(".css") ? "<style>\n" + c + "<style>" : c.toString());
+                }
+
                 if (file.getName().endsWith(".css")) {
                     in = in.replace(matcher.group(), "<style>\n" + c + "</style>");
                 } else {

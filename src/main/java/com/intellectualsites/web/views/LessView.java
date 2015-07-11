@@ -1,5 +1,6 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
 import org.lesscss.LessCompiler;
@@ -21,7 +22,7 @@ public class LessView extends View implements CacheApplicable {
 
     public LessView(String filter, Map<String, Object> options) {
         super(filter, "less", options);
-        super.relatedFolderPath = "/assets/less";
+        super.relatedFolderPath = "./assets/less";
     }
 
     @Override
@@ -30,7 +31,13 @@ public class LessView extends View implements CacheApplicable {
         if (!file.endsWith(".less"))
             file = file + ".less";
         request.addMeta("less_file", file);
-        return matcher.matches() && (new File(getFolder(), file)).exists();
+
+        boolean exists = (new File(getFolder(), file)).exists();
+        if (!exists && Server.getInstance().verbose) {
+            Server.getInstance().log("Couldn't find less file '%s'", file);
+        }
+
+        return matcher.matches() && exists;
     }
 
 

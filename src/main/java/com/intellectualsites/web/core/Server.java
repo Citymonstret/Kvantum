@@ -46,7 +46,7 @@ public class Server extends Thread implements IntellectualServer {
     public static final String PREFIX = "Web";
     private static Server instance;
     private final int port;
-    private final boolean verbose;
+    public final boolean verbose;
 
     /**
      * Is the server stopping?
@@ -62,7 +62,9 @@ public class Server extends Thread implements IntellectualServer {
     public File coreFolder;
     protected ViewManager viewManager;
     protected Collection<ProviderFactory> providers;
-    private boolean started, standalone, enableCaching;
+    private boolean started;
+    private boolean standalone;
+    public boolean enableCaching;
     private ServerSocket socket;
     private SessionManager sessionManager;
     private String hostName;

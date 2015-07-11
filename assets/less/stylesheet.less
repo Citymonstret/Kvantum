@@ -1,51 +1,62 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300italic,300,400italic,600,600italic,700italic,800,800italic,700);
+@logo_img: url('http://www1-11ee.kxcdn.com/img/islogo.png');
+
 body, html {
-    background-size: cover;
-    background-attachment: fixed;
-    background-image: url("http://cdn.morguefile.com/imageData/public/files/f/FidlerJan/10/l/1382643443kmq6s.jpg");
-    background-repeat: no-repeat;
-
-    max-width: 100%;
-    min-height: 100%;
-    overflow: hidden;
-
-    font-family: 'Open Sans', sans-serif;
+  min-height: 100%;
+  max-width: 100%;
+  padding-bottom: 40px;
 }
 
-.container {
-    width: 75%;
-    margin-left: 12.5%;  
-    margin-right: 12.5%;
-    max-width: 75%;
-    
-    padding: 15px;
-    position: absolute;
-    top: 0;
-    height: 100%;
-    background-color: rgba(0, 0, 0, .7);
-    color: #f5f5f5;
-
-    overflow: scroll;
+.alignCenter() {
+  margin-left: auto;
+  margin-right: auto;
 }
 
-h1 {
+#header {
+  #logo {
+    background: @logo_img no-repeat;
+    background-size: contain;
+    width: 300px;
+    height: 300px;
+    .alignCenter();
+    margin-top: 25px;
+    opacity: 0.95;
+  }
+  #logo_text {
+    margin-top: 20px;
     text-align: center;
-    padding-bottom: 3px;
-    border-bottom: 1px solid white;
+    font-size: 35pt;
+    color: rgba(0, 0, 0, 0.8);
+  }
+  padding-bottom: 15px;
 }
 
-.example {
-    background-color: black;
-    padding: 10px;
-}
-.code {
-    background-color: white;
-    border: 1px solid black;
-    padding: 5px;
-    color: black;
+#body {
+  h1 {
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 4px;
+  }
+  ul > li {
+    font-size: 12.5pt;
+  }
+  p {
+    font-size: 12.5pt;
+  }
 }
 
-#copyright {
-    position: fixed;
-    bottom: 5px;
+#footer {
+  position: fixed;
+  bottom: 0;
+  background: white;
+  width: 100%;
+  left: 0;
+
+  padding-top: 5px;
+  padding-bottom: 5px;
+
+  #credits {
+    float: left;
+  }
+  #contact {
+    float: right;
+  }
 }

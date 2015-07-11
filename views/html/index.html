@@ -1,101 +1,157 @@
-<!DOCTYPE HTML>{{:
-    [title: IntellectualServer]
-    [author: Sauilitired/Citymonstret]
-    [copyright: IntellectualSites]
-:}}<html>
+{{:
+[title: Index]
+[author: Sauilitired/Citymonstret]
+[copyright: IntellectualSites]
+:}}
+<html>
 {{include:./views/html/header.html}}
-    <br>
-        <div class="container">
-            <h1>
-                IntellectualServer &amp; CrushTemplate
-            </h1>
-            <p>
-                CrushTemplate is our very own unique template engine; it's shipped natively with IntellectualServer!
-                <br><br>
-                <b>
-                    So... what can it do?
-                </b>
-                <br><br>
-                Well, it has the ability to:
-                <ul>
-                    <li>Include files</li>
-                    <li>Access variables &amp; and config files</li>
-                    <li>Use filters on those variables</li>
-                    <li>Use if statements with the variables</li>
-                </ul>
-                <div id="crush-test">
-                    <div class="example">
-                        Hello {{session.username || UPPERCASE}},
-                        <br>
-                        It's currently {{system.time || LOWERCASE}} and the document is named {{document.name}}!
-                        <br>
-                        The server is running on port {{cfg.server@port}} and the hostname is {{cfg.server@hostname}}
-                        <br>
-                        The server is using {{system.usedram}}mb/{{system.totalram}}mb ({{system.freeram}}mb free!)
-                        <br>
-                        At the time of reading this we support these filters:
-                        {{system.filters || LIST}} and the one used was LIST!
-                        <br>
-                        <br>
-                        FOREACH ATTEMPT
-                        <br>
-
-                        <ol>
-                        {#foreach system.filters -> filter}
-                            <li>{{filter}}</li>
-                        {/foreach}
-                        </ol>
-
-                    </div>
-                    <div class="code">
-                        <code id="explanation">
-                            Hello &#123;&#123;session.username || UPPERCASE&#125;&#125;,
-                            <br>
-                            It's currently &#123;&#123;system.time || LOWERCASE&#125;&#125; and the document is named &#123;&#123;document.name&#125;&#125;!
-                            <br>
-                            The server is running on port &#123;&#123;cfg.server@port&#125;&#125; and the hostname is &#123;&#123;cfg.server@hostname&#125;&#125;
-                            <br>
-                            At the time of reading this we support these filters:
-                            &#123;&#123;system.filters || LIST&#125;&#125; and the one used was LIST!
-                        </code>
-                    </div>
-                </div>
-                <div class="example">
-                    Output: {{post.test}}
-                    <form method="POST" action="#">
-                        <input type="text" name="test" placeholder="TEST" required>
-                        <button type="submit">Submit</button>
-                    </form>
-                </div>
-            <div class="code">
-                &#123;&#123;post.test&#125;&#125;
-            </div>
-                <div id="if-test">
-                    <div class="example">
-                        {#if system.true}
-                            True was true
-                        {/if}
-                        <br>
-                        {#if !system.false}
-                            !False was true
-                        {/if}
-                    </div>
-                    <div class="code">
-                        <code>
-                            &#123;#if system.true&#125;
-                                True was true
-                            &#123;/if&#125;
-                            <br>
-                            &#123;#if !system.false&#125;
-                                !False was true
-                            &#123;/if&#125;
-                        </code>
-                    </div>
-                </div>
-            </p>
-            <div id="copyright">
-                Copyright &copy; IntellectualSites 2015
+<body>
+<div class="container">
+    <div id="header">
+        <div class="row">
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <div id="logo"></div>
             </div>
         </div>
-    </body>
+        <div class="row">
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <div id="logo_text">
+                    IntellectualServer
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div id="body">
+        /* Introduction Text & Stuff */
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-lg-12">
+                <h1>
+                    Introduction
+                </h1>
+
+                <p> /* First Piece of Description */
+                    IntellectualServer is our own handcrafted webserver, written entirely in Java.
+                    It is not meant to replace your traditional webserver (such as Nginx), but
+                    it is fully capable of being used on it's own - If you so desier. We initially
+                    created this piece of software, as we needed a simple way to use java to serve
+                    dynamic content on the web. We found this usable in more situations than the
+                    one we first imagined. That lead us to continue developing the software, into
+                    what it is today.
+                </p>
+
+                <p> /* Some bragging */
+                    IntellectualServer is made to support both static and dynamic content, with
+                    built in caching and back-end speed optimization. We are proud to present
+                    what we think is the new generation of Java-based web development.
+                </p>
+            </div>
+        </div>
+        /* System Requirements */
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-lg-12">
+                <h1>
+                    System Requirements
+                </h1>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-12 col-md-6">
+                        <h2>
+                            Minimum
+                        </h2>
+                        <ul>
+                            <li>
+                                <b>OS:</b> Any OS that supports the Java virtual machine
+                            </li>
+                            <li>
+                                <b>RAM:</b> 128MB RAM allocated to the runtime
+                            </li>
+                            <li>
+                                <b>Java Version:</b> Java 1.7
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6 col-sm-12 col-md-6">
+                        <h2>
+                            Recommended
+                        </h2>
+                        <ul>
+                            <li>
+                                <b>OS:</b> Debian based OS, Windows 7+, CentOS
+                            </li>
+                            <li>
+                                <b>RAM:</b> 512MB RAM allocated to the runtime
+                            </li>
+                            <li>
+                                <b>Java Version:</b> Java 1.8
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        /* Showcase of the crush engine */
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-lg-12">
+                <h1>
+                    Crush Engine
+                </h1>
+                <p>
+                    This site is served using IntellectualServer. IntellectualServer has a
+                    custom templating system built in, along with some custom syntax that
+                    is used to enhance the HTML experience.
+                </p>
+                <br>
+                <h4>Crush comes with these syntax features:</h4>
+                <ul id="syntax_showcase">
+                    <li>
+                        Comments <code title="Not visible to the user">&#47;* Comment *&#47;</code>
+                    </li>
+                    <li>
+                        Variables with filters <code title="You can register your own providers">&#123;&#123;provider.variable || filter&#125;&#125;</code>
+                    </li>
+                    <li>
+                        Foreach loops <code>&#123;#foreach provider.variable -> temp&#125;</code>
+                    </li>
+                    <li>
+                        If statements (and reverse if statements) <code title="Allows '!' as a prefix, which revers the boolean value of the variable">&#123;#if variable&#125;&#123;/if&#125;</code>
+                    </li>
+                    <li>
+                        File inclusion <code>&#123;&#123;include:./file/name&#125;&#125;</code>
+                    </li>
+                    <li>
+                        Meta variables
+                    </li>
+                </ul>
+            </div>
+        </div>
+        /* Getting started */
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-lg-12">
+                <h1>
+                    Getting Started
+                </h1>
+                <p>
+                    We have a wiki, that we keep as up to date as possible at all times. That wiki can
+                    be found <b><a title="GitHub Wiki" href="https://github.com/IntellectualSites/IntellectualServer/wiki">HERE</a></b>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <div class="text-left" id="credits">
+                    IntellectualServer is proudly developed by <a title="Visit IntellectualSites" href="https://intellectualsites.com/">IntellectualSites</a>
+                </div>
+                <div class="text-right" id="contact">
+                    You can contact us at <a title="Support E-Mail" href="mailto:support@intellectualsites.com">support@intellectualsites.com</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
 </html>

@@ -9,10 +9,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CacheManager {
 
+    public final Map<String, String> cachedIncludes;
     private final Map<String, CachedResponse> cachedResponses;
 
     public CacheManager() {
         this.cachedResponses = new ConcurrentHashMap<>();
+        this.cachedIncludes = new ConcurrentHashMap<>();
+    }
+
+    public String getCachedInclude(final String group) {
+        return cachedIncludes.containsKey(group) ? cachedIncludes.get(group) : null;
+    }
+
+    public void setCachedInclude(final String group, final String document) {
+        this.cachedIncludes.put(group, document);
     }
 
     public boolean hasCache(View view) {

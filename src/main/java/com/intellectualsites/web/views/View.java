@@ -105,10 +105,10 @@ public abstract class View {
      */
     protected File getFolder() {
         if (this.folder == null) {
-            if (relatedFolderPath != null) {
-                this.folder = new File(Context.coreFolder, relatedFolderPath);
-            } else if (containsOption("folder")) {
+            if (containsOption("folder")) {
                 this.folder = new File(getOption("folder").toString());
+            } else if (relatedFolderPath != null) {
+                this.folder = new File(Context.coreFolder, relatedFolderPath);
             } else {
                 this.folder = new File(Context.coreFolder, "/" + internalName);
             }
