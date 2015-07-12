@@ -3,6 +3,12 @@
 ##Description
 IntellectualServer  is a lightweight java web server. It's a perfect choice if you need an enbedded webserver in your application, as it can be run as both a standalone or intergrated application. 
 
+##Demo
+A demo can be found on http://server.intellectualsites.com
+
+##Wiki/Information
+More information can be found in our [wiki](https://github.com/IntellectualSites/IntellectualServer/wiki)
+
 ##Crush
 CrushTemplate is a templating engine that is shipped with the core of the server. It allows for things that you just cannot do with normal webservers.
 
@@ -21,14 +27,3 @@ You build IntellectualServer using maven. Use `mvn package` to download all depe
 
 ##Views
 IntellectualServer uses a special view setup, so you can freely design the regex pattern that you want for your website. For example: `(\/assets\/img\/)([A-Za-z0-9]*)(.png|.jpg|.jpeg|.ico|.gif)?`
-
-Views uses this pattern: (path)(filename)(extension), which is required for all built-in view types
-
-IntellectualServer is currently shipped with these types:
-
-- HTML
-- JavaScript
-- Images (png, jpg, ico, gif)
-- CSS
-- Less (with live compilation)
-- File downloads
