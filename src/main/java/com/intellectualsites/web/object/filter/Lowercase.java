@@ -8,7 +8,7 @@ public class Lowercase extends Filter {
         super("lowercase");
     }
 
-    public Object handle(Object in) {
+    public Object handle(String objectName, Object in) {
         return in.toString().toLowerCase();
     }
 

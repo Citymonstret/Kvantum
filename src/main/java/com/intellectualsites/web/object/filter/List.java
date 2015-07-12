@@ -10,9 +10,9 @@ public class List extends Filter {
         super("list");
     }
 
-    public Object handle(Object o) {
+    public Object handle(String objectName, Object o) {
         StringBuilder s = new StringBuilder();
-        s.append("<ul>");
+        s.append("<ul id='list-").append(objectName).append("'>");
         if (o instanceof Object[]) {
             for (Object oo : (Object[]) o) {
                 s.append("<li>").append(oo).append("</li>");

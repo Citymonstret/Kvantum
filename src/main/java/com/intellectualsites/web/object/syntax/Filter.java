@@ -8,7 +8,7 @@ public abstract class Filter {
         this.key = key.toUpperCase();
     }
 
-    public abstract Object handle(final Object in);
+    public abstract Object handle(final String objectName, final Object in);
 
     @Override
     public final String toString() {

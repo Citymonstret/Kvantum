@@ -9,7 +9,7 @@ public class Uppercase extends Filter {
     }
 
     @Override
-    public Object handle(Object in) {
+    public Object handle(String objectName, Object in) {
         return in.toString().toUpperCase();
     }
 

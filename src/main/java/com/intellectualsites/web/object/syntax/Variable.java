@@ -1,6 +1,7 @@
 package com.intellectualsites.web.object.syntax;
 
 import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.object.filter.Javascript;
 import com.intellectualsites.web.object.filter.List;
 import com.intellectualsites.web.object.filter.Lowercase;
 import com.intellectualsites.web.object.filter.Uppercase;
@@ -23,6 +24,7 @@ public class Variable extends Syntax {
         preFilters.add(new Uppercase());
         preFilters.add(new Lowercase());
         preFilters.add(new List());
+        preFilters.add(new Javascript());
         for (final Filter filter : preFilters) {
             filters.put(filter.toString(), filter);
         }
@@ -45,7 +47,7 @@ public class Variable extends Syntax {
                     if (p.contains(variable)) {
                         Object o = p.get(variable);
                         if (!filter.equals("")) {
-                            o = filters.get(filter.toUpperCase()).handle(o);
+                            o = filters.get(filter.toUpperCase()).handle(variable, o);
                         }
                         content = content.replace(matcher.group(), o.toString());
                     }
