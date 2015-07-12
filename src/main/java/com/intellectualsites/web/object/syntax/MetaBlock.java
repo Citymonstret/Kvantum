@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class MetaBlock extends Syntax {
 
-    private MetaBlockStatement statement;
+    private final MetaBlockStatement statement;
 
     public MetaBlock() {
         super(Pattern.compile("\\{\\{:([\\S\\s]*?):\\}\\}"));
@@ -18,7 +18,6 @@ public class MetaBlock extends Syntax {
     @Override
     public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories) {
         while (matcher.find()) {
-            String blockContent = matcher.group(1);
             statement.handle(in, r, factories);
             in = in.replace(matcher.group(), "");
         }

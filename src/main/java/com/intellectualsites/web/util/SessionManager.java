@@ -16,11 +16,11 @@ import java.util.Map;
  */
 public class SessionManager implements ProviderFactory<VariableProvider> {
 
-    private Map<String, Session> sessions;
-    private Server server;
+    private final Map<String, Session> sessions;
+    private final Server server;
 
     public SessionManager(Server server) {
-        sessions = new HashMap<String, Session>();
+        sessions = new HashMap<>();
         this.server = server;
     }
 

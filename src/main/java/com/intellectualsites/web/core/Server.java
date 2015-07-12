@@ -40,45 +40,64 @@ import static com.intellectualsites.web.logging.LogModes.*;
  */
 public class Server extends Thread implements IntellectualServer {
 
-    /**
-     * The logging prefix
-     */
+    //
+    // public static
+    //
     public static final String PREFIX = "Web";
+
+    //
+    // private static
+    //
     private static Server instance;
-    private final int port;
+
+    //
+    // public
+    //
+    public ConfigurationFile translations;
+    public boolean stopping, enableCaching;
+    public Set<Syntax> syntaxes;
+    public File coreFolder;
+
+    //
+    // public final
+    //
     public final boolean verbose;
 
-    /**
-     * Is the server stopping?
-     */
-    public boolean stopping;
-    /**
-     * The Crush syntax particles
-     */
-    public Set<Syntax> syntaxes;
-    /**
-     * The folder from which everything is based
-     */
-    public File coreFolder;
+    //
+    // public volatile
+    //
+    public volatile CacheManager cacheManager;
+
+    //
+    // protected
+    //
     protected ViewManager viewManager;
-    protected Collection<ProviderFactory> providers;
-    private boolean started;
-    private boolean standalone;
-    public boolean enableCaching;
+
+    //
+    // protected final
+    //
+    protected final Collection<ProviderFactory> providers;
+
+    //
+    // private
+    //
+    private boolean started, ipv4, mysqlEnabled;
     private ServerSocket socket;
     private SessionManager sessionManager;
     private String hostName;
-    private boolean ipv4;
     private int bufferIn, bufferOut;
     private ConfigurationFile configViews;
-    public ConfigurationFile translations;
-    private Map<String, Class<? extends View>> viewBindings;
+    private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
-    public volatile CacheManager cacheManager;
-    private MySQLConnManager mysqlConnManager;
-    private boolean mysqlEnabled;
-    private LogWrapper logWrapper;
+
+    //
+    // private final
+    //
+    private final boolean standalone;
+    private final int port;
+    private final Map<String, Class<? extends View>> viewBindings;
+    private final LogWrapper logWrapper;
 
     {
         viewBindings = new HashMap<>();
@@ -306,9 +325,6 @@ public class Server extends Thread implements IntellectualServer {
         this.providers.add(factory);
     }
 
-    /**
-     * Load the plugins
-     */
     private void loadPlugins() {
         if (standalone) {
             File file = new File(coreFolder, "plugins");
@@ -419,11 +435,6 @@ public class Server extends Thread implements IntellectualServer {
         }
     }
 
-    /**
-     * Accept the socket and the information async
-     *
-     * @param remote Socket to send and read from
-     */
     private void runAsync(@NotNull final Socket remote) {
         new Thread() {
             @Override
@@ -546,13 +557,6 @@ public class Server extends Thread implements IntellectualServer {
         }.start();
     }
 
-    /**
-     * The core tick method
-     * <p>
-     * (runs the async socket accept)
-     *
-     * @see #runAsync(Socket)
-     */
     private void tick() {
         try {
             runAsync(socket.accept());

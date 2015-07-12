@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
  */
 public class LessView extends View implements CacheApplicable {
 
-    public static LessCompiler compiler;
+    private static LessCompiler compiler;
 
     public LessView(String filter, Map<String, Object> options) {
         super(filter, "less", options);

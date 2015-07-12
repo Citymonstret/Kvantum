@@ -8,6 +8,7 @@ import com.intellectualsites.web.views.View;
  *
  * @deprecated
  */
+@SuppressWarnings({"unused","deprecation"})
 public class ServerAPI {
 
     private static ServerAPI instance;
@@ -25,7 +26,7 @@ public class ServerAPI {
         instance = new ServerAPI(server);
     }
 
-    private Server server;
+    private final Server server;
     protected ServerAPI(final Server server) {
         this.server = server;
     }

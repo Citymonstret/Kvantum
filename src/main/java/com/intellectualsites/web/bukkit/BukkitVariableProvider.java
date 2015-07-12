@@ -13,6 +13,7 @@ import java.util.Collection;
  *
  * @author Citymonstret
  */
+@SuppressWarnings("ALL")
 public class BukkitVariableProvider implements ProviderFactory<BukkitVariableProvider>, VariableProvider {
 
     @Override
@@ -85,7 +86,7 @@ public class BukkitVariableProvider implements ProviderFactory<BukkitVariablePro
         }
     }
 
-    public PlayerWrapper[] getPlayers() {
+    private PlayerWrapper[] getPlayers() {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
         PlayerWrapper[] playerz = new PlayerWrapper[players.size()];
         int index = 0;

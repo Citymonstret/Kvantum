@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class YamlConfiguration extends ConfigProvider implements ConfigurationFile {
 
-    private File file;
+    private final File file;
     private Map<String, Object> map;
     private Yaml yaml;
 

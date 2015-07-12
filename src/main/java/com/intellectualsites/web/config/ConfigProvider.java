@@ -8,11 +8,10 @@ package com.intellectualsites.web.config;
  */
 public abstract class ConfigProvider implements ConfigurationFile {
 
-    private String name;
+    private final String name;
 
     /**
-     * Constructor, duh
-     *
+     * ConfigurationProvider Constructor
      * @param name Configuration file name
      */
     public ConfigProvider(final String name) {

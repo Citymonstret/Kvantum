@@ -53,9 +53,9 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
      */
     protected class BukkitEventCaller extends EventCaller {
 
-        private Collection<BukkitEventHook> hooks;
+        private final Collection<BukkitEventHook> hooks;
 
-        protected BukkitEventCaller() {
+        BukkitEventCaller() {
             hooks = new ArrayList<>();
             hooks.add(new com.intellectualsites.web.bukkit.events.StartupEvent());
         }
@@ -65,7 +65,7 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
             for (final BukkitEventHook hook : hooks) {
                 if (hook.getEvent().isInstance(event)) {
                     try {
-                        BukkitEventHook h = (BukkitEventHook) hook.getClass().newInstance();
+                        BukkitEventHook h = hook.getClass().newInstance();
                         Bukkit.getPluginManager().callEvent(h);
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();

@@ -1,6 +1,5 @@
 package com.intellectualsites.web.bukkit.events;
 
-import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.events.Event;
 import org.bukkit.event.HandlerList;
 
@@ -13,7 +12,7 @@ public class BukkitEventHook extends org.bukkit.event.Event {
 
     private final Class<? extends Event> event;
 
-    public static HandlerList handlers;
+    public static final HandlerList handlers;
     static {
         handlers = new HandlerList();
     }

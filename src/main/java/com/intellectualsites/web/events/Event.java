@@ -1,6 +1,5 @@
 package com.intellectualsites.web.events;
 
-import com.intellectualsites.web.core.IntellectualServer;
 import com.intellectualsites.web.util.Assert;
 
 /**
@@ -9,7 +8,6 @@ import com.intellectualsites.web.util.Assert;
  * Something that happens, that can be captured
  * using code
  *
- * @see IntellectualServer#handleEvent(Event) To call the event
  * @author Citymonstret
  */
 public abstract class Event {
@@ -23,7 +21,7 @@ public abstract class Event {
      *
      * @param name Event Name
      */
-    public Event(final String name) {
+    protected Event(final String name) {
         Assert.notEmpty(name);
 
         this.name = name;
@@ -40,7 +38,7 @@ public abstract class Event {
      *
      * @return Event name
      */
-    public final String getName() {
+    private String getName() {
         return this.name;
     }
 

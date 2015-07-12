@@ -61,9 +61,9 @@ public class FileUtils {
             e = zis.getNextEntry();
         }
         zis.close();
-        for (int i = 0; i < files.length; i++) {
-            InputStream in = new FileInputStream(files[i]);
-            zos.putNextEntry(new ZipEntry(files[i].getName()));
+        for (File file : files) {
+            InputStream in = new FileInputStream(file);
+            zos.putNextEntry(new ZipEntry(file.getName()));
 
             int len;
             while ((len = in.read(buffer)) > 0) {

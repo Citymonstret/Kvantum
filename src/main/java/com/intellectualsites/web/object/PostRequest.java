@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public class PostRequest {
 
-    public String request;
-    private Map<String, String> vars;
+    public final String request;
+    private final Map<String, String> vars;
 
     public PostRequest(final String request) {
         this.request = request;

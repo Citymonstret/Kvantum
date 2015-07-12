@@ -7,7 +7,7 @@ package com.intellectualsites.web.object;
  */
 public class Cookie {
 
-    private String name, value;
+    private final String name, value;
 
     public Cookie(final String name, final String value) {
         this.name = name;

@@ -17,9 +17,10 @@ public class PluginClassLoader extends URLClassLoader {
 
     private final PluginLoader loader;
     private final PluginFile desc;
-    private final File file, data;
+    private final File data;
     private final Map<String, Class> classes;
-    public Plugin plugin, init;
+    Plugin plugin;
+    private Plugin init;
 
     /**
      * Constructor
@@ -35,11 +36,10 @@ public class PluginClassLoader extends URLClassLoader {
                 .getClassLoader());
         this.loader = loader;
         this.desc = desc;
-        this.file = file;
         data = new File(file.getParent(), desc.name);
         classes = new HashMap<>();
         Class jar;
-        Class<? extends Plugin> plg;
+        Class plg;
         try {
             jar = Class.forName(desc.mainClass, true, this);
         } catch (final ClassNotFoundException e) {
@@ -51,7 +51,7 @@ public class PluginClassLoader extends URLClassLoader {
             throw new RuntimeException("Plugin main class for " + desc.name + " is not instanceof Plugin");
         }
         try {
-            plugin = plg.newInstance();
+            plugin = (Plugin) plg.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -70,11 +70,7 @@ public class PluginClassLoader extends URLClassLoader {
         if (!file.getName().endsWith(".jar"))
             throw new IllegalArgumentException(
                     file.getName() + " is of wrong type");
-        try {
-            super.addURL(file.toURI().toURL());
-        } catch (final MalformedURLException e) {
-            throw e;
-        }
+        super.addURL(file.toURI().toURL());
     }
 
     @Override
@@ -83,7 +79,7 @@ public class PluginClassLoader extends URLClassLoader {
         return this.findClass(name, true);
     }
 
-    protected Class<?> findClass(final String name, final boolean global)
+    Class<?> findClass(final String name, final boolean global)
             throws ClassNotFoundException {
         Class<?> clazz = null;
         if (classes.containsKey(name))
@@ -101,7 +97,7 @@ public class PluginClassLoader extends URLClassLoader {
         return clazz;
     }
 
-    protected Set<String> getClasses() {
+    Set<String> getClasses() {
         return classes.keySet();
     }
 

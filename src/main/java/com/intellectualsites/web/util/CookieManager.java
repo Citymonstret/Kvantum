@@ -4,12 +4,19 @@ import com.intellectualsites.web.object.Cookie;
 import com.intellectualsites.web.object.Request;
 
 /**
- * Created 2015-04-19 for IntellectualServer
+ * This is an utility class
+ * created to handle all
+ * cookie related actions
  *
  * @author Citymonstret
  */
 public class CookieManager {
 
+    /**
+     * Get all cookies from a HTTP Request
+     * @param r HTTP Request
+     * @return an array containing the cookies
+     */
     public static Cookie[] getCookies(final Request r) {
         String raw = r.getHeader("Cookie");
         if (raw.equals("")) {

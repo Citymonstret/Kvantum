@@ -11,7 +11,7 @@ import java.util.Locale;
  */
 public class TimeUtil {
 
-    public static SimpleDateFormat HTTPFormat, LogFormat, LogFileFormat;
+    public final static SimpleDateFormat HTTPFormat, LogFormat, LogFileFormat;
     static {
         HTTPFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.US);
         LogFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);

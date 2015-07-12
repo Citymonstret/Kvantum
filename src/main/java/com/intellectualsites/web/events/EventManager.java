@@ -15,7 +15,7 @@ public class EventManager {
     private final Map<Integer, ArrayDeque<EventListener>> listeners;
     private Map<Integer, EventListener[]> bakedListeners;
 
-    public EventManager() {
+    private EventManager() {
         listeners = new HashMap<>();
     }
 

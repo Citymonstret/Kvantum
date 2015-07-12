@@ -22,12 +22,11 @@ import java.util.Map;
 public class Request {
 
     private Map<String, Object> meta;
-    private Map<String, String> headers;
+    private final Map<String, String> headers;
     private Cookie[] cookies;
-    private final String raw;
     private Query query;
     private PostRequest postRequest;
-    private Socket socket;
+    private final Socket socket;
     private Session session;
 
     /**
@@ -104,7 +103,6 @@ public class Request {
      * @param socket The socket which sent the request
      */
     public Request(final String request, final Socket socket) {
-        this.raw = request;
         this.socket = socket;
         String[] parts = request.split("\\|");
         this.headers = new HashMap<>();

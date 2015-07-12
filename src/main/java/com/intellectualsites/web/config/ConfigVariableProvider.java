@@ -23,9 +23,9 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
         return instance;
     }
 
-    private Map<String, ConfigProvider> configurations;
+    private final Map<String, ConfigProvider> configurations;
 
-    public ConfigVariableProvider() {
+    private ConfigVariableProvider() {
         configurations = new HashMap<>();
     }
 

@@ -54,7 +54,7 @@ public class MySQLConnManager {
         }
     }
 
-    public void log(String message, final Object... args) {
+    private void log(String message, final Object... args) {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }

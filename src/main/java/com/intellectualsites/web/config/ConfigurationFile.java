@@ -6,6 +6,7 @@ package com.intellectualsites.web.config;
  *
  * @author Citymonstret
  */
+@SuppressWarnings("unused")
 public interface ConfigurationFile {
 
     /**

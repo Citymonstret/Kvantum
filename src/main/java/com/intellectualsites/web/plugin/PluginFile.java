@@ -3,6 +3,7 @@ package com.intellectualsites.web.plugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,7 +25,13 @@ public class PluginFile {
      * @throws Exception If anything bad happens
      */
     public PluginFile(final InputStream stream, Yaml yaml) throws Exception {
-        Map<String, Object> info = (Map<String, Object>) yaml.load(stream);
+        Map info;
+        Object temp = yaml.load(stream);
+        if (temp instanceof Map) {
+            info = (Map) temp;
+        } else {
+            info = new HashMap<>();
+        }
         name = info.get("name").toString();
         mainClass = info.get("main").toString();
         author = info.get("author").toString();

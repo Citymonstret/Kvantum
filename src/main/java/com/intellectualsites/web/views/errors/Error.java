@@ -16,7 +16,7 @@ public class Error extends View {
     private final int code;
     private final String desc;
 
-    public Error(final int code, final String desc) {
+    Error(final int code, final String desc) {
         super("", "error");
         this.code = code;
         this.desc = desc;

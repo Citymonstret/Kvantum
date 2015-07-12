@@ -57,7 +57,7 @@ public class HTMLView extends View implements CacheApplicable {
 
     public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider {
 
-        private Map<String, String> storage = new HashMap<>();
+        private final Map<String, String> storage = new HashMap<>();
         public HTMLProvider(final Request r) {
             storage.put("name", r.getMeta("html_file") + ".html");
         }

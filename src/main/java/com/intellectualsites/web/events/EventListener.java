@@ -85,7 +85,7 @@ public abstract class EventListener<T extends Event> {
      *
      * @return Class name of the T class
      */
-    final public String listeningTo() {
+    final String listeningTo() {
         return this.listenTo;
     }
 

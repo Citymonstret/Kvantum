@@ -15,10 +15,10 @@ import java.util.List;
  */
 public class ViewManager {
 
-    private List<View> views;
+    private final List<View> views;
 
     public ViewManager() {
-        this.views = new ArrayList<View>();
+        this.views = new ArrayList<>();
     }
 
     public void add(final View view) {

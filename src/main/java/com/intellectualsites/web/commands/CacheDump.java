@@ -6,11 +6,6 @@ import com.intellectualsites.web.util.CacheManager;
 
 import java.util.Map;
 
-/**
- * Created 2015-07-08 for IntellectualServer
- *
- * @author Citymonstret
- */
 public class CacheDump extends Command {
 
     @Override

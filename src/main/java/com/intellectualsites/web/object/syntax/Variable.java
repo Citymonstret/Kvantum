@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class Variable extends Syntax {
 
-    private Map<String, Filter> filters;
+    private final Map<String, Filter> filters;
 
     public Variable() {
         super(Pattern.compile("\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}"));

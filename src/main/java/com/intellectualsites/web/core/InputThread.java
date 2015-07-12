@@ -15,13 +15,13 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class InputThread extends Thread {
+@SuppressWarnings("all")
+class InputThread extends Thread {
 
-    private Server server;
-    private Map<String, Command> commands;
+    private final Server server;
+    private final Map<String, Command> commands;
 
-
-    protected InputThread(Server server) {
+    InputThread(Server server) {
         this.server = server;
         this.commands = new HashMap<>();
 
@@ -34,9 +34,8 @@ public class InputThread extends Thread {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             String line;
-            boolean stop = false;
-            while (!(line = in.readLine()).equalsIgnoreCase("quit") && !stop) {
-                if (line.startsWith("/")) {
+            for (;;) {
+                if ((line = in.readLine()).startsWith("/")) {
                     line = line.replace("/", "").toLowerCase();
                     String[] strings = line.split(" ");
                     String[] args;
@@ -54,7 +53,6 @@ public class InputThread extends Thread {
                     }
                 }
             }
-            in.close();
         } catch (final Exception ignored) {
         }
     }

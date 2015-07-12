@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class Session implements VariableProvider {
 
-    private Map<String, Object> sessionStorage;
+    private final Map<String, Object> sessionStorage;
 
     public Session() {
         sessionStorage = new HashMap<>();

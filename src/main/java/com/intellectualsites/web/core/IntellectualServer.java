@@ -14,7 +14,8 @@ import com.sun.istack.internal.NotNull;
  * all methods that are required
  * for the server to work
  */
-public interface IntellectualServer {
+@SuppressWarnings("unused")
+interface IntellectualServer {
 
     /**
      * Check if mysql is enabled
