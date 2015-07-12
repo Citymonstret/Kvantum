@@ -42,27 +42,20 @@ public class LessView extends View implements CacheApplicable {
     public LessView(String filter, Map<String, Object> options) {
         super(filter, "less", options);
         super.relatedFolderPath = "./assets/less";
+        super.fileName = "{2}.less";
     }
 
     @Override
     public boolean passes(Matcher matcher, Request request) {
-        String file = matcher.group(2);
-        if (!file.endsWith(".less"))
-            file = file + ".less";
+        File file = getFile(matcher);
         request.addMeta("less_file", file);
-
-        boolean exists = (new File(getFolder(), file)).exists();
-        if (!exists && Server.getInstance().verbose) {
-            Server.getInstance().log("Couldn't find less file '%s'", file);
-        }
-
-        return matcher.matches() && exists;
+        return file.exists();
     }
 
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(getFolder(), r.getMeta("less_file").toString());
+        File file = (File) r.getMeta("less_file");
         StringBuilder document = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file), getBuffer());

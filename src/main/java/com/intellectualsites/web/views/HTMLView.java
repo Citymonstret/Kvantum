@@ -39,29 +39,25 @@ public class HTMLView extends View implements CacheApplicable {
 
     public HTMLView(String filter, Map<String, Object> options) {
         super(filter, "html", options);
+        super.fileName = "{2}.html";
+        super.defaultFile = "index";
     }
 
     @Override
     public boolean passes(Matcher matcher, Request request) {
-        String file = matcher.group(2);
-        if (file == null || file.equals("")) {
-            file = "index";
-        }
+        File file = getFile(matcher);
         request.addMeta("html_file", file);
-        return foundFile(file);
+        return file.exists();
     }
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(getFolder(), r.getMeta("html_file") + ".html");
+        File file = (File) r.getMeta("html_file");
+
         Response response = new Response(this);
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
         response.setContent(FileUtils.getDocument(file, getBuffer()));
         return response;
-    }
-
-    private boolean foundFile(final String file) {
-        return new File(getFolder(), file + ".html").exists();
     }
 
     @Override

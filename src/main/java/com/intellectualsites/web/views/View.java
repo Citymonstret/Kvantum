@@ -22,6 +22,7 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.util.Assert;
 import com.intellectualsites.web.util.Context;
 
 import java.io.File;
@@ -45,7 +46,8 @@ public abstract class View {
     private final String internalName;
 
     private int buffer = -1;
-    protected String relatedFolderPath;
+    protected String relatedFolderPath, fileName, defaultFile;
+    private String internalFileName, internalDefaultFile;
     private File folder;
 
     /**
@@ -138,6 +140,43 @@ public abstract class View {
             }
         }
         return this.folder;
+    }
+
+    protected File getFile(final Matcher matcher) {
+        if (internalFileName == null) {
+            if (containsOption("filepattern")) {
+                this.internalFileName = getOption("filepattern");
+            } else if (fileName != null) {
+                this.internalFileName = fileName;
+            } else {
+                throw new RuntimeException("getFile called without a filename set!");
+            }
+        }
+        String n = internalFileName;
+        {
+            n = n.replace("{0}", matcher.group());
+            n = n.replace("{1}", matcher.group(1));
+            String t = matcher.group(2);
+            if (t == null || t.equals("")) {
+                if (internalDefaultFile == null) {
+                    if (containsOption("defaultfile")) {
+                        this.internalDefaultFile = getOption("defaultfile");
+                    } else if (defaultFile != null) {
+                        this.internalDefaultFile = defaultFile;
+                    } else {
+                        throw new RuntimeException("getFile called with empty file path, and no default file set!");
+                    }
+                }
+                t = internalDefaultFile;
+            }
+            n = n.replace("{2}", t);
+            if (matcher.groupCount() > 3) {
+                n = n.replace("{3}", matcher.group(3));
+            } else {
+                n = n.replace("{3}", "");
+            }
+        }
+        return new File(getFolder(), n);
     }
 
     /**

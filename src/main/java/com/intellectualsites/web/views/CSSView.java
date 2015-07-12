@@ -37,21 +37,19 @@ public class CSSView extends View implements CacheApplicable {
     public CSSView(String filter, Map<String, Object> options) {
         super(filter, "css", options);
         super.relatedFolderPath = "/assets/css";
+        super.fileName = "{2}.css";
     }
 
     @Override
     public boolean passes(Matcher matcher, Request request) {
-        String file = matcher.group(2);
-        if (!file.endsWith(".css"))
-            file = file + ".css";
+        File file = getFile(matcher);
         request.addMeta("css_file", file);
-        return matcher.matches() && (new  File(getFolder(), file)).exists();
+        return file.exists();
     }
-
 
     @Override
     public Response generate(final Request r) {
-        File file = new File(getFolder(), r.getMeta("css_file").toString());
+        File file = (File) r.getMeta("css_file");
         Response response = new Response(this);
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
         response.setContent(FileUtils.getDocument(file, getBuffer()));
