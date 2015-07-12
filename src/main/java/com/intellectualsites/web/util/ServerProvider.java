@@ -42,7 +42,7 @@ public class ServerProvider implements ProviderFactory<ServerProvider>, Variable
             case "authors":
                 return new String[] { "Citymonstret", "IntellectualSites" };
             case "filters":
-                return new String[] { "LIST", "UPPERCASE", "LOWERCASE" };
+                return new String[] { "LIST", "UPPERCASE", "LOWERCASE", "JAVASCRIPT"};
             case "true":
                 return true;
             case "false":
