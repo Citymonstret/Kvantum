@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.object;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.util.CookieManager;
 import com.sun.istack.internal.NotNull;
 
@@ -128,6 +129,13 @@ public class Request {
         for (String part : parts) {
             String[] subParts = part.split(":");
             if (subParts.length < 2) {
+                if (headers.containsKey("query")) {
+                    // This fixes issues with Nginx and proxy_pass
+                    continue;
+                }
+                if (Server.getInstance().verbose) {
+                    Server.getInstance().log("Query: " + subParts[0]);
+                }
                 headers.put("query", subParts[0]);
             } else {
                 headers.put(subParts[0], subParts[1]);

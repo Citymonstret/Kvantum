@@ -7,7 +7,7 @@
     <groupId>com.intellectualsites</groupId>
     <artifactId>IntellectualServer</artifactId>
     <packaging>pom</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.0.5</version>
     <build>
         <resources>
             <resource>
@@ -38,6 +38,7 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <finalName>IntellectualServer v.${project.version}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
