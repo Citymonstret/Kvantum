@@ -14,6 +14,7 @@
                 <directory>src/</directory>
                 <includes>
                     <include>plugin.yml</include>
+                    <include>LICENSE.txt</include>
                 </includes>
             </resource>
         </resources>
