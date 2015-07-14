@@ -23,8 +23,11 @@ import com.intellectualsites.web.bukkit.plotsquared.GetSchematic;
 import com.intellectualsites.web.bukkit.plotsquared.MainView;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.logging.LogProvider;
+import com.intellectualsites.web.views.JSView;
+import com.intellectualsites.web.views.LessView;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class PlotSquaredHook extends Hook implements LogProvider {
 
@@ -37,7 +40,19 @@ public class PlotSquaredHook extends Hook implements LogProvider {
             log("Couldn't create the main folder ('%s')", file);
             return;
         }
-        server.addViewBinding("plotsquared", MainView.class);
+        {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("folder", "./plotsquared/");
+            map.put("filepattern", "stylesheet.less");
+            server.getViewManager().add(new LessView("(\\/assets\\/)(stylesheet).(less|css)?", map));
+        }
+        {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("folder", "./plotsquared/");
+            map.put("filepattern", "script.js");
+            server.getViewManager().add(new JSView("(\\/assets\\/)(script).(js)?", map));
+        }
+        server.getViewManager().add(new MainView(file));
         server.getViewManager().add(new GetSchematic());
     }
 

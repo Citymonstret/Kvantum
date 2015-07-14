@@ -20,24 +20,75 @@
 package com.intellectualsites.web.bukkit.plotsquared;
 
 import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.object.cache.CacheApplicable;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.object.syntax.Variable;
+import com.intellectualsites.web.object.syntax.VariableProvider;
+import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-public class MainView extends View {
+public class MainView extends View implements CacheApplicable {
 
-    public MainView(String pattern, Map<String, Object> options) {
-        super(pattern, "plotsquared", options);
-        super.defaultFile = "index";
-        super.fileName = "{2}.html";
+    private final File psFolder;
+
+    public MainView(final File psFolder) {
+        super("(\\/)?(index)?(.html)?", "plotsquared");
+        this.psFolder = psFolder;
     }
 
     @Override
     public boolean passes(Matcher matcher, Request request) {
-        File file = getFile(matcher);
-        request.addMeta("ps_file", file);
-        return file.exists();
+        return true;
+    }
+
+    @Override
+    public Response generate(final Request r) {
+        Response response = new Response(this);
+        response.setContent(FileUtils.getDocument(new File(psFolder, "index.html"), getBuffer()));
+        return response;
+    }
+
+    @Override
+    public boolean isApplicable(Request r) {
+        return true;
+    }
+
+    public ProviderFactory getFactory(final Request r) {
+        return new ProviderFactory() {
+
+            private final PSProvider provider = new PSProvider();
+
+            @Override
+            public VariableProvider get(Request r) {
+                return provider;
+            }
+
+            @Override
+            public String providerName() {
+                return "ps";
+            }
+        };
+    }
+
+    private class PSProvider implements VariableProvider {
+
+        private final List<String> validOptions = Arrays.asList("");
+
+        @Override
+        public boolean contains(String variable) {
+            return validOptions.contains(variable);
+        }
+
+        @Override
+        public Object get(String variable) {
+            return null;
+        }
     }
 }
