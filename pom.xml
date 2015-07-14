@@ -60,6 +60,13 @@
     </repositories>
     <dependencies>
         <dependency>
+            <groupId>com.intellectualcrafters</groupId>
+            <artifactId>PlotSquared</artifactId>
+            <scope>system</scope>
+            <version>1.0</version>
+            <systemPath>${project.basedir}/libraries/PlotSquared.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.7.10-R0.1-SNAPSHOT</version>

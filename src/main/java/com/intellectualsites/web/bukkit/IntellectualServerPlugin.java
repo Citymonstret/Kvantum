@@ -20,6 +20,8 @@
 package com.intellectualsites.web.bukkit;
 
 import com.intellectualsites.web.bukkit.events.BukkitEventHook;
+import com.intellectualsites.web.bukkit.hooks.Hook;
+import com.intellectualsites.web.bukkit.hooks.PlotSquaredHook;
 import com.intellectualsites.web.core.Bootstrap;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.events.Event;
@@ -31,6 +33,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -42,27 +45,49 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
 
     private static Server server;
 
+    private List<Hook> hooks;
+
     public static Server getIntellectualServer() {
         return IntellectualServerPlugin.server;
     }
 
+    private boolean enable, hook_plotsquared;
+
     @Override
     public void onEnable() {
-        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
-            @Override
-            public void run() {
-                server = Bootstrap.startServer(false, getDataFolder(), new LogWrapper() {
-                    @Override
-                    public void log(String s) {
-                        getLogger().log(Level.INFO, s);
-                    }
-                });
-                server.setEventCaller(new BukkitEventCaller());
-                server.addProviderFactory(new BukkitVariableProvider());
-            }
-        });
-        getServer().getPluginManager().registerEvents(this, this);
+        getConfig().options().copyDefaults(true);
+        getConfig().addDefault("enable", false);
+        getConfig().addDefault("hook.plotsquared", false);
+        saveConfig();
 
+        this.enable = getConfig().getBoolean("enable");
+        this.hook_plotsquared = getConfig().getBoolean("hook.plotsquared");
+
+        if (enable) {
+            hooks = new ArrayList<>();
+            if (hook_plotsquared) {
+                hooks.add(new PlotSquaredHook());
+            }
+            Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+                @Override
+                public void run() {
+                    server = Bootstrap.startServer(false, getDataFolder(), new LogWrapper() {
+                        @Override
+                        public void log(String s) {
+                            getLogger().log(Level.INFO, s);
+                        }
+                    });
+                    server.setEventCaller(new BukkitEventCaller());
+                    server.addProviderFactory(new BukkitVariableProvider());
+                    for (Hook hook : hooks) {
+                        hook.load(server);
+                    }
+                }
+            });
+            getServer().getPluginManager().registerEvents(this, this);
+        } else {
+            getLogger().log(Level.WARNING, "The webserver is not enabled!");
+        }
     }
 
     /**
