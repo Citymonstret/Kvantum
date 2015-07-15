@@ -20,7 +20,6 @@
 package com.intellectualsites.web.object.syntax;
 
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.syntax.ProviderFactory;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -51,7 +50,7 @@ public abstract class Syntax {
      * Process the input string
      *
      * @param in Code Input
-     * @param matcher RegEx Matcher
+     * @param matcher RegEx ViewMatcher
      * @param r HTML Request
      * @param factories Provider Factories
      *

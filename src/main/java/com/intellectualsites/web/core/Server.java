@@ -39,6 +39,7 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
+import com.intellectualsites.web.views.staticviews.StaticViewManager;
 import com.sun.istack.internal.NotNull;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
@@ -423,6 +424,11 @@ public class Server extends Thread implements IntellectualServer {
                     e.printStackTrace();
                 }
             }
+        }
+        try {
+            StaticViewManager.generate(new SystemView());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         viewManager.dump(this);
         //
