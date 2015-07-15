@@ -20,6 +20,7 @@ public class CachedStaticView extends View implements CacheApplicable {
 
     @Override
     public boolean passes(Matcher matcher, Request request) {
+        request.addMeta("matcher", matcher);
         return true;
     }
 

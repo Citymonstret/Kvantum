@@ -19,6 +19,7 @@ public class StaticView extends View {
 
     @Override
     public boolean passes(Matcher matcher, Request request) {
+        request.addMeta("matcher", matcher);
         return true;
     }
 
