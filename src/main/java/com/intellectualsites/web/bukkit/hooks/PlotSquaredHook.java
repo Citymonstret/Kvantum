@@ -19,41 +19,161 @@
 
 package com.intellectualsites.web.bukkit.hooks;
 
+import com.intellectualsites.web.bukkit.IntellectualServerPlugin;
 import com.intellectualsites.web.bukkit.plotsquared.GetSchematic;
 import com.intellectualsites.web.bukkit.plotsquared.MainView;
+import com.intellectualsites.web.bukkit.plotsquared.PlotInfo;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.logging.LogProvider;
-import com.intellectualsites.web.views.JSView;
+import com.intellectualsites.web.object.Header;
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.util.FileUtils;
+
 import com.intellectualsites.web.views.LessView;
+import com.intellectualsites.web.views.decl.ViewDeclaration;
+import com.intellectualsites.web.views.decl.ViewMatcher;
+import com.intellectualsites.web.views.staticviews.StaticViewManager;
+import org.apache.commons.io.IOUtils;
+import org.lesscss.LessCompiler;
 
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.util.HashMap;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-public class PlotSquaredHook extends Hook implements LogProvider {
+@SuppressWarnings({"unused"})
+public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaration {
 
-    private File file;
+    private File styleSheet, script, logo, plotTemplate;
 
     @Override
     public void load(Server server) {
-        file = new File(server.coreFolder, "plotsquared");
-        if (!file.mkdirs()) {
-            log("Couldn't create the main folder ('%s')", file);
+        log("Loading the plotsquared hook!");
+
+        File file1 = new File(IntellectualServerPlugin.getPlugin(IntellectualServerPlugin.class).getDataFolder(), "plotsquared");
+        if  (!file1.exists() && !file1.mkdirs()) {
+            log("Couldn't create the main plotsquared folder ('%s')", file1.getAbsolutePath());
             return;
         }
         {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("folder", "./plotsquared/");
-            map.put("filepattern", "stylesheet.less");
-            server.getViewManager().add(new LessView("(\\/assets\\/)(stylesheet).(less|css)?", map));
+            File file = new File(file1, "/assets/stylesheet.less");
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs()) {
+                    log("Failed to create the plotsquared folder");
+                }
+            }
+            if (!file.exists()) {
+                try {
+                    if (!file.createNewFile()) {
+                        log("Failed to create stylesheet.less");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            styleSheet = file;
         }
         {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("folder", "./plotsquared/");
-            map.put("filepattern", "script.js");
-            server.getViewManager().add(new JSView("(\\/assets\\/)(script).(js)?", map));
+            File file = new File(file1, "plot.html");
+            if (!file.exists()) {
+                boolean c = true;
+                try {
+                    if (!file.createNewFile()) {
+                        c = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    c = false;
+                }
+                if (!c) {
+                    log("Couldn't create plot template file...");
+                    return;
+                }
+            }
+            this.plotTemplate = file;
         }
-        server.getViewManager().add(new MainView(file));
+        {
+            File file = new File(file1, "/assets/script.js");
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs()) {
+                    log("Failed to create the plotsquared folder");
+                }
+            }
+            if (!file.exists()) {
+                try {
+                    if (!file.createNewFile()) {
+                        log("Failed to create script.js");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            script = file;
+        }
+        {
+            File logo = new File(file1, "/assets/logo.png");
+            if (!logo.exists()) {
+                log("There is no logo.png, we'll skip this request for now!");
+                this.logo = null;
+            } else {
+                this.logo = logo;
+            }
+        }
+        server.getViewManager().clear();
+        server.getViewManager().add(new MainView(file1));
         server.getViewManager().add(new GetSchematic());
+        server.getViewManager().add(new PlotInfo(plotTemplate));
+        try {
+            StaticViewManager.generate(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @ViewMatcher(filter = "(\\/assets\\/)(logo)(.png)?", name="plotlogo", cache = true)
+    public Response getLogo(final Request in) {
+        if (this.logo == null) {
+            Response response = new Response(null);
+            response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
+            response.setContent("<h1>The logo file wasn't found >_<");
+            return response;
+        }
+        byte[] bytes = new byte[0];
+        try {
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(logo), (int)(logo.length() / 512));
+            bytes = IOUtils.toByteArray(stream);
+            stream.close();
+        } catch(final Exception e) {
+            e.printStackTrace();
+        }
+        Response response = new Response(null);
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, "image/png; charset=utf-8");
+        response.setBytes(bytes);
+        return response;
+    }
+
+    @ViewMatcher(filter = "(\\/assets\\/)(script)(.js)?", name = "plotscript", cache = false)
+    public Response getScript(final Request in) {
+        Response response = new Response(null);
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT);
+        response.setContent(FileUtils.getDocument(script, 1024 * 1024 * 16));
+        return response;
+    }
+
+    @ViewMatcher(filter = "(\\/assets\\/)(stylesheet)(.less|.css)?", name = "plotstylesheet", cache = false)
+    public Response getStylesheet(final Request in) {
+        Response response = new Response(null);
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
+        if (LessView.compiler == null) {
+            LessView.compiler = new LessCompiler();
+        }
+        try {
+            response.setContent(LessView.compiler.compile(FileUtils.getDocument(styleSheet, 1024 * 1024 * 16)));
+        } catch(final Exception e) {
+            response.setContent("ERROR: " + e.getMessage());
+        }
+        return response;
     }
 
     @Override
@@ -64,4 +184,5 @@ public class PlotSquaredHook extends Hook implements LogProvider {
     private void log(final String s, final Object ... o) {
         Server.getInstance().log(this, s, o);
     }
+
 }

@@ -19,7 +19,6 @@
 
 package com.intellectualsites.web.bukkit;
 
-import com.intellectualsites.web.bukkit.events.BukkitEventHook;
 import com.intellectualsites.web.bukkit.hooks.Hook;
 import com.intellectualsites.web.bukkit.hooks.PlotSquaredHook;
 import com.intellectualsites.web.core.Bootstrap;
@@ -32,7 +31,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -47,12 +45,6 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
 
     private List<Hook> hooks;
 
-    public static Server getIntellectualServer() {
-        return IntellectualServerPlugin.server;
-    }
-
-    private boolean enable, hook_plotsquared;
-
     @Override
     public void onEnable() {
         getConfig().options().copyDefaults(true);
@@ -60,8 +52,8 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
         getConfig().addDefault("hook.plotsquared", false);
         saveConfig();
 
-        this.enable = getConfig().getBoolean("enable");
-        this.hook_plotsquared = getConfig().getBoolean("hook.plotsquared");
+        boolean enable = getConfig().getBoolean("enable");
+        boolean hook_plotsquared = getConfig().getBoolean("hook.plotsquared");
 
         if (enable) {
             hooks = new ArrayList<>();
@@ -71,7 +63,12 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
                 @Override
                 public void run() {
-                    server = Bootstrap.startServer(false, getDataFolder(), new LogWrapper() {
+                    server = Bootstrap.createServer(false, getDataFolder(), new LogWrapper() {
+                        @Override
+                        public void log(String prefix, String prefix1, String timeStamp, String message) {
+                            log(message);
+                        }
+
                         @Override
                         public void log(String s) {
                             getLogger().log(Level.INFO, s);
@@ -82,12 +79,18 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
                     for (Hook hook : hooks) {
                         hook.load(server);
                     }
+                    server.start();
                 }
             });
             getServer().getPluginManager().registerEvents(this, this);
         } else {
             getLogger().log(Level.WARNING, "The webserver is not enabled!");
         }
+    }
+
+    @Override
+    public void onDisable() {
+        Server.getInstance().stopServer();
     }
 
     /**
@@ -97,26 +100,11 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
      */
     protected class BukkitEventCaller extends EventCaller {
 
-        private final Collection<BukkitEventHook> hooks;
-
-        BukkitEventCaller() {
-            hooks = new ArrayList<>();
-            hooks.add(new com.intellectualsites.web.bukkit.events.StartupEvent());
-        }
+        BukkitEventCaller() {}
 
         @Override
-        public void callEvent(final Event event) {
-            for (final BukkitEventHook hook : hooks) {
-                if (hook.getEvent().isInstance(event)) {
-                    try {
-                        BukkitEventHook h = hook.getClass().newInstance();
-                        Bukkit.getPluginManager().callEvent(h);
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
+        public void callEvent(final Event event) {}
+
     }
 
 }

@@ -20,6 +20,7 @@
 package com.intellectualsites.web.core;
 
 import com.intellectualsites.web.object.LogWrapper;
+import com.intellectualsites.web.util.TimeUtil;
 
 import java.io.File;
 import java.util.HashMap;
@@ -60,10 +61,25 @@ public class Bootstrap {
         }
         startServer(true, file, new LogWrapper() {
             @Override
+            public void log(String prefix, String prefix1, String timeStamp, String message) {
+                System.out.printf("[%s][%s][%s] %s%s", prefix, prefix1, timeStamp, message, System.lineSeparator());
+            }
+
+            @Override
             public void log(String s) {
                 System.out.println(s);
             }
         });
+    }
+
+    public static Server createServer(boolean standalone, File coreFolder, LogWrapper wrapper) {
+        Server server = null;
+        try {
+            server = new Server(standalone, coreFolder, wrapper);
+        } catch(final Exception e) {
+            e.printStackTrace();
+        }
+        return server;
     }
 
     /**
@@ -75,7 +91,7 @@ public class Bootstrap {
     public static Server startServer(boolean standalone, File coreFolder, LogWrapper wrapper) {
         Server server = null;
         try {
-            server = new Server(standalone, coreFolder, wrapper);
+            server = createServer(standalone, coreFolder, wrapper);
             server.start();
         } catch(final Exception e) {
             e.printStackTrace();

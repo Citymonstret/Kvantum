@@ -11,11 +11,12 @@
     <build>
         <resources>
             <resource>
-                <directory>src/</directory>
+                <directory>${project.basedir}/src/</directory>
                 <includes>
                     <include>plugin.yml</include>
                     <include>LICENSE.txt</include>
                 </includes>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
@@ -54,6 +55,10 @@
     </build>
     <repositories>
         <repository>
+            <id>intellectualsites</id>
+            <url>http://mvn.intellectualsites.com/content/repositories/intellectualsites/</url>
+        </repository>
+        <repository>
             <id>techcable-repo</id> <!-- Just leave the repositories section alone or bukkit won't work -->
             <url>http://repo.techcable.net/content/groups/public/</url>
         </repository>
@@ -62,9 +67,8 @@
         <dependency>
             <groupId>com.intellectualcrafters</groupId>
             <artifactId>PlotSquared</artifactId>
-            <scope>system</scope>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/libraries/PlotSquared.jar</systemPath>
+            <version>2.12.11</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>

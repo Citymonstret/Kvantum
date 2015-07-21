@@ -41,11 +41,13 @@ import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
 import com.sun.istack.internal.NotNull;
+import jdk.nashorn.internal.runtime.Logging;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -425,10 +427,12 @@ public class Server extends Thread implements IntellectualServer {
                 }
             }
         }
-        try {
-            StaticViewManager.generate(new SystemView());
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (standalone) {
+            try {
+                StaticViewManager.generate(new SystemView());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         viewManager.dump(this);
         //
@@ -448,7 +452,23 @@ public class Server extends Thread implements IntellectualServer {
             socket = new ServerSocket(this.port);
             log(Message.SERVER_STARTED);
         } catch (final Exception e) {
-            throw new RuntimeException("Couldn't start the server...", e);
+            // throw new RuntimeException("Couldn't start the server...", e);
+            boolean run = true;
+
+            int port = this.port + 1;
+            while (run) {
+                try {
+                    socket = new ServerSocket(port++);
+                    run = false;
+                    log("Specified port was occupied, running on " + port + " instead");
+
+                    Field portField = getClass().getDeclaredField("port");
+                    portField.setAccessible(true);
+                    portField.set(this, port);
+                } catch(final Exception ex) {
+                    continue;
+                }
+            }
         }
         //
         log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
@@ -591,6 +611,10 @@ public class Server extends Thread implements IntellectualServer {
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
+
+                log("Request was served by '%s', with the type '%s'. The total lenght of the content was '%s'",
+                        view.getName(), isText ? "text" : "bytes", bytes.length
+                        );
             }
         }.start();
     }
@@ -635,7 +659,8 @@ public class Server extends Thread implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        logWrapper.log(String.format("[%s][%s][%s] %s", PREFIX, prefix, TimeUtil.getTimeStamp(), message));
+        logWrapper.log(PREFIX, prefix, TimeUtil.getTimeStamp(), message);
+        // logWrapper.log(String.format("[%s][%s][%s] %s", PREFIX, prefix, TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
     }
 
@@ -649,7 +674,9 @@ public class Server extends Thread implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        logWrapper.log(String.format("[%s][%s] %s", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
+        logWrapper.log(PREFIX, provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
+        // void log(String prefix, String prefix1, String timeStamp, String message);
+        // logWrapper.log(String.format("[%s][%s] %s", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
     }
 
@@ -657,8 +684,12 @@ public class Server extends Thread implements IntellectualServer {
     public synchronized void stopServer() {
         log(Message.SHUTTING_DOWN);
         EventManager.getInstance().handle(new ShutdownEvent(this));
-        pluginLoader.disableAllPlugins();
-        System.exit(0);
+        if (pluginLoader != null) {
+            pluginLoader.disableAllPlugins();
+        }
+        if (standalone) {
+            System.exit(0);
+        }
     }
 
     @Override

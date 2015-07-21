@@ -29,10 +29,9 @@ import java.util.regex.Pattern;
 public class ForEachBlock extends Syntax {
 
     public ForEachBlock() {
-        super(Pattern.compile("\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([\\s\\S]*)\\{/foreach\\}"));
+        super(Pattern.compile("\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([A-Za-z0-9<>\"'-_\\/\\\\ }{}\\n\\s]*)\\{\\/foreach\\}"));
     }
 
-    @Override
     public String process(String content, Matcher matcher, Request r, Map<String, ProviderFactory> factories) {
         while (matcher.find()) {
             String provider = matcher.group(1);

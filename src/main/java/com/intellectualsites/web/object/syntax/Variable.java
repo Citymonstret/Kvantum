@@ -59,18 +59,22 @@ public class Variable extends Syntax {
             if (matcher.group().contains(" || ")) {
                 filter = matcher.group().split(" \\|\\| ")[1].replace("}}", "");
             }
-
             if (factories.containsKey(provider.toLowerCase())) {
-                VariableProvider p = factories.get(provider.toLowerCase()).get(r);
-                if (p != null) {
-                    if (p.contains(variable)) {
-                        Object o = p.get(variable);
-                        if (!filter.equals("")) {
-                            o = filters.get(filter.toUpperCase()).handle(variable, o);
+                try {
+                    VariableProvider p = factories.get(provider.toLowerCase()).get(r);
+                    if (p != null) {
+                        if (p.contains(variable)) {
+                            Object o = p.get(variable);
+                            if (!filter.equals("")) {
+                                o = filters.get(filter.toUpperCase()).handle(variable, o);
+                            }
+                            content = content.replace(matcher.group(), o.toString());
                         }
-                        content = content.replace(matcher.group(), o.toString());
+                    } else {
+                        content = content.replace(matcher.group(), "");
                     }
-                } else {
+                } catch(final Throwable e) {
+                    e.printStackTrace();
                     content = content.replace(matcher.group(), "");
                 }
             } else {

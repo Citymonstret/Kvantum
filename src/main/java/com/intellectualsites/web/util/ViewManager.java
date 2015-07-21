@@ -71,4 +71,9 @@ public class ViewManager {
             views.remove(view);
         }
     }
+
+    public void clear() {
+        this.views.clear();
+        Server.getInstance().log("Cleared views.");
+    }
 }

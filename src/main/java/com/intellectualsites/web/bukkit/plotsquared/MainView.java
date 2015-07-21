@@ -57,7 +57,7 @@ public class MainView extends View implements CacheApplicable {
 
     @Override
     public boolean isApplicable(Request r) {
-        return true;
+        return false;
     }
 
     public ProviderFactory getFactory(final Request r) {

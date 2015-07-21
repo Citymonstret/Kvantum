@@ -17,74 +17,27 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.views;
+package com.intellectualsites.web.bukkit;
 
-import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.*;
-import com.intellectualsites.web.object.cache.CacheApplicable;
-import org.lesscss.LessCompiler;
+import com.intellectualcrafters.plot.database.DBFunc;
+import com.intellectualcrafters.plot.util.bukkit.UUIDHandler;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Map;
-import java.util.regex.Matcher;
+import java.util.UUID;
 
-/**
- * Created 2015-04-22 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class LessView extends View implements CacheApplicable {
+public class SimplePlayerWrapper {
 
-    public static LessCompiler compiler;
+    final UUID uuid;
 
-    public LessView(String filter, Map<String, Object> options) {
-        super(filter, "less", options);
-        super.relatedFolderPath = "./assets/less";
-        super.fileName = "{2}.less";
+    public SimplePlayerWrapper(final UUID uuid) {
+        this.uuid = uuid;
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        File file = getFile(matcher);
-        request.addMeta("less_file", file);
-        return file.exists();
+    public String toString() {
+        if (this.uuid.equals(DBFunc.everyone)) {
+            return "PlotSquared";
+        }
+        return UUIDHandler.getName(this.uuid);
     }
 
-
-    @Override
-    public Response generate(final Request r) {
-        File file = (File) r.getMeta("less_file");
-        StringBuilder document = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file), getBuffer());
-            String line;
-            while ((line = reader.readLine()) != null) {
-                document.append(line).append("\n");
-            }
-            reader.close();
-        } catch(final Exception e) {
-            e.printStackTrace();
-        }
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
-
-        if (compiler == null) {
-            compiler = new LessCompiler();
-        }
-        try {
-            response.setContent(compiler.compile(document.toString()));
-        } catch(final Exception e) {
-            response.setContent("");
-            e.printStackTrace();
-        }
-
-        return response;
-    }
-
-    @Override
-    public boolean isApplicable(Request r) {
-        return true;
-    }
 }

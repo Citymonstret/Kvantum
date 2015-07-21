@@ -20,6 +20,7 @@
 package com.intellectualsites.web.bukkit.plotsquared;
 
 // import com.intellectualcrafters.plot.config.Settings;
+import com.intellectualcrafters.plot.config.Settings;
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
@@ -45,7 +46,7 @@ public class GetSchematic extends View {
     @Override
     public boolean passes(Matcher matcher, Request request) {
         String fileName = matcher.group(2) + ".schematic";
-        File file = new File(/* Settings.SCHEMATIC_SAVE_PATH */ "", fileName);
+        File file = new File(Settings.SCHEMATIC_SAVE_PATH, fileName);
         request.addMeta("ps_schematic", file);
         return file.exists();
     }
@@ -71,6 +72,7 @@ public class GetSchematic extends View {
             response.getHeader().set(Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"schematic.zip\"");
             response.getHeader().set(Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary");
             response.getHeader().set(Header.HEADER_CONTENT_LENGTH, "" + bytes.length);
+            response.getHeader().set(Header.HEADER_REFRESH, "15; url=/");
             response.setBytes(bytes);
         } catch (IOException e) {
             e.printStackTrace();
