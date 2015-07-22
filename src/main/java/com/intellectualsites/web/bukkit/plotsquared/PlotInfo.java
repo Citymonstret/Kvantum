@@ -26,6 +26,7 @@ import com.intellectualcrafters.plot.flag.FlagManager;
 import com.intellectualcrafters.plot.object.Location;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotId;
+import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.util.BlockManager;
 import com.intellectualcrafters.plot.util.MainUtil;
 import com.intellectualcrafters.plot.util.bukkit.BukkitUtil;
@@ -37,6 +38,7 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -171,12 +173,9 @@ public class PlotInfo extends View {
 
     public Collection<SimplePlayerWrapper> getPlayersInPlot(final Plot plot) {
         List<SimplePlayerWrapper> l = new ArrayList<>();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().getName().equals(plot.world)) {
-                Plot p = MainUtil.getPlot(BukkitUtil.getLocation(player));
-                if (p != null && p.equals(plot)) {
-                    l.add(new SimplePlayerWrapper(player.getUniqueId()));
-                }
+        for (PlotPlayer pp : UUIDHandler.players.values()) {
+            if (plot.equals(MainUtil.getPlot(pp.getLocation()))) {
+                l.add(new SimplePlayerWrapper(pp.getUUID()));
             }
         }
         return l;
