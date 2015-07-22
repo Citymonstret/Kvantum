@@ -19,9 +19,16 @@
 
 package com.intellectualsites.web.bukkit.plotsquared;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+
 import com.intellectualcrafters.plot.PS;
 import com.intellectualcrafters.plot.config.Settings;
-import com.intellectualcrafters.plot.flag.Flag;
 import com.intellectualcrafters.plot.flag.FlagManager;
 import com.intellectualcrafters.plot.object.Location;
 import com.intellectualcrafters.plot.object.Plot;
@@ -29,30 +36,22 @@ import com.intellectualcrafters.plot.object.PlotId;
 import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.util.BlockManager;
 import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.bukkit.BukkitUtil;
 import com.intellectualcrafters.plot.util.bukkit.UUIDHandler;
 import com.intellectualsites.web.bukkit.SimplePlayerWrapper;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.object.cache.CacheApplicable;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
-
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.io.*;
-import java.util.*;
-import java.util.regex.Matcher;
 
 /**
  * Created 7/20/2015 for IntellectualServer
  *
  * @author Citymonstret
  */
-public class PlotInfo extends View {
+public class PlotInfo extends View implements CacheApplicable {
 
     final File template;
 
@@ -103,6 +102,11 @@ public class PlotInfo extends View {
         };
     }
 
+    @Override
+    public boolean isApplicable(Request r) {
+        return true;
+    }
+
     private class PlotProvider implements VariableProvider {
 
         final Plot plot;
@@ -135,7 +139,7 @@ public class PlotInfo extends View {
                 case "inplot":
                     return getPlayersInPlot(plot);
                 case "rating":
-                    return "[Plot:NotImplemented]";
+                    return (int)(plot.getAverageRating());
                 case "trusted":
                     return getPlayers(plot.trusted);
                 case "members":

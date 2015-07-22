@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.object.syntax;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
 
 import java.util.Collection;
@@ -39,31 +40,41 @@ public class ForEachBlock extends Syntax {
             String variableName = matcher.group(3);
             String forContent = matcher.group(4);
 
-            if (factories.containsKey(provider.toLowerCase())) {
-                VariableProvider p = factories.get(provider.toLowerCase()).get(r);
-                if (p != null) {
-                    if (!p.contains(variable)) {
-                        content = content.replace(matcher.group(), "");
-                    } else {
-                        Object o = p.get(variable);
+            try {
+                if (factories.containsKey(provider.toLowerCase())) {
+                    VariableProvider p = factories.get(provider.toLowerCase()).get(r);
+                    if (p != null) {
+                        if (!p.contains(variable)) {
+                            content = content.replace(matcher.group(), "");
+                        } else {
+                            Object o = p.get(variable);
 
-                        StringBuilder totalContent = new StringBuilder();
-                        if (o instanceof Object[]) {
-                            for (Object oo : (Object[]) o) {
-                                totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                            StringBuilder totalContent = new StringBuilder();
+                            if (o instanceof Object[]) {
+                                for (Object oo : (Object[]) o) {
+                                    if (oo == null) {
+                                        continue;
+                                    }
+                                    totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                                }
+                            } else if (o instanceof Collection) {
+                                for (Object oo : (Collection) o) {
+                                    if (oo == null) {
+                                        continue;
+                                    }
+                                    totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                                }
                             }
-                        } else if (o instanceof Collection) {
-                            for (Object oo : (Collection) o) {
-                                totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
-                            }
+                            content = content.replace(matcher.group(), totalContent.toString());
                         }
-                        content = content.replace(matcher.group(), totalContent.toString());
+                    } else {
+                        content = content.replace(matcher.group(), "");
                     }
                 } else {
                     content = content.replace(matcher.group(), "");
                 }
-            }  else {
-                content = content.replace(matcher.group(), "");
+            } catch(final Exception e) {
+                Server.getInstance().log("Failed to finish the foor loop (" + provider + "." + variable + " -> " + variableName + ") -> " + e.getMessage());
             }
         }
         return content;

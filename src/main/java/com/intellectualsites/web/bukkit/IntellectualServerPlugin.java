@@ -79,6 +79,7 @@ public class IntellectualServerPlugin extends JavaPlugin implements Listener {
                     for (Hook hook : hooks) {
                         hook.load(server);
                     }
+                    server.silent = true;
                     server.start();
                 }
             });
