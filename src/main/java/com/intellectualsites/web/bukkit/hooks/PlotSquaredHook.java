@@ -19,10 +19,10 @@
 
 package com.intellectualsites.web.bukkit.hooks;
 
+import com.intellectualcrafters.plot.PS;
+import com.intellectualcrafters.plot.commands.MainCommand;
 import com.intellectualsites.web.bukkit.IntellectualServerPlugin;
-import com.intellectualsites.web.bukkit.plotsquared.GetSchematic;
-import com.intellectualsites.web.bukkit.plotsquared.MainView;
-import com.intellectualsites.web.bukkit.plotsquared.PlotInfo;
+import com.intellectualsites.web.bukkit.plotsquared.*;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.Header;
@@ -45,7 +45,7 @@ import java.io.IOException;
 @SuppressWarnings({"unused"})
 public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaration {
 
-    private File styleSheet, script, logo, plotTemplate;
+    private File styleSheet, script, logo, plotTemplate, userTemplate, searchTemplate, entryTemplate;
 
     @Override
     public void load(Server server) {
@@ -94,6 +94,64 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
             this.plotTemplate = file;
         }
         {
+            File file = new File(file1, "user.html");
+            if (!file.exists()) {
+                boolean c = true;
+                try {
+                    if (!file.createNewFile()) {
+                        c = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    c = false;
+                }
+                if (!c) {
+                    log("Couldn't create user template file...");
+                    return;
+                }
+            }
+            this.userTemplate = file;
+        }
+        {
+            File file = new File(file1, "search.html");
+            if (!file.exists()) {
+                boolean c = true;
+                try {
+                    if (!file.createNewFile()) {
+                        c = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    c = false;
+                }
+                if (!c) {
+                    log("Couldn't create search template file...");
+                    return;
+                }
+            }
+
+            this.searchTemplate = file;
+        }
+        {
+            File file = new File(file1, "search_entry.html");
+            if (!file.exists()) {
+                boolean c = true;
+                try {
+                    if (!file.createNewFile()) {
+                        c = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    c = false;
+                }
+                if (!c) {
+                    log("Couldn't create search entry template file...");
+                    return;
+                }
+            }
+            this.entryTemplate = file;
+        }
+        {
             File file = new File(file1, "/assets/script.js");
             if (!file.getParentFile().exists()) {
                 if (!file.getParentFile().mkdirs()) {
@@ -124,11 +182,14 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
         server.getViewManager().add(new MainView(file1));
         server.getViewManager().add(new GetSchematic());
         server.getViewManager().add(new PlotInfo(plotTemplate));
+        server.getViewManager().add(new UserInfo(userTemplate));
+        server.getViewManager().add(new SearchView(searchTemplate, entryTemplate));
         try {
             StaticViewManager.generate(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        MainCommand.subCommands.add(new PlotCommandWeb());
     }
 
     @ViewMatcher(filter = "(\\/assets\\/)(logo)(.png)?", name="plotlogo", cache = true)
@@ -153,7 +214,7 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
         return response;
     }
 
-    @ViewMatcher(filter = "(\\/assets\\/)(script)(.js)?", name = "plotscript", cache = false)
+    @ViewMatcher(filter = "(\\/assets\\/)(script)(.js)?", name = "plotscript", cache = true)
     public Response getScript(final Request in) {
         Response response = new Response(null);
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT);
@@ -161,7 +222,7 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
         return response;
     }
 
-    @ViewMatcher(filter = "(\\/assets\\/)(stylesheet)(.less|.css)?", name = "plotstylesheet", cache = false)
+    @ViewMatcher(filter = "(\\/assets\\/)(stylesheet)(.less|.css)?", name = "plotstylesheet", cache = true)
     public Response getStylesheet(final Request in) {
         Response response = new Response(null);
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);

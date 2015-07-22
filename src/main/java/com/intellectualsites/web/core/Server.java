@@ -62,6 +62,8 @@ import static com.intellectualsites.web.logging.LogModes.*;
  */
 public class Server extends Thread implements IntellectualServer {
 
+    public boolean silent = false;
+
     //
     // public static
     //
@@ -106,7 +108,7 @@ public class Server extends Thread implements IntellectualServer {
     private boolean started, ipv4, mysqlEnabled;
     private ServerSocket socket;
     private SessionManager sessionManager;
-    private String hostName;
+    public String hostName;
     private int bufferIn, bufferOut;
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
@@ -530,7 +532,9 @@ public class Server extends Thread implements IntellectualServer {
                     e.printStackTrace();
                     return;
                 }
-                log(r.buildLog());
+                if (!silent) {
+                    log(r.buildLog());
+                }
                 // Get the view
                 View view = viewManager.match(r);
 
@@ -612,9 +616,11 @@ public class Server extends Thread implements IntellectualServer {
                     e.printStackTrace();
                 }
 
-                log("Request was served by '%s', with the type '%s'. The total lenght of the content was '%s'",
-                        view.getName(), isText ? "text" : "bytes", bytes.length
-                        );
+                if (!silent) {
+                    log("Request was served by '%s', with the type '%s'. The total lenght of the content was '%s'",
+                            view.getName(), isText ? "text" : "bytes", bytes.length
+                    );
+                }
             }
         }.start();
     }
