@@ -117,13 +117,13 @@ public class UserInfo extends View implements CacheApplicable {
                     return getPlotList(getPlots(new PlotFilter() {
                         @Override
                         public boolean check(Plot plot) {
-                            return plot.trusted.contains(uuid);
+                            return plot.getTrusted().contains(uuid);
                         }
                     }));
                 case "member":
-                    return getPlotList(getPlots(new PlotFilter(){@Override public boolean check(Plot plot){return plot.members.contains(uuid);}}));
+                    return getPlotList(getPlots(new PlotFilter(){@Override public boolean check(Plot plot){return plot.getMembers().contains(uuid);}}));
                 case "denied":
-                    return getPlotList(getPlots(new PlotFilter(){@Override public boolean check(Plot plot){return plot.denied.contains(uuid);}}));
+                    return getPlotList(getPlots(new PlotFilter(){@Override public boolean check(Plot plot){return plot.getDenied().contains(uuid);}}));
                 case "online":
                     return p != null && p.isOnline();
                 case "offline":

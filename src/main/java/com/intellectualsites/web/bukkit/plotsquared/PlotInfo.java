@@ -127,8 +127,7 @@ public class PlotInfo extends View implements CacheApplicable {
                 case "id":
                     return plot.id.toString();
                 case "alias":
-                    String alias = plot.settings.getAlias();
-                    return alias.length() > 0 ? alias : "none";
+                    return plot.toString();
                 case "owner":
                     return UUIDHandler.getName(plot.owner);
                 case "biome": {
@@ -141,11 +140,11 @@ public class PlotInfo extends View implements CacheApplicable {
                 case "rating":
                     return (int)(plot.getAverageRating());
                 case "trusted":
-                    return getPlayers(plot.trusted);
+                    return getPlayers(plot.getTrusted());
                 case "members":
-                    return getPlayers(plot.members);
+                    return getPlayers(plot.getMembers());
                 case "denied":
-                    return getPlayers(plot.denied);
+                    return getPlayers(plot.getDenied());
                 case "flags":
                     return toStringCollection(FlagManager.getPlotFlags(plot).values());
                 case "world":
