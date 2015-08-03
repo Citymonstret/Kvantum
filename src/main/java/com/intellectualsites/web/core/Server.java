@@ -40,7 +40,7 @@ import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
-import com.sun.istack.internal.NotNull;
+
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -312,7 +312,7 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     @Override
-    public void addViewBinding(@NotNull final String key, @NotNull final Class<? extends View> c) {
+    public void addViewBinding(final String key, final Class<? extends View> c) {
         Assert.notNull(c);
         Assert.notEmpty(key);
         viewBindings.put(key, c);
@@ -336,7 +336,7 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     @Override
-    public void handleEvent(@NotNull final Event event) {
+    public void handleEvent(final Event event) {
         Assert.notNull(event);
         if (standalone) {
             EventManager.getInstance().handle(event);
@@ -350,13 +350,13 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     @Override
-    public void setEventCaller(@NotNull final EventCaller caller) {
+    public void setEventCaller(final EventCaller caller) {
         Assert.notNull(caller);
         this.eventCaller = caller;
     }
 
     @Override
-    public void addProviderFactory(@NotNull final ProviderFactory factory) {
+    public void addProviderFactory(final ProviderFactory factory) {
         Assert.notNull(factory);
         this.providers.add(factory);
     }
@@ -494,7 +494,7 @@ public class Server extends Thread implements IntellectualServer {
         }
     }
 
-    private void runAsync(@NotNull final Socket remote) {
+    private void runAsync(final Socket remote) {
         new Thread() {
             @Override
             public void run() {
@@ -632,11 +632,11 @@ public class Server extends Thread implements IntellectualServer {
         }
     }
 
-    public void log(@NotNull Message message, @NotNull final Object... args) {
+    public void log(Message message, final Object... args) {
         this.log(message.toString(), message.getMode(), args);
     }
 
-    private synchronized void log(@NotNull String message, @NotNull int mode, @NotNull final Object... args) {
+    private synchronized void log(String message, int mode, final Object... args) {
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
         // to limit to only error messages or such
@@ -670,12 +670,12 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     @Override
-    public synchronized void log(@NotNull String message, @NotNull final Object... args) {
+    public synchronized void log(String message, final Object... args) {
         this.log(message, MODE_INFO, args);
     }
 
     @Override
-    public void log(@NotNull LogProvider provider, @NotNull String message, @NotNull final Object... args) {
+    public void log(LogProvider provider, String message, final Object... args) {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }

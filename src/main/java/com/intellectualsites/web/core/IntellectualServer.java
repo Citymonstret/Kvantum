@@ -26,7 +26,6 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.SessionManager;
 import com.intellectualsites.web.util.ViewManager;
 import com.intellectualsites.web.views.View;
-import com.sun.istack.internal.NotNull;
 
 /**
  * Core server interface, contains
@@ -50,7 +49,7 @@ interface IntellectualServer {
      * @param c   The View Class
      * @see #validateViews()
      */
-    void addViewBinding(@NotNull String key, @NotNull Class<? extends View> c);
+    void addViewBinding(String key, Class<? extends View> c);
 
     /**
      * Validate the views, and make sure they
@@ -63,21 +62,21 @@ interface IntellectualServer {
      *
      * @param event Event to handle
      */
-    void handleEvent(@NotNull Event event);
+    void handleEvent(Event event);
 
     /**
      * Set the engine event caller
      *
      * @param caller New Event Caller
      */
-    void setEventCaller(@NotNull EventCaller caller);
+    void setEventCaller(EventCaller caller);
 
     /**
      * Add a provider factory to the core provider
      *
      * @param factory Factory to add
      */
-    void addProviderFactory(@NotNull final ProviderFactory factory);
+    void addProviderFactory(final ProviderFactory factory);
 
 
     /**
@@ -86,9 +85,9 @@ interface IntellectualServer {
      * @param message String message to log
      * @param args    Arguments to be sent (replaces %s with arg#toString)
      */
-    void log(@NotNull String message, Object... args);
+    void log(String message, Object... args);
 
-    void log(@NotNull LogProvider provider, @NotNull String message, Object... args);
+    void log(LogProvider provider, String message, Object... args);
 
     /**
      * Stop the web server

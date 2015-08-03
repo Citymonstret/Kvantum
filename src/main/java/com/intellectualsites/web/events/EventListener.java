@@ -20,7 +20,6 @@
 package com.intellectualsites.web.events;
 
 import com.intellectualsites.web.util.Assert;
-import com.sun.istack.internal.NotNull;
 
 import java.lang.reflect.ParameterizedType;
 
@@ -54,7 +53,7 @@ public abstract class EventListener<T extends Event> {
      * @param priority The priority in which the event should be called {@see EventPriority}
      */
     @SuppressWarnings("ALL")
-    public EventListener(@NotNull final EventPriority priority) {
+    public EventListener(final EventPriority priority) {
         Assert.notNull(priority);
 
         this.listenTo = ((Class<T>) ((ParameterizedType) getClass()
@@ -77,7 +76,7 @@ public abstract class EventListener<T extends Event> {
      *
      * @param t Incoming event
      */
-    public abstract void listen(@NotNull final T t);
+    public abstract void listen(final T t);
 
     /**
      * IGNORE

@@ -21,7 +21,6 @@ package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.util.CookieManager;
-import com.sun.istack.internal.NotNull;
 
 import java.net.Socket;
 import java.util.HashMap;
@@ -236,7 +235,7 @@ public class Request {
      *
      * @param session Session
      */
-    public void setSession(@NotNull final Session session) {
+    public void setSession(final Session session) {
         this.session = session;
     }
 
