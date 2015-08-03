@@ -22,8 +22,6 @@ package com.intellectualsites.web.bukkit.plotsquared;
 import com.intellectualcrafters.plot.PS;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.bukkit.BukkitUtil;
-import com.intellectualcrafters.plot.util.bukkit.UUIDHandler;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -31,6 +29,8 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
+import com.plotsquared.bukkit.util.UUIDHandler;
+import com.plotsquared.bukkit.util.bukkit.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

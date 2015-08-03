@@ -36,7 +36,7 @@ import com.intellectualcrafters.plot.object.PlotId;
 import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.util.BlockManager;
 import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.bukkit.UUIDHandler;
+
 import com.intellectualsites.web.bukkit.SimplePlayerWrapper;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
@@ -45,6 +45,7 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
+import com.plotsquared.bukkit.util.UUIDHandler;
 
 /**
  * Created 7/20/2015 for IntellectualServer
@@ -176,7 +177,7 @@ public class PlotInfo extends View implements CacheApplicable {
 
     public Collection<SimplePlayerWrapper> getPlayersInPlot(final Plot plot) {
         List<SimplePlayerWrapper> l = new ArrayList<>();
-        for (PlotPlayer pp : UUIDHandler.players.values()) {
+        for (PlotPlayer pp : UUIDHandler.getPlayers().values()) {
             if (plot.equals(MainUtil.getPlot(pp.getLocation()))) {
                 l.add(new SimplePlayerWrapper(pp.getUUID()));
             }

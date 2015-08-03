@@ -19,15 +19,14 @@
 
 package com.intellectualsites.web.bukkit.plotsquared;
 
-
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.bukkit.UUIDHandler;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
+import com.plotsquared.bukkit.util.UUIDHandler;
 
 import java.io.File;
 import java.util.List;
