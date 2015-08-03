@@ -17,38 +17,41 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.bukkit.plotsquared;
+package com.intellectualsites.web.util;
 
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.commands.SubCommand;
-import com.intellectualcrafters.plot.config.C;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.StringMan;
-import com.intellectualsites.web.core.Server;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 
-public class PlotCommandWeb extends SubCommand {
+import java.net.URL;
 
-    public PlotCommandWeb() {
-        super("web", "plots.web", "Get the link to the plot you're standing on", "", "w", CommandCategory.INFO, true);
-    }
+public class CSSUtil {
 
-    @Override
-    public boolean execute(PlotPlayer plotPlayer, String... strings) {
-        if (plotPlayer == null) {
-            sendMessage(null, C.IS_CONSOLE);
-        } else {
-            if (PS.get().isPlotWorld(plotPlayer.getLocation().getWorld())) {
-                Plot p = MainUtil.getPlot(plotPlayer.getLocation());
-                if (p != null) {
-                    String s = StringMan.replaceFromMap("$1The URL for this plot is: $2http://" + Server.getInstance().hostName + "/plot/" + p.world + "/" + p.id.toString(), C.replacements);
-                    MainUtil.sendMessage(plotPlayer, s);
-                }
-                return true;
-            }
-            sendMessage(plotPlayer, C.NOT_IN_PLOT);
+    public static final String MINIFIER_URL = "http://cssminifier.com/raw";
+
+    public static String minify(String in) throws IOException {
+        URL url = new URL(MINIFIER_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+        connection.setDoOutput(true);
+
+        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+        outputStream.writeBytes("input=" + in);
+        outputStream.flush();
+        outputStream.close();
+
+        StringBuilder builder = new StringBuilder();
+
+        BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line;
+        while ((line = response.readLine()) != null) {
+            builder.append(line);
         }
-        return true;
+        response.close();
+
+        return builder.toString();
     }
 }

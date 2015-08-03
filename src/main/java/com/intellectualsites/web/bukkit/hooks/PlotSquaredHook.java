@@ -28,6 +28,7 @@ import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.util.CSSUtil;
 import com.intellectualsites.web.util.FileUtils;
 
 import com.intellectualsites.web.views.LessView;
@@ -189,7 +190,6 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
         } catch (Exception e) {
             e.printStackTrace();
         }
-        MainCommand.subCommands.add(new PlotCommandWeb());
     }
 
     @ViewMatcher(filter = "(\\/assets\\/)(logo)(.png)?", name="plotlogo", cache = true)
@@ -230,7 +230,15 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
             LessView.compiler = new LessCompiler();
         }
         try {
-            response.setContent(LessView.compiler.compile(FileUtils.getDocument(styleSheet, 1024 * 1024 * 16)));
+            String content = LessView.compiler.compile(FileUtils.getDocument(styleSheet, 1024 * 1024 * 16));
+            if (false && Server.getInstance().enableCaching) {
+                try {
+                    content = CSSUtil.minify(content);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            response.setContent(content);
         } catch(final Exception e) {
             response.setContent("ERROR: " + e.getMessage());
         }
