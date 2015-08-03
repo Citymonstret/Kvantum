@@ -37,6 +37,7 @@ import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.util.BlockManager;
 import com.intellectualcrafters.plot.util.MainUtil;
 
+import com.intellectualcrafters.plot.util.UUIDHandler;
 import com.intellectualsites.web.bukkit.SimplePlayerWrapper;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
@@ -45,7 +46,6 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
-import com.plotsquared.bukkit.util.UUIDHandler;
 
 /**
  * Created 7/20/2015 for IntellectualServer
@@ -133,8 +133,7 @@ public class PlotInfo extends View implements CacheApplicable {
                     return UUIDHandler.getName(plot.owner);
                 case "biome": {
                     Location top = MainUtil.getPlotTopLoc(plot.world, plot.id);
-                    Location bot = MainUtil.getPlotBottomLoc(plot.world, plot.id).add(1, 0, 1);
-                    return BlockManager.manager.getBiome(bot.add((top.getX() - bot.getX()) / 2, 0, (top.getX() - bot.getX()) / 2));
+                    return BlockManager.manager.getBiome(top.getWorld(), top.getX(), top.getZ());
                 }
                 case "inplot":
                     return getPlayersInPlot(plot);

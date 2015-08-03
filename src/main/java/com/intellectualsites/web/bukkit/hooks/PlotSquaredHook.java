@@ -19,8 +19,6 @@
 
 package com.intellectualsites.web.bukkit.hooks;
 
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.commands.MainCommand;
 import com.intellectualsites.web.bukkit.IntellectualServerPlugin;
 import com.intellectualsites.web.bukkit.plotsquared.*;
 import com.intellectualsites.web.core.Server;

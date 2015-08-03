@@ -22,6 +22,7 @@ package com.intellectualsites.web.bukkit.plotsquared;
 import com.intellectualcrafters.plot.PS;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.util.MainUtil;
+import com.intellectualcrafters.plot.util.UUIDHandler;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -29,8 +30,7 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
-import com.plotsquared.bukkit.util.UUIDHandler;
-import com.plotsquared.bukkit.util.bukkit.BukkitUtil;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -51,7 +51,7 @@ public class UserInfo extends View implements CacheApplicable {
     @Override
     public boolean passes(Matcher matcher, Request r) {
         String username = matcher.group(2);
-        UUID uuid =  UUIDHandler.getUUID(username);
+        UUID uuid =  UUIDHandler.getUUIDWrapper().getUUID(username);
         r.addMeta("uuid", uuid);
         return uuid != null;
     }
@@ -135,7 +135,7 @@ public class UserInfo extends View implements CacheApplicable {
                         return "none";
                     } else {
                         if (PS.get().isPlotWorld(p.getWorld().getName())) {
-                            Plot plot = MainUtil.getPlot(BukkitUtil.getLocation(p));
+                            Plot plot = MainUtil.getPlot(new com.intellectualcrafters.plot.object.Location(p.getWorld().getName(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ(), p.getLocation().getYaw(), p.getLocation().getPitch()));
                             if (plot != null) {
                                 return "<a href=\"/plot/" + plot.world + "/" + plot.getId().toString() + "\" tooltip=\"View Plot Page\">" + plot.id + "</a>";
                             }

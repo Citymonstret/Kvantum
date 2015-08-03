@@ -19,7 +19,6 @@
 
 package com.intellectualsites.web.bukkit.plotsquared;
 
-// import com.intellectualcrafters.plot.config.Settings;
 import com.intellectualcrafters.plot.config.Settings;
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;

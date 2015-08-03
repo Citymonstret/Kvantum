@@ -68,19 +68,19 @@
         <dependency>
             <groupId>com.intellectualcrafters</groupId>
             <artifactId>PlotSquared</artifactId>
-            <version>2.12.19</version>
+            <version>3.0.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.8.3-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
 		</dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.14</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.lesscss</groupId>

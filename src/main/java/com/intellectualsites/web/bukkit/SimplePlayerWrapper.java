@@ -20,7 +20,7 @@
 package com.intellectualsites.web.bukkit;
 
 import com.intellectualcrafters.plot.database.DBFunc;
-import com.plotsquared.bukkit.util.UUIDHandler;
+import com.intellectualcrafters.plot.util.UUIDHandler;
 
 import java.util.UUID;
 
