@@ -46,7 +46,7 @@ import java.io.IOException;
 @SuppressWarnings({"unused"})
 public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaration {
 
-    private File styleSheet, script, logo, plotTemplate, userTemplate, searchTemplate, entryTemplate;
+    private File styleSheet, script, logo, plotTemplate, userTemplate, searchTemplate, entryTemplate, uploadTemplate;
 
     @Override
     public void load(Server server) {
@@ -134,6 +134,26 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
             this.searchTemplate = file;
         }
         {
+            File file = new File(file1, "upload.html");
+            if (!file.exists()) {
+                boolean c = true;
+                try {
+                    if (!file.createNewFile()) {
+                        c = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    c = false;
+                }
+                if (!c) {
+                    log("Couldn't create upload template file...");
+                    return;
+                }
+            }
+
+            this.uploadTemplate = file;
+        }
+        {
             File file = new File(file1, "search_entry.html");
             if (!file.exists()) {
                 boolean c = true;
@@ -185,6 +205,7 @@ public class PlotSquaredHook extends Hook implements LogProvider, ViewDeclaratio
         server.getViewManager().add(new PlotInfo(plotTemplate));
         server.getViewManager().add(new UserInfo(userTemplate));
         server.getViewManager().add(new SearchView(searchTemplate, entryTemplate));
+        server.getViewManager().add(new UploadView(uploadTemplate));
         try {
             StaticViewManager.generate(this);
         } catch (Exception e) {

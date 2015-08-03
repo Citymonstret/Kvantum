@@ -67,7 +67,11 @@ public class SearchView extends View {
             );
         }
         Response response = new Response(this);
-        response.setContent(FileUtils.getDocument(template, getBuffer()).replace("{{results}}", resultText.toString()));
+        String resultString = resultText.toString();
+        if (resultString.length() == 0) {
+            resultString = "No results found!"; // Should do something like this if there are no results
+        }
+        response.setContent(FileUtils.getDocument(template, getBuffer()).replace("{{results}}", resultString));
         return response;
     }
 }

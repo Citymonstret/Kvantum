@@ -19,16 +19,23 @@
 
 package com.intellectualsites.web.bukkit.plotsquared;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+
 import com.intellectualcrafters.plot.PS;
 import com.intellectualcrafters.plot.config.Settings;
-
 import com.intellectualcrafters.plot.flag.FlagManager;
 import com.intellectualcrafters.plot.object.Location;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotId;
+import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.util.BlockManager;
 import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.bukkit.BukkitUtil;
 import com.intellectualcrafters.plot.util.bukkit.UUIDHandler;
 import com.intellectualsites.web.bukkit.SimplePlayerWrapper;
 import com.intellectualsites.web.object.Request;
@@ -38,13 +45,6 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.io.*;
-import java.util.*;
-import java.util.regex.Matcher;
 
 /**
  * Created 7/20/2015 for IntellectualServer
@@ -127,8 +127,7 @@ public class PlotInfo extends View implements CacheApplicable {
                 case "id":
                     return plot.id.toString();
                 case "alias":
-                    String alias = plot.settings.getAlias();
-                    return alias.length() > 0 ? alias : "none";
+                    return plot.toString();
                 case "owner":
                     return UUIDHandler.getName(plot.owner);
                 case "biome": {
@@ -141,11 +140,11 @@ public class PlotInfo extends View implements CacheApplicable {
                 case "rating":
                     return (int)(plot.getAverageRating());
                 case "trusted":
-                    return getPlayers(plot.trusted);
+                    return getPlayers(plot.getTrusted());
                 case "members":
-                    return getPlayers(plot.members);
+                    return getPlayers(plot.getMembers());
                 case "denied":
-                    return getPlayers(plot.denied);
+                    return getPlayers(plot.getDenied());
                 case "flags":
                     return toStringCollection(FlagManager.getPlotFlags(plot).values());
                 case "world":
@@ -177,12 +176,9 @@ public class PlotInfo extends View implements CacheApplicable {
 
     public Collection<SimplePlayerWrapper> getPlayersInPlot(final Plot plot) {
         List<SimplePlayerWrapper> l = new ArrayList<>();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().getName().equals(plot.world)) {
-                Plot p = MainUtil.getPlot(BukkitUtil.getLocation(player));
-                if (p != null && p.equals(plot)) {
-                    l.add(new SimplePlayerWrapper(player.getUniqueId()));
-                }
+        for (PlotPlayer pp : UUIDHandler.players.values()) {
+            if (plot.equals(MainUtil.getPlot(pp.getLocation()))) {
+                l.add(new SimplePlayerWrapper(pp.getUUID()));
             }
         }
         return l;
