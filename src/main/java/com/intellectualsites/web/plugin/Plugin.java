@@ -113,14 +113,14 @@ public class Plugin implements LogProvider {
     /**
      * Listen to enable
      */
-    private void onEnable() {
+    void onEnable() {
         // Override!
     }
 
     /**
      * Listen to disable
      */
-    private void onDisable() {
+    void onDisable() {
         // Override!
     }
 
