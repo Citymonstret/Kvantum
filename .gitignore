@@ -54,6 +54,7 @@ crashlytics-build.properties
 /redirect
 /target
 /config
+/temporary
 .project
 *.classpath
 *.prefs
