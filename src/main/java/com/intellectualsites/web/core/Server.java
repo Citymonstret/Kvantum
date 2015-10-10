@@ -523,10 +523,6 @@ public class Server extends Thread implements IntellectualServer {
                         }
                         r.setPostRequest(new PostRequest(pR.toString()));
                     }
-                    Session session = sessionManager.getSession(r, out);
-                    if (session != null) {
-                        r.setSession(session);
-                    }
                 } catch (final Exception e) {
                     e.printStackTrace();
                     return;
@@ -556,6 +552,12 @@ public class Server extends Thread implements IntellectualServer {
                         }
                     } else {
                         Response response = view.generate(r);
+                        Session session = sessionManager.getSession(r, response, out);
+                        if (session != null) {
+                            r.setSession(session);
+                        } else {
+                            r.setSession(sessionManager.createSession(r, response, out));
+                        }
                         response.getHeader().apply(out);
                         cacheManager.setCache(view, response);
                         if ((isText = response.isText())) {
@@ -566,6 +568,12 @@ public class Server extends Thread implements IntellectualServer {
                     }
                 } else {
                     Response response = view.generate(r);
+                    Session session = sessionManager.getSession(r, response, out);
+                    if (session != null) {
+                        r.setSession(session);
+                    } else {
+                        r.setSession(sessionManager.createSession(r, response, out));
+                    }
                     response.getHeader().apply(out);
                     if ((isText = response.isText())) {
                         content = response.getContent();

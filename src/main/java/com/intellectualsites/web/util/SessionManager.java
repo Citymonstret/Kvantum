@@ -24,9 +24,12 @@ import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created 2015-04-19 for IntellectualServer
@@ -37,33 +40,56 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
 
     private final Map<String, Session> sessions;
     private final Server server;
+    private final SessionIdentifierProvider sessionIdentifierProvider;
 
     public SessionManager(Server server) {
         sessions = new HashMap<>();
         this.server = server;
+
+        final String i = "" + System.nanoTime();
+        this.sessionIdentifierProvider = new SessionIdentifierProvider() {
+            @Override
+            public String getIdentifier(Request r) {
+                return i;
+            }
+        };
     }
 
-    public Session getSession(final Request r, OutputStream out) {
+    public Session createSession(Request r, Response re, BufferedOutputStream out) {
+        String name = sessionIdentifierProvider.getIdentifier(r) + "session";
+        String sessionID = UUID.randomUUID().toString();
+
+        re.getHeader().setCookie(name, sessionID);
+
+        server.log("Set session (%s=%s)", name, sessionID);
+
+        Session session = new Session();
+        this.sessions.put(sessionID, session);
+        return session;
+    }
+
+    public Session getSession(final Request r, final Response re, OutputStream out) {
         Cookie[] cookies = r.getCookies();
         Session session = null;
+
+        String name = sessionIdentifierProvider.getIdentifier(r) + "session";
+
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equalsIgnoreCase("session")) {
+            if (cookie.getName().equalsIgnoreCase(name)) {
                 String sessionID = cookie.getValue();
                 if (sessions.containsKey(sessionID)) {
                     session = sessions.get(sessionID);
+                    server.log("Found session (%s=%s)", session, sessionID);
                 } else {
                     if (out != null) {
-                        try {
-                            out.write(("Set-Cookie: session=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT\n").getBytes());
-                        } catch(final Exception e) {
-                            e.printStackTrace();
-                        }
+                        re.getHeader().setCookie(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
                         server.log("Deleting invalid session cookie (%s)", cookie.getValue());
                     }
                 }
                 break;
             }
         }
+
         return session;
     }
 
@@ -79,4 +105,5 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
     public String providerName() {
         return "session";
     }
+
 }
