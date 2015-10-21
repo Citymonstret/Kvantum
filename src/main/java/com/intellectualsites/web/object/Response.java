@@ -29,7 +29,7 @@ import com.intellectualsites.web.views.View;
  *
  * @author Citymonstret
  */
-public class Response {
+public class Response implements HeaderProvider {
 
     private Header header;
     private String content;

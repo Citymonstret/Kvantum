@@ -17,31 +17,10 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.object.cache;
+package com.intellectualsites.web.object;
 
-import com.intellectualsites.web.object.Header;
-import com.intellectualsites.web.object.HeaderProvider;
-import com.intellectualsites.web.object.Response;
+public interface HeaderProvider {
 
-public class CachedResponse implements HeaderProvider {
+    Header getHeader();
 
-    public final boolean isText;
-    public final byte[] bodyBytes; //, headerBytes;
-    public final Header header;
-
-    public CachedResponse(final Response parent) {
-        this.isText = parent.isText();
-        this.header = parent.getHeader();
-        // this.headerBytes = parent.getHeader().getBytes();
-        if (parent.isText()) {
-            this.bodyBytes = parent.getContent().getBytes();
-        } else {
-            this.bodyBytes = parent.getBytes();
-        }
-    }
-
-    @Override
-    public Header getHeader() {
-        return header;
-    }
 }

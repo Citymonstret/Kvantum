@@ -537,6 +537,8 @@ public class Server extends Thread implements IntellectualServer {
                 String content = "";
                 byte[] bytes = null;
 
+                final HeaderProvider headerProvider;
+
                 if (enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
                     if (cacheManager.hasCache(view)) {
                         CachedResponse response = cacheManager.getCache(view);
@@ -545,20 +547,10 @@ public class Server extends Thread implements IntellectualServer {
                         } else {
                             bytes = response.bodyBytes;
                         }
-                        try {
-                            out.write(response.headerBytes);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        headerProvider = response;
                     } else {
                         Response response = view.generate(r);
-                        Session session = sessionManager.getSession(r, response, out);
-                        if (session != null) {
-                            r.setSession(session);
-                        } else {
-                            r.setSession(sessionManager.createSession(r, response, out));
-                        }
-                        response.getHeader().apply(out);
+                        headerProvider = response;
                         cacheManager.setCache(view, response);
                         if ((isText = response.isText())) {
                             content = response.getContent();
@@ -568,18 +560,19 @@ public class Server extends Thread implements IntellectualServer {
                     }
                 } else {
                     Response response = view.generate(r);
-                    Session session = sessionManager.getSession(r, response, out);
-                    if (session != null) {
-                        r.setSession(session);
-                    } else {
-                        r.setSession(sessionManager.createSession(r, response, out));
-                    }
-                    response.getHeader().apply(out);
+                    headerProvider = response;
                     if ((isText = response.isText())) {
                         content = response.getContent();
                     } else {
                         bytes = response.getBytes();
                     }
+                }
+
+                Session session = sessionManager.getSession(r, headerProvider, out);
+                if (session != null) {
+                    r.setSession(session);
+                } else {
+                    r.setSession(sessionManager.createSession(r, headerProvider, out));
                 }
 
                 if (isText) {
@@ -609,6 +602,8 @@ public class Server extends Thread implements IntellectualServer {
                     // Now, finally, let's get the bytes.
                     bytes = content.getBytes();
                 }
+
+                headerProvider.getHeader().apply(out);
 
                 try {
                     out.write(bytes);

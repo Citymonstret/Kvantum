@@ -55,7 +55,7 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
         };
     }
 
-    public Session createSession(Request r, Response re, BufferedOutputStream out) {
+    public Session createSession(Request r, HeaderProvider re, BufferedOutputStream out) {
         String name = sessionIdentifierProvider.getIdentifier(r) + "session";
         String sessionID = UUID.randomUUID().toString();
 
@@ -68,7 +68,13 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
         return session;
     }
 
-    public Session getSession(final Request r, final Response re, OutputStream out) {
+    public void deleteSession(final Request r, final HeaderProvider re) {
+        String name = sessionIdentifierProvider.getIdentifier(r) + "session";
+        re.getHeader().setCookie(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+        server.log("Deleted cookie");
+    }
+
+    public Session getSession(final Request r, final HeaderProvider re, OutputStream out) {
         Cookie[] cookies = r.getCookies();
         Session session = null;
 
@@ -94,12 +100,7 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
     }
 
     public VariableProvider get(Request r) {
-        return new Session() {
-            {
-                set("username", "guest");
-            }
-        };
-        //return getSession(r, null);
+        return getSession(r, null, null);
     }
 
     public String providerName() {
