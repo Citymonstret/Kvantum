@@ -17,56 +17,44 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.iweb.views;
+package com.intellectualsites.web.iweb.core;
 
-import com.intellectualsites.web.iweb.core.IWeb;
-import com.intellectualsites.web.iweb.accounts.Account;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.views.View;
-
-import java.util.regex.Matcher;
+import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.iweb.accounts.AccountCommand;
+import com.intellectualsites.web.iweb.accounts.AccountManager;
+import com.intellectualsites.web.iweb.views.Login;
+import com.intellectualsites.web.iweb.views.Main;
 
 /**
  * Created 10/24/2015 for IntellectualServer
  *
  * @author Citymonstret
  */
-public class Main extends View {
+public class IWeb {
 
-    public Main() {
-        super("\\/?(main)([\\s\\S]*)", "imain");
-    }
+    protected static IWeb instance;
 
-    @Override
-    public boolean passes(Matcher matcher, Request request) {
-        return true;
-    }
-
-    @Override
-    public Response generate(final Request r) {
-        Response response = new Response(this);
-
-        Account account = IWeb.getInstance().getAccountManager().getAccount(r.getSession());
-        if (account != null) {
-            response.setContent("Hello " + account);
-
-            int parts = r.getQuery().getResource().split("/").length;
-            if (parts > 2) {
-                String action = r.getQuery().getResource().split("/")[2];
-                response.setContent("Action: " + action);
-                switch (action) {
-                    case "logout": {
-                        IWeb.getInstance().getAccountManager().unbindAccount(r.getSession());
-                        response.getHeader().redirect("/login");
-                    } break;
-                    default: break;
-                }
-            }
-        } else {
-            response.getHeader().redirect("/login");
+    public static IWeb getInstance() {
+        if (instance == null) {
+            instance = new IWeb();
         }
+        return instance;
+    }
 
-        return response;
+    private final AccountManager accountManager;
+
+    public AccountManager getAccountManager() {
+        return accountManager;
+    }
+
+    public IWeb() {
+        this.accountManager = new AccountManager();
+    }
+
+    public void registerViews(Server server) {
+        server.getViewManager().add(new Login());
+        server.getViewManager().add(new Main());
+
+        server.inputThread.commands.put("account", new AccountCommand());
     }
 }

@@ -21,7 +21,7 @@ package com.intellectualsites.web.iweb.accounts;
 
 import com.intellectualsites.web.commands.Command;
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.iweb.IWeb;
+import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.object.Session;
 
 public class AccountCommand extends Command {

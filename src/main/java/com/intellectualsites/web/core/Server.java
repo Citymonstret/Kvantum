@@ -28,7 +28,7 @@ import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
-import com.intellectualsites.web.iweb.IWeb;
+import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
