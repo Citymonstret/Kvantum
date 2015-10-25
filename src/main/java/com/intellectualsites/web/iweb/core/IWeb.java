@@ -24,6 +24,10 @@ import com.intellectualsites.web.iweb.accounts.AccountCommand;
 import com.intellectualsites.web.iweb.accounts.AccountManager;
 import com.intellectualsites.web.iweb.views.Login;
 import com.intellectualsites.web.iweb.views.Main;
+import com.intellectualsites.web.util.SQLiteManager;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Created 10/24/2015 for IntellectualServer
@@ -42,12 +46,18 @@ public class IWeb {
     }
 
     private final AccountManager accountManager;
+    private SQLiteManager database;
 
     public AccountManager getAccountManager() {
         return accountManager;
     }
 
     public IWeb() {
+        try {
+            this.database = new SQLiteManager("iweb");
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
         this.accountManager = new AccountManager();
     }
 
@@ -56,5 +66,9 @@ public class IWeb {
         server.getViewManager().add(new Main());
 
         server.inputThread.commands.put("account", new AccountCommand());
+    }
+
+    public SQLiteManager getDatabaseManager() {
+        return database;
     }
 }

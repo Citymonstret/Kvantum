@@ -24,6 +24,8 @@ import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.object.Session;
 
+import java.sql.SQLException;
+
 public class AccountCommand extends Command {
 
     @Override
@@ -44,7 +46,11 @@ public class AccountCommand extends Command {
                         } else {
                             Account account = new Account(IWeb.getInstance().getAccountManager().getNextId(), username, password);
                             send("Account created (Username: " + username + ", ID: " + account.getID() + ")");
-                            IWeb.getInstance().getAccountManager().registerAccount(account);
+                            try {
+                                IWeb.getInstance().getAccountManager().createAccount(account);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 } break;

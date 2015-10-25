@@ -17,64 +17,61 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.iweb.accounts;
+package com.intellectualsites.web.util;
 
-import java.util.UUID;
+import com.intellectualsites.web.core.Server;
 
-public class Account {
+import java.io.File;
+import java.io.IOException;
+import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
 
-    private int id;
-    private UUID uuid;
-    private String username;
-    private byte[] password;
+public class SQLiteManager {
 
-    public Account(int id, String username, byte[] password) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.uuid = UUID.randomUUID();
-    }
+    public static Set<SQLiteManager> sessions = new HashSet<>();
 
-    public boolean passwordMatches(final byte[] password) {
-        if (password.length != this.password.length) {
-            return false;
-        }
-        for (int i = 0; i < password.length; i++) {
-            if (password[i] != this.password[i]) {
-                    return false;
+    private final String name;
+    private final Connection connection;
+    private final File file;
+
+    public SQLiteManager(final String name) throws IOException, SQLException {
+        sessions.add(this);
+
+        this.name = name + ".db";
+        this.file = new File(new File(Server.getInstance().coreFolder, "storage"), this.name);
+        if (!file.exists()) {
+            if (!(file.getParentFile().exists() || file.getParentFile().mkdir()) || !file.createNewFile()) {
+                throw new RuntimeException("Couldn't create: " + name);
             }
         }
-        return true;
+        this.connection = DriverManager.getConnection("jdbc:sqlite:" + file.getAbsolutePath());
     }
 
-    @Override
-    public String toString() {
-        return this.username;
+    public void executeUpdate(String sql) throws SQLException {
+        Statement statement = this.connection.createStatement();
+        statement.executeUpdate(sql);
+        statement.close();
     }
 
-    public int getID() {
-        return this.id;
+    public PreparedStatement prepareStatement(String statement) throws SQLException {
+        return connection.prepareStatement(statement);
     }
 
-    @Override
-    public int hashCode() {
-        return this.id;
+    public Blob createBlob() {
+        try {
+            return connection.createBlob();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public String getUsername() {
-        return this.username;
-    }
-
-    public UUID getUUID() {
-        return this.uuid;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return (o instanceof Account) && ((Account) o).getUUID().equals(getUUID());
-    }
-
-    public byte[] getPassword() {
-        return password;
+    public void close() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

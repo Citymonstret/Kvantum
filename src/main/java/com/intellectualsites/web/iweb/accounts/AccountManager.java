@@ -19,9 +19,15 @@
 
 package com.intellectualsites.web.iweb.accounts;
 
+import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.object.Session;
 import com.intellectualsites.web.util.Assert;
 
+import java.sql.Blob;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,12 +43,47 @@ public class AccountManager {
     public AccountManager() {
         this.accountList = Collections.synchronizedList(new ArrayList<Account>());
         this.sessionAccountMap = new ConcurrentHashMap<>();
+    }
 
-        this.accountList.add(new Account(getNextId(), "test", "test".getBytes()));
+    public boolean load() {
+        try {
+            IWeb.getInstance().getDatabaseManager().executeUpdate("CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR(32), password VARCHAR(256))");
+            PreparedStatement loadAccounts = IWeb.getInstance().getDatabaseManager().prepareStatement("SELECT * FROM account");
+            ResultSet results = loadAccounts.executeQuery();
+            while (results.next()) {
+                this.id++;
+                int id = results.getInt("id");
+                String username = results.getString("name");
+                String password = results.getString("password");
+                Account account = new Account(id, username, password.getBytes());
+                registerAccount(account);
+            }
+            results.close();
+            loadAccounts.close();
+
+            Server.getInstance().log("Loaded " + accountList.size() + " accounts from the database");
+
+            if (accountList.isEmpty()) {
+                createAccount(new Account(getNextId(), "test", "test".getBytes()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     public int getNextId() {
         return id++;
+    }
+
+    public void createAccount(final Account account) throws SQLException {
+        PreparedStatement statement = IWeb.getInstance().getDatabaseManager().prepareStatement("INSERT INTO account(name, password) VALUES(?, ?)");
+        statement.setString(1, account.getUsername());
+        statement.setString(2, new String(account.getPassword()));
+        statement.executeUpdate();
+        statement.close();
+        registerAccount(account);
     }
 
     public Account getAccount(Session session) {

@@ -305,6 +305,13 @@ public class Server extends Thread implements IntellectualServer {
         syntaxes.add(new IfStatement());
         syntaxes.add(new ForEachBlock());
         syntaxes.add(new Variable());
+
+        // Load user accounts
+        if (!IWeb.getInstance().getAccountManager().load()) {
+            log("Failed to load user accounts :(");
+        } else {
+            log("Successfully loaded the user accounts!");
+        }
     }
 
     /**
@@ -701,6 +708,10 @@ public class Server extends Thread implements IntellectualServer {
     public synchronized void stopServer() {
         log(Message.SHUTTING_DOWN);
         EventManager.getInstance().handle(new ShutdownEvent(this));
+        // Close all database connections
+        for (SQLiteManager sqLiteManager : SQLiteManager.sessions) {
+            sqLiteManager.close();
+        }
         if (pluginLoader != null) {
             pluginLoader.disableAllPlugins();
         }
