@@ -26,8 +26,8 @@ package com.intellectualsites.web.views.errors;
  */
 public class View404 extends Error {
 
-    public View404() {
-        super(404, "Not Found");
+    public View404(String url) {
+        super(404, "Not Found: " + url);
     }
 
 }

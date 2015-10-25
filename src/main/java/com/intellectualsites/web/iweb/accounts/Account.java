@@ -17,64 +17,63 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.core;
+package com.intellectualsites.web.iweb.accounts;
 
-import com.intellectualsites.web.commands.CacheDump;
-import com.intellectualsites.web.commands.Command;
-import com.intellectualsites.web.commands.Show;
-import com.intellectualsites.web.commands.Stop;
+import java.util.UUID;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+public class Account {
 
-/**
- * The thread which handles command inputs, when ran as a standalone
- * applications.
- *
- * @author Citymonstret
- */
-@SuppressWarnings("all")
-public class InputThread extends Thread {
+    private int id;
+    private UUID uuid;
+    private String username;
+    private byte[] password;
 
-    private final Server server;
-    public final Map<String, Command> commands;
+    public Account(int id, String username, byte[] password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.uuid = UUID.randomUUID();
+    }
 
-    InputThread(Server server) {
-        this.server = server;
-        this.commands = new HashMap<>();
+    public boolean passwordMatches(final byte[] password) {
+        if (password.length != this.password.length) {
+            return false;
+        }
 
-        this.commands.put("stop", new Stop());
-        this.commands.put("cachedump", new CacheDump());
-        this.commands.put("show", new Show());
+        for (int i = 0; i < password.length; i++) {
+            if (password[i] != this.password[i]) {
+                    return false;
+            }
+        }
+
+        return true;
+
     }
 
     @Override
-    public void run() {
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            String line;
-            for (;;) {
-                if ((line = in.readLine()).startsWith("/")) {
-                    line = line.replace("/", "").toLowerCase();
-                    String[] strings = line.split(" ");
-                    String[] args;
-                    if (strings.length > 1) {
-                        args = new String[strings.length - 1];
-                        System.arraycopy(strings, 1, args, 0, strings.length - 1);
-                    } else {
-                        args = new String[0];
-                    }
-                    String command = strings[0];
-                    if (commands.containsKey(command)) {
-                        commands.get(command).handle(args);
-                    } else {
-                        server.log("Unknown command '%s'", line);
-                    }
-                }
-            }
-        } catch (final Exception ignored) {
-        }
+    public String toString() {
+        return this.username;
+    }
+
+    public int getID() {
+        return this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public UUID getUUID() {
+        return this.uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Account) && ((Account) o).getUUID().equals(getUUID());
     }
 }

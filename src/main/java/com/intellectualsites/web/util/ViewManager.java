@@ -57,7 +57,7 @@ public class ViewManager {
                 return v;
             }
         }
-        return new View404();
+        return new View404(request.getQuery().getResource());
     }
 
     public void dump(final Server server) {

@@ -17,64 +17,38 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.core;
+package com.intellectualsites.web.util;
 
-import com.intellectualsites.web.commands.CacheDump;
-import com.intellectualsites.web.commands.Command;
-import com.intellectualsites.web.commands.Show;
-import com.intellectualsites.web.commands.Stop;
+public class MathUtils {
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+    public static class Indices {
 
-/**
- * The thread which handles command inputs, when ran as a standalone
- * applications.
- *
- * @author Citymonstret
- */
-@SuppressWarnings("all")
-public class InputThread extends Thread {
-
-    private final Server server;
-    public final Map<String, Command> commands;
-
-    InputThread(Server server) {
-        this.server = server;
-        this.commands = new HashMap<>();
-
-        this.commands.put("stop", new Stop());
-        this.commands.put("cachedump", new CacheDump());
-        this.commands.put("show", new Show());
-    }
-
-    @Override
-    public void run() {
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            String line;
-            for (;;) {
-                if ((line = in.readLine()).startsWith("/")) {
-                    line = line.replace("/", "").toLowerCase();
-                    String[] strings = line.split(" ");
-                    String[] args;
-                    if (strings.length > 1) {
-                        args = new String[strings.length - 1];
-                        System.arraycopy(strings, 1, args, 0, strings.length - 1);
-                    } else {
-                        args = new String[0];
-                    }
-                    String command = strings[0];
-                    if (commands.containsKey(command)) {
-                        commands.get(command).handle(args);
-                    } else {
-                        server.log("Unknown command '%s'", line);
-                    }
-                }
+        public static int index(int base, int index) {
+            if (index == 0) {
+                return indexZero(base);
+            } else if (index == 1) {
+                return indexOne(base);
+            } else {
+                return index(base, base, index);
             }
-        } catch (final Exception ignored) {
         }
+
+        private static int index(int base, int current, int count) {
+            if (count == 1) {
+                return current;
+            } else {
+                return index(base, current * base, --count);
+            }
+        }
+
+        public static int indexOne(int base) {
+            return base;
+        }
+
+        public static int indexZero(int base) {
+            return 1;
+        }
+
     }
+
 }

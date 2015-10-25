@@ -28,6 +28,7 @@ import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
+import com.intellectualsites.web.iweb.IWeb;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -41,6 +42,7 @@ import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
 
+import jdk.internal.util.xml.impl.Input;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -80,6 +82,7 @@ public class Server extends Thread implements IntellectualServer {
     public boolean stopping, enableCaching;
     public Set<Syntax> syntaxes;
     public File coreFolder;
+    public InputThread inputThread;
 
     //
     // public final
@@ -174,7 +177,7 @@ public class Server extends Thread implements IntellectualServer {
                     }
                 }
             });
-            new InputThread(this).start();
+            (inputThread = new InputThread(this)).start();
         }
 
         File logFolder = new File(coreFolder, "log");
@@ -225,6 +228,7 @@ public class Server extends Thread implements IntellectualServer {
             e.printStackTrace();
         }
 
+
         log(Message.DEBUG);
 
         ConfigurationFile configServer;
@@ -263,6 +267,8 @@ public class Server extends Thread implements IntellectualServer {
         if (mysqlEnabled) {
             this.mysqlConnManager = new MySQLConnManager();
         }
+
+        IWeb.getInstance().registerViews(this);
 
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
@@ -539,6 +545,13 @@ public class Server extends Thread implements IntellectualServer {
 
                 final HeaderProvider headerProvider;
 
+                Session session = sessionManager.getSession(r, out);
+                if (session != null) {
+                    r.setSession(session);
+                } else {
+                    r.setSession(sessionManager.createSession(r, out));
+                }
+
                 if (enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
                     if (cacheManager.hasCache(view)) {
                         CachedResponse response = cacheManager.getCache(view);
@@ -568,11 +581,8 @@ public class Server extends Thread implements IntellectualServer {
                     }
                 }
 
-                Session session = sessionManager.getSession(r, headerProvider, out);
-                if (session != null) {
-                    r.setSession(session);
-                } else {
-                    r.setSession(sessionManager.createSession(r, headerProvider, out));
+                for (Map.Entry<String, String> postponedCookie : r.postponedCookies.entrySet()) {
+                    headerProvider.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
                 }
 
                 if (isText) {

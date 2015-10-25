@@ -40,7 +40,8 @@ public enum Message {
     SERVER_STARTED("The server is started", MODE_INFO),
     TICK_ERROR("Error in server ticking...", MODE_ERROR),
     CONNECTION_ACCEPTED("Connection accepted from '%s' - Handling the data!", MODE_DEBUG),
-    DEBUG(">> Debug - Ignore <<", MODE_DEBUG);
+    DEBUG(">> Debug - Ignore <<", MODE_DEBUG),
+    INITIALIZING_LOCATION_SERVICES("Initializing location services", MODE_INFO);
 
     private final String message;
     private final int mode;

@@ -17,64 +17,56 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.core;
+package com.intellectualsites.web.iweb.views;
 
-import com.intellectualsites.web.commands.CacheDump;
-import com.intellectualsites.web.commands.Command;
-import com.intellectualsites.web.commands.Show;
-import com.intellectualsites.web.commands.Stop;
+import com.intellectualsites.web.iweb.IWeb;
+import com.intellectualsites.web.iweb.accounts.Account;
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.views.View;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
- * The thread which handles command inputs, when ran as a standalone
- * applications.
+ * Created 10/24/2015 for IntellectualServer
  *
  * @author Citymonstret
  */
-@SuppressWarnings("all")
-public class InputThread extends Thread {
+public class Main extends View {
 
-    private final Server server;
-    public final Map<String, Command> commands;
-
-    InputThread(Server server) {
-        this.server = server;
-        this.commands = new HashMap<>();
-
-        this.commands.put("stop", new Stop());
-        this.commands.put("cachedump", new CacheDump());
-        this.commands.put("show", new Show());
+    public Main() {
+        super("\\/?(main)([\\s\\S]*)", "imain");
     }
 
     @Override
-    public void run() {
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            String line;
-            for (;;) {
-                if ((line = in.readLine()).startsWith("/")) {
-                    line = line.replace("/", "").toLowerCase();
-                    String[] strings = line.split(" ");
-                    String[] args;
-                    if (strings.length > 1) {
-                        args = new String[strings.length - 1];
-                        System.arraycopy(strings, 1, args, 0, strings.length - 1);
-                    } else {
-                        args = new String[0];
-                    }
-                    String command = strings[0];
-                    if (commands.containsKey(command)) {
-                        commands.get(command).handle(args);
-                    } else {
-                        server.log("Unknown command '%s'", line);
-                    }
+    public boolean passes(Matcher matcher, Request request) {
+        return true;
+    }
+
+    @Override
+    public Response generate(final Request r) {
+        Response response = new Response(this);
+
+        Account account = IWeb.getInstance().getAccountManager().getAccount(r.getSession());
+        if (account != null) {
+            response.setContent("Hello " + account);
+
+            int parts = r.getQuery().getResource().split("/").length;
+            if (parts > 2) {
+                String action = r.getQuery().getResource().split("/")[2];
+                response.setContent("Action: " + action);
+                switch (action) {
+                    case "logout": {
+                        IWeb.getInstance().getAccountManager().unbindAccount(r.getSession());
+                        response.getHeader().redirect("/login");
+                    } break;
+                    default: break;
                 }
             }
-        } catch (final Exception ignored) {
+        } else {
+            response.getHeader().redirect("/login");
         }
+
+        return response;
     }
 }

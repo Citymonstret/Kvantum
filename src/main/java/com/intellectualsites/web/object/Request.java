@@ -47,6 +47,7 @@ public class Request {
     private PostRequest postRequest;
     private final Socket socket;
     private Session session;
+    public Map<String, String> postponedCookies = new HashMap<>();
 
     /**
      * The post request is basically... a POST request.
@@ -110,6 +111,9 @@ public class Request {
      * @return PostRequest if exists, null if not
      */
     public PostRequest getPostRequest() {
+        if (this.postRequest == null) {
+            this.postRequest = new PostRequest("&");
+        }
         return this.postRequest;
     }
 
