@@ -21,10 +21,11 @@ package com.intellectualsites.web.iweb.accounts;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.iweb.core.IWeb;
+import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Session;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.Assert;
 
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AccountManager {
+public class AccountManager implements ProviderFactory<Account> {
 
     private final List<Account> accountList;
     private final Map<Session, Account> sessionAccountMap;
@@ -150,5 +151,15 @@ public class AccountManager {
             }
         }
         return null;
+    }
+
+    @Override
+    public Account get(Request r) {
+        return getAccount(r.getSession());
+    }
+
+    @Override
+    public String providerName() {
+        return "account";
     }
 }

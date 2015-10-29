@@ -296,6 +296,7 @@ public class Server extends Thread implements IntellectualServer {
         this.providers.add(ConfigVariableProvider.getInstance());
         this.providers.add(new PostProviderFactory());
         this.providers.add(new MetaProvider());
+        this.providers.add(IWeb.getInstance().getAccountManager());
 
         // Setup the crush syntax-particles
         this.syntaxes = new LinkedHashSet<>();

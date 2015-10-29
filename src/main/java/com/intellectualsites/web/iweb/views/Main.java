@@ -19,12 +19,15 @@
 
 package com.intellectualsites.web.iweb.views;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.iweb.accounts.Account;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.util.FileUtils;
 import com.intellectualsites.web.views.View;
 
+import java.io.File;
 import java.util.regex.Matcher;
 
 /**
@@ -49,8 +52,7 @@ public class Main extends View {
 
         Account account = IWeb.getInstance().getAccountManager().getAccount(r.getSession());
         if (account != null) {
-            response.setContent("Hello " + account);
-
+            response.setContent(FileUtils.getDocument(new File(new File(new File(Server.getInstance().coreFolder, "views"), "html"), "main.html"), getBuffer()));
             int parts = r.getQuery().getResource().split("/").length;
             if (parts > 2) {
                 String action = r.getQuery().getResource().split("/")[2];

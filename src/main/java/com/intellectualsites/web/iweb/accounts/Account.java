@@ -19,9 +19,12 @@
 
 package com.intellectualsites.web.iweb.accounts;
 
+import com.intellectualsites.web.object.syntax.VariableProvider;
+
+import java.util.Arrays;
 import java.util.UUID;
 
-public class Account {
+public class Account implements VariableProvider {
 
     private int id;
     private UUID uuid;
@@ -76,5 +79,22 @@ public class Account {
 
     public byte[] getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean contains(String variable) {
+        return Arrays.asList("username", "id").contains(variable);
+    }
+
+    @Override
+    public Object get(String variable) {
+        switch (variable) {
+            case "username":
+                return getUsername();
+            case "id":
+                return getID();
+            default:
+                return null;
+        }
     }
 }
