@@ -21,7 +21,7 @@ package com.intellectualsites.web.iweb.views;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.iweb.core.IWeb;
-import com.intellectualsites.web.iweb.accounts.Account;
+import com.intellectualsites.web.extra.accounts.Account;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.util.FileUtils;

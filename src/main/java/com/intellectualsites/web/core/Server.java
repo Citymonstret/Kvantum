@@ -28,7 +28,7 @@ import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
-import com.intellectualsites.web.iweb.core.IWeb;
+import com.intellectualsites.web.isites.Application;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -267,8 +267,6 @@ public class Server extends Thread implements IntellectualServer {
             this.mysqlConnManager = new MySQLConnManager();
         }
 
-        IWeb.getInstance().registerViews(this);
-
         try {
             configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
             configViews.loadFile();
@@ -296,7 +294,7 @@ public class Server extends Thread implements IntellectualServer {
         this.providers.add(ConfigVariableProvider.getInstance());
         this.providers.add(new PostProviderFactory());
         this.providers.add(new MetaProvider());
-        this.providers.add(IWeb.getInstance().getAccountManager());
+        this.providers.add(Application.getApplication().getAccountManager());
 
         // Setup the crush syntax-particles
         this.syntaxes = new LinkedHashSet<>();
@@ -308,11 +306,12 @@ public class Server extends Thread implements IntellectualServer {
         syntaxes.add(new Variable());
 
         // Load user accounts
-        if (!IWeb.getInstance().getAccountManager().load()) {
+        if (!Application.getApplication().getAccountManager().load()) {
             log("Failed to load user accounts :(");
         } else {
             log("Successfully loaded the user accounts!");
         }
+
     }
 
     /**
@@ -448,6 +447,7 @@ public class Server extends Thread implements IntellectualServer {
                 e.printStackTrace();
             }
         }
+
         viewManager.dump(this);
         //
         if (this.ipv4) {

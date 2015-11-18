@@ -17,58 +17,84 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.iweb.views;
+package com.intellectualsites.web.extra.accounts;
 
-import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.iweb.core.IWeb;
-import com.intellectualsites.web.extra.accounts.Account;
-import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.util.FileUtils;
-import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 
-import java.io.File;
-import java.util.regex.Matcher;
+import java.util.Arrays;
+import java.util.UUID;
 
-/**
- * Created 10/24/2015 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class Main extends View {
+public class Account implements VariableProvider {
 
-    public Main() {
-        super("\\/?(main)([\\s\\S]*)", "imain");
+    private int id;
+    private UUID uuid;
+    private String username;
+    private byte[] password;
+
+    public Account(int id, String username, byte[] password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.uuid = UUID.randomUUID();
     }
 
-    @Override
-    public boolean passes(Matcher matcher, Request request) {
+    public boolean passwordMatches(final byte[] password) {
+        if (password.length != this.password.length) {
+            return false;
+        }
+        for (int i = 0; i < password.length; i++) {
+            if (password[i] != this.password[i]) {
+                    return false;
+            }
+        }
         return true;
     }
 
     @Override
-    public Response generate(final Request r) {
-        Response response = new Response(this);
+    public String toString() {
+        return this.username;
+    }
 
-        Account account = IWeb.getInstance().getAccountManager().getAccount(r.getSession());
-        if (account != null) {
-            response.setContent(FileUtils.getDocument(new File(new File(new File(Server.getInstance().coreFolder, "views"), "html"), "main.html"), getBuffer()));
-            int parts = r.getQuery().getResource().split("/").length;
-            if (parts > 2) {
-                String action = r.getQuery().getResource().split("/")[2];
-                response.setContent("Action: " + action);
-                switch (action) {
-                    case "logout": {
-                        IWeb.getInstance().getAccountManager().unbindAccount(r.getSession());
-                        response.getHeader().redirect("/login");
-                    } break;
-                    default: break;
-                }
-            }
-        } else {
-            response.getHeader().redirect("/login");
+    public int getID() {
+        return this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public UUID getUUID() {
+        return this.uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Account) && ((Account) o).getUUID().equals(getUUID());
+    }
+
+    public byte[] getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean contains(String variable) {
+        return Arrays.asList("username", "id").contains(variable);
+    }
+
+    @Override
+    public Object get(String variable) {
+        switch (variable) {
+            case "username":
+                return getUsername();
+            case "id":
+                return getID();
+            default:
+                return null;
         }
-
-        return response;
     }
 }

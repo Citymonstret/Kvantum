@@ -54,6 +54,10 @@ public class Response implements HeaderProvider {
         this.bytes = new byte[0];
     }
 
+    public Response() {
+        this(null);
+    }
+
     /**
      * Use raw bytes, rather than text
      *

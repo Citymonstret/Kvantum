@@ -17,14 +17,14 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.iweb.accounts;
+package com.intellectualsites.web.extra.accounts;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Session;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.Assert;
+import com.intellectualsites.web.util.SQLiteManager;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,16 +40,18 @@ public class AccountManager implements ProviderFactory<Account> {
     private final List<Account> accountList;
     private final Map<Session, Account> sessionAccountMap;
     private int id = 0;
+    private final SQLiteManager databaseManager;
 
-    public AccountManager() {
+    public AccountManager(final SQLiteManager databaseManager) {
         this.accountList = Collections.synchronizedList(new ArrayList<Account>());
         this.sessionAccountMap = new ConcurrentHashMap<>();
+        this.databaseManager = databaseManager;
     }
 
     public boolean load() {
         try {
-            IWeb.getInstance().getDatabaseManager().executeUpdate("CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR(32), password VARCHAR(256))");
-            PreparedStatement loadAccounts = IWeb.getInstance().getDatabaseManager().prepareStatement("SELECT * FROM account");
+            databaseManager.executeUpdate("CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR(32), password VARCHAR(256))");
+            PreparedStatement loadAccounts = databaseManager.prepareStatement("SELECT * FROM account");
             ResultSet results = loadAccounts.executeQuery();
             while (results.next()) {
                 this.id++;
@@ -79,7 +81,7 @@ public class AccountManager implements ProviderFactory<Account> {
     }
 
     public void createAccount(final Account account) throws SQLException {
-        PreparedStatement statement = IWeb.getInstance().getDatabaseManager().prepareStatement("INSERT INTO account(name, password) VALUES(?, ?)");
+        PreparedStatement statement = databaseManager.prepareStatement("INSERT INTO account(name, password) VALUES(?, ?)");
         statement.setString(1, account.getUsername());
         statement.setString(2, new String(account.getPassword()));
         statement.executeUpdate();

@@ -20,21 +20,27 @@
 package com.intellectualsites.web.iweb.core;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.iweb.accounts.AccountCommand;
-import com.intellectualsites.web.iweb.accounts.AccountManager;
+import com.intellectualsites.web.extra.ApplicationStructure;
+import com.intellectualsites.web.extra.accounts.AccountCommand;
+import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.iweb.views.Login;
 import com.intellectualsites.web.iweb.views.Main;
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.util.SQLiteManager;
+import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.views.ViewReturn;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
 
 /**
  * Created 10/24/2015 for IntellectualServer
  *
  * @author Citymonstret
  */
-public class IWeb {
+public class IWeb extends ApplicationStructure {
 
     protected static IWeb instance;
 
@@ -45,30 +51,22 @@ public class IWeb {
         return instance;
     }
 
-    private final AccountManager accountManager;
-    private SQLiteManager database;
-
-    public AccountManager getAccountManager() {
-        return accountManager;
-    }
-
     public IWeb() {
-        try {
-            this.database = new SQLiteManager("iweb");
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-        this.accountManager = new AccountManager();
+        super("iweb");
     }
 
     public void registerViews(Server server) {
         server.getViewManager().add(new Login());
         server.getViewManager().add(new Main());
-
-        server.inputThread.commands.put("account", new AccountCommand());
+        server.inputThread.commands.put("account", new AccountCommand(this));
     }
 
-    public SQLiteManager getDatabaseManager() {
-        return database;
+    {
+        new View("", "", null, new ViewReturn() {
+            @Override
+            public Response get(Request r) {
+                return new Response();
+            }
+        }).register();
     }
 }

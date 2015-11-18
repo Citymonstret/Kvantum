@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
  *
  * @author Citymonstret
  */
-public abstract class View {
+public class View {
 
     private final Pattern pattern;
     private final String rawPattern;
@@ -49,6 +50,7 @@ public abstract class View {
     protected String relatedFolderPath, fileName, defaultFile;
     private String internalFileName, internalDefaultFile;
     private File folder;
+    private ViewReturn viewReturn;
 
     /**
      * The constructor (Without prestored options)
@@ -103,6 +105,10 @@ public abstract class View {
      * @param options Pre Stored options
      */
     public View(String pattern, String internalName, Map<String, Object> options) {
+        this(pattern, internalName, options, null);
+    }
+
+    public View(String pattern, String internalName, Map<String, Object> options, ViewReturn viewReturn) {
         if (options == null) {
             this.options = new HashMap<>();
         } else {
@@ -111,10 +117,15 @@ public abstract class View {
         this.internalName = internalName;
         this.pattern = Pattern.compile(pattern);
         this.rawPattern = pattern;
+        this.viewReturn = viewReturn;
     }
 
     public final String getName() {
         return this.internalName;
+    }
+
+    public void register() {
+        Server.getInstance().getViewManager().add(this);
     }
 
     /**
@@ -218,7 +229,9 @@ public abstract class View {
      *
      * @return True if the request matches, false if not
      */
-    public abstract boolean passes(Matcher matcher, Request request);
+    public boolean passes(Matcher matcher, Request request) {
+        return true;
+    }
 
     @Override
     public String toString() {
@@ -232,9 +245,13 @@ public abstract class View {
      * @return Generated response
      */
     public Response generate(final Request r) {
-        Response response = new Response(this);
-        response.setContent("<h1>Content!</h1>");
-        return response;
+        if (viewReturn != null) {
+            return viewReturn.get(r);
+        } else {
+            Response response = new Response(this);
+            response.setContent("<h1>Content!</h1>");
+            return response;
+        }
     }
 
     /**

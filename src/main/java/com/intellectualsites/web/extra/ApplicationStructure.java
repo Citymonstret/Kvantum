@@ -17,84 +17,43 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.iweb.accounts;
+package com.intellectualsites.web.extra;
 
-import com.intellectualsites.web.object.syntax.VariableProvider;
+import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.extra.accounts.AccountManager;
+import com.intellectualsites.web.util.SQLiteManager;
 
-import java.util.Arrays;
-import java.util.UUID;
+import java.io.IOException;
+import java.sql.SQLException;
 
-public class Account implements VariableProvider {
+/**
+ * Created 11/13/2015 for IntellectualServer
+ *
+ * @author Citymonstret
+ */
+public abstract class ApplicationStructure {
 
-    private int id;
-    private UUID uuid;
-    private String username;
-    private byte[] password;
+    private final AccountManager accountManager;
+    private SQLiteManager database;
+    private final String applicationName;
 
-    public Account(int id, String username, byte[] password) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.uuid = UUID.randomUUID();
+    public AccountManager getAccountManager() {
+        return this.accountManager;
     }
 
-    public boolean passwordMatches(final byte[] password) {
-        if (password.length != this.password.length) {
-            return false;
+    public ApplicationStructure(final String applicationName) {
+        this.applicationName = applicationName;
+        try {
+            this.database = new SQLiteManager(this.applicationName);
+        } catch(final IOException | SQLException e) {
+            throw new RuntimeException(e);
         }
-        for (int i = 0; i < password.length; i++) {
-            if (password[i] != this.password[i]) {
-                    return false;
-            }
-        }
-        return true;
+        this.accountManager = new AccountManager(database);
     }
 
-    @Override
-    public String toString() {
-        return this.username;
+    public SQLiteManager getDatabaseManager() {
+        return this.database;
     }
 
-    public int getID() {
-        return this.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.id;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public UUID getUUID() {
-        return this.uuid;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return (o instanceof Account) && ((Account) o).getUUID().equals(getUUID());
-    }
-
-    public byte[] getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean contains(String variable) {
-        return Arrays.asList("username", "id").contains(variable);
-    }
-
-    @Override
-    public Object get(String variable) {
-        switch (variable) {
-            case "username":
-                return getUsername();
-            case "id":
-                return getID();
-            default:
-                return null;
-        }
-    }
+    public abstract void registerViews(Server server);
 }
