@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  */
 public class View {
 
-    private final Pattern pattern;
+    protected final Pattern pattern;
     private final String rawPattern;
     private final Map<String, Object> options;
     private final String internalName;

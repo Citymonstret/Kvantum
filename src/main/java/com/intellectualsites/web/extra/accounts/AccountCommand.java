@@ -25,6 +25,7 @@ import com.intellectualsites.web.extra.ApplicationStructure;
 import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.object.Session;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 
 public class AccountCommand extends Command {
@@ -57,6 +58,19 @@ public class AccountCommand extends Command {
                                 structure.getAccountManager().createAccount(account);
                             } catch (SQLException e) {
                                 e.printStackTrace();
+                            }
+
+                            if (account.getUsername().equalsIgnoreCase("admin")) {
+                                Server server = Server.getInstance();
+                                try {
+                                    Field field = Server.class.getDeclaredField("pause");
+                                    field.setAccessible(true);
+                                    field.set(server, false);
+
+                                    Server.getInstance().log("Unpaused!");
+                                } catch (NoSuchFieldException | IllegalAccessException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }

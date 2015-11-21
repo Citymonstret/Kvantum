@@ -31,7 +31,7 @@ import java.sql.SQLException;
  *
  * @author Citymonstret
  */
-public abstract class ApplicationStructure {
+public class ApplicationStructure {
 
     private final AccountManager accountManager;
     private SQLiteManager database;
@@ -55,5 +55,5 @@ public abstract class ApplicationStructure {
         return this.database;
     }
 
-    public abstract void registerViews(Server server);
+    public void registerViews(Server server) {}
 }

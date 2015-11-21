@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.core;
 
+import com.cedarsoftware.util.io.JsonWriter;
 import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.Message;
@@ -28,6 +29,10 @@ import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
+import com.intellectualsites.web.extra.ApplicationStructure;
+import com.intellectualsites.web.extra.accounts.Account;
+import com.intellectualsites.web.extra.accounts.AccountCommand;
+import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.isites.Application;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.*;
@@ -43,6 +48,7 @@ import com.intellectualsites.web.views.*;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
 
 import org.apache.commons.io.output.TeeOutputStream;
+import org.json.simple.JSONObject;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -50,7 +56,9 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import static com.intellectualsites.web.logging.LogModes.*;
 
@@ -123,6 +131,12 @@ public class Server extends Thread implements IntellectualServer {
     private final int port;
     private final Map<String, Class<? extends View>> viewBindings;
     public final LogWrapper logWrapper;
+
+    private boolean pause = false;
+
+    private final ApplicationStructure applicationStructure;
+    private final SQLiteManager globalSQLiteManager;
+    private final AccountManager globalAccountManager;
 
     {
         viewBindings = new HashMap<>();
@@ -312,6 +326,13 @@ public class Server extends Thread implements IntellectualServer {
             log("Successfully loaded the user accounts!");
         }
 
+        {
+            this.applicationStructure = new ApplicationStructure("core");
+            this.globalSQLiteManager = applicationStructure.getDatabaseManager();
+            this.globalAccountManager = applicationStructure.getAccountManager();
+            this.globalAccountManager.load();
+            this.inputThread.commands.put("account", new AccountCommand(applicationStructure));
+        }
     }
 
     /**
@@ -448,6 +469,80 @@ public class Server extends Thread implements IntellectualServer {
             }
         }
 
+        new View("\\/api(\\/)?", "apiCore", null, new ViewReturn() {
+            @Override
+            public Response get(Request r) {
+                Response response = new Response(null);
+                response.setContent("<ul><li>user</li></ul>");
+                return response;
+            }
+        }).register();
+        new View("\\/api\\/user\\/([A-Za-z0-9_-]+)?", "personAPI", null, new ViewReturn() {
+            @Override
+            public Response get(Request re) {
+                if (re.getMeta("nouser") != null) {
+                    Response r = new Response(null);
+                    r.setContent("You have to specify a user!");
+                    return r;
+                }
+                if (re.getMeta("unknownuser") != null) {
+                    Response r = new Response(null);
+                    r.setContent("There is no such user.");
+                    return r;
+                }
+
+                Account user = (Account) re.getMeta("user");
+
+                JSONObject object = new JSONObject();
+                JSONObject request = new JSONObject();
+                request.put("resource", "user");
+                request.put("type", "user");
+                request.put("identifier", user.getUsername());
+                object.put("request", request);
+                JSONObject response = new JSONObject();
+                response.put("username", user.getUsername());
+                response.put("uuid", user.getUUID().toString());
+                response.put("id", user.getID());
+                object.put("response", response);
+
+                Response r = new Response(null);
+                r.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT);
+                try {
+                    r.setContent(JsonWriter.formatJson(object.toJSONString()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return r;
+            }
+        }) {
+            @Override
+            public boolean passes(Matcher matcher, Request request) {
+                String user = matcher.group(1);
+
+                if (user == null) {
+                    request.addMeta("nouser", true);
+                    return true;
+                }
+
+                Account account;
+                int id;
+                try {
+                    id = Integer.parseInt(user);
+                    account = globalAccountManager.getAccount(new Object[]{id,null,null});
+                } catch(final Exception e) {
+                    account = globalAccountManager.getAccount(new Object[]{null,user,null});
+                }
+                if (account == null) {
+                    request.addMeta("unknownuser", true);
+                } else {
+                    request.addMeta("user", account);
+                }
+
+                return true;
+            }
+        }.register();
+
         viewManager.dump(this);
         //
         if (this.ipv4) {
@@ -487,6 +582,14 @@ public class Server extends Thread implements IntellectualServer {
         //
         log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
         log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
+
+        // Pre-Steps
+        {
+            if (globalAccountManager.getAccount(new Object[] {null, "admin", null}) == null) {
+                log("There is no admin account, create one via /account create admin ...! Server will resume when completed!");
+                pause = true;
+            }
+        }
         // Main Loop
 
         long lastExecution = System.currentTimeMillis();
@@ -645,6 +748,7 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     private void tick() {
+        if (pause) return;
         try {
             runAsync(socket.accept());
         } catch (final Exception e) {
