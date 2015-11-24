@@ -23,6 +23,8 @@ import com.intellectualsites.web.commands.CacheDump;
 import com.intellectualsites.web.commands.Command;
 import com.intellectualsites.web.commands.Show;
 import com.intellectualsites.web.commands.Stop;
+import com.intellectualsites.web.events.Event;
+import com.intellectualsites.web.events.EventManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -38,8 +40,29 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class InputThread extends Thread {
 
+    public String currentString = "";
     private final Server server;
     public final Map<String, Command> commands;
+
+    public static class TextEvent extends Event {
+
+        private final String text;
+
+        /**
+         * The name which will be used
+         * to identity this event
+         *
+         * @param name Event Name
+         */
+        protected TextEvent(String text) {
+            super("inputtextevent");
+            this.text = text;
+        }
+
+        final public String getText() {
+            return this.text;
+        }
+    }
 
     InputThread(Server server) {
         this.server = server;
@@ -56,7 +79,11 @@ public class InputThread extends Thread {
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             String line;
             for (;;) {
-                if ((line = in.readLine()).startsWith("/")) {
+                line = in.readLine();
+                if (line == null || line.isEmpty()) {
+                    continue;
+                }
+                if (line.startsWith("/")) {
                     line = line.replace("/", "").toLowerCase();
                     String[] strings = line.split(" ");
                     String[] args;
@@ -72,9 +99,11 @@ public class InputThread extends Thread {
                     } else {
                         server.log("Unknown command '%s'", line);
                     }
+                } else {
+                    currentString = line;
+                    Server.getInstance().handleEvent(new TextEvent(line));
                 }
             }
-        } catch (final Exception ignored) {
-        }
+        } catch (final Exception ignored) {}
     }
 }

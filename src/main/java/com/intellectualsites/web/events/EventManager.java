@@ -45,6 +45,14 @@ public class EventManager {
         return instance;
     }
 
+    public void addListener(final EventListener listener) {
+        synchronized (listeners) {
+            if (!listeners.containsKey(listener.hashCode()))
+                listeners.put(listener.hashCode(),
+                        new ArrayDeque<EventListener>());
+            listeners.get(listener.hashCode()).add(listener);
+        }
+    }
     public Collection<EventListener> getAll(final Object y) {
         synchronized (listeners) {
             final List<EventListener> l = new ArrayList<>();

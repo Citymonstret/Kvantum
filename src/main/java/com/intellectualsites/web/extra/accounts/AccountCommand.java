@@ -59,19 +59,6 @@ public class AccountCommand extends Command {
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-
-                            if (account.getUsername().equalsIgnoreCase("admin")) {
-                                Server server = Server.getInstance();
-                                try {
-                                    Field field = Server.class.getDeclaredField("pause");
-                                    field.setAccessible(true);
-                                    field.set(server, false);
-
-                                    Server.getInstance().log("Unpaused!");
-                                } catch (NoSuchFieldException | IllegalAccessException e) {
-                                    e.printStackTrace();
-                                }
-                            }
                         }
                     }
                 } break;

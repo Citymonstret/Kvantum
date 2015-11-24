@@ -24,16 +24,15 @@ import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.config.YamlConfiguration;
-import com.intellectualsites.web.events.Event;
-import com.intellectualsites.web.events.EventCaller;
-import com.intellectualsites.web.events.EventManager;
+import com.intellectualsites.web.events.*;
+import com.intellectualsites.web.events.EventListener;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.extra.ApplicationStructure;
 import com.intellectualsites.web.extra.accounts.Account;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
 import com.intellectualsites.web.extra.accounts.AccountManager;
-import com.intellectualsites.web.isites.Application;
+
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -70,35 +69,57 @@ import static com.intellectualsites.web.logging.LogModes.*;
  */
 public class Server extends Thread implements IntellectualServer {
 
+    /**
+     * Running in silent mode means that the server
+     * wont output anything, anywhere - not recommended
+     * for obvious reasons
+     */
     public boolean silent = false;
 
-    //
-    // public static
-    //
+    /**
+     * This is the logging prefix
+     */
     public static final String PREFIX = "Web";
 
-    //
-    // private static
-    //
-    private static Server instance;
-
-    //
-    // public
-    //
+    /**
+     * This is the configuration file
+     * used for translations of logging messages
+     */
     public ConfigurationFile translations;
-    public boolean stopping, enableCaching;
+
+    /**
+     * Set to true to stop the server
+     */
+    public boolean stopping;
+
+    /**
+     * Whether or not to cache view responses
+     */
+    public boolean enableCaching;
+
+    /**
+     * All the syntaxtes used by the Crush Engine
+     */
     public Set<Syntax> syntaxes;
+
+    /**
+     * The core folder for the server
+     */
     public File coreFolder;
+
+    /**
+     * The thread handing user input
+     */
     public InputThread inputThread;
 
-    //
-    // public final
-    //
+    /**
+     * Verbose ouputs?
+     */
     public final boolean verbose;
 
-    //
-    // public volatile
-    //
+    /**
+     * The cache manager
+     */
     public volatile CacheManager cacheManager;
 
     //
@@ -123,17 +144,12 @@ public class Server extends Thread implements IntellectualServer {
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
-
-    //
-    // private final
-    //
+    private static Server instance;
     private final boolean standalone;
     private final int port;
     private final Map<String, Class<? extends View>> viewBindings;
     public final LogWrapper logWrapper;
-
     private boolean pause = false;
-
     private final ApplicationStructure applicationStructure;
     private final SQLiteManager globalSQLiteManager;
     private final AccountManager globalAccountManager;
@@ -158,7 +174,7 @@ public class Server extends Thread implements IntellectualServer {
 
         Assert.notNull(coreFolder, logWrapper);
 
-        {
+        { // This is due to the licensing nature of the code
             logWrapper.log("");
             logWrapper.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             logWrapper.log("> GNU GENERAL PUBLIC LICENSE NOTICE:");
@@ -308,7 +324,6 @@ public class Server extends Thread implements IntellectualServer {
         this.providers.add(ConfigVariableProvider.getInstance());
         this.providers.add(new PostProviderFactory());
         this.providers.add(new MetaProvider());
-        this.providers.add(Application.getApplication().getAccountManager());
 
         // Setup the crush syntax-particles
         this.syntaxes = new LinkedHashSet<>();
@@ -319,20 +334,12 @@ public class Server extends Thread implements IntellectualServer {
         syntaxes.add(new ForEachBlock());
         syntaxes.add(new Variable());
 
-        // Load user accounts
-        if (!Application.getApplication().getAccountManager().load()) {
-            log("Failed to load user accounts :(");
-        } else {
-            log("Successfully loaded the user accounts!");
-        }
-
-        {
-            this.applicationStructure = new ApplicationStructure("core");
-            this.globalSQLiteManager = applicationStructure.getDatabaseManager();
-            this.globalAccountManager = applicationStructure.getAccountManager();
-            this.globalAccountManager.load();
-            this.inputThread.commands.put("account", new AccountCommand(applicationStructure));
-        }
+        this.applicationStructure = new ApplicationStructure("core");
+        this.globalSQLiteManager = applicationStructure.getDatabaseManager();
+        this.globalAccountManager = applicationStructure.getAccountManager();
+        this.globalAccountManager.load();
+        this.inputThread.commands.put("account", new AccountCommand(applicationStructure));
+        this.providers.add(this.globalAccountManager);
     }
 
     /**
@@ -469,80 +476,6 @@ public class Server extends Thread implements IntellectualServer {
             }
         }
 
-        new View("\\/api(\\/)?", "apiCore", null, new ViewReturn() {
-            @Override
-            public Response get(Request r) {
-                Response response = new Response(null);
-                response.setContent("<ul><li>user</li></ul>");
-                return response;
-            }
-        }).register();
-        new View("\\/api\\/user\\/([A-Za-z0-9_-]+)?", "personAPI", null, new ViewReturn() {
-            @Override
-            public Response get(Request re) {
-                if (re.getMeta("nouser") != null) {
-                    Response r = new Response(null);
-                    r.setContent("You have to specify a user!");
-                    return r;
-                }
-                if (re.getMeta("unknownuser") != null) {
-                    Response r = new Response(null);
-                    r.setContent("There is no such user.");
-                    return r;
-                }
-
-                Account user = (Account) re.getMeta("user");
-
-                JSONObject object = new JSONObject();
-                JSONObject request = new JSONObject();
-                request.put("resource", "user");
-                request.put("type", "user");
-                request.put("identifier", user.getUsername());
-                object.put("request", request);
-                JSONObject response = new JSONObject();
-                response.put("username", user.getUsername());
-                response.put("uuid", user.getUUID().toString());
-                response.put("id", user.getID());
-                object.put("response", response);
-
-                Response r = new Response(null);
-                r.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT);
-                try {
-                    r.setContent(JsonWriter.formatJson(object.toJSONString()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return r;
-            }
-        }) {
-            @Override
-            public boolean passes(Matcher matcher, Request request) {
-                String user = matcher.group(1);
-
-                if (user == null) {
-                    request.addMeta("nouser", true);
-                    return true;
-                }
-
-                Account account;
-                int id;
-                try {
-                    id = Integer.parseInt(user);
-                    account = globalAccountManager.getAccount(new Object[]{id,null,null});
-                } catch(final Exception e) {
-                    account = globalAccountManager.getAccount(new Object[]{null,user,null});
-                }
-                if (account == null) {
-                    request.addMeta("unknownuser", true);
-                } else {
-                    request.addMeta("user", account);
-                }
-
-                return true;
-            }
-        }.register();
-
         viewManager.dump(this);
         //
         if (this.ipv4) {
@@ -586,10 +519,25 @@ public class Server extends Thread implements IntellectualServer {
         // Pre-Steps
         {
             if (globalAccountManager.getAccount(new Object[] {null, "admin", null}) == null) {
-                log("There is no admin account, create one via /account create admin ...! Server will resume when completed!");
+                log("There is no admin account as of yet. So, well, let's create one! Please enter a password!");
                 pause = true;
+                EventManager.getInstance().addListener(new EventListener<InputThread.TextEvent>() {
+                    @Override
+                    public void listen(InputThread.TextEvent event) {
+                        String password = event.getText();
+                        try {
+                            globalAccountManager.createAccount(new Account(globalAccountManager.getNextId(), "admin", password.getBytes()));
+                            log("Great, you've got yourself an admin account. The username is \"admin\".");
+                            pause = false;
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                EventManager.getInstance().bake();
             }
         }
+
         // Main Loop
 
         long lastExecution = System.currentTimeMillis();
