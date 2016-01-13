@@ -138,8 +138,22 @@ public class FileUtils {
      * @return String
      */
     public static String getDocument(final File file, int buffer) {
+        return getDocument(file, buffer, false);
+    }
+
+    public static String getDocument(final File file, int buffer, boolean create) {
         StringBuilder document = new StringBuilder();
         try {
+            if (!file.exists()) {
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                if (create) {
+                    file.createNewFile();
+                    return "";
+                }
+            }
+
             BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
             String line;
             while ((line = reader.readLine()) != null) {

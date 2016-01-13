@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //     IntellectualServer is a web server, written entirely in the Java language.                            /
-//     Copyright (C) 2015 IntellectualSites                                                                  /
+//     Copyright (C) 2016 IntellectualSites                                                                  /
 //                                                                                                           /
 //     This program is free software; you can redistribute it and/or modify                                  /
 //     it under the terms of the GNU General Public License as published by                                  /
@@ -17,50 +17,45 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.core;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.Socket;
 
-/**
- * Created 2015-04-21 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class PostRequest {
+public class WorkerThread extends Thread {
 
-    public final String request;
-    private final Map<String, String> vars;
+    private static int idAlloaction = 0;
 
-    public PostRequest(final String request) {
-        this.request = request;
-        this.vars = new HashMap<>();
-        for (String s : request.split("&")) {
-            if (!s.isEmpty()) {
-                String[] p = s.split("=");
-                if (p.length < 2) continue;
-                vars.put(p[0], p[1].replace("+", " "));
+    private final int id;
+    private final Server.Worker task;
+    private volatile Socket current;
+    private final Server server;
+
+    public WorkerThread(Server.Worker task, Server server) {
+        super("Worker Thread: " + ++idAlloaction);
+        this.id = idAlloaction;
+        this.task = task;
+        this.server = server;
+
+    }
+
+    @Override
+    public synchronized void start() {
+        super.start();
+        server.log("Started thread: " + id);
+    }
+
+    @Override
+    final public void run() {
+        Socket current;
+        for (;;) {
+            String s = ("Checking queue");
+            if (!server.queue.isEmpty()) {
+                current = server.queue.poll();
+                task.run(current, server);
+            } else {
+
             }
         }
     }
 
-    public String buildLog() {
-        StringBuilder b = new StringBuilder();
-        for (Map.Entry<String, String> e : vars.entrySet()) {
-            b.append(e.getKey()).append("=").append(e.getValue()).append("&");
-        }
-        return b.toString();
-    }
-
-    public String get(String k) {
-        return vars.get(k);
-    }
-
-    public boolean contains(String k) {
-        return vars.containsKey(k);
-    }
-
-    public Map<String, String> get() {
-        return vars;
-    }
 }

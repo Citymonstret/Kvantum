@@ -17,50 +17,27 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.intellectualsites.web.object;
+package com.intellectualsites.web.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created 2015-04-21 for IntellectualServer
+ * Created 12/24/2015 for IntellectualServer
  *
  * @author Citymonstret
  */
-public class PostRequest {
+public class MapUtils {
 
-    public final String request;
-    private final Map<String, String> vars;
-
-    public PostRequest(final String request) {
-        this.request = request;
-        this.vars = new HashMap<>();
-        for (String s : request.split("&")) {
-            if (!s.isEmpty()) {
-                String[] p = s.split("=");
-                if (p.length < 2) continue;
-                vars.put(p[0], p[1].replace("+", " "));
-            }
+    public static <K,P> Map<K, P> createMap(K[] keys, P[] values) {
+        if (keys.length != values.length) {
+            return new HashMap<>();
         }
-    }
-
-    public String buildLog() {
-        StringBuilder b = new StringBuilder();
-        for (Map.Entry<String, String> e : vars.entrySet()) {
-            b.append(e.getKey()).append("=").append(e.getValue()).append("&");
+        Map<K, P> map = new HashMap<>();
+        for (int i = 0; i < keys.length; i++) {
+            map.put(keys[i], values[i]);
         }
-        return b.toString();
+        return map;
     }
 
-    public String get(String k) {
-        return vars.get(k);
-    }
-
-    public boolean contains(String k) {
-        return vars.containsKey(k);
-    }
-
-    public Map<String, String> get() {
-        return vars;
-    }
 }

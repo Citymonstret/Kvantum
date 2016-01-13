@@ -19,20 +19,20 @@
 
 package com.intellectualsites.web.core;
 
-import com.cedarsoftware.util.io.JsonWriter;
 import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.config.YamlConfiguration;
-import com.intellectualsites.web.events.*;
+import com.intellectualsites.web.events.Event;
+import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventListener;
+import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.extra.ApplicationStructure;
 import com.intellectualsites.web.extra.accounts.Account;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
 import com.intellectualsites.web.extra.accounts.AccountManager;
-
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -45,9 +45,7 @@ import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
-
 import org.apache.commons.io.output.TeeOutputStream;
-import org.json.simple.JSONObject;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -57,7 +55,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
 
 import static com.intellectualsites.web.logging.LogModes.*;
 
@@ -138,8 +135,8 @@ public class Server extends Thread implements IntellectualServer {
     private boolean started, ipv4, mysqlEnabled;
     private ServerSocket socket;
     private SessionManager sessionManager;
-    public String hostName;
-    private int bufferIn, bufferOut;
+    public String hostName, mainApplication;
+    private int bufferIn, bufferOut, workers;
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
@@ -153,6 +150,8 @@ public class Server extends Thread implements IntellectualServer {
     private final ApplicationStructure applicationStructure;
     private final SQLiteManager globalSQLiteManager;
     private final AccountManager globalAccountManager;
+    private ApplicationStructure mainApplicationStructure;
+    private WorkerThread[] workerThreads;
 
     {
         viewBindings = new HashMap<>();
@@ -270,8 +269,10 @@ public class Server extends Thread implements IntellectualServer {
             configServer.setIfNotExists("buffer.out", 1024 * 1024);
             configServer.setIfNotExists("verbose", false);
             configServer.setIfNotExists("ipv4", false);
+            configServer.setIfNotExists("workers", 4);
             configServer.setIfNotExists("cache.enabled", true);
             configServer.setIfNotExists("mysql.enabled", false);
+            configServer.setIfNotExists("application.main", "");
             configServer.saveFile();
         } catch (final Exception e) {
             throw new IntellectualServerInitializationException("Couldn't load in the configuration file", e);
@@ -285,6 +286,15 @@ public class Server extends Thread implements IntellectualServer {
         this.verbose = configServer.get("verbose");
         this.enableCaching = configServer.get("cache.enabled");
         this.mysqlEnabled = configServer.get("mysql.enabled");
+        this.mainApplication = configServer.get("application.main");
+        this.workers = configServer.get("workers");
+
+        Worker task = new Worker();
+
+        this.workerThreads = new WorkerThread[this.workers];
+        for (int i = 0; i < workers; i++) {
+            workerThreads[i] = new WorkerThread(task, this);
+        }
 
         this.started = false;
         this.stopping = false;
@@ -340,6 +350,24 @@ public class Server extends Thread implements IntellectualServer {
         this.globalAccountManager.load();
         this.inputThread.commands.put("account", new AccountCommand(applicationStructure));
         this.providers.add(this.globalAccountManager);
+
+        if (!mainApplication.isEmpty()) {
+            try {
+                Class temp = Class.forName(mainApplication);
+                if (temp.getSuperclass().equals(ApplicationStructure.class)) {
+                    ApplicationStructure applicationStructure = (ApplicationStructure) temp.newInstance();
+                    this.mainApplicationStructure = applicationStructure;
+                } else {
+                    log("Application '%s' does not extend ApplicationStructure.class", mainApplication);
+                }
+            } catch (ClassNotFoundException e) {
+                log("Could not find application '%s'", mainApplication);
+                e.printStackTrace();
+            } catch (InstantiationException | IllegalAccessException e) {
+                log("Could not initiate application '%s'", mainApplication);
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -356,6 +384,10 @@ public class Server extends Thread implements IntellectualServer {
         Assert.notNull(c);
         Assert.notEmpty(key);
         viewBindings.put(key, c);
+    }
+
+    public AccountManager getAccountManager() {
+        return this.globalAccountManager;
     }
 
     @Override
@@ -476,6 +508,10 @@ public class Server extends Thread implements IntellectualServer {
             }
         }
 
+        if (mainApplicationStructure != null) {
+            mainApplicationStructure.registerViews(this);
+        }
+
         viewManager.dump(this);
         //
         if (this.ipv4) {
@@ -512,6 +548,12 @@ public class Server extends Thread implements IntellectualServer {
                 }
             }
         }
+
+
+        for (WorkerThread thread : workerThreads) {
+            thread.start();
+        }
+
         //
         log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
         log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
@@ -558,147 +600,147 @@ public class Server extends Thread implements IntellectualServer {
         }
     }
 
-    private void runAsync(final Socket remote) {
-        new Thread() {
-            @Override
-            public void run() {
-                if (verbose) {
-                    log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
+    public static class Worker {
+
+        public void run(Socket remote, Server server) {
+            if (server.verbose) {
+                server.log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
+            }
+            StringBuilder rRaw = new StringBuilder();
+            BufferedOutputStream out;
+            BufferedReader input;
+            Request r;
+            try {
+                // Let's read from the socket :D
+                input = new BufferedReader(new InputStreamReader(remote.getInputStream()), server.bufferIn);
+                // And... write!
+                out = new BufferedOutputStream(remote.getOutputStream(), server.bufferOut);
+                String str;
+                while ((str = input.readLine()) != null && !str.equals("")) {
+                    rRaw.append(str).append("|");
                 }
-                StringBuilder rRaw = new StringBuilder();
-                BufferedOutputStream out;
-                BufferedReader input;
-                Request r;
-                try {
-                    // Let's read from the socket :D
-                    input = new BufferedReader(new InputStreamReader(remote.getInputStream()), bufferIn);
-                    // And... write!
-                    out = new BufferedOutputStream(remote.getOutputStream(), bufferOut);
-                    String str;
-                    while ((str = input.readLine()) != null && !str.equals("")) {
-                        rRaw.append(str).append("|");
+                r = new Request(rRaw.toString(), remote);
+                if (r.getQuery().getMethod() == Method.POST) {
+                    StringBuilder pR = new StringBuilder();
+                    int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
+                    for (int i = 0; i < cl; i++) {
+                        pR.append((char) input.read());
                     }
-                    r = new Request(rRaw.toString(), remote);
-                    if (r.getQuery().getMethod() == Method.POST) {
-                        StringBuilder pR = new StringBuilder();
-                        int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
-                        for (int i = 0; i < cl; i++) {
-                            pR.append((char) input.read());
-                        }
-                        r.setPostRequest(new PostRequest(pR.toString()));
-                    }
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    return;
+                    r.setPostRequest(new PostRequest(pR.toString()));
                 }
-                if (!silent) {
-                    log(r.buildLog());
-                }
-                // Get the view
-                View view = viewManager.match(r);
+            } catch (final Exception e) {
+                e.printStackTrace();
+                return;
+            }
+            if (!server.silent) {
+                server.log(r.buildLog());
+            }
+            // Get the view
+            View view = server.viewManager.match(r);
 
-                boolean isText;
-                String content = "";
-                byte[] bytes = null;
+            boolean isText;
+            String content = "";
+            byte[] bytes = null;
 
-                final HeaderProvider headerProvider;
+            final HeaderProvider headerProvider;
 
-                Session session = sessionManager.getSession(r, out);
-                if (session != null) {
-                    r.setSession(session);
-                } else {
-                    r.setSession(sessionManager.createSession(r, out));
-                }
+            Session session = server.sessionManager.getSession(r, out);
+            if (session != null) {
+                r.setSession(session);
+            } else {
+                r.setSession(server.sessionManager.createSession(r, out));
+            }
 
-                if (enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
-                    if (cacheManager.hasCache(view)) {
-                        CachedResponse response = cacheManager.getCache(view);
-                        if ((isText = response.isText)) {
-                            content = new String(response.bodyBytes);
-                        } else {
-                            bytes = response.bodyBytes;
-                        }
-                        headerProvider = response;
+            if (server.enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
+                if (server.cacheManager.hasCache(view)) {
+                    CachedResponse response = server.cacheManager.getCache(view);
+                    if ((isText = response.isText)) {
+                        content = new String(response.bodyBytes);
                     } else {
-                        Response response = view.generate(r);
-                        headerProvider = response;
-                        cacheManager.setCache(view, response);
-                        if ((isText = response.isText())) {
-                            content = response.getContent();
-                        } else {
-                            bytes = response.getBytes();
-                        }
+                        bytes = response.bodyBytes;
                     }
+                    headerProvider = response;
                 } else {
                     Response response = view.generate(r);
                     headerProvider = response;
+                    server.cacheManager.setCache(view, response);
                     if ((isText = response.isText())) {
                         content = response.getContent();
                     } else {
                         bytes = response.getBytes();
                     }
                 }
-
-                for (Map.Entry<String, String> postponedCookie : r.postponedCookies.entrySet()) {
-                    headerProvider.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
-                }
-
-                if (isText) {
-                    // Make sure to not use Crush when
-                    // told not to
-                    if (!(view instanceof IgnoreSyntax)) {
-                        // Provider factories are fun, and so is the
-                        // global map. But we also need the view
-                        // specific ones!
-                        Map<String, ProviderFactory> factories = new HashMap<>();
-                        for (final ProviderFactory factory : providers) {
-                            factories.put(factory.providerName().toLowerCase(), factory);
-                        }
-                        // Now make use of the view specific ProviderFactory
-                        ProviderFactory z = view.getFactory(r);
-                        if (z != null) {
-                            factories.put(z.providerName().toLowerCase(), z);
-                        }
-                        // This is how the crush engine works.
-                        // Quite simple, yet powerful!
-                        for (Syntax syntax : syntaxes) {
-                            if (syntax.matches(content)) {
-                                content = syntax.handle(content, r, factories);
-                            }
-                        }
-                    }
-                    // Now, finally, let's get the bytes.
-                    bytes = content.getBytes();
-                }
-
-                headerProvider.getHeader().apply(out);
-
-                try {
-                    out.write(bytes);
-                    out.flush();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    input.close();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (!silent) {
-                    log("Request was served by '%s', with the type '%s'. The total lenght of the content was '%s'",
-                            view.getName(), isText ? "text" : "bytes", bytes.length
-                    );
+            } else {
+                Response response = view.generate(r);
+                headerProvider = response;
+                if ((isText = response.isText())) {
+                    content = response.getContent();
+                } else {
+                    bytes = response.getBytes();
                 }
             }
-        }.start();
-    }
 
+            for (Map.Entry<String, String> postponedCookie : r.postponedCookies.entrySet()) {
+                headerProvider.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
+            }
+
+            if (isText) {
+                // Make sure to not use Crush when
+                // told not to
+                if (!(view instanceof IgnoreSyntax)) {
+                    // Provider factories are fun, and so is the
+                    // global map. But we also need the view
+                    // specific ones!
+                    Map<String, ProviderFactory> factories = new HashMap<>();
+                    for (final ProviderFactory factory : server.providers) {
+                        factories.put(factory.providerName().toLowerCase(), factory);
+                    }
+                    // Now make use of the view specific ProviderFactory
+                    ProviderFactory z = view.getFactory(r);
+                    if (z != null) {
+                        factories.put(z.providerName().toLowerCase(), z);
+                    }
+                    // This is how the crush engine works.
+                    // Quite simple, yet powerful!
+                    for (Syntax syntax : server.syntaxes) {
+                        if (syntax.matches(content)) {
+                            content = syntax.handle(content, r, factories);
+                        }
+                    }
+                }
+                // Now, finally, let's get the bytes.
+                bytes = content.getBytes();
+            }
+
+            headerProvider.getHeader().apply(out);
+
+            try {
+                out.write(bytes);
+                out.flush();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
+                input.close();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+
+            if (!server.silent) {
+                server.log("Request was served by '%s', with the type '%s'. The total lenght of the content was '%s'",
+                        view.getName(), isText ? "text" : "bytes", bytes.length
+                );
+            }
+        }
+    };
+
+    public Queue<Socket> queue = new LinkedList<>();
     private void tick() {
         if (pause) return;
         try {
-            runAsync(socket.accept());
+            Socket s = socket.accept();
+            queue.add(s);
         } catch (final Exception e) {
             e.printStackTrace();
         }

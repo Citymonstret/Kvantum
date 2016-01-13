@@ -32,13 +32,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AccountManager implements ProviderFactory<Account> {
 
     private final List<Account> accountList;
-    private final Map<Session, Account> sessionAccountMap;
+    private final ConcurrentHashMap<Session, Account> sessionAccountMap;
     private int id = 0;
     private final SQLiteManager databaseManager;
 
@@ -89,7 +88,7 @@ public class AccountManager implements ProviderFactory<Account> {
         registerAccount(account);
     }
 
-    public Account getAccount(Session session) {
+    public synchronized Account getAccount(Session session) {
         if (!sessionAccountMap.containsKey(session)) {
             return null;
         }
@@ -135,7 +134,7 @@ public class AccountManager implements ProviderFactory<Account> {
         }
     }
 
-    public void bindAccount(Session session, Account account) {
+    public synchronized void bindAccount(Session session, Account account) {
         sessionAccountMap.put(session, account);
     }
 

@@ -19,10 +19,7 @@
 
 package com.intellectualsites.web.core;
 
-import com.intellectualsites.web.commands.CacheDump;
-import com.intellectualsites.web.commands.Command;
-import com.intellectualsites.web.commands.Show;
-import com.intellectualsites.web.commands.Stop;
+import com.intellectualsites.web.commands.*;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventManager;
 
@@ -71,6 +68,7 @@ public class InputThread extends Thread {
         this.commands.put("stop", new Stop());
         this.commands.put("cachedump", new CacheDump());
         this.commands.put("show", new Show());
+        this.commands.put("dump", new Dump());
     }
 
     @Override

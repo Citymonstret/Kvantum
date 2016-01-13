@@ -31,10 +31,14 @@ import java.util.Map;
  */
 public class Session implements VariableProvider {
 
+    private static long id = 0L;
+
+    private long sessionId = 0;
     private final Map<String, Object> sessionStorage;
 
     public Session() {
         sessionStorage = new HashMap<>();
+        sessionId = id++;
     }
 
     public boolean contains(String variable) {
@@ -43,6 +47,10 @@ public class Session implements VariableProvider {
 
     public Object get(String variable) {
         return sessionStorage.get(variable.toLowerCase());
+    }
+
+    public long getId() {
+        return this.sessionId;
     }
 
     public void set(final String s, final Object o) {
