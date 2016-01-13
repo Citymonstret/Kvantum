@@ -26,11 +26,11 @@ public class WorkerThread extends Thread {
     private static int idAlloaction = 0;
 
     private final int id;
-    private final Server.Worker task;
+    private final Worker task;
     private volatile Socket current;
     private final Server server;
 
-    public WorkerThread(Server.Worker task, Server server) {
+    public WorkerThread(Worker task, Server server) {
         super("Worker Thread: " + ++idAlloaction);
         this.id = idAlloaction;
         this.task = task;
