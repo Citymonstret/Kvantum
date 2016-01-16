@@ -20,10 +20,9 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.util.Assert;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.Context;
 
 import java.io.File;
@@ -200,7 +199,7 @@ public class View {
             if (containsOption("buffer")) {
                 this.buffer = getOption("buffer");
             } else {
-                this.buffer = 1024 * 64; // 64kb
+                this.buffer = 65536; // 64kb
             }
         }
         return this.buffer;

@@ -28,7 +28,6 @@ import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventListener;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
-import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.extra.ApplicationStructure;
 import com.intellectualsites.web.extra.accounts.Account;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
@@ -42,7 +41,6 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
-import com.intellectualsites.web.views.staticviews.StaticViewManager;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -119,7 +117,7 @@ public class Server extends Thread implements IntellectualServer {
      * The cache manager
      */
     public volatile CacheManager cacheManager;
-
+    public final Queue<Socket> queue = new LinkedList<>();
     //
     // protected
     //
@@ -133,23 +131,23 @@ public class Server extends Thread implements IntellectualServer {
     //
     // private
     //
-    private boolean started, ipv4, mysqlEnabled;
+    private boolean started;
+    private boolean ipv4;
+    boolean mysqlEnabled;
     private ServerSocket socket;
     protected SessionManager sessionManager;
     public String hostName, mainApplication;
     protected int bufferIn, bufferOut, workers;
-    private ConfigurationFile configViews;
-    private MySQLConnManager mysqlConnManager;
+    ConfigurationFile configViews;
+    MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
     private static Server instance;
-    private final boolean standalone;
+    final boolean standalone;
     private final int port;
-    private final Map<String, Class<? extends View>> viewBindings;
+    final Map<String, Class<? extends View>> viewBindings;
     public final LogWrapper logWrapper;
     private boolean pause = false;
-    private final ApplicationStructure applicationStructure;
-    private final SQLiteManager globalSQLiteManager;
     private final AccountManager globalAccountManager;
     private ApplicationStructure mainApplicationStructure;
     private WorkerThread[] workerThreads;
@@ -253,7 +251,7 @@ public class Server extends Thread implements IntellectualServer {
             }
             this.translations.saveFile();
         } catch (final Exception e) {
-            log("Cannot load the translations file");
+            log(Message.CANNOT_LOAD_TRANSLATIONS);
             e.printStackTrace();
         }
 
@@ -345,8 +343,7 @@ public class Server extends Thread implements IntellectualServer {
         syntaxes.add(new ForEachBlock());
         syntaxes.add(new Variable());
 
-        this.applicationStructure = new ApplicationStructure("core");
-        this.globalSQLiteManager = applicationStructure.getDatabaseManager();
+        ApplicationStructure applicationStructure = new ApplicationStructure("core");
         this.globalAccountManager = applicationStructure.getAccountManager();
         this.globalAccountManager.load();
         this.inputThread.commands.put("account", new AccountCommand(applicationStructure));
@@ -356,16 +353,15 @@ public class Server extends Thread implements IntellectualServer {
             try {
                 Class temp = Class.forName(mainApplication);
                 if (temp.getSuperclass().equals(ApplicationStructure.class)) {
-                    ApplicationStructure applicationStructure = (ApplicationStructure) temp.newInstance();
-                    this.mainApplicationStructure = applicationStructure;
+                    this.mainApplicationStructure = (ApplicationStructure) temp.newInstance();
                 } else {
-                    log("Application '%s' does not extend ApplicationStructure.class", mainApplication);
+                    log(Message.APPLICATION_DOES_NOT_EXTEND, mainApplication);
                 }
             } catch (ClassNotFoundException e) {
-                log("Could not find application '%s'", mainApplication);
+                log(Message.APPLICATION_CANNOT_FIND, mainApplication);
                 e.printStackTrace();
             } catch (InstantiationException | IllegalAccessException e) {
-                log("Could not initiate application '%s'", mainApplication);
+                log(Message.APPLICATION_CANNOT_INITIATE, mainApplication);
                 e.printStackTrace();
             }
         }
@@ -387,6 +383,7 @@ public class Server extends Thread implements IntellectualServer {
         viewBindings.put(key, c);
     }
 
+    @Override
     public AccountManager getAccountManager() {
         return this.globalAccountManager;
     }
@@ -434,7 +431,8 @@ public class Server extends Thread implements IntellectualServer {
         this.providers.add(factory);
     }
 
-    private void loadPlugins() {
+    @Override
+    public void loadPlugins() {
         if (standalone) {
             File file = new File(coreFolder, "plugins");
             if (!file.exists()) {
@@ -447,7 +445,7 @@ public class Server extends Thread implements IntellectualServer {
             pluginLoader.loadAllPlugins(file);
             pluginLoader.enableAllPlugins();
         } else {
-            log("Running as standalone, not loading plugins!");
+            log(Message.STANDALONE_NOT_LOADING_PLUGINS);
         }
     }
 
@@ -460,53 +458,17 @@ public class Server extends Thread implements IntellectualServer {
             e.printStackTrace();
             return;
         }
-        //
-        if (standalone) {
-            loadPlugins();
-            EventManager.getInstance().bake();
-        }
-        //
-        log(Message.CALLING_EVENT, "startup");
-        handleEvent(new StartupEvent(this));
-        //
-        if (mysqlEnabled) {
-            log("Initalizing MySQL Connection");
-            mysqlConnManager.init();
-        }
-        log(Message.VALIDATING_VIEWS);
-        validateViews();
-        //
-        log("Loading views...");
-        Map<String, Map<String, Object>> views = configViews.get("views");
-        for (final Map.Entry<String, Map<String, Object>> entry : views.entrySet()) {
-            Map<String, Object> view = entry.getValue();
-            String type = "html", filter = view.get("filter").toString();
-            if (view.containsKey("type")) {
-                type = view.get("type").toString();
-            }
-            Map<String, Object> options;
-            if (view.containsKey("options")) {
-                options = (HashMap<String, Object>) view.get("options");
-            } else {
-                options = new HashMap<>();
-            }
 
-            if (viewBindings.containsKey(type.toLowerCase())) {
-                Class<? extends View> vc = viewBindings.get(type.toLowerCase());
-                try {
-                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
-                    this.viewManager.add(vv);
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (standalone) {
-            try {
-                StaticViewManager.generate(new SystemView());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        List<StartupStep> steps = new ArrayList<>();
+        steps.add(new Step_LoadPlugins());
+        steps.add(new Step_StartupEventCall());
+        steps.add(new Step_MySQLManagement());
+        steps.add(new Step_ValidateViews());
+        steps.add(new Step_LoadViews());
+        steps.add(new Step_SystemView());
+
+        for (StartupStep step : steps) {
+            step.call(this);
         }
 
         if (mainApplicationStructure != null) {
@@ -514,17 +476,17 @@ public class Server extends Thread implements IntellectualServer {
         }
 
         viewManager.dump(this);
-        //
+
         if (this.ipv4) {
             log("ipv4 is true - Using IPv4 stack");
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
         if (!this.enableCaching) {
-            log("Caching is not enabled, this can reduce load times on bigger files!");
+            log(Message.CACHING_DISABLED);
         } else {
-            log("Caching is enabled, beware that this increases memory usage - So keep an eye on it");
+            log(Message.CACHING_ENABLED);
         }
-        //
+
         log(Message.STARTING_ON_PORT, this.port);
         this.started = true;
         try {
@@ -582,11 +544,6 @@ public class Server extends Thread implements IntellectualServer {
         }
 
         // Main Loop
-
-        long lastExecution = System.currentTimeMillis();
-        long placeholder = System.currentTimeMillis();
-        int loops = 0;
-
         for (; ; ) {
             if (this.stopping) {
                 log(Message.SHUTTING_DOWN);
@@ -601,9 +558,12 @@ public class Server extends Thread implements IntellectualServer {
         }
     }
 
-    public Queue<Socket> queue = new LinkedList<>();
-    private void tick() {
+    @Override
+    public void tick() {
         if (pause) return;
+        // Recently remade to use worker threads, rather than
+        // creating a new thread for each request - this saves time
+        // and makes sure to use all resources to their fullest potential
         try {
             Socket s = socket.accept();
             queue.add(s);
@@ -612,11 +572,13 @@ public class Server extends Thread implements IntellectualServer {
         }
     }
 
+    @Override
     public void log(Message message, final Object... args) {
         this.log(message.toString(), message.getMode(), args);
     }
 
-    private synchronized void log(String message, int mode, final Object... args) {
+    @Override
+    public synchronized void log(String message, int mode, final Object... args) {
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
         // to limit to only error messages or such

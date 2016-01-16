@@ -19,12 +19,6 @@
 
 package com.intellectualsites.web.core;
 
-/**
- * Created 1/13/2016 for IntellectualServer
- *
- * @author Citymonstret
- */
-
 import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
@@ -44,39 +38,54 @@ import java.util.Map;
 public class Worker {
 
     public void run(Socket remote, Server server) {
+        // Do we want to output a load of useless information?
         if (server.verbose) {
             server.log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
         }
-        StringBuilder rRaw = new StringBuilder();
-        BufferedOutputStream out;
-        BufferedReader input;
+
+        // The request object
         Request r;
-        try {
-            // Let's read from the socket :D
-            input = new BufferedReader(new InputStreamReader(remote.getInputStream()), server.bufferIn);
-            // And... write!
-            out = new BufferedOutputStream(remote.getOutputStream(), server.bufferOut);
-            String str;
-            while ((str = input.readLine()) != null && !str.equals("")) {
-                rRaw.append(str).append("|");
-            }
-            r = new Request(rRaw.toString(), remote);
-            if (r.getQuery().getMethod() == Method.POST) {
-                StringBuilder pR = new StringBuilder();
-                int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
-                for (int i = 0; i < cl; i++) {
-                    pR.append((char) input.read());
+        // The output stream, that we will write to
+        BufferedOutputStream out;
+        // The input information
+        BufferedReader input;
+
+        {
+            StringBuilder rRaw = new StringBuilder();
+            try {
+                // Create a new reader
+                input = new BufferedReader(new InputStreamReader(remote.getInputStream()), server.bufferIn);
+                // And writer
+                out = new BufferedOutputStream(remote.getOutputStream(), server.bufferOut);
+
+                // Read the request
+                String str;
+                while ((str = input.readLine()) != null && !str.equals("")) {
+                    rRaw.append(str).append("|");
                 }
-                r.setPostRequest(new PostRequest(pR.toString()));
+                r = new Request(rRaw.toString(), remote);
+
+                // Fetch the post request, if it exists
+                if (r.getQuery().getMethod() == Method.POST) {
+                    StringBuilder pR = new StringBuilder();
+                    int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
+                    for (int i = 0; i < cl; i++) {
+                        pR.append((char) input.read());
+                    }
+                    r.setPostRequest(new PostRequest(pR.toString()));
+                }
+            } catch (final Exception e) {
+                e.printStackTrace();
+                return;
             }
-        } catch (final Exception e) {
-            e.printStackTrace();
-            return;
         }
+
+        // Do we want to output a log?
         if (!server.silent) {
             server.log(r.buildLog());
         }
-        // Get the view
+
+        // Match a view
         View view = server.viewManager.match(r);
 
         boolean isText;
@@ -85,6 +94,7 @@ public class Worker {
 
         final HeaderProvider headerProvider;
 
+        // Session management stuff
         Session session = server.sessionManager.getSession(r, out);
         if (session != null) {
             r.setSession(session);

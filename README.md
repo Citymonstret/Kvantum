@@ -1,10 +1,9 @@
 #IntellectualServer
 
 ##Description
-IntellectualServer  is a lightweight java web server. It's a perfect choice if you need an enbedded webserver in your application, as it can be run as both a standalone or intergrated application. 
-
-##Demo
-A demo can be found on http://server.intellectualsites.com
+IntellectualServer is a lightweight, innovative and totally portable web server - Written entirely in java.
+It is the perfect choice, if you need a an embedded webserver to ship with your application; as it can be
+run as both an intergrated and standalone application.
 
 ##Wiki/Information
 More information can be found in our [wiki](https://github.com/IntellectualSites/IntellectualServer/wiki)

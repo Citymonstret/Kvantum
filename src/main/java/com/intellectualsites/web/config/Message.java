@@ -41,6 +41,16 @@ public enum Message {
     TICK_ERROR("Error in server ticking...", MODE_ERROR),
     CONNECTION_ACCEPTED("Connection accepted from '%s' - Handling the data!", MODE_DEBUG),
     DEBUG(">> Debug - Ignore <<", MODE_DEBUG),
+    CANNOT_LOAD_TRANSLATIONS("Cannot load the translation file", MODE_ERROR),
+    APPLICATION_CANNOT_FIND("Couldn't find application '%s'"),
+    APPLICATION_CANNOT_INITIATE("Couldn't initiate application '%s'"),
+    STANDALONE_NOT_LOADING_PLUGINS("Running as standalone, not loading plugins!", MODE_INFO),
+    MYSQL_INIT("Initalizing MySQL Connection", MODE_INFO),
+    LOADING_VIEWS("Loading views...", MODE_INFO),
+    STARTUP_STEP("Calling Startup Step: '%s'", MODE_DEBUG),
+    CACHING_DISABLED("Caching is not enabled, this can reduce load times on bigger files!", MODE_WARNING),
+    CACHING_ENABLED("Caching is enabled, beware that this increases memory usage - So keep an eye on it", MODE_WARNING),
+    APPLICATION_DOES_NOT_EXTEND("Application '%s' does not extend ApplicationStructure.class", MODE_WARNING),
     INITIALIZING_LOCATION_SERVICES("Initializing location services", MODE_INFO);
 
     private final String message;

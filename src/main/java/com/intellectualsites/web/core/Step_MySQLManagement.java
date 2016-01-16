@@ -19,43 +19,24 @@
 
 package com.intellectualsites.web.core;
 
-import java.net.Socket;
+import com.intellectualsites.web.config.Message;
 
-@SuppressWarnings("ALL")
-public class WorkerThread extends Thread {
+/**
+ * Created 1/14/2016 for IntellectualServer
+ *
+ * @author Citymonstret
+ */
+public class Step_MySQLManagement extends StartupStep {
 
-    private static int idAlloaction = 0;
-
-    private final int id;
-    private final Worker task;
-    private final Server server;
-
-    public WorkerThread(Worker task, Server server) {
-        super("Worker Thread: " + ++idAlloaction);
-        this.id = idAlloaction;
-        this.task = task;
-        this.server = server;
-
+    Step_MySQLManagement() {
+        super("MySQLManagement");
     }
 
     @Override
-    public synchronized void start() {
-        super.start();
-        server.log("Started thread: " + id);
-    }
-
-    @Override
-    final public void run() {
-        Socket current;
-        for (;;) {
-            String s = ("Checking queue");
-            if (!server.queue.isEmpty()) {
-                current = server.queue.poll();
-                task.run(current, server);
-            } else {
-
-            }
+    public void execute(Server scope) {
+        if (scope.mysqlEnabled) {
+            scope.log(Message.MYSQL_INIT);
+            scope.mysqlConnManager.init();
         }
     }
-
 }

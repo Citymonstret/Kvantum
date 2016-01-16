@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //     IntellectualServer is a web server, written entirely in the Java language.                            /
-//     Copyright (C) 2015 IntellectualSites                                                                  /
+//     Copyright (C) 2016 IntellectualSites                                                                  /
 //                                                                                                           /
 //     This program is free software; you can redistribute it and/or modify                                  /
 //     it under the terms of the GNU General Public License as published by                                  /
@@ -19,46 +19,28 @@
 
 package com.intellectualsites.web.core;
 
-import com.intellectualsites.web.object.syntax.ProviderFactory;
-import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.views.SystemView;
+import com.intellectualsites.web.views.staticviews.StaticViewManager;
 
 /**
- * Server API
+ * Created 1/14/2016 for IntellectualServer
  *
- * @deprecated
+ * @author Citymonstret
  */
-@SuppressWarnings({"unused","deprecation"})
-public class ServerAPI {
+public class Step_SystemView extends StartupStep {
 
-    private static ServerAPI instance;
-
-    /**
-     * Get the server api instance
-     *
-     * @return WebServer API instance
-     */
-    public static ServerAPI instance() {
-        return instance;
+    Step_SystemView() {
+        super("SystemView");
     }
 
-    protected static void setInstance(final Server server) {
-        instance = new ServerAPI(server);
-    }
-
-    private final Server server;
-    protected ServerAPI(final Server server) {
-        this.server = server;
-    }
-
-    public void addView(final View view) {
-        server.viewManager.add(view);
-    }
-
-    public void removeView(final View view) {
-        server.viewManager.remove(view);
-    }
-
-    public void addProviderFactory(final ProviderFactory factory) {
-        server.providers.add(factory);
+    @Override
+    void execute(Server scope) {
+        if (scope.standalone) {
+            try {
+                StaticViewManager.generate(new SystemView());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

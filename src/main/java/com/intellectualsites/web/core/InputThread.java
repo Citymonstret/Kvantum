@@ -21,7 +21,6 @@ package com.intellectualsites.web.core;
 
 import com.intellectualsites.web.commands.*;
 import com.intellectualsites.web.events.Event;
-import com.intellectualsites.web.events.EventManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

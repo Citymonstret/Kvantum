@@ -19,8 +19,10 @@
 
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventCaller;
+import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.SessionManager;
@@ -51,6 +53,8 @@ interface IntellectualServer {
      */
     void addViewBinding(String key, Class<? extends View> c);
 
+    AccountManager getAccountManager();
+
     /**
      * Validate the views, and make sure they
      * contain the right constructor
@@ -78,6 +82,17 @@ interface IntellectualServer {
      */
     void addProviderFactory(final ProviderFactory factory);
 
+
+    void loadPlugins();
+
+    @SuppressWarnings("ALL")
+    void start();
+
+    void tick();
+
+    void log(Message message, Object... args);
+
+    void log(String message, int mode, Object... args);
 
     /**
      * Log a message

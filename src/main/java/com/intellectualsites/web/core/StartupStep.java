@@ -19,43 +19,19 @@
 
 package com.intellectualsites.web.core;
 
-import java.net.Socket;
+import com.intellectualsites.web.config.Message;
 
-@SuppressWarnings("ALL")
-public class WorkerThread extends Thread {
+public abstract class StartupStep {
 
-    private static int idAlloaction = 0;
-
-    private final int id;
-    private final Worker task;
-    private final Server server;
-
-    public WorkerThread(Worker task, Server server) {
-        super("Worker Thread: " + ++idAlloaction);
-        this.id = idAlloaction;
-        this.task = task;
-        this.server = server;
-
+    String s;
+    StartupStep(String stepName) {
+        s = stepName;
     }
 
-    @Override
-    public synchronized void start() {
-        super.start();
-        server.log("Started thread: " + id);
+    void call(Server scope) {
+        scope.log(Message.STARTUP_STEP, s);
+        execute(scope);
     }
 
-    @Override
-    final public void run() {
-        Socket current;
-        for (;;) {
-            String s = ("Checking queue");
-            if (!server.queue.isEmpty()) {
-                current = server.queue.poll();
-                task.run(current, server);
-            } else {
-
-            }
-        }
-    }
-
+    abstract void execute(Server scope);
 }

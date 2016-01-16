@@ -19,43 +19,51 @@
 
 package com.intellectualsites.web.core;
 
-import java.net.Socket;
+import com.intellectualsites.web.config.Message;
+import com.intellectualsites.web.util.Assert;
+import com.intellectualsites.web.views.View;
 
-@SuppressWarnings("ALL")
-public class WorkerThread extends Thread {
+import java.util.HashMap;
+import java.util.Map;
 
-    private static int idAlloaction = 0;
+/**
+ * Created 1/14/2016 for IntellectualServer
+ *
+ * @author Citymonstret
+ */
+public class Step_LoadViews extends StartupStep {
 
-    private final int id;
-    private final Worker task;
-    private final Server server;
-
-    public WorkerThread(Worker task, Server server) {
-        super("Worker Thread: " + ++idAlloaction);
-        this.id = idAlloaction;
-        this.task = task;
-        this.server = server;
-
+    Step_LoadViews() {
+        super("LoadViews");
     }
 
     @Override
-    public synchronized void start() {
-        super.start();
-        server.log("Started thread: " + id);
-    }
-
-    @Override
-    final public void run() {
-        Socket current;
-        for (;;) {
-            String s = ("Checking queue");
-            if (!server.queue.isEmpty()) {
-                current = server.queue.poll();
-                task.run(current, server);
+    void execute(Server scope) {
+        scope.log(Message.LOADING_VIEWS);
+        Map<String, Map<String, Object>> views = scope.configViews.get("views");
+        Assert.notNull(views);
+        for (final Map.Entry<String, Map<String, Object>> entry : views.entrySet()) {
+            Map<String, Object> view = entry.getValue();
+            String type = "html", filter = view.get("filter").toString();
+            if (view.containsKey("type")) {
+                type = view.get("type").toString();
+            }
+            Map<String, Object> options;
+            if (view.containsKey("options")) {
+                options = (HashMap<String, Object>) view.get("options");
             } else {
+                options = new HashMap<>();
+            }
 
+            if (scope.viewBindings.containsKey(type.toLowerCase())) {
+                Class<? extends View> vc = scope.viewBindings.get(type.toLowerCase());
+                try {
+                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
+                    scope.viewManager.add(vv);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
-
 }
