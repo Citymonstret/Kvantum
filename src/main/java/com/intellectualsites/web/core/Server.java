@@ -43,7 +43,6 @@ import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -150,7 +149,7 @@ public class Server extends Thread implements IntellectualServer {
     private boolean pause = false;
     private final AccountManager globalAccountManager;
     private ApplicationStructure mainApplicationStructure;
-    private WorkerThread[] workerThreads;
+    private Worker[] workerThreads;
 
     {
         viewBindings = new HashMap<>();
@@ -194,14 +193,12 @@ public class Server extends Thread implements IntellectualServer {
         addViewBinding("img", ImgView.class);
         addViewBinding("download", DownloadView.class);
         addViewBinding("redirect", RedirectView.class);
+        addViewBinding("std", StandardView.class);
 
         if (standalone) {
-            Signal.handle(new Signal("INT"), new SignalHandler() {
-                @Override
-                public void handle(Signal signal) {
-                    if (signal.toString().equals("SIGINT")) {
-                        stopServer();
-                    }
+            Signal.handle(new Signal("INT"), signal -> {
+                if (signal.toString().equals("SIGINT")) {
+                    stopServer();
                 }
             });
             (inputThread = new InputThread(this)).start();
@@ -288,11 +285,9 @@ public class Server extends Thread implements IntellectualServer {
         this.mainApplication = configServer.get("application.main");
         this.workers = configServer.get("workers");
 
-        Worker task = new Worker();
-
-        this.workerThreads = new WorkerThread[this.workers];
+        this.workerThreads = new Worker[this.workers];
         for (int i = 0; i < workers; i++) {
-            workerThreads[i] = new WorkerThread(task, this);
+            workerThreads[i] = new Worker();
         }
 
         this.started = false;
@@ -513,7 +508,7 @@ public class Server extends Thread implements IntellectualServer {
         }
 
 
-        for (WorkerThread thread : workerThreads) {
+        for (Worker thread : workerThreads) {
             thread.start();
         }
 

@@ -19,8 +19,9 @@
 
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.core.Server;
-import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.object.Header;
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.cache.CacheApplicable;
 import org.lesscss.LessCompiler;
 
@@ -56,9 +57,16 @@ public class LessView extends View implements CacheApplicable {
     @Override
     public Response generate(final Request r) {
         File file = (File) r.getMeta("less_file");
+        Response response = new Response(this);
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
+        response.setContent(getLess(file, getBuffer()));
+        return response;
+    }
+
+    public static String getLess(File file, int buffer) {
         StringBuilder document = new StringBuilder();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file), getBuffer());
+            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line).append("\n");
@@ -67,20 +75,17 @@ public class LessView extends View implements CacheApplicable {
         } catch(final Exception e) {
             e.printStackTrace();
         }
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
 
         if (compiler == null) {
             compiler = new LessCompiler();
         }
         try {
-            response.setContent(compiler.compile(document.toString()));
+            return compiler.compile(document.toString());
         } catch(final Exception e) {
-            response.setContent("");
             e.printStackTrace();
         }
 
-        return response;
+        return "";
     }
 
     @Override

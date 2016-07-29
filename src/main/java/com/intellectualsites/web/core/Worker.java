@@ -26,7 +26,9 @@ import com.intellectualsites.web.object.cache.CachedResponse;
 import com.intellectualsites.web.object.syntax.IgnoreSyntax;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.Syntax;
+import com.intellectualsites.web.thread.ThreadManager;
 import com.intellectualsites.web.views.View;
+import lombok.Getter;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -37,7 +39,33 @@ import java.util.Map;
 
 public class Worker {
 
+    private static int idPool = 0;
+
+    @Getter
+    private final int id;
+
+    public Worker() {
+        this.id = idPool++;
+    }
+
+    public synchronized void start() {
+        Server.getInstance().log("Started thread: " + id);
+        final Server server = Server.getInstance();
+        ThreadManager.createThread(() -> {
+            // TODO WAT?
+            String s = ("Checking queue");
+            if (!server.queue.isEmpty()) {
+                Socket current = server.queue.poll();
+                run(current, server);
+            }
+        });
+    }
+
     public void run(Socket remote, Server server) {
+        if (remote == null || remote.isClosed()) {
+            return; // TODO: Why?
+        }
+
         // Do we want to output a load of useless information?
         if (server.verbose) {
             server.log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
