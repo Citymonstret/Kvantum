@@ -37,18 +37,18 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Worker {
+class Worker {
 
     private static int idPool = 0;
 
     @Getter
     private final int id;
 
-    public Worker() {
+    Worker() {
         this.id = idPool++;
     }
 
-    public synchronized void start() {
+    synchronized void start() {
         Server.getInstance().log("Started thread: " + id);
         final Server server = Server.getInstance();
         ThreadManager.createThread(() -> {

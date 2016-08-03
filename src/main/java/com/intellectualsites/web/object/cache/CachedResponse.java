@@ -22,6 +22,7 @@ package com.intellectualsites.web.object.cache;
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.HeaderProvider;
 import com.intellectualsites.web.object.Response;
+import lombok.NonNull;
 
 public class CachedResponse implements HeaderProvider {
 
@@ -29,7 +30,7 @@ public class CachedResponse implements HeaderProvider {
     public final byte[] bodyBytes; //, headerBytes;
     public final Header header;
 
-    public CachedResponse(final Response parent) {
+    public CachedResponse(@NonNull final Response parent) {
         this.isText = parent.isText();
         this.header = parent.getHeader();
         // this.headerBytes = parent.getHeader().getBytes();
@@ -44,4 +45,5 @@ public class CachedResponse implements HeaderProvider {
     public Header getHeader() {
         return header;
     }
+
 }

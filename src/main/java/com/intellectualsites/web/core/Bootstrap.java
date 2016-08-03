@@ -20,6 +20,7 @@
 package com.intellectualsites.web.core;
 
 import com.intellectualsites.web.object.LogWrapper;
+import lombok.NonNull;
 
 import java.io.File;
 import java.util.HashMap;
@@ -71,7 +72,7 @@ public class Bootstrap {
         });
     }
 
-    public static Server createServer(boolean standalone, File coreFolder, LogWrapper wrapper) {
+    public static Server createServer(final boolean standalone, final @NonNull File coreFolder, final @NonNull LogWrapper wrapper) {
         Server server = null;
         try {
             server = new Server(standalone, coreFolder, wrapper);

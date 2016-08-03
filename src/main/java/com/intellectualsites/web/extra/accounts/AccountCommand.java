@@ -22,10 +22,8 @@ package com.intellectualsites.web.extra.accounts;
 import com.intellectualsites.web.commands.Command;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.extra.ApplicationStructure;
-import com.intellectualsites.web.iweb.core.IWeb;
 import com.intellectualsites.web.object.Session;
 
-import java.lang.reflect.Field;
 import java.sql.SQLException;
 
 public class AccountCommand extends Command {

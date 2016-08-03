@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.object;
 
+@FunctionalInterface
 public interface HeaderProvider {
 
     Header getHeader();

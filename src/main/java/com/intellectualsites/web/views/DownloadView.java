@@ -22,11 +22,9 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
-import org.apache.commons.io.IOUtils;
+import com.intellectualsites.web.util.FileUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -63,14 +61,7 @@ public class DownloadView extends View {
     @Override
     public Response generate(final Request r) {
         File file = new File(getFolder(), r.getMeta("zip_file").toString());
-        byte[] bytes = new byte[0];
-        try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), getBuffer());
-            bytes = IOUtils.toByteArray(stream);
-            stream.close();
-        } catch(final Exception e) {
-            e.printStackTrace();
-        }
+        byte[] bytes = FileUtils.getBytes(file, getBuffer());
         Response response = new Response(this);
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_OCTET_STREAM);
         response.getHeader().set(Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + r.getMeta("zip_file").toString() + "\"");

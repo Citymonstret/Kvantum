@@ -21,10 +21,12 @@ package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.util.CookieManager;
+import com.intellectualsites.web.views.View;
 
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * The HTTP Request Class
@@ -251,4 +253,7 @@ public class Request {
     public Session getSession() {
         return this.session;
     }
+
+    final public Predicate<View> matches = view -> view.matches(this);
+
 }

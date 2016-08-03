@@ -32,16 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheManager {
 
-    public final Map<String, String> cachedIncludes;
-    private final Map<String, CachedResponse> cachedResponses;
-
-    /**
-     * Constructor
-     */
-    public CacheManager() {
-        this.cachedResponses = new ConcurrentHashMap<>();
-        this.cachedIncludes = new ConcurrentHashMap<>();
-    }
+    public final Map<String, String> cachedIncludes = new ConcurrentHashMap<>();
+    private final Map<String, CachedResponse> cachedResponses = new ConcurrentHashMap<>();
 
     /**
      * Get a cached include block

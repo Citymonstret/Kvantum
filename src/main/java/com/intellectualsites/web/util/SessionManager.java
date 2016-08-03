@@ -25,7 +25,6 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,12 +46,7 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
         this.server = server;
 
         final String i = "" + System.nanoTime();
-        this.sessionIdentifierProvider = new SessionIdentifierProvider() {
-            @Override
-            public String getIdentifier(Request r) {
-                return i;
-            }
-        };
+        this.sessionIdentifierProvider = r -> i;
     }
 
     public Session createSession(Request r, BufferedOutputStream out) {

@@ -22,19 +22,21 @@ package com.intellectualsites.web.util;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.syntax.VariableProvider;
+import lombok.NoArgsConstructor;
 
 /**
  * Created 2015-04-25 for IntellectualServer
  *
  * @author Citymonstret
  */
+@NoArgsConstructor
 public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider {
 
     private Request r;
+
     public MetaProvider(final Request r) {
         this.r = r;
     }
-    public MetaProvider() {}
 
     @Override
     public MetaProvider get(Request r) {

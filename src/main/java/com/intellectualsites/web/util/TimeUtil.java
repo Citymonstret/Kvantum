@@ -30,7 +30,9 @@ import java.util.Locale;
  */
 public class TimeUtil {
 
-    public final static SimpleDateFormat HTTPFormat, LogFormat, LogFileFormat;
+    private final static SimpleDateFormat HTTPFormat;
+    private final static SimpleDateFormat LogFormat;
+    public final static SimpleDateFormat LogFileFormat;
     static {
         HTTPFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.US);
         LogFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);

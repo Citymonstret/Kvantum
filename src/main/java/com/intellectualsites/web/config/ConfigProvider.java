@@ -42,4 +42,5 @@ public abstract class ConfigProvider implements ConfigurationFile {
     public String toString() {
         return this.name;
     }
+
 }

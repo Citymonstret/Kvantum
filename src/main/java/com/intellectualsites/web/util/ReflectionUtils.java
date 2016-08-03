@@ -32,16 +32,8 @@ public class ReflectionUtils {
         Class<?> c = clazz;
         while (c != Object.class) {
             final List<Method> allMethods = new ArrayList<>(Arrays.asList(c.getDeclaredMethods()));
-            for (final Method method : allMethods) {
-                if (method.isAnnotationPresent(a)) {
-                    Annotation[] annotations = method.getAnnotations();
-                    for (Annotation an : annotations) {
-                        if (a.isInstance(an)) {
-                            annotatedMethods.add(new AnnotatedMethod(an, method));
-                        }
-                    }
-                }
-            }
+            allMethods.stream().filter(method -> method.isAnnotationPresent(a)).forEach(method ->
+                    LambdaUtil.arrayForeach(method.getAnnotations(), a::isInstance, an -> annotatedMethods.add(new AnnotatedMethod(an, method))));
             c = c.getSuperclass();
         }
 

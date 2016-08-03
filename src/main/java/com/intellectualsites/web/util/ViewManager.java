@@ -23,9 +23,11 @@ import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.views.View;
 import com.intellectualsites.web.views.errors.View404;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created 2015-04-19 for IntellectualServer
@@ -40,33 +42,28 @@ public class ViewManager {
         this.views = new ArrayList<>();
     }
 
-    public void add(final View view) {
-        Assert.notNull(view);
-
-        for (View v : views) {
-            if (v.toString().equalsIgnoreCase(view.toString())) {
-                throw new IllegalArgumentException("Duplicate view pattern!");
-            }
+    public void add(@NonNull final View view) {
+        final Optional<View> illegalView = LambdaUtil.getFirst(views, v -> v.toString().equalsIgnoreCase(view.toString()));
+        if (illegalView.isPresent()) {
+            throw new IllegalArgumentException("Duplicate view pattern!");
         }
         views.add(view);
     }
 
-    public View match(final Request request) {
-        for (View v : views) {
-            if (v.matches(request)) {
-                return v;
-            }
+    public View match(@NonNull final Request request) {
+        final Optional<View> view = LambdaUtil.getFirst(views, request.matches);
+        if (view.isPresent()) {
+            return view.get();
         }
         return new View404(request.getQuery().getResource());
     }
 
-    public void dump(final Server server) {
-        for (View view : views) {
-            server.log("> View - Class '%s', Regex: '%s'\n\tOptions: %s", view.getClass().getSimpleName(), view.toString(), view.getOptionString());
-        }
+    public void dump(@NonNull final Server server) {
+        ((IConsumer<View>) view -> server.log("> View - Class '%s', Regex: '%s'\n\tOptions: %s",
+                view.getClass().getSimpleName(), view.toString(), view.getOptionString())).foreach(views);
     }
 
-    public void remove(View view) {
+    public void remove(@NonNull View view) {
         if (views.contains(view)) {
             views.remove(view);
         }

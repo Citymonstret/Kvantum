@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.object;
 
+@FunctionalInterface
 public interface SessionIdentifierProvider {
 
     String getIdentifier(Request r);

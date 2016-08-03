@@ -24,6 +24,7 @@ import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.Context;
+import com.intellectualsites.web.util.Final;
 
 import java.io.File;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import java.util.regex.Pattern;
  *
  * @author Citymonstret
  */
+@SuppressWarnings("ALL")
 public class View {
 
     protected final Pattern pattern;
@@ -64,14 +66,14 @@ public class View {
     /**
      * Get a stored option
      *
-     * @param s   Key
      * @param <T> Type
+     * @param s   Key
      * @return (Type Casted) Value
      * @see #containsOption(String) Check if the option exists before getting it
      */
     @SuppressWarnings("ALL")
     public <T> T getOption(final String s) {
-        return (T) options.get(s);
+        return ((T) options.get(s));
     }
 
     /**
@@ -194,7 +196,8 @@ public class View {
      *
      * @return file buffer
      */
-    protected int getBuffer() {
+    @Final
+    final protected int getBuffer() {
         if (this.buffer == -1) {
             if (containsOption("buffer")) {
                 this.buffer = getOption("buffer");
@@ -208,13 +211,13 @@ public class View {
     /**
      * Check if the request URL matches the regex pattern
      *
-     *
      * @param request Request, from which the URL should be checked
      *
      * @see #passes(Matcher, Request) - This is called!
      * @return True if the request Matches, False if not
      */
-    public boolean matches(final Request request) {
+    @Final
+    final public boolean matches(final Request request) {
         Matcher matcher = pattern.matcher(request.getQuery().getResource());
         return matcher.matches() && passes(matcher, request);
     }
@@ -262,5 +265,4 @@ public class View {
     public ProviderFactory getFactory(final Request r) {
         return null;
     }
-
 }

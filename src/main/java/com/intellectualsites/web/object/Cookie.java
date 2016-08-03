@@ -19,29 +19,27 @@
 
 package com.intellectualsites.web.object;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 /**
  * Created 2015-04-19 for IntellectualServer
  *
  * @author Citymonstret
  */
+@RequiredArgsConstructor
 public class Cookie {
 
-    private final String name, value;
+    @NonNull
+    @Getter
+    private final String name;
 
-    public Cookie(final String name, final String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getValue() {
-        return this.value;
-    }
+    @Getter
+    private final String value;
 
     public String toString() {
         return name + "=" + value;
     }
+
 }

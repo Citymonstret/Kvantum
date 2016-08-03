@@ -19,6 +19,8 @@
 
 package com.intellectualsites.web.util;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -139,6 +141,18 @@ public class FileUtils {
      */
     public static String getDocument(final File file, int buffer) {
         return getDocument(file, buffer, false);
+    }
+
+    public static byte[] getBytes(final File file, final int buffer) {
+        byte[] bytes = new byte[0];
+        try {
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file), buffer);
+            bytes = IOUtils.toByteArray(stream);
+            stream.close();
+        } catch(final Exception e) {
+            e.printStackTrace();
+        }
+        return bytes;
     }
 
     public static String getDocument(final File file, int buffer, boolean create) {

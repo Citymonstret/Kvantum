@@ -21,6 +21,7 @@ package com.intellectualsites.web.object.cache;
 
 import com.intellectualsites.web.object.Request;
 
+@FunctionalInterface
 public interface CacheApplicable {
 
     boolean isApplicable(Request r);

@@ -23,12 +23,14 @@ import com.intellectualsites.web.object.PostRequest;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.syntax.VariableProvider;
+import lombok.NoArgsConstructor;
 
 /**
  * Created 2015-04-25 for IntellectualServer
  *
  * @author Citymonstret
  */
+@NoArgsConstructor
 public class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider {
 
     private PostRequest p;
@@ -36,8 +38,6 @@ public class PostProviderFactory implements ProviderFactory<PostProviderFactory>
     public PostProviderFactory(PostRequest p) {
         this.p = p;
     }
-
-    public PostProviderFactory() {}
 
     @Override
     public PostProviderFactory get(Request r) {

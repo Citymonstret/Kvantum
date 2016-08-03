@@ -19,17 +19,17 @@
 
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.configurable.ConfigurationFactory;
 import com.intellectualsites.web.config.ConfigVariableProvider;
 import com.intellectualsites.web.config.ConfigurationFile;
 import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventCaller;
-import com.intellectualsites.web.events.EventListener;
 import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
+import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.extra.ApplicationStructure;
-import com.intellectualsites.web.extra.accounts.Account;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
 import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.logging.LogProvider;
@@ -41,17 +41,17 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
+import com.intellectualsites.web.views.staticviews.StaticViewManager;
+import lombok.NonNull;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.*;
 
 import static com.intellectualsites.web.logging.LogModes.*;
@@ -69,7 +69,7 @@ public class Server extends Thread implements IntellectualServer {
      * wont output anything, anywhere - not recommended
      * for obvious reasons
      */
-    public boolean silent = false;
+    boolean silent = false;
 
     /**
      * This is the logging prefix
@@ -85,7 +85,7 @@ public class Server extends Thread implements IntellectualServer {
     /**
      * Set to true to stop the server
      */
-    public boolean stopping;
+    private boolean stopping;
 
     /**
      * Whether or not to cache view responses
@@ -95,7 +95,7 @@ public class Server extends Thread implements IntellectualServer {
     /**
      * All the syntaxtes used by the Crush Engine
      */
-    public Set<Syntax> syntaxes;
+    Set<Syntax> syntaxes;
 
     /**
      * The core folder for the server
@@ -105,7 +105,7 @@ public class Server extends Thread implements IntellectualServer {
     /**
      * The thread handing user input
      */
-    public InputThread inputThread;
+    private InputThread inputThread;
 
     /**
      * Verbose ouputs?
@@ -116,37 +116,36 @@ public class Server extends Thread implements IntellectualServer {
      * The cache manager
      */
     public volatile CacheManager cacheManager;
-    public final Queue<Socket> queue = new LinkedList<>();
+    final Queue<Socket> queue = new LinkedList<>();
     //
     // protected
     //
-    protected ViewManager viewManager;
+    ViewManager viewManager;
 
     //
     // protected final
     //
-    protected final Collection<ProviderFactory> providers;
+    final Collection<ProviderFactory> providers;
 
     //
     // private
     //
     private boolean started;
     private boolean ipv4;
-    boolean mysqlEnabled;
+    private boolean mysqlEnabled;
     private ServerSocket socket;
-    protected SessionManager sessionManager;
-    public String hostName, mainApplication;
-    protected int bufferIn, bufferOut, workers;
-    ConfigurationFile configViews;
-    MySQLConnManager mysqlConnManager;
+    SessionManager sessionManager;
+    private String hostName;
+    int bufferIn, bufferOut;
+    private ConfigurationFile configViews;
+    private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
     private PluginLoader pluginLoader;
     private static Server instance;
-    final boolean standalone;
+    private final boolean standalone;
     private final int port;
-    final Map<String, Class<? extends View>> viewBindings;
+    private final Map<String, Class<? extends View>> viewBindings;
     public final LogWrapper logWrapper;
-    private boolean pause = false;
     private final AccountManager globalAccountManager;
     private ApplicationStructure mainApplicationStructure;
     private Worker[] workerThreads;
@@ -211,12 +210,7 @@ public class Server extends Thread implements IntellectualServer {
             }
         }
         try {
-            FileUtils.addToZip(new File(logFolder, "old.zip"), logFolder.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".txt");
-                }
-            }), true);
+            FileUtils.addToZip(new File(logFolder, "old.zip"), logFolder.listFiles((dir, name) -> name.endsWith(".txt")), true);
             System.setOut(new PrintStream(new TeeOutputStream(System.out, new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt")))));
         } catch (final Exception e) {
             e.printStackTrace();
@@ -252,43 +246,20 @@ public class Server extends Thread implements IntellectualServer {
             e.printStackTrace();
         }
 
-
         log(Message.DEBUG);
 
-        ConfigurationFile configServer;
-        try {
-            configServer = new YamlConfiguration("server", new File(new File(coreFolder, "config"), "server.yml"));
-            configServer.loadFile();
-            configServer.setIfNotExists("port", 80);
-            configServer.setIfNotExists("hostname", "localhost");
-            configServer.setIfNotExists("buffer.in", 1024 * 1024); // 16 mb
-            configServer.setIfNotExists("buffer.out", 1024 * 1024);
-            configServer.setIfNotExists("verbose", false);
-            configServer.setIfNotExists("ipv4", false);
-            configServer.setIfNotExists("workers", 4);
-            configServer.setIfNotExists("cache.enabled", true);
-            configServer.setIfNotExists("mysql.enabled", false);
-            configServer.setIfNotExists("application.main", "");
-            configServer.saveFile();
-        } catch (final Exception e) {
-            throw new IntellectualServerInitializationException("Couldn't load in the configuration file", e);
-        }
+        ConfigurationFactory.load(CoreConfig.class, new File(coreFolder, "config")).get();
+        this.port = CoreConfig.port;
+        this.hostName = CoreConfig.hostname;
+        this.bufferIn = CoreConfig.Buffer.in;
+        this.bufferOut = CoreConfig.Buffer.out;
+        this.ipv4 = CoreConfig.ipv4;
+        this.verbose = CoreConfig.verbose;
+        this.enableCaching = CoreConfig.Cache.enabled;
+        this.mysqlEnabled = CoreConfig.MySQL.enabled;
+        String mainApplication = CoreConfig.Application.main;
 
-        this.port = configServer.get("port");
-        this.hostName = configServer.get("hostname");
-        this.bufferIn = configServer.get("buffer.in");
-        this.bufferOut = configServer.get("buffer.out");
-        this.ipv4 = configServer.get("ipv4");
-        this.verbose = configServer.get("verbose");
-        this.enableCaching = configServer.get("cache.enabled");
-        this.mysqlEnabled = configServer.get("mysql.enabled");
-        this.mainApplication = configServer.get("application.main");
-        this.workers = configServer.get("workers");
-
-        this.workerThreads = new Worker[this.workers];
-        for (int i = 0; i < workers; i++) {
-            workerThreads[i] = new Worker();
-        }
+        this.workerThreads = LambdaUtil.arrayAssign(new Worker[CoreConfig.workers], Worker::new);
 
         this.started = false;
         this.stopping = false;
@@ -395,13 +366,11 @@ public class Server extends Thread implements IntellectualServer {
                 toRemove.add(e.getKey());
             }
         }
-        for (String s : toRemove) {
-            viewBindings.remove(s);
-        }
+        toRemove.forEach(viewBindings::remove);
     }
 
     @Override
-    public void handleEvent(final Event event) {
+    public void handleEvent(@NonNull final Event event) {
         Assert.notNull(event);
         if (standalone) {
             EventManager.getInstance().handle(event);
@@ -448,22 +417,60 @@ public class Server extends Thread implements IntellectualServer {
     @Override
     public void start() {
         try {
-            Assert.equals(this.started, false, new IntellectualServerStartException("Cannot start the server, it is already started", new RuntimeException("Cannot restart server singleton")));
+            Assert.equals(this.started, false, new IntellectualServerStartException("Cannot start the server, it is already started",
+                    new RuntimeException("Cannot restart server singleton")));
         } catch (IntellectualServerStartException e) {
             e.printStackTrace();
             return;
         }
 
-        List<StartupStep> steps = new ArrayList<>();
-        steps.add(new Step_LoadPlugins());
-        steps.add(new Step_StartupEventCall());
-        steps.add(new Step_MySQLManagement());
-        steps.add(new Step_ValidateViews());
-        steps.add(new Step_LoadViews());
-        steps.add(new Step_SystemView());
+        // Load Plugins
+        this.loadPlugins();
+        EventManager.getInstance().bake();
 
-        for (StartupStep step : steps) {
-            step.call(this);
+        this.log(Message.CALLING_EVENT, "startup");
+        this.handleEvent(new StartupEvent(this));
+
+        if (mysqlEnabled) {
+            this.log(Message.MYSQL_INIT);
+            this.mysqlConnManager.init();
+        }
+
+        // Validating views
+        this.log(Message.VALIDATING_VIEWS);
+        this.validateViews();
+
+        this.log(Message.LOADING_VIEWS);
+        Map<String, Map<String, Object>> views = configViews.get("views");
+        Assert.notNull(views);
+        views.entrySet().forEach(entry -> {
+            Map<String, Object> view = entry.getValue();
+            String type = "html", filter = view.get("filter").toString();
+            if (view.containsKey("type")) {
+                type = view.get("type").toString();
+            }
+            Map<String, Object> options;
+            if (view.containsKey("options")) {
+                options = (HashMap<String, Object>) view.get("options");
+            } else {
+                options = new HashMap<>();
+            }
+
+            if (viewBindings.containsKey(type.toLowerCase())) {
+                Class<? extends View> vc = viewBindings.get(type.toLowerCase());
+                try {
+                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
+                    viewManager.add(vv);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        try {
+            StaticViewManager.generate(new SystemView());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (mainApplicationStructure != null) {
@@ -507,17 +514,15 @@ public class Server extends Thread implements IntellectualServer {
             }
         }
 
-
-        for (Worker thread : workerThreads) {
-            thread.start();
-        }
+        // Start the workers
+        LambdaUtil.arrayForeach(workerThreads, Worker::start);
 
         //
         log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
         log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
 
         // Pre-Steps
-        {
+        /* {
             if (globalAccountManager.getAccount(new Object[] {null, "admin", null}) == null) {
                 log("There is no admin account as of yet. So, well, let's create one! Please enter a password!");
                 pause = true;
@@ -536,7 +541,7 @@ public class Server extends Thread implements IntellectualServer {
                 });
                 EventManager.getInstance().bake();
             }
-        }
+        } */
 
         // Main Loop
         for (; ; ) {
@@ -555,12 +560,11 @@ public class Server extends Thread implements IntellectualServer {
 
     @Override
     public void tick() {
-        if (pause) return;
         // Recently remade to use worker threads, rather than
         // creating a new thread for each request - this saves time
         // and makes sure to use all resources to their fullest potential
         try {
-            Socket s = socket.accept();
+            final Socket s = socket.accept();
             queue.add(s);
         } catch (final Exception e) {
             e.printStackTrace();
@@ -612,7 +616,7 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     @Override
-    public void log(LogProvider provider, String message, final Object... args) {
+    public void log(@NonNull final LogProvider provider, @NonNull String message, final Object... args) {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
@@ -625,14 +629,16 @@ public class Server extends Thread implements IntellectualServer {
     @Override
     public synchronized void stopServer() {
         log(Message.SHUTTING_DOWN);
+
         EventManager.getInstance().handle(new ShutdownEvent(this));
+
         // Close all database connections
-        for (SQLiteManager sqLiteManager : SQLiteManager.sessions) {
-            sqLiteManager.close();
-        }
+        SQLiteManager.sessions.forEach(SQLiteManager::close);
+
         if (pluginLoader != null) {
             pluginLoader.disableAllPlugins();
         }
+
         if (standalone) {
             System.exit(0);
         }

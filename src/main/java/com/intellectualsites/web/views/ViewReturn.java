@@ -22,6 +22,7 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 
+@FunctionalInterface
 public interface ViewReturn {
 
     Response get(Request r);
