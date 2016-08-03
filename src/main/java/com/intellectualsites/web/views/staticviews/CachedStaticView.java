@@ -6,6 +6,7 @@ import com.intellectualsites.web.object.cache.CacheApplicable;
 import com.intellectualsites.web.views.View;
 import com.intellectualsites.web.views.decl.ResponseMethod;
 import com.intellectualsites.web.views.decl.ViewMatcher;
+import lombok.NonNull;
 
 import java.util.regex.Matcher;
 
@@ -13,7 +14,7 @@ public class CachedStaticView extends View implements CacheApplicable {
 
     private final ResponseMethod method;
 
-    CachedStaticView(final ViewMatcher matcher, final ResponseMethod method) {
+    CachedStaticView(@NonNull final ViewMatcher matcher, @NonNull final ResponseMethod method) {
         super(matcher.filter(), matcher.name());
         this.method = method;
     }

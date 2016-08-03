@@ -19,8 +19,8 @@
 
 package com.intellectualsites.web.util;
 
+import com.intellectualsites.web.object.ResponseBody;
 import com.intellectualsites.web.object.cache.CachedResponse;
-import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.views.View;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheManager {
 
     public final Map<String, String> cachedIncludes = new ConcurrentHashMap<>();
-    private final Map<String, CachedResponse> cachedResponses = new ConcurrentHashMap<>();
+    private final Map<String, CachedResponse> cachedResponseBodys = new ConcurrentHashMap<>();
 
     /**
      * Get a cached include block
@@ -54,39 +54,39 @@ public class CacheManager {
     }
 
     /**
-     * Check if there is a response cached for the view
+     * Check if there is a ResponseBody cached for the view
      * @param view View
-     * @return true if there is a response cached, else false
+     * @return true if there is a ResponseBody cached, else false
      */
     public boolean hasCache(View view) {
-        return cachedResponses.containsKey(view.toString());
+        return cachedResponseBodys.containsKey(view.toString());
     }
 
     /**
-     * Add a cached response
+     * Add a cached ResponseBody
      * @param view View for which the caching will apply
-     * @param response Response (will generate a CachedResponse)
+     * @param ResponseBody ResponseBody (will generate a CachedResponseBody)
      * @see CachedResponse
      */
-    public void setCache(View view, Response response) {
-        cachedResponses.put(view.toString(), new CachedResponse(response));
+    public void setCache(View view, ResponseBody ResponseBody) {
+        cachedResponseBodys.put(view.toString(), new CachedResponse(ResponseBody));
     }
 
     /**
      * Get the cached reponse for a view
      * @param view View
-     * @return the cached response
+     * @return the cached ResponseBody
      * @see #hasCache(View) To check if the view has a cache
      */
     public CachedResponse getCache(View view) {
-        return cachedResponses.get(view.toString());
+        return cachedResponseBodys.get(view.toString());
     }
 
     /**
-     * Get all cached responses
-     * @return all cached responses
+     * Get all cached ResponseBodys
+     * @return all cached ResponseBodys
      */
     public Map<String, CachedResponse> getAll() {
-        return this.cachedResponses;
+        return this.cachedResponseBodys;
     }
 }

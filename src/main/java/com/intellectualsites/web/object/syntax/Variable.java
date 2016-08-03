@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Variable extends Syntax {
+final public class Variable extends Syntax {
 
     private final Map<String, Filter> filters;
 

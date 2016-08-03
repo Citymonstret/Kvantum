@@ -1,12 +1,14 @@
 package com.intellectualsites.web.object;
 
+import com.intellectualsites.web.util.LambdaUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 @RequiredArgsConstructor
 public enum FileType {
     HTML("html", Header.CONTENT_TYPE_HTML),
@@ -24,8 +26,8 @@ public enum FileType {
     private final String contentType;
 
     public static Optional<FileType> byExtension(String ext) {
-        return Arrays.stream(values())
-                .filter(fileType -> fileType.extension.equalsIgnoreCase(ext)).findFirst();
+        final Predicate<FileType> filter = type -> type.extension.equalsIgnoreCase(ext);
+        return LambdaUtil.getFirst(values(), filter);
     }
 
 }

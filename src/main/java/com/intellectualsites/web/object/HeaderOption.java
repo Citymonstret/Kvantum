@@ -1,12 +1,9 @@
 package com.intellectualsites.web.object;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-class HeaderOption {
+final class HeaderOption {
 
     @NonNull
     @Getter
@@ -15,18 +12,22 @@ class HeaderOption {
     @Getter
     private boolean cacheApplicable = true;
 
-    public static HeaderOption create(final String text) {
+    public static HeaderOption create(@NonNull final String text) {
         return new HeaderOption(text);
     }
 
-    public static HeaderOption create(final String text, boolean cacheApplicable) {
-        HeaderOption option = new HeaderOption(text);
-        option.cacheApplicable = cacheApplicable;
-        return option;
+    private HeaderOption cacheApplicable(final boolean b) {
+        this.cacheApplicable = b;
+        return this;
+    }
+
+    public static HeaderOption create(@NonNull final String text, boolean cacheApplicable) {
+        return new HeaderOption(text).cacheApplicable(cacheApplicable);
     }
 
     @Override
     public final String toString() {
         return this.text;
     }
+
 }

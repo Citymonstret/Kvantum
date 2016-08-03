@@ -49,7 +49,6 @@ public class Error extends View {
     @Override
     public Response generate(final Request r) {
         Response response = new Response(this);
-        response.setHeader(response.getHeader().setStatus(this.code + " " + this.desc));
         response.setContent(String.format("<p><b>Error:</b> %d %s</p>", this.code, this.desc));
         return response;
     }

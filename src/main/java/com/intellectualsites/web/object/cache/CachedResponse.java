@@ -20,17 +20,16 @@
 package com.intellectualsites.web.object.cache;
 
 import com.intellectualsites.web.object.Header;
-import com.intellectualsites.web.object.HeaderProvider;
-import com.intellectualsites.web.object.Response;
+import com.intellectualsites.web.object.ResponseBody;
 import lombok.NonNull;
 
-public class CachedResponse implements HeaderProvider {
+public class CachedResponse implements ResponseBody {
 
     public final boolean isText;
     public final byte[] bodyBytes; //, headerBytes;
     public final Header header;
 
-    public CachedResponse(@NonNull final Response parent) {
+    public CachedResponse(@NonNull final ResponseBody parent) {
         this.isText = parent.isText();
         this.header = parent.getHeader();
         // this.headerBytes = parent.getHeader().getBytes();
@@ -42,8 +41,23 @@ public class CachedResponse implements HeaderProvider {
     }
 
     @Override
+    public byte[] getBytes() {
+        return bodyBytes;
+    }
+
+    @Override
     public Header getHeader() {
         return header;
+    }
+
+    @Override
+    public String getContent() {
+        throw new RuntimeException("getContent" /* TODO: Make better */);
+    }
+
+    @Override
+    public boolean isText() {
+        return false;
     }
 
 }

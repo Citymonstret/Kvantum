@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Comment extends Syntax {
+final public class Comment extends Syntax {
 
     public Comment() {
         super(Pattern.compile("(/\\*[\\S\\s]*?\\*/)"));

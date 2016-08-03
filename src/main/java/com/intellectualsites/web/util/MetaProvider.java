@@ -34,7 +34,7 @@ public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProv
 
     private Request r;
 
-    public MetaProvider(final Request r) {
+    private MetaProvider(final Request r) {
         this.r = r;
     }
 

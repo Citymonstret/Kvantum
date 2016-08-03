@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.logging;
 
+@FunctionalInterface
 public interface LogProvider {
 
     String getLogIdentifier();

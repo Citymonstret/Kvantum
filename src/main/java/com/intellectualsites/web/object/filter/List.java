@@ -23,7 +23,7 @@ import com.intellectualsites.web.object.syntax.Filter;
 
 import java.util.Collection;
 
-public class List extends Filter {
+final public class List extends Filter {
 
     public List() {
         super("list");

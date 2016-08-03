@@ -20,6 +20,7 @@
 package com.intellectualsites.web.object.syntax;
 
 import com.intellectualsites.web.object.Request;
+import lombok.NonNull;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,7 +43,7 @@ public abstract class Syntax {
      *
      * @param pattern The regex pattern used to match the code
      */
-    public Syntax(final Pattern pattern) {
+    public Syntax(@NonNull final Pattern pattern) {
         this.pattern = pattern;
     }
 
@@ -71,7 +72,7 @@ public abstract class Syntax {
      *
      * @return Processed Input
      */
-    public final String handle(String in, Request r, Map<String, ProviderFactory> factories) {
+    public final String handle(@NonNull final String in, @NonNull final Request r, @NonNull final Map<String, ProviderFactory> factories) {
         return process(in, pattern.matcher(in), r, factories);
     }
 
@@ -81,7 +82,7 @@ public abstract class Syntax {
      * @param in Code Input
      * @return True if the regex matches
      */
-    public final boolean matches(String in) {
+    public final boolean matches(@NonNull final String in) {
         return this.pattern.matcher(in).find();
     }
 

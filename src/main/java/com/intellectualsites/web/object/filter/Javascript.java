@@ -24,12 +24,7 @@ import com.intellectualsites.web.object.syntax.Filter;
 import java.util.Arrays;
 import java.util.Iterator;
 
-/**
- * Created 2015-07-12 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class Javascript extends Filter {
+final public class Javascript extends Filter {
 
     public Javascript() {
         super("javascript");

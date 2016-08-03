@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MetaBlockStatement extends Syntax {
+final public class MetaBlockStatement extends Syntax {
 
     public MetaBlockStatement() {
         super(Pattern.compile("\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]"));

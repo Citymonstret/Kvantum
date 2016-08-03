@@ -279,14 +279,12 @@ public class Server extends Thread implements IntellectualServer {
             Map<String, Object> views = new HashMap<>();
             // HTML View
             Map<String, Object> view = new HashMap<>();
-            view.put("filter", "(\\/)([A-Za-z0-9]*)(.html)?");
-            view.put("type", "html");
-            views.put("html", view);
-            // CSS View
-            view = new HashMap<>();
-            view.put("filter", "(\\/style\\/)([A-Za-z0-9]*)(.css)?");
-            view.put("type", "css");
-            views.put("css", view);
+            view.put("filter", "(\\/?[A-Za-z]*)\\/([A-Za-z0-9]*)\\.?([A-Za-z]?)");
+            view.put("type", "std");
+            Map<String, Object> opts = new HashMap<>();
+            opts.put("folder", "./public");
+            view.put("options", opts);
+            views.put("std", view);
             configViews.setIfNotExists("views", views);
             configViews.saveFile();
         } catch (final Exception e) {

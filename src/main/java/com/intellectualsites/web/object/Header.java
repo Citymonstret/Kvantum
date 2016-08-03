@@ -29,7 +29,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @SuppressWarnings({"unused"})
-public class Header {
+final public class Header {
 
     public static final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
     public static final String CONTENT_TYPE_OCTET_STREAM = "application/octet-stream; charset=utf-8";
@@ -233,7 +233,7 @@ public class Header {
      */
     public static final HeaderOption HEADER_RETRY_AFTER = HeaderOption.create("Retry-After");
 
-    private Map<HeaderOption, String> headers = new HashMap<>();
+    private final Map<HeaderOption, String> headers = new HashMap<>();
     @NonNull private String status;
     @NonNull private String format;
 
@@ -296,7 +296,7 @@ public class Header {
         set(HEADER_SET_COOKIE, v);
     }
 
-    public void removeCookie(final String cookie) {
+    public void removeCookie(@NonNull final String cookie) {
         setCookie(cookie, Header.COOKIE_DELETED);
     }
 

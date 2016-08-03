@@ -20,6 +20,7 @@
 package com.intellectualsites.web.extra.accounts;
 
 import com.intellectualsites.web.object.syntax.VariableProvider;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -28,7 +29,9 @@ public class Account implements VariableProvider {
 
     private int id;
     private UUID uuid;
+    @Getter
     private String username;
+    @Getter
     private byte[] password;
 
     public Account(int id, String username, byte[] password) {
@@ -51,21 +54,12 @@ public class Account implements VariableProvider {
     }
 
     @Override
-    public String toString() {
-        return this.username;
-    }
-
-    public int getID() {
-        return this.id;
-    }
-
-    @Override
     public int hashCode() {
         return this.id;
     }
 
-    public String getUsername() {
-        return this.username;
+    public int getID() {
+        return this.id;
     }
 
     public UUID getUUID() {
@@ -75,10 +69,6 @@ public class Account implements VariableProvider {
     @Override
     public boolean equals(Object o) {
         return (o instanceof Account) && ((Account) o).getUUID().equals(getUUID());
-    }
-
-    public byte[] getPassword() {
-        return password;
     }
 
     @Override

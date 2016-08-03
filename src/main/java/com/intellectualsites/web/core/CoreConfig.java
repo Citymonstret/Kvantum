@@ -4,10 +4,13 @@ import com.intellectualsites.configurable.ConfigurationImplementation;
 import com.intellectualsites.configurable.annotations.ConfigSection;
 import com.intellectualsites.configurable.annotations.Configuration;
 
+@SuppressWarnings("all")
 @Configuration (implementation = ConfigurationImplementation.YAML, name = "server")
 public class CoreConfig {
 
     public static int port = 80;
+
+    public static String webAddress = "http://localhost";
 
     public static String hostname = "localhost";
 

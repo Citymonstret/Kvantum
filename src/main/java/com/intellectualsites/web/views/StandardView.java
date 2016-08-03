@@ -68,7 +68,7 @@ public class StandardView extends View implements CacheApplicable {
         } else {
             final Optional<FileType> type = FileType.byExtension(extension);
             if (!type.isPresent()) {
-                return new View404("TODO").generate(r);
+                return View404.construct(r.getResourceRequest().getResource()).generate(r);
             }
             response.getHeader().set(Header.HEADER_CONTENT_TYPE, type.get().getContentType());
             if (type.get() != FileType.LESS) {
@@ -77,7 +77,6 @@ public class StandardView extends View implements CacheApplicable {
                 response.setContent(LessView.getLess(file, getBuffer()));
             }
         }
-
         return response;
     }
 }

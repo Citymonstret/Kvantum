@@ -20,19 +20,17 @@
 package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.object.syntax.VariableProvider;
+import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created 2015-04-19 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class Session implements VariableProvider {
+final public class Session implements VariableProvider {
 
     private static long id = 0L;
 
+    @Getter
     private long sessionId = 0;
     private final Map<String, Object> sessionStorage;
 
@@ -41,19 +39,16 @@ public class Session implements VariableProvider {
         sessionId = id++;
     }
 
-    public boolean contains(String variable) {
+    public boolean contains(@NonNull final String variable) {
         return sessionStorage.containsKey(variable.toLowerCase());
     }
 
-    public Object get(String variable) {
+    public Object get(@NonNull final String variable) {
         return sessionStorage.get(variable.toLowerCase());
     }
 
-    public long getId() {
-        return this.sessionId;
-    }
-
-    public void set(final String s, final Object o) {
+    public void set(@NonNull final String s, @NonNull final Object o) {
         sessionStorage.put(s.toLowerCase(), o);
     }
+
 }

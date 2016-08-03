@@ -7,7 +7,6 @@ import com.intellectualsites.web.util.IConsumer;
 import com.intellectualsites.web.util.ReflectionUtils;
 import com.intellectualsites.web.views.View;
 import com.intellectualsites.web.views.decl.ResponseMethod;
-import com.intellectualsites.web.views.decl.ViewDeclaration;
 import com.intellectualsites.web.views.decl.ViewMatcher;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -21,8 +20,8 @@ final public class StaticViewManager {
 
     private static final Class<?>[] parameters = new Class<?>[]{Request.class};
 
-    public static void generate(@NonNull final ViewDeclaration viewDeclaration) throws Exception {
-        final Class<? extends ViewDeclaration> clazz = viewDeclaration.getClass();
+    public static void generate(@NonNull final Object viewDeclaration) throws Exception {
+        final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod> annotatedMethods = ReflectionUtils.getAnnotatedMethods(ViewMatcher.class, clazz);
         ((IConsumer<ReflectionUtils.AnnotatedMethod>) annotatedMethod -> {
             final Method m = annotatedMethod.getMethod();

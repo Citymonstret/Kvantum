@@ -29,11 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created 2015-04-19 for IntellectualServer
- *
- * @author Citymonstret
- */
+@SuppressWarnings("unused")
 public class ViewManager {
 
     private final List<View> views;
@@ -55,7 +51,7 @@ public class ViewManager {
         if (view.isPresent()) {
             return view.get();
         }
-        return new View404(request.getQuery().getResource());
+        return View404.construct(request.getQuery().getFullRequest());
     }
 
     public void dump(@NonNull final Server server) {

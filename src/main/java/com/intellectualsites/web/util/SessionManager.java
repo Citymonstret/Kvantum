@@ -23,33 +23,29 @@ import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.VariableProvider;
+import lombok.NonNull;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Created 2015-04-19 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class SessionManager implements ProviderFactory<VariableProvider> {
+@SuppressWarnings("unused")
+final public class SessionManager implements ProviderFactory<VariableProvider> {
 
-    private final Map<String, Session> sessions;
+    private final Map<String, Session> sessions = new HashMap<>();
     private final Server server;
     private final SessionIdentifierProvider sessionIdentifierProvider;
 
-    public SessionManager(Server server) {
-        sessions = new HashMap<>();
+    public SessionManager(@NonNull final Server server) {
         this.server = server;
-
         final String i = "" + System.nanoTime();
         this.sessionIdentifierProvider = r -> i;
     }
 
-    public Session createSession(Request r, BufferedOutputStream out) {
+    public Session createSession(@NonNull final Request r, @NonNull final BufferedOutputStream out) {
         String name = sessionIdentifierProvider.getIdentifier(r) + "session";
         String sessionID = UUID.randomUUID().toString();
         r.postponedCookies.put(name, sessionID);
@@ -59,38 +55,36 @@ public class SessionManager implements ProviderFactory<VariableProvider> {
         return session;
     }
 
-    public void deleteSession(final Request r, final HeaderProvider re) {
+    public void deleteSession(@NonNull final Request r, @NonNull final HeaderProvider re) {
         String name = sessionIdentifierProvider.getIdentifier(r) + "session";
         re.getHeader().setCookie(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
         server.log("Deleted cookie");
     }
 
-    public Session getSession(final Request r, OutputStream out) {
-        Cookie[] cookies = r.getCookies();
+    public Session getSession(@NonNull final Request r, final OutputStream out) {
         Session session = null;
 
-        String name = sessionIdentifierProvider.getIdentifier(r) + "session";
+        final Cookie[] cookies = r.getCookies();
+        final String name = sessionIdentifierProvider.getIdentifier(r) + "session";
 
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equalsIgnoreCase(name)) {
-                String sessionID = cookie.getValue();
-                if (sessions.containsKey(sessionID)) {
-                    session = sessions.get(sessionID);
-                    server.log("Found session (%s=%s)", session, sessionID);
-                } else {
-                    if (out != null) {
-                        r.postponedCookies.put(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
-                        server.log("Deleting invalid session cookie (%s)", cookie.getValue());
-                    }
+        final Optional<Cookie> cookie = LambdaUtil.getFirst(cookies, c -> c.getName().equalsIgnoreCase(name));
+        if (cookie.isPresent()) {
+            final String sessionID = cookie.get().getValue();
+            if (sessions.containsKey(sessionID)) {
+                session = sessions.get(sessionID);
+                server.log("Found session (%s=%s)", session, sessionID);
+            } else {
+                if (out != null) {
+                    r.postponedCookies.put(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+                    server.log("Deleting invalid session cookie (%s)", cookie.get().getValue());
                 }
-                break;
             }
         }
 
         return session;
     }
 
-    public VariableProvider get(Request r) {
+    public VariableProvider get(@NonNull final Request r) {
         return getSession(r, null);
     }
 

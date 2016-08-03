@@ -22,13 +22,13 @@ package com.intellectualsites.web.core;
 import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
-import com.intellectualsites.web.object.cache.CachedResponse;
 import com.intellectualsites.web.object.syntax.IgnoreSyntax;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.Syntax;
 import com.intellectualsites.web.thread.ThreadManager;
 import com.intellectualsites.web.views.View;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -39,6 +39,7 @@ import java.util.Map;
 
 class Worker {
 
+    private static byte[] empty = "NULL".getBytes();
     private static int idPool = 0;
 
     @Getter
@@ -52,8 +53,6 @@ class Worker {
         Server.getInstance().log("Started thread: " + id);
         final Server server = Server.getInstance();
         ThreadManager.createThread(() -> {
-            // TODO WAT?
-            String s = ("Checking queue");
             if (!server.queue.isEmpty()) {
                 Socket current = server.queue.poll();
                 run(current, server);
@@ -61,46 +60,37 @@ class Worker {
         });
     }
 
-    public void run(Socket remote, Server server) {
+    public void run(final Socket remote, @NonNull final Server server) {
         if (remote == null || remote.isClosed()) {
             return; // TODO: Why?
         }
 
-        // Do we want to output a load of useless information?
-        if (server.verbose) {
+        if (server.verbose) {         // Do we want to output a load of useless information?
             server.log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
         }
 
-        // The request object
-        Request r;
-        // The output stream, that we will write to
-        BufferedOutputStream out;
-        // The input information
-        BufferedReader input;
+        final Request request;
+        final BufferedOutputStream output;
+        final BufferedReader input;
 
-        {
-            StringBuilder rRaw = new StringBuilder();
+        { // Read the actual request
+            final StringBuilder rRaw = new StringBuilder();
             try {
-                // Create a new reader
                 input = new BufferedReader(new InputStreamReader(remote.getInputStream()), server.bufferIn);
-                // And writer
-                out = new BufferedOutputStream(remote.getOutputStream(), server.bufferOut);
-
-                // Read the request
+                output = new BufferedOutputStream(remote.getOutputStream(), server.bufferOut);
                 String str;
                 while ((str = input.readLine()) != null && !str.equals("")) {
                     rRaw.append(str).append("|");
                 }
-                r = new Request(rRaw.toString(), remote);
-
+                request = new Request(rRaw.toString(), remote);
                 // Fetch the post request, if it exists
-                if (r.getQuery().getMethod() == Method.POST) {
-                    StringBuilder pR = new StringBuilder();
-                    int cl = Integer.parseInt(r.getHeader("Content-Length").substring(1));
+                if (request.getQuery().getMethod() == Method.POST) {
+                    final StringBuilder pR = new StringBuilder();
+                    final int cl = Integer.parseInt(request.getHeader("Content-Length").substring(1));
                     for (int i = 0; i < cl; i++) {
                         pR.append((char) input.read());
                     }
-                    r.setPostRequest(new PostRequest(pR.toString()));
+                    request.setPostRequest(new PostRequest(pR.toString()));
                 }
             } catch (final Exception e) {
                 e.printStackTrace();
@@ -108,62 +98,54 @@ class Worker {
             }
         }
 
-        // Do we want to output a log?
         if (!server.silent) {
-            server.log(r.buildLog());
+            server.log(request.buildLog());
         }
 
-        // Match a view
-        View view = server.viewManager.match(r);
+        final View view = server.viewManager.match(request);
 
-        boolean isText;
-        String content = "";
-        byte[] bytes = null;
+        String textContent = "";
+        byte[] bytes = empty;
 
-        final HeaderProvider headerProvider;
-
-        // Session management stuff
-        Session session = server.sessionManager.getSession(r, out);
+        final Session session = server.sessionManager.getSession(request, output);
         if (session != null) {
-            r.setSession(session);
+            request.setSession(session);
         } else {
-            r.setSession(server.sessionManager.createSession(r, out));
+            request.setSession(server.sessionManager.createSession(request, output));
         }
 
-        if (server.enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(r)) {
-            if (server.cacheManager.hasCache(view)) {
-                CachedResponse response = server.cacheManager.getCache(view);
-                if ((isText = response.isText)) {
-                    content = new String(response.bodyBytes);
-                } else {
-                    bytes = response.bodyBytes;
-                }
-                headerProvider = response;
-            } else {
-                Response response = view.generate(r);
-                headerProvider = response;
-                server.cacheManager.setCache(view, response);
-                if ((isText = response.isText())) {
-                    content = response.getContent();
-                } else {
-                    bytes = response.getBytes();
-                }
-            }
-        } else {
-            Response response = view.generate(r);
-            headerProvider = response;
-            if ((isText = response.isText())) {
-                content = response.getContent();
-            } else {
-                bytes = response.getBytes();
+        boolean shouldCache = false;
+        boolean cache = false;
+        final ResponseBody body;
+
+        if (server.enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(request)) {
+            cache = true;
+            if (!server.cacheManager.hasCache(view)) {
+                shouldCache = true;
             }
         }
 
-        for (Map.Entry<String, String> postponedCookie : r.postponedCookies.entrySet()) {
-            headerProvider.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
+        if (!cache || shouldCache) { // Either it's a non-cached view, or there is no cache stored
+            body = view.generate(request);
+        } else { // Just read from memory
+            body = server.cacheManager.getCache(view);
         }
 
-        if (isText) {
+        if (shouldCache) {
+            server.cacheManager.setCache(view, body);
+        }
+
+        if (body.isText()) {
+            textContent = body.getContent();
+        } else {
+            bytes = body.getBytes();
+        }
+
+        for (final Map.Entry<String, String> postponedCookie : request.postponedCookies.entrySet()) {
+            body.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
+        }
+
+        if (body.isText()) {
             // Make sure to not use Crush when
             // told not to
             if (!(view instanceof IgnoreSyntax)) {
@@ -175,40 +157,35 @@ class Worker {
                     factories.put(factory.providerName().toLowerCase(), factory);
                 }
                 // Now make use of the view specific ProviderFactory
-                ProviderFactory z = view.getFactory(r);
+                ProviderFactory z = view.getFactory(request);
                 if (z != null) {
                     factories.put(z.providerName().toLowerCase(), z);
                 }
                 // This is how the crush engine works.
                 // Quite simple, yet powerful!
                 for (Syntax syntax : server.syntaxes) {
-                    if (syntax.matches(content)) {
-                        content = syntax.handle(content, r, factories);
+                    if (syntax.matches(textContent)) {
+                        textContent = syntax.handle(textContent, request, factories);
                     }
                 }
             }
             // Now, finally, let's get the bytes.
-            bytes = content.getBytes();
+            bytes = textContent.getBytes();
         }
 
-        headerProvider.getHeader().apply(out);
+        body.getHeader().apply(output);
 
         try {
-            out.write(bytes);
-            out.flush();
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
+            output.write(bytes);
+            output.flush();
             input.close();
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
         if (!server.silent) {
-            server.log("Request was served by '%s', with the type '%s'. The total lenght of the content was '%s'",
-                    view.getName(), isText ? "text" : "bytes", bytes.length
+            server.log("Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
+                    view.getName(), body.isText() ? "text" : "bytes", bytes.length
             );
         }
     }

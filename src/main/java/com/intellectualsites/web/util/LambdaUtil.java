@@ -16,6 +16,10 @@ public class LambdaUtil {
         return collection.stream().filter(predicate).findFirst();
     }
 
+    public static <T> Optional<T> getFirst(@NonNull final T[] collection, @NonNull final Predicate<T> predicate) {
+        return Arrays.stream(collection).filter(predicate).findFirst();
+    }
+
     public static <T> T[] arrayAssign(@NonNull final T[] array, @NonNull final Provider<T> provider) {
          for (int i = 0; i < array.length; i++) {
              array[i] = provider.provide();

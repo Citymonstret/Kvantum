@@ -21,6 +21,7 @@ package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.util.TimeUtil;
 import com.intellectualsites.web.views.View;
+import lombok.NonNull;
 
 /**
  * The HTTP response,
@@ -29,7 +30,7 @@ import com.intellectualsites.web.views.View;
  *
  * @author Citymonstret
  */
-public class Response implements HeaderProvider {
+final public class Response implements ResponseBody {
 
     private Header header;
     private String content;
@@ -63,7 +64,7 @@ public class Response implements HeaderProvider {
      *
      * @param bytes Bytes to send to the client
      */
-    public void setBytes(final byte[] bytes) {
+    public void setBytes(@NonNull final byte[] bytes) {
         this.bytes = bytes;
         this.isText = false;
     }
@@ -74,6 +75,7 @@ public class Response implements HeaderProvider {
      * @return bytes, if exists
      * @see #isText() Should be false for this to work
      */
+    @Override
     public byte[] getBytes() {
         return this.bytes;
     }
@@ -84,7 +86,7 @@ public class Response implements HeaderProvider {
      * @param content The string content
      * @see #setBytes(byte[]) to send raw bytes
      */
-    public void setContent(final String content) {
+    public void setContent(@NonNull final String content) {
         this.content = content;
         this.isText = true;
     }
@@ -94,7 +96,7 @@ public class Response implements HeaderProvider {
      *
      * @param header Header file
      */
-    public void setHeader(final Header header) {
+    public void setHeader(@NonNull final Header header) {
         this.header = header;
     }
 
@@ -104,6 +106,7 @@ public class Response implements HeaderProvider {
      * @return the set response header
      * @see #setHeader(Header) - To set the header
      */
+    @Override
     public Header getHeader() {
         return this.header;
     }
@@ -114,6 +117,7 @@ public class Response implements HeaderProvider {
      * @return The string content
      * @see #isText() Should be true for this to work
      */
+    @Override
     public String getContent() {
         return this.content;
     }
@@ -125,6 +129,7 @@ public class Response implements HeaderProvider {
      * @see #setContent(String) To set the string content
      * @see #setBytes(byte[]) To set the byte content
      */
+    @Override
     public boolean isText() {
         return isText;
     }

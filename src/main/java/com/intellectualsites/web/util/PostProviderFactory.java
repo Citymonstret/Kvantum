@@ -35,7 +35,7 @@ public class PostProviderFactory implements ProviderFactory<PostProviderFactory>
 
     private PostRequest p;
 
-    public PostProviderFactory(PostRequest p) {
+    private PostProviderFactory(PostRequest p) {
         this.p = p;
     }
 

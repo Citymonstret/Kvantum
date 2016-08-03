@@ -23,12 +23,7 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 
-/**
- * Created 2015-04-20 for IntellectualServer
- *
- * @author Citymonstret
- */
-public class ServerProvider implements ProviderFactory<ServerProvider>, VariableProvider {
+final public class ServerProvider implements ProviderFactory<ServerProvider>, VariableProvider {
 
     public ServerProvider get(Request r) {
         return this;

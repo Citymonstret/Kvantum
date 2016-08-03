@@ -21,7 +21,7 @@ package com.intellectualsites.web.object.filter;
 
 import com.intellectualsites.web.object.syntax.Filter;
 
-public class Lowercase extends Filter {
+final public class Lowercase extends Filter {
 
     public Lowercase() {
         super("lowercase");

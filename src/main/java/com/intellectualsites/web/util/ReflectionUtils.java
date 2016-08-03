@@ -1,5 +1,7 @@
 package com.intellectualsites.web.util;
 
+import lombok.NonNull;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,8 +28,8 @@ public class ReflectionUtils {
         }
     }
 
-    public static List<AnnotatedMethod> getAnnotatedMethods(Class<? extends Annotation> a, Class<?> clazz) {
-        List<AnnotatedMethod> annotatedMethods = new ArrayList<>();
+    public static List<AnnotatedMethod> getAnnotatedMethods(@NonNull final Class<? extends Annotation> a, @NonNull final Class<?> clazz) {
+        final List<AnnotatedMethod> annotatedMethods = new ArrayList<>();
 
         Class<?> c = clazz;
         while (c != Object.class) {

@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  * @author Citymonstret
  */
 @RequiredArgsConstructor
-public class Cookie {
+public final class Cookie {
 
     @NonNull
     @Getter

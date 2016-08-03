@@ -21,7 +21,7 @@ package com.intellectualsites.web.object.filter;
 
 import com.intellectualsites.web.object.syntax.Filter;
 
-public class Uppercase extends Filter {
+final public class Uppercase extends Filter {
 
     public Uppercase() {
         super("uppercase");

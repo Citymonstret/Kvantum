@@ -21,7 +21,10 @@ package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.util.CookieManager;
+import com.intellectualsites.web.util.StringUtil;
 import com.intellectualsites.web.views.View;
+import lombok.Getter;
+import lombok.NonNull;
 
 import java.net.Socket;
 import java.util.HashMap;
@@ -40,7 +43,7 @@ import java.util.function.Predicate;
  *
  * @author Citymonstret
  */
-public class Request {
+final public class Request {
 
     private Map<String, Object> meta;
     private final Map<String, String> headers;
@@ -56,7 +59,7 @@ public class Request {
      *
      * @param postRequest The post request
      */
-    public void setPostRequest(PostRequest postRequest) {
+    public void setPostRequest(@NonNull final PostRequest postRequest) {
         this.postRequest = postRequest;
     }
 
@@ -65,8 +68,13 @@ public class Request {
      * "http://localhost/query?example=this"
      */
     public static class Query {
+
+        @Getter
         private final Method method;
+        @Getter
         private final String resource;
+        @Getter
+        private final Map<String, String> parameters = new HashMap<>();
 
         /**
          * The query constructor
@@ -74,27 +82,18 @@ public class Request {
          * @param method   Request Method
          * @param resource The requested resource
          */
-        public Query(Method method, String resource) {
+        Query(Method method, String resource) {
             this.method = method;
+            if (resource.contains("?")) {
+                final String[] parts = resource.split("\\?");
+                final String[] subParts = parts[1].split("&");
+                resource = parts[0];
+                for (final String part : subParts) {
+                    final String[] subSubParts = part.split("=");
+                    this.parameters.put(subSubParts[0], subSubParts[1]);
+                }
+            }
             this.resource = resource;
-        }
-
-        /**
-         * The Request method
-         *
-         * @return Request method
-         */
-        public Method getMethod() {
-            return this.method;
-        }
-
-        /**
-         * Get the request resource name
-         *
-         * @return Requested resource
-         */
-        public String getResource() {
-            return this.resource;
         }
 
         /**
@@ -102,9 +101,15 @@ public class Request {
          *
          * @return compiled string
          */
-        public String buildLog() {
+        String buildLog() {
             return "Query >\n\t\tMethod: " + method.toString() + "\n\t\tResource: " + resource;
         }
+
+        public String getFullRequest() {
+            final String parameters = StringUtil.join(getParameters(), "=", "&");
+            return parameters.isEmpty() ? resource : resource + "?" + parameters;
+        }
+
     }
 
     /**
@@ -127,12 +132,12 @@ public class Request {
      * @param request Request (from the client)
      * @param socket The socket which sent the request
      */
-    public Request(final String request, final Socket socket) {
+    public Request(@NonNull final String request, @NonNull final Socket socket) {
         this.socket = socket;
-        String[] parts = request.split("\\|");
         this.headers = new HashMap<>();
-        for (String part : parts) {
-            String[] subParts = part.split(":");
+        final String[] parts = request.split("\\|");
+        for (final String part : parts) {
+            final String[] subParts = part.split(":");
             if (subParts.length < 2) {
                 if (headers.containsKey("query")) {
                     // This fixes issues with Nginx and proxy_pass
@@ -149,7 +154,7 @@ public class Request {
         if (!this.headers.containsKey("query")) {
             throw new RuntimeException("Couldn't find query header...");
         }
-        getResourceRequest();
+        this.getResourceRequest();
         this.cookies = CookieManager.getCookies(this);
         this.meta = new HashMap<>();
     }
@@ -172,20 +177,24 @@ public class Request {
      * @param name Header Name
      * @return The header value, if the header exists. Otherwise an empty string will be returned.
      */
-    public String getHeader(final String name) {
+    public String getHeader(@NonNull final String name) {
         if (this.headers.containsKey(name)) {
             return this.headers.get(name);
         }
         return "";
     }
 
-    private void getResourceRequest() {
-        String[] parts = getHeader("query").split(" ");
+    public Query getResourceRequest() {
+        if (this.query != null) {
+            return getQuery();
+        }
+        final String[] parts = getHeader("query").split(" ");
         if (parts.length < 3) {
             this.query = new Query(Method.GET, "/");
         } else {
             this.query = new Query(parts[0].equalsIgnoreCase("GET") ? Method.GET : Method.POST, parts[1]);
         }
+        return this.query;
     }
 
     /**
@@ -217,7 +226,7 @@ public class Request {
      * @param name Key (which will be used to get the meta value)
      * @param var Value (Any object will do)
      */
-    public void addMeta(String name, Object var) {
+    public void addMeta(@NonNull final String name, @NonNull final Object var) {
         meta.put(name, var);
     }
 
@@ -229,7 +238,7 @@ public class Request {
      * @param name The key
      * @return Meta value if exists, else null
      */
-    public Object getMeta(String name) {
+    public Object getMeta(@NonNull final String name) {
         if (!meta.containsKey(name)) {
             return null;
         }
@@ -241,7 +250,7 @@ public class Request {
      *
      * @param session Session
      */
-    public void setSession(final Session session) {
+    public void setSession(@NonNull final Session session) {
         this.session = session;
     }
 

@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Include extends Syntax {
+final public class Include extends Syntax {
 
     public Include() {
         super(Pattern.compile("\\{\\{include:([/A-Za-z\\.\\-]*)\\}\\}"));

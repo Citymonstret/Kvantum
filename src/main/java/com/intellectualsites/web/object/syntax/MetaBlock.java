@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MetaBlock extends Syntax {
+final public class MetaBlock extends Syntax {
 
     private final MetaBlockStatement statement;
 
