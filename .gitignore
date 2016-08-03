@@ -62,3 +62,14 @@ crashlytics-build.properties
 .project
 *.classpath
 *.prefs
+/public/
+.gradle/
+build.gradle
+build/
+gradle/
+gradlew
+gradlew.bat
+settings.gradle
+src/main/resources/
+src/test/
+storage/
