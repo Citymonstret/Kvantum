@@ -26,7 +26,7 @@ import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.logging.LogProvider;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.SessionManager;
-import com.intellectualsites.web.util.ViewManager;
+import com.intellectualsites.web.util.RequestManager;
 import com.intellectualsites.web.views.View;
 
 /**
@@ -121,5 +121,5 @@ interface IntellectualServer {
      *
      * @return view manager
      */
-    ViewManager getViewManager();
+    RequestManager getRequestManager();
 }

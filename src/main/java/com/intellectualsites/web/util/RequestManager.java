@@ -21,7 +21,7 @@ package com.intellectualsites.web.util;
 
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
-import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.views.RequestHandler;
 import com.intellectualsites.web.views.errors.View404;
 import lombok.NonNull;
 
@@ -30,24 +30,24 @@ import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class ViewManager {
+public class RequestManager {
 
-    private final List<View> views;
+    private final List<RequestHandler> views;
 
-    public ViewManager() {
+    public RequestManager() {
         this.views = new ArrayList<>();
     }
 
-    public void add(@NonNull final View view) {
-        final Optional<View> illegalView = LambdaUtil.getFirst(views, v -> v.toString().equalsIgnoreCase(view.toString()));
-        if (illegalView.isPresent()) {
+    public void add(@NonNull final RequestHandler view) {
+        final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst(views, v -> v.toString().equalsIgnoreCase(view.toString()));
+        if (illegalRequestHandler.isPresent()) {
             throw new IllegalArgumentException("Duplicate view pattern!");
         }
         views.add(view);
     }
 
-    public View match(@NonNull final Request request) {
-        final Optional<View> view = LambdaUtil.getFirst(views, request.matches);
+    public RequestHandler match(@NonNull final Request request) {
+        final Optional<RequestHandler> view = LambdaUtil.getFirst(views, request.matches);
         if (view.isPresent()) {
             return view.get();
         }
@@ -55,11 +55,11 @@ public class ViewManager {
     }
 
     public void dump(@NonNull final Server server) {
-        ((IConsumer<View>) view -> server.log("> View - Class '%s', Regex: '%s'\n\tOptions: %s",
-                view.getClass().getSimpleName(), view.toString(), view.getOptionString())).foreach(views);
+        ((IConsumer<RequestHandler>) view -> server.log("> RequestHandler - Class '%s', Regex: '%s'",
+                view.getClass().getSimpleName(), view.toString())).foreach(views);
     }
 
-    public void remove(@NonNull View view) {
+    public void remove(@NonNull RequestHandler view) {
         if (views.contains(view)) {
             views.remove(view);
         }

@@ -29,6 +29,6 @@ import com.intellectualsites.web.core.Server;
 public class Dump extends Command {
     @Override
     public void handle(String[] args) {
-        Server.getInstance().getViewManager().dump(Server.getInstance());
+        Server.getInstance().getRequestManager().dump(Server.getInstance());
     }
 }

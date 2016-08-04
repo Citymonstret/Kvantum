@@ -22,7 +22,6 @@ package com.intellectualsites.web.views;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
-import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.util.Context;
 import com.intellectualsites.web.util.Final;
 
@@ -40,7 +39,7 @@ import java.util.regex.Pattern;
  * @author Citymonstret
  */
 @SuppressWarnings("ALL")
-public class View {
+public class View extends RequestHandler {
 
     protected final Pattern pattern;
     private final String rawPattern;
@@ -121,12 +120,13 @@ public class View {
         this.viewReturn = viewReturn;
     }
 
+    @Override
     public final String getName() {
         return this.internalName;
     }
 
     public void register() {
-        Server.getInstance().getViewManager().add(this);
+        Server.getInstance().getRequestManager().add(this);
     }
 
     /**
@@ -217,6 +217,7 @@ public class View {
      * @return True if the request Matches, False if not
      */
     @Final
+    @Override
     final public boolean matches(final Request request) {
         Matcher matcher = pattern.matcher(request.getQuery().getResource());
         return matcher.matches() && passes(matcher, request);
@@ -231,7 +232,7 @@ public class View {
      *
      * @return True if the request matches, false if not
      */
-    public boolean passes(Matcher matcher, Request request) {
+    protected boolean passes(Matcher matcher, Request request) {
         return true;
     }
 
@@ -246,6 +247,7 @@ public class View {
      * @param r Request
      * @return Generated response
      */
+    @Override
     public Response generate(final Request r) {
         if (viewReturn != null) {
             return viewReturn.get(r);
@@ -256,13 +258,4 @@ public class View {
         }
     }
 
-    /**
-     * Get the view specific factory (if it exists)
-     *
-     * @param r Request IN
-     * @return Null by default, or the ProviderFactory (if set by the view)
-     */
-    public ProviderFactory getFactory(final Request r) {
-        return null;
-    }
 }

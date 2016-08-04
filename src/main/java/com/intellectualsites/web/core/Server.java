@@ -33,7 +33,9 @@ import com.intellectualsites.web.extra.ApplicationStructure;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
 import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.logging.LogProvider;
+import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.LogWrapper;
+import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.error.IntellectualServerInitializationException;
 import com.intellectualsites.web.object.error.IntellectualServerStartException;
 import com.intellectualsites.web.object.syntax.*;
@@ -41,6 +43,7 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
+import com.intellectualsites.web.views.requesthandler.SimpleRequestHandler;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
 import lombok.NonNull;
 import org.apache.commons.io.output.TeeOutputStream;
@@ -120,7 +123,7 @@ public class Server extends Thread implements IntellectualServer {
     //
     // protected
     //
-    ViewManager viewManager;
+    RequestManager requestManager;
 
     //
     // protected final
@@ -264,7 +267,7 @@ public class Server extends Thread implements IntellectualServer {
         this.started = false;
         this.stopping = false;
 
-        this.viewManager = new ViewManager();
+        this.requestManager = new RequestManager();
         this.sessionManager = new SessionManager(this);
         this.cacheManager = new CacheManager();
 
@@ -458,7 +461,7 @@ public class Server extends Thread implements IntellectualServer {
                 Class<? extends View> vc = viewBindings.get(type.toLowerCase());
                 try {
                     View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
-                    viewManager.add(vv);
+                    requestManager.add(vv);
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
@@ -471,11 +474,19 @@ public class Server extends Thread implements IntellectualServer {
             e.printStackTrace();
         }
 
+        requestManager.clear();
+        requestManager.add(new SimpleRequestHandler("([\\S\\s]*)", request -> {
+            Response response = new Response();
+            response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
+            response.setContent("<h1>HELLO WORLD!</h1>");
+            return response;
+        }));
+
         if (mainApplicationStructure != null) {
             mainApplicationStructure.registerViews(this);
         }
 
-        viewManager.dump(this);
+        requestManager.dump(this);
 
         if (this.ipv4) {
             log("ipv4 is true - Using IPv4 stack");
@@ -647,8 +658,7 @@ public class Server extends Thread implements IntellectualServer {
         return this.sessionManager;
     }
 
-    @Override
-    public ViewManager getViewManager() {
-        return viewManager;
+    public RequestManager getRequestManager() {
+        return requestManager;
     }
 }

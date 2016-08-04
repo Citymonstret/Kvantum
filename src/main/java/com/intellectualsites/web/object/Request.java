@@ -22,7 +22,7 @@ package com.intellectualsites.web.object;
 import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.util.CookieManager;
 import com.intellectualsites.web.util.StringUtil;
-import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.views.RequestHandler;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -263,6 +263,6 @@ final public class Request {
         return this.session;
     }
 
-    final public Predicate<View> matches = view -> view.matches(this);
+    final public Predicate<RequestHandler> matches = view -> view.matches(this);
 
 }

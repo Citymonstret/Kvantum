@@ -21,7 +21,7 @@ package com.intellectualsites.web.util;
 
 import com.intellectualsites.web.object.ResponseBody;
 import com.intellectualsites.web.object.cache.CachedResponse;
-import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.views.RequestHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,30 +55,30 @@ public class CacheManager {
 
     /**
      * Check if there is a ResponseBody cached for the view
-     * @param view View
+     * @param view RequestHandler
      * @return true if there is a ResponseBody cached, else false
      */
-    public boolean hasCache(View view) {
+    public boolean hasCache(RequestHandler view) {
         return cachedResponseBodys.containsKey(view.toString());
     }
 
     /**
      * Add a cached ResponseBody
-     * @param view View for which the caching will apply
+     * @param view RequestHandler for which the caching will apply
      * @param ResponseBody ResponseBody (will generate a CachedResponseBody)
      * @see CachedResponse
      */
-    public void setCache(View view, ResponseBody ResponseBody) {
+    public void setCache(RequestHandler view, ResponseBody ResponseBody) {
         cachedResponseBodys.put(view.toString(), new CachedResponse(ResponseBody));
     }
 
     /**
      * Get the cached reponse for a view
-     * @param view View
+     * @param view RequestHandler
      * @return the cached ResponseBody
-     * @see #hasCache(View) To check if the view has a cache
+     * @see #hasCache(RequestHandler) To check if the view has a cache
      */
-    public CachedResponse getCache(View view) {
+    public CachedResponse getCache(RequestHandler view) {
         return cachedResponseBodys.get(view.toString());
     }
 

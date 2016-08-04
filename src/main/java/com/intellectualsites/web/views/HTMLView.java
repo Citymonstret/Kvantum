@@ -19,7 +19,6 @@
 
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.*;
 import com.intellectualsites.web.object.cache.CacheApplicable;
 import com.intellectualsites.web.object.syntax.ProviderFactory;

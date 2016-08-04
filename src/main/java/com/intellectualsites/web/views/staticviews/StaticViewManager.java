@@ -38,7 +38,7 @@ final public class StaticViewManager {
                     } else {
                         view = new StaticView(matcher, new ResponseMethod(m, viewDeclaration));
                     }
-                    Server.getInstance().getViewManager().add(view);
+                    Server.getInstance().getRequestManager().add(view);
                 }
             }
         }).foreach(annotatedMethods);

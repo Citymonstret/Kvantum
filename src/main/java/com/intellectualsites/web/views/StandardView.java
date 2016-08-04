@@ -1,31 +1,15 @@
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.object.FileType;
-import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.cache.CacheApplicable;
-import com.intellectualsites.web.util.FileUtils;
-import com.intellectualsites.web.views.errors.View404;
+import com.intellectualsites.web.util.GenericViewUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 
 public class StandardView extends View implements CacheApplicable {
-
-    private static final Collection<String> image = new ArrayList<>();
-
-    static {
-        image.add("png");
-        image.add("ico");
-        image.add("gif");
-        image.add("jpg");
-        image.add("jpeg");
-    }
 
     public StandardView(String filter, Map<String, Object> options) {
         super(filter, "STANDARD", options);
@@ -61,22 +45,6 @@ public class StandardView extends View implements CacheApplicable {
         final File file = (File) r.getMeta("stdfile");
         final Response response = new Response(this);
         final String extension = r.getMeta("stdext").toString();
-        if (image.contains(extension)) {
-            byte[] bytes = FileUtils.getBytes(file, getBuffer());
-            response.getHeader().set(Header.HEADER_CONTENT_TYPE, "image/" + r.getMeta("img_type") + "; charset=utf-8");
-            response.setBytes(bytes);
-        } else {
-            final Optional<FileType> type = FileType.byExtension(extension);
-            if (!type.isPresent()) {
-                return View404.construct(r.getResourceRequest().getResource()).generate(r);
-            }
-            response.getHeader().set(Header.HEADER_CONTENT_TYPE, type.get().getContentType());
-            if (type.get() != FileType.LESS) {
-                response.setContent(FileUtils.getDocument(file, getBuffer()));
-            } else {
-                response.setContent(LessView.getLess(file, getBuffer()));
-            }
-        }
-        return response;
+        return GenericViewUtil.getGenericResponse(file, r, response, extension, getBuffer());
     }
 }

@@ -20,7 +20,7 @@
 package com.intellectualsites.web.object;
 
 import com.intellectualsites.web.util.TimeUtil;
-import com.intellectualsites.web.views.View;
+import com.intellectualsites.web.views.RequestHandler;
 import lombok.NonNull;
 
 /**
@@ -34,7 +34,7 @@ final public class Response implements ResponseBody {
 
     private Header header;
     private String content;
-    public final View parent;
+    public RequestHandler parent;
     private boolean isText;
     private byte[] bytes;
 
@@ -43,7 +43,7 @@ final public class Response implements ResponseBody {
      *
      * @param parent The view that generated this response
      */
-    public Response(final View parent) {
+    public Response(final RequestHandler parent) {
         this.parent = parent;
         this.header = new Header(Header.STATUS_OK)
                 .set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML)
@@ -132,5 +132,13 @@ final public class Response implements ResponseBody {
     @Override
     public boolean isText() {
         return isText;
+    }
+
+    public void setParent(RequestHandler parent) {
+        this.parent = parent;
+    }
+
+    public boolean hasParent() {
+        return this.parent != null;
     }
 }

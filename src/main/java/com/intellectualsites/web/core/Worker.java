@@ -26,6 +26,7 @@ import com.intellectualsites.web.object.syntax.IgnoreSyntax;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.Syntax;
 import com.intellectualsites.web.thread.ThreadManager;
+import com.intellectualsites.web.views.RequestHandler;
 import com.intellectualsites.web.views.View;
 import lombok.Getter;
 import lombok.NonNull;
@@ -102,7 +103,7 @@ class Worker {
             server.log(request.buildLog());
         }
 
-        final View view = server.viewManager.match(request);
+        final RequestHandler requestHandler = server.requestManager.match(request);
 
         String textContent = "";
         byte[] bytes = empty;
@@ -118,21 +119,21 @@ class Worker {
         boolean cache = false;
         final ResponseBody body;
 
-        if (server.enableCaching && view instanceof CacheApplicable && ((CacheApplicable) view).isApplicable(request)) {
+        if (server.enableCaching && requestHandler instanceof CacheApplicable && ((CacheApplicable) requestHandler).isApplicable(request)) {
             cache = true;
-            if (!server.cacheManager.hasCache(view)) {
+            if (!server.cacheManager.hasCache(requestHandler)) {
                 shouldCache = true;
             }
         }
 
         if (!cache || shouldCache) { // Either it's a non-cached view, or there is no cache stored
-            body = view.generate(request);
+            body = requestHandler.generate(request);
         } else { // Just read from memory
-            body = server.cacheManager.getCache(view);
+            body = server.cacheManager.getCache(requestHandler);
         }
 
         if (shouldCache) {
-            server.cacheManager.setCache(view, body);
+            server.cacheManager.setCache(requestHandler, body);
         }
 
         if (body.isText()) {
@@ -148,7 +149,7 @@ class Worker {
         if (body.isText()) {
             // Make sure to not use Crush when
             // told not to
-            if (!(view instanceof IgnoreSyntax)) {
+            if (!(requestHandler instanceof IgnoreSyntax)) {
                 // Provider factories are fun, and so is the
                 // global map. But we also need the view
                 // specific ones!
@@ -157,7 +158,7 @@ class Worker {
                     factories.put(factory.providerName().toLowerCase(), factory);
                 }
                 // Now make use of the view specific ProviderFactory
-                ProviderFactory z = view.getFactory(request);
+                ProviderFactory z = requestHandler.getFactory(request);
                 if (z != null) {
                     factories.put(z.providerName().toLowerCase(), z);
                 }
@@ -185,7 +186,7 @@ class Worker {
 
         if (!server.silent) {
             server.log("Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
-                    view.getName(), body.isText() ? "text" : "bytes", bytes.length
+                    requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length
             );
         }
     }
