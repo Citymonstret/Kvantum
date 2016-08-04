@@ -33,9 +33,7 @@ import com.intellectualsites.web.extra.ApplicationStructure;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
 import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.logging.LogProvider;
-import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.LogWrapper;
-import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.error.IntellectualServerInitializationException;
 import com.intellectualsites.web.object.error.IntellectualServerStartException;
 import com.intellectualsites.web.object.syntax.*;
@@ -43,7 +41,6 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
-import com.intellectualsites.web.views.requesthandler.SimpleRequestHandler;
 import com.intellectualsites.web.views.staticviews.StaticViewManager;
 import lombok.NonNull;
 import org.apache.commons.io.output.TeeOutputStream;
@@ -473,14 +470,6 @@ public class Server extends Thread implements IntellectualServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        requestManager.clear();
-        requestManager.add(new SimpleRequestHandler("([\\S\\s]*)", request -> {
-            Response response = new Response();
-            response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
-            response.setContent("<h1>HELLO WORLD!</h1>");
-            return response;
-        }));
 
         if (mainApplicationStructure != null) {
             mainApplicationStructure.registerViews(this);
