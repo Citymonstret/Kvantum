@@ -34,7 +34,7 @@ final public class Response implements ResponseBody {
 
     private Header header;
     private String content;
-    public RequestHandler parent;
+    private RequestHandler parent;
     private boolean isText;
     private byte[] bytes;
 
@@ -97,8 +97,9 @@ final public class Response implements ResponseBody {
      *
      * @param header Header file
      */
-    public void setHeader(@NonNull final Header header) {
+    public Response setHeader(@NonNull final Header header) {
         this.header = header;
+        return this;
     }
 
     /**
@@ -135,8 +136,9 @@ final public class Response implements ResponseBody {
         return isText;
     }
 
-    public void setParent(RequestHandler parent) {
+    public Response setParent(@NonNull final RequestHandler parent) {
         this.parent = parent;
+        return this;
     }
 
     public boolean hasParent() {

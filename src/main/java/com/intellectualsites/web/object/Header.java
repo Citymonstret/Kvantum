@@ -256,7 +256,7 @@ final public class Header {
         return temporary.toString().getBytes();
     }
 
-    public void apply(@NonNull final OutputStream out) {
+    public Header apply(@NonNull final OutputStream out) {
         try {
             out.write((this.format + " " + this.status + "\n").getBytes());
             for (final Map.Entry<HeaderOption, String> entry : this.headers.entrySet()) {
@@ -268,6 +268,7 @@ final public class Header {
         } catch(final Exception e) {
             e.printStackTrace();
         }
+        return this;
     }
 
     public String[] dump() {
@@ -286,7 +287,7 @@ final public class Header {
         setStatus(Header.STATUS_TEMPORARY_REDIRECT);
     }
 
-    public void setCookie(@NonNull final String cookie, @NonNull final String value) {
+    public Header setCookie(@NonNull final String cookie, @NonNull final String value) {
         String v;
         if (this.headers.containsKey(HEADER_SET_COOKIE)) {
             v = this.headers.get(HEADER_SET_COOKIE) + "," + cookie + "=" + value;
@@ -294,10 +295,12 @@ final public class Header {
             v = cookie + "=" + value;
         }
         set(HEADER_SET_COOKIE, v);
+        return this;
     }
 
-    public void removeCookie(@NonNull final String cookie) {
+    public Header removeCookie(@NonNull final String cookie) {
         setCookie(cookie, Header.COOKIE_DELETED);
+        return this;
     }
 
     public Header setStatus(@NonNull final String status) {

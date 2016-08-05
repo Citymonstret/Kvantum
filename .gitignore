@@ -4,6 +4,8 @@
 src/main/java/org/*
 fresh/
 
+.iserver/
+
 *.iml
 
 ## Directory-based project format:

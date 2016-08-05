@@ -30,6 +30,7 @@ import com.intellectualsites.web.events.EventManager;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.extra.ApplicationStructure;
+import com.intellectualsites.web.extra.accounts.Account;
 import com.intellectualsites.web.extra.accounts.AccountCommand;
 import com.intellectualsites.web.extra.accounts.AccountManager;
 import com.intellectualsites.web.logging.LogProvider;
@@ -52,16 +53,11 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.*;
 
 import static com.intellectualsites.web.logging.LogModes.*;
 
-/**
- * The core server
- * <p>
- *
- * @author Citymonstret
- */
 public class Server extends Thread implements IntellectualServer {
 
     /**
@@ -70,6 +66,8 @@ public class Server extends Thread implements IntellectualServer {
      * for obvious reasons
      */
     boolean silent = false;
+
+    private boolean pause = false;
 
     /**
      * This is the logging prefix
@@ -161,11 +159,14 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     /**
-     * Constructor
-     *
-     * @param standalone Should the server run async?
+     * @param standalone Whether or not the server should run as a standalone application,
+     *                   or as an integrated application
+     * @param coreFolder The main folder (in which configuration files and alike are stored)
+     * @param logWrapper The log implementation
+     * @throws IntellectualServerInitializationException If anything was to fail
      */
-    protected Server(boolean standalone, File coreFolder, LogWrapper logWrapper) throws IntellectualServerInitializationException {
+    protected Server(boolean standalone, @NonNull File coreFolder, @NonNull final LogWrapper logWrapper)
+            throws IntellectualServerInitializationException {
         instance = this;
 
         Assert.notNull(coreFolder, logWrapper);
@@ -183,9 +184,18 @@ public class Server extends Thread implements IntellectualServer {
             logWrapper.log("");
         }
 
+        coreFolder = new File(coreFolder, ".iserver"); // Makes everything more portable
+        if (!coreFolder.exists()) {
+            if (!coreFolder.mkdirs()) {
+                throw new IntellectualServerInitializationException("Failed to create the core folder: " + coreFolder);
+            }
+        }
+
+        this.coreFolder = coreFolder;
         this.logWrapper = logWrapper;
         this.standalone = standalone;
 
+        // This adds the default view bindings
         addViewBinding("html", HTMLView.class);
         addViewBinding("css", CSSView.class);
         addViewBinding("javascript", JSView.class);
@@ -196,15 +206,18 @@ public class Server extends Thread implements IntellectualServer {
         addViewBinding("std", StandardView.class);
 
         if (standalone) {
+            // Makes the application closable in ze terminal
             Signal.handle(new Signal("INT"), signal -> {
                 if (signal.toString().equals("SIGINT")) {
                     stopServer();
                 }
             });
+            // Handles incoming commands
+            // TODO: Replace the command system
             (inputThread = new InputThread(this)).start();
         }
 
-        File logFolder = new File(coreFolder, "log");
+        final File logFolder = new File(coreFolder, "log");
         if (!logFolder.exists()) {
             if (!logFolder.mkdirs()) {
                 log(Message.COULD_NOT_CREATE_FOLDER, "log");
@@ -221,7 +234,7 @@ public class Server extends Thread implements IntellectualServer {
             this.translations = new YamlConfiguration("translations", new File(new File(coreFolder, "config"), "translations.yml"));
             this.translations.loadFile();
             for (final Message message : Message.values()) {
-                String nameSpace;
+                final String nameSpace;
                 switch (message.getMode()) {
                     case MODE_DEBUG:
                         nameSpace = "debug";
@@ -507,7 +520,7 @@ public class Server extends Thread implements IntellectualServer {
                     Field portField = getClass().getDeclaredField("port");
                     portField.setAccessible(true);
                     portField.set(this, port);
-                } catch(final Exception ex) {
+                } catch (final Exception ex) {
                     continue;
                 }
             }
@@ -520,11 +533,11 @@ public class Server extends Thread implements IntellectualServer {
         log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
 
         // Pre-Steps
-        /* {
-            if (globalAccountManager.getAccount(new Object[] {null, "admin", null}) == null) {
+        {
+            if (globalAccountManager.getAccount(new Object[]{null, "admin", null}) == null) {
                 log("There is no admin account as of yet. So, well, let's create one! Please enter a password!");
                 pause = true;
-                EventManager.getInstance().addListener(new EventListener<InputThread.TextEvent>() {
+                EventManager.getInstance().addListener(new com.intellectualsites.web.events.EventListener<InputThread.TextEvent>() {
                     @Override
                     public void listen(InputThread.TextEvent event) {
                         String password = event.getText();
@@ -539,13 +552,16 @@ public class Server extends Thread implements IntellectualServer {
                 });
                 EventManager.getInstance().bake();
             }
-        } */
+        }
 
         // Main Loop
         for (; ; ) {
             if (this.stopping) {
                 log(Message.SHUTTING_DOWN);
                 break;
+            }
+            if (pause) {
+                continue;
             }
             try {
                 tick();
@@ -647,6 +663,7 @@ public class Server extends Thread implements IntellectualServer {
         return this.sessionManager;
     }
 
+    @Override
     public RequestManager getRequestManager() {
         return requestManager;
     }
