@@ -22,6 +22,7 @@ package com.intellectualsites.web.util;
 import com.intellectualsites.web.object.ResponseBody;
 import com.intellectualsites.web.object.cache.CachedResponse;
 import com.intellectualsites.web.views.RequestHandler;
+import lombok.NonNull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,15 +34,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheManager {
 
     public final Map<String, String> cachedIncludes = new ConcurrentHashMap<>();
-    private final Map<String, CachedResponse> cachedResponseBodys = new ConcurrentHashMap<>();
+    private final Map<String, CachedResponse> cachedBodies = new ConcurrentHashMap<>();
 
     /**
      * Get a cached include block
      * @param group Include block (matcher.group())
      * @return string|null
      */
-    public String getCachedInclude(final String group) {
-        return cachedIncludes.containsKey(group) ? cachedIncludes.get(group) : null;
+    public String getCachedInclude(@NonNull final String group) {
+        return this.cachedIncludes.containsKey(group) ?
+                cachedIncludes.get(group) : null;
     }
 
     /**
@@ -49,7 +51,7 @@ public class CacheManager {
      * @param group matcher.group()
      * @param document Generated document
      */
-    public void setCachedInclude(final String group, final String document) {
+    public void setCachedInclude(@NonNull final String group, @NonNull final String document) {
         this.cachedIncludes.put(group, document);
     }
 
@@ -58,8 +60,8 @@ public class CacheManager {
      * @param view RequestHandler
      * @return true if there is a ResponseBody cached, else false
      */
-    public boolean hasCache(RequestHandler view) {
-        return cachedResponseBodys.containsKey(view.toString());
+    public boolean hasCache(@NonNull final RequestHandler view) {
+        return this.cachedBodies.containsKey(view.toString());
     }
 
     /**
@@ -68,8 +70,8 @@ public class CacheManager {
      * @param ResponseBody ResponseBody (will generate a CachedResponseBody)
      * @see CachedResponse
      */
-    public void setCache(RequestHandler view, ResponseBody ResponseBody) {
-        cachedResponseBodys.put(view.toString(), new CachedResponse(ResponseBody));
+    public void setCache(@NonNull final RequestHandler view, @NonNull final ResponseBody ResponseBody) {
+        this.cachedBodies.put(view.toString(), new CachedResponse(ResponseBody));
     }
 
     /**
@@ -78,8 +80,8 @@ public class CacheManager {
      * @return the cached ResponseBody
      * @see #hasCache(RequestHandler) To check if the view has a cache
      */
-    public CachedResponse getCache(RequestHandler view) {
-        return cachedResponseBodys.get(view.toString());
+    public CachedResponse getCache(@NonNull final RequestHandler view) {
+        return this.cachedBodies.get(view.toString());
     }
 
     /**
@@ -87,6 +89,6 @@ public class CacheManager {
      * @return all cached ResponseBodys
      */
     public Map<String, CachedResponse> getAll() {
-        return this.cachedResponseBodys;
+        return this.cachedBodies;
     }
 }

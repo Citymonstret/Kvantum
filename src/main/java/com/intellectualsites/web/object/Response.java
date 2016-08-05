@@ -86,9 +86,10 @@ final public class Response implements ResponseBody {
      * @param content The string content
      * @see #setBytes(byte[]) to send raw bytes
      */
-    public void setContent(@NonNull final String content) {
+    public Response setContent(@NonNull final String content) {
         this.content = content;
         this.isText = true;
+        return this;
     }
 
     /**

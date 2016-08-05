@@ -20,6 +20,7 @@
 package com.intellectualsites.web.views.errors;
 
 import com.intellectualsites.web.core.CoreConfig;
+import lombok.NonNull;
 
 /**
  * Created 2015-04-19 for IntellectualServer
@@ -28,11 +29,11 @@ import com.intellectualsites.web.core.CoreConfig;
  */
 public class View404 extends Error {
 
-    private View404(String url) {
+    private View404(@NonNull final String url) {
         super(404, "Not Found: " + url);
     }
 
-    public static View404 construct(final String url) {
+    public static View404 construct(@NonNull final String url) {
         final String webAddress = CoreConfig.webAddress.endsWith("/") ?
                 CoreConfig.webAddress.substring(0, CoreConfig.webAddress.length() - 1) : CoreConfig.webAddress;
         return new View404(webAddress + url);

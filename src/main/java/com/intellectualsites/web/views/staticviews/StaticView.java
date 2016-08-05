@@ -5,10 +5,11 @@ import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.views.View;
 import com.intellectualsites.web.views.decl.ResponseMethod;
 import com.intellectualsites.web.views.decl.ViewMatcher;
+import lombok.NonNull;
 
 import java.util.regex.Matcher;
 
-public class StaticView extends View {
+class StaticView extends View {
 
     private final ResponseMethod method;
 
@@ -18,13 +19,13 @@ public class StaticView extends View {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
+    public boolean passes(@NonNull final Matcher matcher, @NonNull final Request request) {
         request.addMeta("matcher", matcher);
         return true;
     }
 
     @Override
-    public final Response generate(final Request r) {
+    public final Response generate(@NonNull final Request r) {
         return method.handle(r);
     }
 }

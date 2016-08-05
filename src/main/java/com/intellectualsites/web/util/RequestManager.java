@@ -69,4 +69,5 @@ public class RequestManager {
         this.views.clear();
         Server.getInstance().log("Cleared views.");
     }
+
 }

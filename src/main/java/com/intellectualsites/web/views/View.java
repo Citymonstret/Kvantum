@@ -71,7 +71,8 @@ public class View extends RequestHandler {
      * @see #containsOption(String) Check if the option exists before getting it
      */
     @SuppressWarnings("ALL")
-    public <T> T getOption(final String s) {
+    @Final
+    final public <T> T getOption(final String s) {
         return ((T) options.get(s));
     }
 
@@ -80,7 +81,8 @@ public class View extends RequestHandler {
      *
      * @return options as string
      */
-    public String getOptionString() {
+    @Final
+    final public String getOptionString() {
         StringBuilder b = new StringBuilder();
         for (Map.Entry<String, Object> e : options.entrySet()) {
             b.append(";").append(e.getKey()).append("=").append(e.getValue().toString());
@@ -94,7 +96,8 @@ public class View extends RequestHandler {
      * @param s Key
      * @return True if the option is stored, False if it isn't
      */
-    public boolean containsOption(final String s) {
+    @Final
+    final public boolean containsOption(final String s) {
         return options.containsKey(s);
     }
 
@@ -125,7 +128,8 @@ public class View extends RequestHandler {
         return this.internalName;
     }
 
-    public void register() {
+    @Final
+    final public void register() {
         Server.getInstance().getRequestManager().add(this);
     }
 
@@ -241,12 +245,6 @@ public class View extends RequestHandler {
         return this.rawPattern;
     }
 
-    /**
-     * Generate the response
-     *
-     * @param r Request
-     * @return Generated response
-     */
     @Override
     public Response generate(final Request r) {
         if (viewReturn != null) {

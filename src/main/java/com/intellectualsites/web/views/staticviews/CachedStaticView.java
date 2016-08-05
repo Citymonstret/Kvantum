@@ -10,7 +10,7 @@ import lombok.NonNull;
 
 import java.util.regex.Matcher;
 
-public class CachedStaticView extends View implements CacheApplicable {
+class CachedStaticView extends View implements CacheApplicable {
 
     private final ResponseMethod method;
 
@@ -20,18 +20,18 @@ public class CachedStaticView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
+    public boolean passes(@NonNull final Matcher matcher, @NonNull final Request request) {
         request.addMeta("matcher", matcher);
         return true;
     }
 
     @Override
-    public final Response generate(final Request r) {
+    public final Response generate(@NonNull final Request r) {
         return method.handle(r);
     }
 
     @Override
-    public boolean isApplicable(Request r) {
+    public boolean isApplicable(@NonNull final Request r) {
         return true;
     }
 }

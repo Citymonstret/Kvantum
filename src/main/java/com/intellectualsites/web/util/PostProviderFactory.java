@@ -24,6 +24,7 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.syntax.VariableProvider;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 /**
  * Created 2015-04-25 for IntellectualServer
@@ -35,12 +36,12 @@ public class PostProviderFactory implements ProviderFactory<PostProviderFactory>
 
     private PostRequest p;
 
-    private PostProviderFactory(PostRequest p) {
+    private PostProviderFactory(@NonNull final PostRequest p) {
         this.p = p;
     }
 
     @Override
-    public PostProviderFactory get(Request r) {
+    public PostProviderFactory get(@NonNull final Request r) {
         if (r.getPostRequest() == null) {
             return null;
         }
@@ -53,12 +54,12 @@ public class PostProviderFactory implements ProviderFactory<PostProviderFactory>
     }
 
     @Override
-    public boolean contains(String variable) {
+    public boolean contains(@NonNull final String variable) {
         return p.contains(variable);
     }
 
     @Override
-    public Object get(String variable) {
+    public Object get(@NonNull final String variable) {
         return p.get(variable);
     }
 }

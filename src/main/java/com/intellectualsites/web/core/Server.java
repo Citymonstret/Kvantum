@@ -185,6 +185,7 @@ public class Server extends Thread implements IntellectualServer {
 
         this.logWrapper = logWrapper;
         this.standalone = standalone;
+
         addViewBinding("html", HTMLView.class);
         addViewBinding("css", CSSView.class);
         addViewBinding("javascript", JSView.class);
@@ -354,9 +355,9 @@ public class Server extends Thread implements IntellectualServer {
 
     @Override
     public void validateViews() {
-        List<String> toRemove = new ArrayList<>();
-        for (Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
-            Class<? extends View> vc = e.getValue();
+        final List<String> toRemove = new ArrayList<>();
+        for (final Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
+            final Class<? extends View> vc = e.getValue();
             try {
                 vc.getDeclaredConstructor(String.class, Map.class);
             } catch (final Exception ex) {
@@ -382,13 +383,13 @@ public class Server extends Thread implements IntellectualServer {
     }
 
     @Override
-    public void setEventCaller(final EventCaller caller) {
+    public void setEventCaller(@NonNull final EventCaller caller) {
         Assert.notNull(caller);
         this.eventCaller = caller;
     }
 
     @Override
-    public void addProviderFactory(final ProviderFactory factory) {
+    public void addProviderFactory(@NonNull final ProviderFactory factory) {
         Assert.notNull(factory);
         this.providers.add(factory);
     }
@@ -396,7 +397,7 @@ public class Server extends Thread implements IntellectualServer {
     @Override
     public void loadPlugins() {
         if (standalone) {
-            File file = new File(coreFolder, "plugins");
+            final File file = new File(coreFolder, "plugins");
             if (!file.exists()) {
                 if (!file.mkdirs()) {
                     log(Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file);
@@ -439,15 +440,15 @@ public class Server extends Thread implements IntellectualServer {
         this.validateViews();
 
         this.log(Message.LOADING_VIEWS);
-        Map<String, Map<String, Object>> views = configViews.get("views");
+        final Map<String, Map<String, Object>> views = configViews.get("views");
         Assert.notNull(views);
         views.entrySet().forEach(entry -> {
-            Map<String, Object> view = entry.getValue();
+            final Map<String, Object> view = entry.getValue();
             String type = "html", filter = view.get("filter").toString();
             if (view.containsKey("type")) {
                 type = view.get("type").toString();
             }
-            Map<String, Object> options;
+            final Map<String, Object> options;
             if (view.containsKey("options")) {
                 options = (HashMap<String, Object>) view.get("options");
             } else {
@@ -455,9 +456,9 @@ public class Server extends Thread implements IntellectualServer {
             }
 
             if (viewBindings.containsKey(type.toLowerCase())) {
-                Class<? extends View> vc = viewBindings.get(type.toLowerCase());
+                final Class<? extends View> vc = viewBindings.get(type.toLowerCase());
                 try {
-                    View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
+                    final View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
                     requestManager.add(vv);
                 } catch (final Exception e) {
                     e.printStackTrace();
@@ -515,7 +516,6 @@ public class Server extends Thread implements IntellectualServer {
         // Start the workers
         LambdaUtil.arrayForeach(workerThreads, Worker::start);
 
-        //
         log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
         log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
 

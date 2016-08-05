@@ -22,6 +22,7 @@ package com.intellectualsites.web.views.errors;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.views.View;
+import lombok.NonNull;
 
 import java.util.regex.Matcher;
 
@@ -42,12 +43,12 @@ public class Error extends View {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
+    public boolean passes(@NonNull final Matcher matcher, @NonNull final Request request) {
         return true;
     }
 
     @Override
-    public Response generate(final Request r) {
+    public Response generate(@NonNull final Request r) {
         Response response = new Response(this);
         response.setContent(String.format("<p><b>Error:</b> %d %s</p>", this.code, this.desc));
         return response;
