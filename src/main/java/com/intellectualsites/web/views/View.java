@@ -20,6 +20,7 @@
 package com.intellectualsites.web.views;
 
 import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.matching.ViewPattern;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.util.Context;
@@ -28,8 +29,6 @@ import com.intellectualsites.web.util.Final;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * These are the view management classes.
@@ -41,10 +40,9 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class View extends RequestHandler {
 
-    protected final Pattern pattern;
-    private final String rawPattern;
     private final Map<String, Object> options;
     private final String internalName;
+    private final ViewPattern viewPattern;
 
     private int buffer = -1;
     protected String relatedFolderPath, fileName, defaultFile;
@@ -118,8 +116,7 @@ public class View extends RequestHandler {
             this.options = options;
         }
         this.internalName = internalName;
-        this.pattern = Pattern.compile(pattern);
-        this.rawPattern = pattern;
+        this.viewPattern = new ViewPattern(pattern);
         this.viewReturn = viewReturn;
     }
 
@@ -158,7 +155,8 @@ public class View extends RequestHandler {
         return this.folder;
     }
 
-    protected File getFile(final Matcher matcher) {
+    protected File getFile(final Request request) {
+        final Map<String, String> variables = (Map<String, String>) request.getMeta("viewV");
         if (internalFileName == null) {
             if (containsOption("filepattern")) {
                 this.internalFileName = getOption("filepattern");
@@ -170,9 +168,8 @@ public class View extends RequestHandler {
         }
         String n = internalFileName;
         {
-            n = n.replace("{0}", matcher.group());
-            n = n.replace("{1}", matcher.group(1));
-            String t = matcher.group(2);
+            String t = variables.get("file");
+            n = n.replace("{1}", variables.get("folder"));
             if (t == null || t.equals("")) {
                 if (internalDefaultFile == null) {
                     if (containsOption("defaultfile")) {
@@ -185,9 +182,9 @@ public class View extends RequestHandler {
                 }
                 t = internalDefaultFile;
             }
-            n = n.replace("{2}", t);
-            if (matcher.groupCount() > 3) {
-                n = n.replace("{3}", matcher.group(3));
+            n = n.replace("{2}", variables.get("file"));
+            if (variables.containsKey("extension")) {
+                n = n.replace("{3}", variables.get("extension").replace(".", ""));
             } else {
                 n = n.replace("{3}", "");
             }
@@ -217,32 +214,34 @@ public class View extends RequestHandler {
      *
      * @param request Request, from which the URL should be checked
      *
-     * @see #passes(Matcher, Request) - This is called!
+     * @see #passes(Request) - This is called!
      * @return True if the request Matches, False if not
      */
     @Final
     @Override
     final public boolean matches(final Request request) {
-        Matcher matcher = pattern.matcher(request.getQuery().getResource());
-        return matcher.matches() && passes(matcher, request);
+        final Map<String, String> map = viewPattern.matches(request.getQuery().getFullRequest());
+        if (map != null) {
+            request.addMeta("variables", map);
+        }
+        return map != null && passes(request);
     }
 
     /**
      * This is for further testing (... further than regex...)
      * For example, check if a file exists etc.
      *
-     * @param matcher The regex matcher
      * @param request The request from which the URL is fetches
      *
      * @return True if the request matches, false if not
      */
-    protected boolean passes(Matcher matcher, Request request) {
+    protected boolean passes(Request request) {
         return true;
     }
 
     @Override
     public String toString() {
-        return this.rawPattern;
+        return this.viewPattern.toString();
     }
 
     @Override

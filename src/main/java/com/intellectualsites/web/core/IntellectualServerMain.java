@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.core;
 
+import com.intellectualsites.web.gui.GuiMain;
 import com.intellectualsites.web.object.LogWrapper;
 import lombok.NonNull;
 
@@ -29,7 +30,8 @@ import java.util.Map;
 /**
  * This is a booster, I.E, it's the strap on a boot.
  */
-public class Bootstrap {
+@com.intellectualsites.web.util.Bootstrap
+public class IntellectualServerMain {
 
     private static Map<String, String> getOptions(final String[] args) {
         Map<String, String> out = new HashMap<>();
@@ -51,25 +53,19 @@ public class Bootstrap {
     public static void main(String[] args) {
         Map<String, String> options = getOptions(args);
         File file;
-        if (options.containsKey("folder")) {
-            // folder=./this/new/path
-            // folder=/web/intellectualserver/
-            // and etc.
-            file = new File(options.get("folder"));
+        if (options.containsKey("gui")) {
+            GuiMain.main(args);
         } else {
-            file = new File("./");
+            if (options.containsKey("folder")) {
+                // folder=./this/new/path
+                // folder=/web/intellectualserver/
+                // and etc.
+                file = new File(options.get("folder"));
+            } else {
+                file = new File("./");
+            }
+            startServer(true, file, new DefaultLogWrapper());
         }
-        startServer(true, file, new LogWrapper() {
-            @Override
-            public void log(String prefix, String prefix1, String timeStamp, String message) {
-                System.out.printf("[%s][%s][%s] %s%s", prefix, prefix1, timeStamp, message, System.lineSeparator());
-            }
-
-            @Override
-            public void log(String s) {
-                System.out.println(s);
-            }
-        });
     }
 
     public static Server createServer(final boolean standalone, final @NonNull File coreFolder, final @NonNull LogWrapper wrapper) {

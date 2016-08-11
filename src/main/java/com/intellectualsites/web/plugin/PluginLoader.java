@@ -120,8 +120,7 @@ public class PluginLoader {
      * Enable all plugins
      */
     public void enableAllPlugins() {
-        for (final Plugin plugin : manager.getPlugins())
-            enablePlugin(plugin);
+        manager.getPlugins().forEach(this::enablePlugin);
     }
 
     /**
@@ -217,9 +216,6 @@ public class PluginLoader {
                 loaders.put(name, plugin.getClassLoader());
             manager.enablePlugin(plugin);
             plugin.log(plugin.getName() + " is enabled!");
-            // TODO Replace this
-            // final PluginEnableEvent loadEvent = new PluginEnableEvent(plugin);
-            // Marine.getServer().callEvent(loadEvent);
         }
     }
 
@@ -234,8 +230,7 @@ public class PluginLoader {
             manager.disablePlugin(plugin);
             loaders.remove(plugin.getName());
             final PluginClassLoader loader = plugin.getClassLoader();
-            for (final String name : loader.getClasses())
-                removeClass(name);
+            loader.getClasses().forEach(this::removeClass);
             // TODO Replace this
             // EventManager.getInstance().removeAll(plugin);
             // Marine.getServer().getScheduler().removeAll(plugin);

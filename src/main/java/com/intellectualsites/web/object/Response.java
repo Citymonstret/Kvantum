@@ -30,7 +30,7 @@ import lombok.NonNull;
  *
  * @author Citymonstret
  */
-final public class Response implements ResponseBody {
+public class Response implements ResponseBody {
 
     private Header header;
     private String content;

@@ -8,8 +8,6 @@ import com.intellectualsites.web.views.decl.ResponseMethod;
 import com.intellectualsites.web.views.decl.ViewMatcher;
 import lombok.NonNull;
 
-import java.util.regex.Matcher;
-
 class CachedStaticView extends View implements CacheApplicable {
 
     private final ResponseMethod method;
@@ -20,8 +18,7 @@ class CachedStaticView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(@NonNull final Matcher matcher, @NonNull final Request request) {
-        request.addMeta("matcher", matcher);
+    public boolean passes(@NonNull final Request request) {
         return true;
     }
 

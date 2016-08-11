@@ -24,8 +24,6 @@ import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.views.View;
 import lombok.NonNull;
 
-import java.util.regex.Matcher;
-
 /**
  * Created 2015-04-19 for IntellectualServer
  *
@@ -37,13 +35,13 @@ public class Error extends View {
     private final String desc;
 
     Error(final int code, final String desc) {
-        super("", "error");
+        super("/", "error");
         this.code = code;
         this.desc = desc;
     }
 
     @Override
-    public boolean passes(@NonNull final Matcher matcher, @NonNull final Request request) {
+    public boolean passes(@NonNull final Request request) {
         return true;
     }
 

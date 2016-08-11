@@ -29,7 +29,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Created 2015-04-22 for IntellectualServer
@@ -47,8 +46,8 @@ public class LessView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        File file = getFile(matcher);
+    public boolean passes(Request request) {
+        File file = getFile(request);
         request.addMeta("less_file", file);
         return file.exists();
     }

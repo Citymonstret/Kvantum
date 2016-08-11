@@ -32,7 +32,7 @@ public class CacheDump extends Command {
         CacheManager cacheManager = Server.getInstance().cacheManager;
         StringBuilder output = new StringBuilder("Currently Cached Responses: ");
         for (Map.Entry<String, CachedResponse> e : cacheManager.getAll().entrySet()) {
-            output.append(e.getKey()).append(" = ").append(e.getValue().isText ? "text" : "bytes").append(", ");
+            output.append(e.getKey()).append(" = ").append(e.getValue().isText() ? "text" : "bytes").append(", ");
         }
         output.append("\n").append("Cached Includes: ");
         for (String s : cacheManager.cachedIncludes.keySet()) {

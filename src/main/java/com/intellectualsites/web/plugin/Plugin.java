@@ -40,11 +40,11 @@ public class Plugin implements LogProvider {
     private final UUID uuid;
     private boolean enabled;
 
-    private String name, version, author, provider;
+    protected String name, version, author, provider;
 
     private File data;
 
-    private PluginClassLoader classLoader;
+    protected PluginClassLoader classLoader;
 
     private PluginFile desc;
 
@@ -113,14 +113,14 @@ public class Plugin implements LogProvider {
     /**
      * Listen to enable
      */
-    void onEnable() {
+    protected void onEnable() {
         // Override!
     }
 
     /**
      * Listen to disable
      */
-    void onDisable() {
+    protected void onDisable() {
         // Override!
     }
 

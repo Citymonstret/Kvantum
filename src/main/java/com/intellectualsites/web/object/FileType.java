@@ -25,7 +25,7 @@ public enum FileType {
     @NonNull
     private final String contentType;
 
-    public static Optional<FileType> byExtension(String ext) {
+    public static Optional<FileType> byExtension(@NonNull final String ext) {
         final Predicate<FileType> filter = type -> type.extension.equalsIgnoreCase(ext);
         return LambdaUtil.getFirst(values(), filter);
     }

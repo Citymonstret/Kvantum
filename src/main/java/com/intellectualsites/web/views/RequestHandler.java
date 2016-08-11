@@ -1,14 +1,22 @@
 package com.intellectualsites.web.views;
 
+import com.intellectualsites.web.core.Server;
 import com.intellectualsites.web.object.Request;
 import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.views.requesthandler.MiddlewareQueue;
+import com.intellectualsites.web.views.requesthandler.MiddlewareQueuePopulator;
+import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * A handler which uses an incoming
  * request to generate a response
  */
 public abstract class RequestHandler {
+
+    @Getter
+    protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
     /**
      * Used to check if a request is to be served
@@ -18,6 +26,16 @@ public abstract class RequestHandler {
      *         False if not
      */
     abstract public boolean matches(final Request request);
+
+    final public Response handle(@NonNull final Request request) {
+        final MiddlewareQueue middlewareQueue = middlewareQueuePopulator.generateQueue();
+        middlewareQueue.handle(request);
+        if (!middlewareQueue.finished()) {
+            Server.getInstance().log("Skipping request as a middleware broke the chain!");
+            return null;
+        }
+        return generate(request);
+    }
 
     /**
      * Generate a response for the incoming request

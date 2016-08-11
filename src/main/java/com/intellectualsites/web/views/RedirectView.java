@@ -27,7 +27,6 @@ import lombok.NonNull;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 public class RedirectView extends View implements IgnoreSyntax {
 
@@ -46,9 +45,10 @@ public class RedirectView extends View implements IgnoreSyntax {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        if (this.configuration.contains(matcher.group(1))) {
-            request.addMeta("redirect_url", configuration.get(matcher.group(1)));
+    public boolean passes(Request request) {
+        Map<String, String> variables = request.getVariables();
+        if (this.configuration.contains(variables.get("entry"))) {
+            request.addMeta("redirect_url", configuration.get(variables.get("entry")));
             return true;
         }
         return false;

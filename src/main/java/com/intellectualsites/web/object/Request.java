@@ -19,8 +19,12 @@
 
 package com.intellectualsites.web.object;
 
+import com.intellectualsites.web.config.Message;
 import com.intellectualsites.web.core.Server;
+import com.intellectualsites.web.object.syntax.ProviderFactory;
+import com.intellectualsites.web.object.syntax.VariableProvider;
 import com.intellectualsites.web.util.CookieManager;
+import com.intellectualsites.web.util.Final;
 import com.intellectualsites.web.util.StringUtil;
 import com.intellectualsites.web.views.RequestHandler;
 import lombok.Getter;
@@ -43,14 +47,14 @@ import java.util.function.Predicate;
  *
  * @author Citymonstret
  */
-final public class Request {
+final public class Request implements ProviderFactory<Request>, VariableProvider {
 
     private Map<String, Object> meta;
-    private final Map<String, String> headers;
+    private Map<String, String> headers;
     private Cookie[] cookies;
     private Query query;
     private PostRequest postRequest;
-    private final Socket socket;
+    private Socket socket;
     private Session session;
     public Map<String, String> postponedCookies = new HashMap<>();
 
@@ -61,6 +65,30 @@ final public class Request {
      */
     public void setPostRequest(@NonNull final PostRequest postRequest) {
         this.postRequest = postRequest;
+    }
+
+    public void removeMeta(String internalRedirect) {
+        this.meta.remove(internalRedirect);
+    }
+
+    @Override
+    public Request get(Request r) {
+        return this;
+    }
+
+    @Override
+    public String providerName() {
+        return null;
+    }
+
+    @Override
+    public boolean contains(String variable) {
+        return getVariables().containsKey(variable);
+    }
+
+    @Override
+    public Object get(String variable) {
+        return getVariables().get(variable);
     }
 
     /**
@@ -123,6 +151,18 @@ final public class Request {
         }
         return this.postRequest;
     }
+
+    public Request newRequest(String query) {
+        Request request = new Request();
+        request.headers = new HashMap<>(headers);
+        request.socket = socket;
+        request.query = new Query(Method.GET, query);
+        request.meta = new HashMap<>(meta);
+        request.cookies = cookies;
+        return request;
+    }
+
+    private Request() {}
 
     /**
      * The request constructor
@@ -230,6 +270,11 @@ final public class Request {
         meta.put(name, var);
     }
 
+    final public void internalRedirect(@NonNull final String url) {
+        this.addMeta("internalRedirect", newRequest(url));
+        Message.INTERNAL_REDIRECT.log(url);
+    }
+
     /**
      * Get a meta value
      *
@@ -243,6 +288,11 @@ final public class Request {
             return null;
         }
         return meta.get(name);
+    }
+
+    @Final
+    final public Map<String, String> getVariables() {
+        return (Map<String, String>) getMeta("variables");
     }
 
     /**

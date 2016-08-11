@@ -29,6 +29,10 @@ public class CoreConfig {
 
     public static int workers = 1;
 
+    public static boolean disableViews = false;
+
+    public static boolean debug = true;
+
     @ConfigSection(name = "cache")
     public static class Cache {
 

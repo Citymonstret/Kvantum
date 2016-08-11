@@ -25,7 +25,6 @@ import com.intellectualsites.web.util.FileUtils;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Created 2015-04-22 for IntellectualServer
@@ -41,12 +40,14 @@ public class JSView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        String file = matcher.group(2);
+    public boolean passes(Request request) {
+        Map<String, String> variables = request.getVariables();
+        String file = variables.get("file") ;
+
         if (!file.endsWith(".js"))
             file = file + ".js";
         request.addMeta("js_file", file);
-        return matcher.matches() && (new  File(getFolder(), file)).exists();
+        return (new  File(getFolder(), file)).exists();
     }
 
 

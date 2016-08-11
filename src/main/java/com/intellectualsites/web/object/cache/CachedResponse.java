@@ -21,33 +21,25 @@ package com.intellectualsites.web.object.cache;
 
 import com.intellectualsites.web.object.Header;
 import com.intellectualsites.web.object.ResponseBody;
+import lombok.Getter;
 import lombok.NonNull;
 
 public class CachedResponse implements ResponseBody {
 
-    public final boolean isText;
-    public final byte[] bodyBytes; //, headerBytes;
+    @Getter
+    public final byte[] bytes; //, headerBytes;
+
+    @Getter
     public final Header header;
 
     public CachedResponse(@NonNull final ResponseBody parent) {
-        this.isText = parent.isText();
         this.header = parent.getHeader();
         // this.headerBytes = parent.getHeader().getBytes();
         if (parent.isText()) {
-            this.bodyBytes = parent.getContent().getBytes();
+            this.bytes = parent.getContent().getBytes();
         } else {
-            this.bodyBytes = parent.getBytes();
+            this.bytes = parent.getBytes();
         }
-    }
-
-    @Override
-    public byte[] getBytes() {
-        return bodyBytes;
-    }
-
-    @Override
-    public Header getHeader() {
-        return header;
     }
 
     @Override

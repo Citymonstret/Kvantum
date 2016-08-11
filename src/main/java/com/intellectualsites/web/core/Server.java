@@ -27,6 +27,7 @@ import com.intellectualsites.web.config.YamlConfiguration;
 import com.intellectualsites.web.events.Event;
 import com.intellectualsites.web.events.EventCaller;
 import com.intellectualsites.web.events.EventManager;
+import com.intellectualsites.web.events.defaultEvents.ServerReadyEvent;
 import com.intellectualsites.web.events.defaultEvents.ShutdownEvent;
 import com.intellectualsites.web.events.defaultEvents.StartupEvent;
 import com.intellectualsites.web.extra.ApplicationStructure;
@@ -42,7 +43,8 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
-import com.intellectualsites.web.views.staticviews.StaticViewManager;
+import com.intellectualsites.web.views.requesthandler.AuthenticationRequiredMiddleware;
+import com.intellectualsites.web.views.requesthandler.SimpleRequestHandler;
 import lombok.NonNull;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
@@ -224,14 +226,17 @@ public class Server extends Thread implements IntellectualServer {
             }
         }
         try {
-            FileUtils.addToZip(new File(logFolder, "old.zip"), logFolder.listFiles((dir, name) -> name.endsWith(".txt")), true);
-            System.setOut(new PrintStream(new TeeOutputStream(System.out, new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt")))));
+            FileUtils.addToZip(new File(logFolder, "old.zip"),
+                    logFolder.listFiles((dir, name) -> name.endsWith(".txt")), true);
+            System.setOut(new PrintStream(new TeeOutputStream(System.out,
+                    new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt")))));
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
         try {
-            this.translations = new YamlConfiguration("translations", new File(new File(coreFolder, "config"), "translations.yml"));
+            this.translations = new YamlConfiguration("translations",
+                    new File(new File(coreFolder, "config"), "translations.yml"));
             this.translations.loadFile();
             for (final Message message : Message.values()) {
                 final String nameSpace;
@@ -260,9 +265,12 @@ public class Server extends Thread implements IntellectualServer {
             e.printStackTrace();
         }
 
-        log(Message.DEBUG);
-
         ConfigurationFactory.load(CoreConfig.class, new File(coreFolder, "config")).get();
+
+        if (CoreConfig.debug) {
+            log(Message.DEBUG);
+        }
+
         this.port = CoreConfig.port;
         this.hostName = CoreConfig.hostname;
         this.bufferIn = CoreConfig.Buffer.in;
@@ -286,23 +294,25 @@ public class Server extends Thread implements IntellectualServer {
             this.mysqlConnManager = new MySQLConnManager();
         }
 
-        try {
-            configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
-            configViews.loadFile();
-            // These are the default views
-            Map<String, Object> views = new HashMap<>();
-            // HTML View
-            Map<String, Object> view = new HashMap<>();
-            view.put("filter", "(\\/?[A-Za-z]*)\\/([A-Za-z0-9]*)\\.?([A-Za-z]?)");
-            view.put("type", "std");
-            Map<String, Object> opts = new HashMap<>();
-            opts.put("folder", "./public");
-            view.put("options", opts);
-            views.put("std", view);
-            configViews.setIfNotExists("views", views);
-            configViews.saveFile();
-        } catch (final Exception e) {
-            throw new RuntimeException("Couldn't load in views");
+        if (!CoreConfig.disableViews) {
+            try {
+                configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
+                configViews.loadFile();
+                // These are the default views
+                Map<String, Object> views = new HashMap<>();
+                // HTML View
+                Map<String, Object> view = new HashMap<>();
+                view.put("filter", "(\\/?[A-Za-z]*)\\/([A-Za-z0-9]*)\\.?([A-Za-z]?)");
+                view.put("type", "std");
+                Map<String, Object> opts = new HashMap<>();
+                opts.put("folder", "./public");
+                view.put("options", opts);
+                views.put("std", view);
+                configViews.setIfNotExists("views", views);
+                configViews.saveFile();
+            } catch (final Exception e) {
+                throw new RuntimeException("Couldn't load in views");
+            }
         }
 
         // Setup the provider factories
@@ -429,7 +439,8 @@ public class Server extends Thread implements IntellectualServer {
     @Override
     public void start() {
         try {
-            Assert.equals(this.started, false, new IntellectualServerStartException("Cannot start the server, it is already started",
+            Assert.equals(this.started, false,
+                    new IntellectualServerStartException("Cannot start the server, it is already started",
                     new RuntimeException("Cannot restart server singleton")));
         } catch (IntellectualServerStartException e) {
             e.printStackTrace();
@@ -452,38 +463,52 @@ public class Server extends Thread implements IntellectualServer {
         this.log(Message.VALIDATING_VIEWS);
         this.validateViews();
 
-        this.log(Message.LOADING_VIEWS);
-        final Map<String, Map<String, Object>> views = configViews.get("views");
-        Assert.notNull(views);
-        views.entrySet().forEach(entry -> {
-            final Map<String, Object> view = entry.getValue();
-            String type = "html", filter = view.get("filter").toString();
-            if (view.containsKey("type")) {
-                type = view.get("type").toString();
-            }
-            final Map<String, Object> options;
-            if (view.containsKey("options")) {
-                options = (HashMap<String, Object>) view.get("options");
-            } else {
-                options = new HashMap<>();
-            }
-
-            if (viewBindings.containsKey(type.toLowerCase())) {
-                final Class<? extends View> vc = viewBindings.get(type.toLowerCase());
-                try {
-                    final View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
-                    requestManager.add(vv);
-                } catch (final Exception e) {
-                    e.printStackTrace();
+        if (!CoreConfig.disableViews) {
+            this.log(Message.LOADING_VIEWS);
+            final Map<String, Map<String, Object>> views = configViews.get("views");
+            Assert.notNull(views);
+            views.entrySet().forEach(entry -> {
+                final Map<String, Object> view = entry.getValue();
+                String type = "html", filter = view.get("filter").toString();
+                if (view.containsKey("type")) {
+                    type = view.get("type").toString();
                 }
-            }
+                final Map<String, Object> options;
+                if (view.containsKey("options")) {
+                    options = (HashMap<String, Object>) view.get("options");
+                } else {
+                    options = new HashMap<>();
+                }
+
+                if (viewBindings.containsKey(type.toLowerCase())) {
+                    final Class<? extends View> vc = viewBindings.get(type.toLowerCase());
+                    try {
+                        final View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
+                        requestManager.add(vv);
+                    } catch (final Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else {
+            Message.VIEWS_DISABLED.log();
+        }
+
+        // DEBUG CODE
+        final SimpleRequestHandler simpleRequestHandler = new SimpleRequestHandler("", (request, response) -> {
+            response.setContent("<h1>Hello World</h1>");
+        });
+        final SimpleRequestHandler login = new SimpleRequestHandler("login/[test]", (request, response) -> {
+            response.setContent("<h1>Login {{request.test}}</h1>");
         });
 
-        try {
-            StaticViewManager.generate(new SystemView());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        login.setInternalName("login");
+        simpleRequestHandler.setInternalName("main");
+        simpleRequestHandler.getMiddlewareQueuePopulator().add(AuthenticationRequiredMiddleware.class);
+
+        getRequestManager().add(simpleRequestHandler);
+        getRequestManager().add(login);
+        // DEBUG CODE
 
         if (mainApplicationStructure != null) {
             mainApplicationStructure.registerViews(this);
@@ -537,7 +562,8 @@ public class Server extends Thread implements IntellectualServer {
             if (globalAccountManager.getAccount(new Object[]{null, "admin", null}) == null) {
                 log("There is no admin account as of yet. So, well, let's create one! Please enter a password!");
                 pause = true;
-                EventManager.getInstance().addListener(new com.intellectualsites.web.events.EventListener<InputThread.TextEvent>() {
+                EventManager.getInstance()
+                        .addListener(new com.intellectualsites.web.events.EventListener<InputThread.TextEvent>() {
                     @Override
                     public void listen(InputThread.TextEvent event) {
                         String password = event.getText();
@@ -553,6 +579,8 @@ public class Server extends Thread implements IntellectualServer {
                 EventManager.getInstance().bake();
             }
         }
+
+        this.handleEvent(new ServerReadyEvent(this));
 
         // Main Loop
         for (; ; ) {
@@ -619,7 +647,7 @@ public class Server extends Thread implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        logWrapper.log(PREFIX, prefix, TimeUtil.getTimeStamp(), message);
+        logWrapper.log(PREFIX, prefix, TimeUtil.getTimeStamp(), message, Thread.currentThread().getName());
         // logWrapper.log(String.format("[%s][%s][%s] %s", PREFIX, prefix, TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
     }
@@ -634,7 +662,7 @@ public class Server extends Thread implements IntellectualServer {
         for (final Object a : args) {
             message = message.replaceFirst("%s", a.toString());
         }
-        logWrapper.log(PREFIX, provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
+        logWrapper.log(PREFIX, provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message, Thread.currentThread().getName());
         // void log(String prefix, String prefix1, String timeStamp, String message);
         // logWrapper.log(String.format("[%s][%s] %s", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);

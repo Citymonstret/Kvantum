@@ -27,7 +27,6 @@ import com.intellectualsites.web.util.FileUtils;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Created 2015-04-21 for IntellectualServer
@@ -42,8 +41,9 @@ public class ImgView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        String file = matcher.group(2) + matcher.group(3);
+    public boolean passes(Request request) {
+        Map<String, String> variables = request.getVariables();
+        String file = variables.get("file") + variables.get("extension");
 
         if(file.endsWith(".png")) {
             request.addMeta("img_type", "png");
@@ -57,7 +57,7 @@ public class ImgView extends View implements CacheApplicable {
             return false;
         }
         request.addMeta("img_file", file);
-        return matcher.matches() && (new  File(getFolder(), file)).exists();
+        return (new  File(getFolder(), file)).exists();
     }
 
     @Override

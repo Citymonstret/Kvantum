@@ -22,6 +22,7 @@ package com.intellectualsites.web.events;
 import com.intellectualsites.web.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The event manager
@@ -49,7 +50,7 @@ public class EventManager {
         synchronized (listeners) {
             if (!listeners.containsKey(listener.hashCode()))
                 listeners.put(listener.hashCode(),
-                        new ArrayDeque<EventListener>());
+                        new ArrayDeque<>());
             listeners.get(listener.hashCode()).add(listener);
         }
     }
@@ -57,11 +58,8 @@ public class EventManager {
         synchronized (listeners) {
             final List<EventListener> l = new ArrayList<>();
             for (final Deque<EventListener> listeners : this.listeners.values()) {
-                for (final EventListener listener : listeners) {
-                    if (listener.sddww().equals(y)) {
-                        l.add(listener);
-                    }
-                }
+                l.addAll(listeners.stream().filter(listener ->
+                        listener.sddww().equals(y)).collect(Collectors.toList()));
             }
             return l;
         }
@@ -70,11 +68,8 @@ public class EventManager {
     public void removeAll(final Object y) {
         synchronized (listeners) {
             for (final Deque<EventListener> listeners : this.listeners.values()) {
-                for (final EventListener listener : listeners) {
-                    if (listener.sddww().equals(y)) {
-                        listeners.remove(listener);
-                    }
-                }
+                listeners.stream().filter(listener ->
+                        listener.sddww().equals(y)).forEachOrdered(listeners::remove);
             }
             bake();
         }

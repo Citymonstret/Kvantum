@@ -22,6 +22,7 @@ package com.intellectualsites.web.plugin;
 import com.intellectualsites.web.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Plugin Manager
@@ -112,10 +113,7 @@ public class PluginManager {
      * @return A collection containing the names of the plugins
      */
     public Collection<String> getPluginNames() {
-        final List<String> strings = new ArrayList<>();
-        for (final Plugin plugin : plugins.values())
-            strings.add(plugin.getName());
-        return strings;
+        return plugins.values().stream().map(Plugin::getName).collect(Collectors.toList());
     }
 
     /**
@@ -124,10 +122,6 @@ public class PluginManager {
      * @return all enabled plugins
      */
     public Collection<Plugin> getEnabledPlugins() {
-        final Collection<Plugin> plugins = new ArrayList<>();
-        for (final Plugin plugin : this.plugins.values())
-            if (plugin.isEnabled())
-                plugins.add(plugin);
-        return plugins;
+        return this.plugins.values().stream().filter(Plugin::isEnabled).collect(Collectors.toCollection(ArrayList::new));
     }
 }

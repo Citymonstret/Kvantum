@@ -27,7 +27,6 @@ import com.intellectualsites.web.object.syntax.ProviderFactory;
 import com.intellectualsites.web.object.syntax.Syntax;
 import com.intellectualsites.web.thread.ThreadManager;
 import com.intellectualsites.web.views.RequestHandler;
-import com.intellectualsites.web.views.View;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -61,7 +60,113 @@ class Worker {
         });
     }
 
-    public void run(final Socket remote, @NonNull final Server server) {
+    private void handle(final Request request, final Server server, final BufferedOutputStream output) {
+        final RequestHandler requestHandler = server.requestManager.match(request);
+
+        String textContent = "";
+        byte[] bytes = empty;
+
+        final Session session = server.sessionManager.getSession(request, output);
+        if (session != null) {
+            request.setSession(session);
+        } else {
+            request.setSession(server.sessionManager.createSession(request, output));
+        }
+
+        boolean shouldCache = false;
+        boolean cache = false;
+        final ResponseBody body;
+
+        if (server.enableCaching && requestHandler instanceof CacheApplicable
+                && ((CacheApplicable) requestHandler).isApplicable(request)) {
+            cache = true;
+            if (!server.cacheManager.hasCache(requestHandler)) {
+                shouldCache = true;
+            }
+        }
+
+        if (!cache || shouldCache) { // Either it's a non-cached view, or there is no cache stored
+            body = requestHandler.handle(request);
+        } else { // Just read from memory
+            body = server.cacheManager.getCache(requestHandler);
+        }
+
+        boolean skip = false;
+        if (body == null) {
+            final Object redirect = request.getMeta("internalRedirect");
+            if (redirect != null && redirect instanceof Request) {
+                final Request newRequest = (Request) redirect;
+                newRequest.removeMeta("internalRedirect");
+                handle(newRequest, server, output);
+                return;
+            } else {
+                skip = true;
+            }
+        }
+
+        if (!skip) {
+            if (shouldCache) {
+                server.cacheManager.setCache(requestHandler, body);
+            }
+
+            if (body.isText()) {
+                textContent = body.getContent();
+            } else {
+                bytes = body.getBytes();
+            }
+
+            for (final Map.Entry<String, String> postponedCookie : request.postponedCookies.entrySet()) {
+                body.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
+            }
+
+            if (body.isText()) {
+                // Make sure to not use Crush when
+                // told not to
+                if (!(requestHandler instanceof IgnoreSyntax)) {
+                    // Provider factories are fun, and so is the
+                    // global map. But we also need the view
+                    // specific ones!
+                    Map<String, ProviderFactory> factories = new HashMap<>();
+                    for (final ProviderFactory factory : server.providers) {
+                        factories.put(factory.providerName().toLowerCase(), factory);
+                    }
+                    // Now make use of the view specific ProviderFactory
+                    ProviderFactory z = requestHandler.getFactory(request);
+                    if (z != null) {
+                        factories.put(z.providerName().toLowerCase(), z);
+                    }
+                    factories.put("request", request);
+                    // This is how the crush engine works.
+                    // Quite simple, yet powerful!
+                    for (Syntax syntax : server.syntaxes) {
+                        if (syntax.matches(textContent)) {
+                            textContent = syntax.handle(textContent, request, factories);
+                        }
+                    }
+                }
+                // Now, finally, let's get the bytes.
+                bytes = textContent.getBytes();
+            }
+
+            body.getHeader().apply(output);
+
+            try {
+                output.write(bytes);
+                output.flush();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        if (!server.silent && !skip) {
+            server.log("Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
+                    requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length
+            );
+        }
+    }
+
+    private void run(final Socket remote, @NonNull final Server server) {
         if (remote == null || remote.isClosed()) {
             return; // TODO: Why?
         }
@@ -103,91 +208,12 @@ class Worker {
             server.log(request.buildLog());
         }
 
-        final RequestHandler requestHandler = server.requestManager.match(request);
-
-        String textContent = "";
-        byte[] bytes = empty;
-
-        final Session session = server.sessionManager.getSession(request, output);
-        if (session != null) {
-            request.setSession(session);
-        } else {
-            request.setSession(server.sessionManager.createSession(request, output));
-        }
-
-        boolean shouldCache = false;
-        boolean cache = false;
-        final ResponseBody body;
-
-        if (server.enableCaching && requestHandler instanceof CacheApplicable && ((CacheApplicable) requestHandler).isApplicable(request)) {
-            cache = true;
-            if (!server.cacheManager.hasCache(requestHandler)) {
-                shouldCache = true;
-            }
-        }
-
-        if (!cache || shouldCache) { // Either it's a non-cached view, or there is no cache stored
-            body = requestHandler.generate(request);
-        } else { // Just read from memory
-            body = server.cacheManager.getCache(requestHandler);
-        }
-
-        if (shouldCache) {
-            server.cacheManager.setCache(requestHandler, body);
-        }
-
-        if (body.isText()) {
-            textContent = body.getContent();
-        } else {
-            bytes = body.getBytes();
-        }
-
-        for (final Map.Entry<String, String> postponedCookie : request.postponedCookies.entrySet()) {
-            body.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
-        }
-
-        if (body.isText()) {
-            // Make sure to not use Crush when
-            // told not to
-            if (!(requestHandler instanceof IgnoreSyntax)) {
-                // Provider factories are fun, and so is the
-                // global map. But we also need the view
-                // specific ones!
-                Map<String, ProviderFactory> factories = new HashMap<>();
-                for (final ProviderFactory factory : server.providers) {
-                    factories.put(factory.providerName().toLowerCase(), factory);
-                }
-                // Now make use of the view specific ProviderFactory
-                ProviderFactory z = requestHandler.getFactory(request);
-                if (z != null) {
-                    factories.put(z.providerName().toLowerCase(), z);
-                }
-                // This is how the crush engine works.
-                // Quite simple, yet powerful!
-                for (Syntax syntax : server.syntaxes) {
-                    if (syntax.matches(textContent)) {
-                        textContent = syntax.handle(textContent, request, factories);
-                    }
-                }
-            }
-            // Now, finally, let's get the bytes.
-            bytes = textContent.getBytes();
-        }
-
-        body.getHeader().apply(output);
+        handle(request, server, output);
 
         try {
-            output.write(bytes);
-            output.flush();
             input.close();
         } catch (final Exception e) {
             e.printStackTrace();
-        }
-
-        if (!server.silent) {
-            server.log("Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
-                    requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length
-            );
         }
     }
 }

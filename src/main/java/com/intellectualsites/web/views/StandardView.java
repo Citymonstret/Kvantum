@@ -7,7 +7,6 @@ import com.intellectualsites.web.util.GenericViewUtil;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 public class StandardView extends View implements CacheApplicable {
 
@@ -16,10 +15,13 @@ public class StandardView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        String folderName = matcher.group(1);
-        String fileName = matcher.group(2);
-        String extension = matcher.group(3);
+    public boolean passes(Request request) {
+        String folderName, fileName, extension;
+        final Map<String, String> variables = request.getVariables();
+        folderName = variables.get("folder");
+        fileName = variables.get("file");
+        extension = variables.get("extension").replace(".", "");
+
         if (extension.isEmpty()) {
             if (containsOption("defaultExt")) {
                 extension = getOption("defaultExt");
@@ -37,7 +39,7 @@ public class StandardView extends View implements CacheApplicable {
 
     @Override
     public boolean isApplicable(Request r) {
-        return false; // TODO: Turn on cache when done
+        return true;
     }
 
     @Override

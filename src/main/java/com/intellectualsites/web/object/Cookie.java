@@ -23,11 +23,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Created 2015-04-19 for IntellectualServer
- *
- * @author Citymonstret
- */
 @RequiredArgsConstructor
 public final class Cookie {
 

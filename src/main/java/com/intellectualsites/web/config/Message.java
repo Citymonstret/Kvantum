@@ -20,6 +20,7 @@
 package com.intellectualsites.web.config;
 
 import com.intellectualsites.web.core.Server;
+import lombok.Getter;
 
 import static com.intellectualsites.web.logging.LogModes.*;
 
@@ -47,6 +48,8 @@ public enum Message {
     STANDALONE_NOT_LOADING_PLUGINS("Running as standalone, not loading plugins!", MODE_INFO),
     MYSQL_INIT("Initalizing MySQL Connection", MODE_INFO),
     LOADING_VIEWS("Loading views...", MODE_INFO),
+    INTERNAL_REDIRECT("Redirecting request to \"/%s\"", MODE_DEBUG),
+    VIEWS_DISABLED("Skipped view loading (Disabled)", MODE_INFO),
     STARTUP_STEP("Calling Startup Step: '%s'", MODE_DEBUG),
     CACHING_DISABLED("Caching is not enabled, this can reduce load times on bigger files!", MODE_WARNING),
     CACHING_ENABLED("Caching is enabled, beware that this increases memory usage - So keep an eye on it", MODE_WARNING),
@@ -54,6 +57,7 @@ public enum Message {
     INITIALIZING_LOCATION_SERVICES("Initializing location services", MODE_INFO);
 
     private final String message;
+    @Getter
     private final int mode;
 
     Message(final String message) {
@@ -63,10 +67,6 @@ public enum Message {
     Message(final String message, int mode) {
         this.message = message;
         this.mode = mode;
-    }
-
-    public int getMode() {
-        return this.mode;
     }
 
     @Override
@@ -95,5 +95,9 @@ public enum Message {
             }
         }
         return this.message;
+    }
+
+    public void log(Object ... args) {
+        Server.getInstance().log(this, args);
     }
 }

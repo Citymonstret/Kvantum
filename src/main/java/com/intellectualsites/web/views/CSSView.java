@@ -19,13 +19,14 @@
 
 package com.intellectualsites.web.views;
 
-import com.intellectualsites.web.object.*;
+import com.intellectualsites.web.object.Header;
+import com.intellectualsites.web.object.Request;
+import com.intellectualsites.web.object.Response;
 import com.intellectualsites.web.object.cache.CacheApplicable;
 import com.intellectualsites.web.util.FileUtils;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Created 2015-04-21 for IntellectualServer
@@ -41,8 +42,8 @@ public class CSSView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        File file = getFile(matcher);
+    public boolean passes(Request request) {
+        File file = getFile(request);
         request.addMeta("css_file", file);
         return file.exists();
     }

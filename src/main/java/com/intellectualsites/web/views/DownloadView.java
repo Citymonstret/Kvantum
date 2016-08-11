@@ -26,7 +26,6 @@ import com.intellectualsites.web.util.FileUtils;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Created 2015-05-01 for IntellectualServer
@@ -41,9 +40,9 @@ public class DownloadView extends View {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        String file = matcher.group(2) + matcher.group(3);
-
+    public boolean passes(Request request) {
+        Map<String, String> variables = request.getVariables();
+        String file = variables.get("file") + variables.get("extension");
         if(file.endsWith(".zip")) {
             request.addMeta("file_type", "zip");
         } else if(file.endsWith(".txt")) {
@@ -54,7 +53,7 @@ public class DownloadView extends View {
             return false;
         }
         request.addMeta("zip_file", file);
-        return matcher.matches() && (new  File(getFolder(), file)).exists();
+        return (new  File(getFolder(), file)).exists();
     }
 
 

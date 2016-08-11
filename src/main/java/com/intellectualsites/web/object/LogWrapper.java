@@ -21,7 +21,7 @@ package com.intellectualsites.web.object;
 
 public interface LogWrapper {
 
-    void log(String prefix, String prefix1, String timeStamp, String message);
+    void log(String prefix, String prefix1, String timeStamp, String message, String thread);
     void log(String s);
 
 }

@@ -19,6 +19,7 @@
 
 package com.intellectualsites.web.config;
 
+import lombok.NonNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -38,7 +39,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     private Map<String, Object> map;
     private Yaml yaml;
 
-    public YamlConfiguration(String name, File file) throws Exception {
+    public YamlConfiguration(@NonNull final String name, @NonNull final File file) throws Exception {
         super(name);
         this.file = file;
         if (!file.getParentFile().exists()) {
@@ -56,7 +57,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
 
     private Yaml getYaml() {
         if (yaml == null) {
-            DumperOptions options = new DumperOptions();
+            final DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setAllowReadOnlyProperties(true);
             options.setAllowUnicode(true);
@@ -69,16 +70,14 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     @Override
     public void reload() {
         this.map = new HashMap<>();
-        loadFile();
+        this.loadFile();
     }
 
     @Override
     public void saveFile() {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            getYaml().dump(map, writer);
-            writer.close();
-        } catch(final Exception e) {
+        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            this.getYaml().dump(map, writer);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -86,34 +85,32 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     @SuppressWarnings("ALL")
     @Override
     public void loadFile() {
-        try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
-            Object o = getYaml().load(stream);
+        try (final BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
+            final Object o = this.getYaml().load(stream);
             if (o != null) {
                 this.map.putAll((HashMap<String, Object>) o);
             }
-            stream.close();
-        } catch(final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public <T> void set(String key, T value) {
+    public <T> void set(@NonNull final String key, @NonNull final T value) {
         if (key.contains(".")) {
-            convertToMap(key, value);
+            this.convertToMap(key, value);
         } else {
             this.map.put(key, value);
         }
     }
 
-    private void convertToMap(String in, Object value) {
+    private void convertToMap(@NonNull String in, @NonNull final Object value) {
         if (in.contains(".")) {
             Map<String, Object> lastMap = this.map;
             while (in.contains(".")) {
-                String[] parts = in.split("\\.");
+                final String[] parts = in.split("\\.");
                 if (lastMap.containsKey(parts[0])) {
-                    Object o = lastMap.get(parts[0]);
+                    final Object o = lastMap.get(parts[0]);
                     if (o instanceof Map) {
                         lastMap = (Map) o;
                     }
@@ -121,7 +118,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
                     lastMap.put(parts[0], new HashMap<>());
                     lastMap = (Map) lastMap.get(parts[0]);
                 }
-                StringBuilder b = new StringBuilder();
+                final StringBuilder b = new StringBuilder();
                 for (int i = 1; i < parts.length; i++) {
                     b.append(".").append(parts[i]);
                 }
@@ -134,26 +131,26 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     }
 
     @Override
-    public <T> T get(String key, T def) {
-        if (!contains(key)) {
-            setIfNotExists(key, def);
+    public <T> T get(@NonNull final String key, @NonNull final T def) {
+        if (!this.contains(key)) {
+            this.setIfNotExists(key, def);
             return def;
         }
-        return get(key);
+        return this.get(key);
     }
 
     @SuppressWarnings("ALL")
     @Override
-    public <T> T get(String key) {
-        if (map.containsKey(key)) {
-            return (T) map.get(key);
+    public <T> T get(@NonNull final String key) {
+        if (this.map.containsKey(key)) {
+            return (T) this.map.get(key);
         } else {
             if (key.contains(".")) {
-                String[] parts = key.split("\\.");
+                final String[] parts = key.split("\\.");
                 Map<String, Object> lastMap = this.map;
                 for (String p : parts) {
                     if (lastMap.containsKey(p)) {
-                        Object o = lastMap.get(p);
+                        final Object o = lastMap.get(p);
                         if (o instanceof Map) {
                             lastMap = (Map) o;
                         } else {
@@ -167,16 +164,16 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     }
 
     @Override
-    public boolean contains(String key) {
-        if (map.containsKey(key)) {
+    public boolean contains(@NonNull final String key) {
+        if (this.map.containsKey(key)) {
             return true;
         } else {
             if (key.contains(".")) {
-                String[] parts = key.split("\\.");
+                final String[] parts = key.split("\\.");
                 Map<String, Object> lastMap = this.map;
                 for (String p : parts) {
                     if (lastMap.containsKey(p)) {
-                        Object o = lastMap.get(p);
+                        final Object o = lastMap.get(p);
                         if (o instanceof Map) {
                             lastMap = (Map) o;
                         } else {
@@ -190,9 +187,9 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     }
 
     @Override
-    public <T> void setIfNotExists(String key, T value) {
-        if (!contains(key)) {
-            set(key, value);
+    public <T> void setIfNotExists(@NonNull final String key, @NonNull final T value) {
+        if (!this.contains(key)) {
+            this.set(key, value);
         }
     }
 }

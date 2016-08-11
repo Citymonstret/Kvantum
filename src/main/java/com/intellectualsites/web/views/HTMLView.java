@@ -28,7 +28,6 @@ import com.intellectualsites.web.util.FileUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Created 2015-04-19 for IntellectualServer
@@ -44,8 +43,8 @@ public class HTMLView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Matcher matcher, Request request) {
-        File file = getFile(matcher);
+    public boolean passes(Request request) {
+        File file = getFile(request);
         request.addMeta("html_file", file);
         return file.exists();
     }
