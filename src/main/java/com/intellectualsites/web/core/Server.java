@@ -43,8 +43,6 @@ import com.intellectualsites.web.plugin.PluginLoader;
 import com.intellectualsites.web.plugin.PluginManager;
 import com.intellectualsites.web.util.*;
 import com.intellectualsites.web.views.*;
-import com.intellectualsites.web.views.requesthandler.AuthenticationRequiredMiddleware;
-import com.intellectualsites.web.views.requesthandler.SimpleRequestHandler;
 import lombok.NonNull;
 import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
@@ -493,22 +491,6 @@ public class Server extends Thread implements IntellectualServer {
         } else {
             Message.VIEWS_DISABLED.log();
         }
-
-        // DEBUG CODE
-        final SimpleRequestHandler simpleRequestHandler = new SimpleRequestHandler("", (request, response) -> {
-            response.setContent("<h1>Hello World</h1>");
-        });
-        final SimpleRequestHandler login = new SimpleRequestHandler("login/[test]", (request, response) -> {
-            response.setContent("<h1>Login {{request.test}}</h1>");
-        });
-
-        login.setInternalName("login");
-        simpleRequestHandler.setInternalName("main");
-        simpleRequestHandler.getMiddlewareQueuePopulator().add(AuthenticationRequiredMiddleware.class);
-
-        getRequestManager().add(simpleRequestHandler);
-        getRequestManager().add(login);
-        // DEBUG CODE
 
         if (mainApplicationStructure != null) {
             mainApplicationStructure.registerViews(this);
