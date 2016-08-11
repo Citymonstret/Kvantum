@@ -20,7 +20,8 @@
 package com.plotsquared.iserver.object;
 
 @SuppressWarnings("ALL")
-public enum Method {
+public enum Method
+{
 
     /**
      * Post requests are used

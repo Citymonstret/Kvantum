@@ -27,54 +27,72 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final public class ForEachBlock extends Syntax {
+final public class ForEachBlock extends Syntax
+{
 
-    public ForEachBlock() {
-        super(Pattern.compile("\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([A-Za-z0-9<>\"'-_\\/\\\\ }{}\\n\\s]*)\\{\\/foreach\\}"));
+    public ForEachBlock()
+    {
+        super( Pattern.compile( "\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([A-Za-z0-9<>\"'-_\\/\\\\ }{}\\n\\s]*)\\{\\/foreach\\}" ) );
     }
 
-    public String process(String content, Matcher matcher, Request r, Map<String, ProviderFactory> factories) {
-        while (matcher.find()) {
-            String provider = matcher.group(1);
-            String variable = matcher.group(2);
-            String variableName = matcher.group(3);
-            String forContent = matcher.group(4);
+    public String process(String content, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    {
+        while ( matcher.find() )
+        {
+            String provider = matcher.group( 1 );
+            String variable = matcher.group( 2 );
+            String variableName = matcher.group( 3 );
+            String forContent = matcher.group( 4 );
 
-            try {
-                if (factories.containsKey(provider.toLowerCase())) {
-                    VariableProvider p = factories.get(provider.toLowerCase()).get(r);
-                    if (p != null) {
-                        if (!p.contains(variable)) {
-                            content = content.replace(matcher.group(), "");
-                        } else {
-                            Object o = p.get(variable);
+            try
+            {
+                if ( factories.containsKey( provider.toLowerCase() ) )
+                {
+                    VariableProvider p = factories.get( provider.toLowerCase() ).get( r );
+                    if ( p != null )
+                    {
+                        if ( !p.contains( variable ) )
+                        {
+                            content = content.replace( matcher.group(), "" );
+                        } else
+                        {
+                            Object o = p.get( variable );
 
                             StringBuilder totalContent = new StringBuilder();
-                            if (o instanceof Object[]) {
-                                for (Object oo : (Object[]) o) {
-                                    if (oo == null) {
+                            if ( o instanceof Object[] )
+                            {
+                                for ( Object oo : (Object[]) o )
+                                {
+                                    if ( oo == null )
+                                    {
                                         continue;
                                     }
-                                    totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                                    totalContent.append( forContent.replace( "{{" + variableName + "}}", oo.toString() ) );
                                 }
-                            } else if (o instanceof Collection) {
-                                for (Object oo : (Collection) o) {
-                                    if (oo == null) {
+                            } else if ( o instanceof Collection )
+                            {
+                                for ( Object oo : (Collection) o )
+                                {
+                                    if ( oo == null )
+                                    {
                                         continue;
                                     }
-                                    totalContent.append(forContent.replace("{{" + variableName + "}}", oo.toString()));
+                                    totalContent.append( forContent.replace( "{{" + variableName + "}}", oo.toString() ) );
                                 }
                             }
-                            content = content.replace(matcher.group(), totalContent.toString());
+                            content = content.replace( matcher.group(), totalContent.toString() );
                         }
-                    } else {
-                        content = content.replace(matcher.group(), "");
+                    } else
+                    {
+                        content = content.replace( matcher.group(), "" );
                     }
-                } else {
-                    content = content.replace(matcher.group(), "");
+                } else
+                {
+                    content = content.replace( matcher.group(), "" );
                 }
-            } catch (final Exception e) {
-                Server.getInstance().log("Failed to finish the foor loop (" + provider + "." + variable + " -> " + variableName + ") -> " + e.getMessage());
+            } catch ( final Exception e )
+            {
+                Server.getInstance().log( "Failed to finish the foor loop (" + provider + "." + variable + " -> " + variableName + ") -> " + e.getMessage() );
             }
         }
         return content;

@@ -34,120 +34,148 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AccountManager implements ProviderFactory<Account> {
+public class AccountManager implements ProviderFactory<Account>
+{
 
     private final List<Account> accountList;
     private final ConcurrentHashMap<Session, Account> sessionAccountMap;
     private final SQLiteManager databaseManager;
     private int id = 0;
 
-    public AccountManager(final SQLiteManager databaseManager) {
-        this.accountList = Collections.synchronizedList(new ArrayList<Account>());
+    public AccountManager(final SQLiteManager databaseManager)
+    {
+        this.accountList = Collections.synchronizedList( new ArrayList<Account>() );
         this.sessionAccountMap = new ConcurrentHashMap<>();
         this.databaseManager = databaseManager;
     }
 
-    public boolean load() {
-        try {
-            databaseManager.executeUpdate("CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR(32), password VARCHAR(256))");
-            PreparedStatement loadAccounts = databaseManager.prepareStatement("SELECT * FROM account");
+    public boolean load()
+    {
+        try
+        {
+            databaseManager.executeUpdate( "CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR(32), password VARCHAR(256))" );
+            PreparedStatement loadAccounts = databaseManager.prepareStatement( "SELECT * FROM account" );
             ResultSet results = loadAccounts.executeQuery();
-            while (results.next()) {
+            while ( results.next() )
+            {
                 this.id++;
-                int id = results.getInt("id");
-                String username = results.getString("name");
-                String password = results.getString("password");
-                Account account = new Account(id, username, password.getBytes());
-                registerAccount(account);
+                int id = results.getInt( "id" );
+                String username = results.getString( "name" );
+                String password = results.getString( "password" );
+                Account account = new Account( id, username, password.getBytes() );
+                registerAccount( account );
             }
             results.close();
             loadAccounts.close();
 
-            Server.getInstance().log("Loaded " + accountList.size() + " accounts from the database");
+            Server.getInstance().log( "Loaded " + accountList.size() + " accounts from the database" );
 
-            if (accountList.isEmpty()) {
-                createAccount(new Account(getNextId(), "test", "test".getBytes()));
+            if ( accountList.isEmpty() )
+            {
+                createAccount( new Account( getNextId(), "test", "test".getBytes() ) );
             }
-        } catch (SQLException e) {
+        } catch ( SQLException e )
+        {
             e.printStackTrace();
             return false;
         }
         return true;
     }
 
-    public int getNextId() {
+    public int getNextId()
+    {
         return id++;
     }
 
-    public void createAccount(final Account account) throws SQLException {
-        PreparedStatement statement = databaseManager.prepareStatement("INSERT INTO account(name, password) VALUES(?, ?)");
-        statement.setString(1, account.getUsername());
-        statement.setString(2, new String(account.getPassword()));
+    public void createAccount(final Account account) throws SQLException
+    {
+        PreparedStatement statement = databaseManager.prepareStatement( "INSERT INTO account(name, password) VALUES(?, ?)" );
+        statement.setString( 1, account.getUsername() );
+        statement.setString( 2, new String( account.getPassword() ) );
         statement.executeUpdate();
         statement.close();
-        registerAccount(account);
+        registerAccount( account );
     }
 
-    public synchronized Account getAccount(Session session) {
-        if (!sessionAccountMap.containsKey(session)) {
+    public synchronized Account getAccount(Session session)
+    {
+        if ( !sessionAccountMap.containsKey( session ) )
+        {
             return null;
         }
-        return sessionAccountMap.get(session);
+        return sessionAccountMap.get( session );
     }
 
-    public Account getAccount(final Object[] objects) {
+    public Account getAccount(final Object[] objects)
+    {
         // 0 = id
         // 1 = username
         // 2 = email
         // ...
-        Assert.equals(objects.length >= 2, true);
-        if (objects[0] != null) {
-            return getAccountById((Integer) objects[0]);
+        Assert.equals( objects.length >= 2, true );
+        if ( objects[ 0 ] != null )
+        {
+            return getAccountById( (Integer) objects[ 0 ] );
         }
-        if (objects[1] != null) {
-            return getAccountByUsername(objects[1].toString());
+        if ( objects[ 1 ] != null )
+        {
+            return getAccountByUsername( objects[ 1 ].toString() );
         }
         return null;
     }
 
-    protected Account getAccountById(int id) {
-        for (Account account : accountList) {
-            if (account.getID() == id) {
+    protected Account getAccountById(int id)
+    {
+        for ( Account account : accountList )
+        {
+            if ( account.getID() == id )
+            {
                 return account;
             }
         }
         return null;
     }
 
-    protected Account getAccountByUsername(String username) {
-        for (Account account : accountList) {
-            if (account.getUsername().equals(username)) {
+    protected Account getAccountByUsername(String username)
+    {
+        for ( Account account : accountList )
+        {
+            if ( account.getUsername().equals( username ) )
+            {
                 return account;
             }
         }
         return null;
     }
 
-    public void unbindAccount(Session session) {
-        if (sessionAccountMap.containsKey(session)) {
-            sessionAccountMap.remove(session);
+    public void unbindAccount(Session session)
+    {
+        if ( sessionAccountMap.containsKey( session ) )
+        {
+            sessionAccountMap.remove( session );
         }
     }
 
-    public synchronized void bindAccount(Session session, Account account) {
-        sessionAccountMap.put(session, account);
+    public synchronized void bindAccount(Session session, Account account)
+    {
+        sessionAccountMap.put( session, account );
     }
 
-    public void registerAccount(Account account) {
-        accountList.add(account);
+    public void registerAccount(Account account)
+    {
+        accountList.add( account );
     }
 
-    public Session getSession(Account account) {
-        if (!sessionAccountMap.containsValue(account)) {
+    public Session getSession(Account account)
+    {
+        if ( !sessionAccountMap.containsValue( account ) )
+        {
             return null;
         }
-        for (Session session : sessionAccountMap.keySet()) {
-            if (sessionAccountMap.get(session).equals(account)) {
+        for ( Session session : sessionAccountMap.keySet() )
+        {
+            if ( sessionAccountMap.get( session ).equals( account ) )
+            {
                 return session;
             }
         }
@@ -155,12 +183,14 @@ public class AccountManager implements ProviderFactory<Account> {
     }
 
     @Override
-    public Account get(Request r) {
-        return getAccount(r.getSession());
+    public Account get(Request r)
+    {
+        return getAccount( r.getSession() );
     }
 
     @Override
-    public String providerName() {
+    public String providerName()
+    {
         return "account";
     }
 }

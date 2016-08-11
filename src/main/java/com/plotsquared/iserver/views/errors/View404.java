@@ -26,16 +26,19 @@ import com.plotsquared.iserver.core.CoreConfig;
  *
  * @author Citymonstret
  */
-public class View404 extends Error {
+public class View404 extends Error
+{
 
-    private View404(final String url) {
-        super(404, "Not Found: " + url);
+    private View404(final String url)
+    {
+        super( 404, "Not Found: " + url );
     }
 
-    public static View404 construct(final String url) {
-        final String webAddress = CoreConfig.webAddress.endsWith("/") ?
-                CoreConfig.webAddress.substring(0, CoreConfig.webAddress.length() - 1) : CoreConfig.webAddress;
-        return new View404(webAddress + url);
+    public static View404 construct(final String url)
+    {
+        final String webAddress = CoreConfig.webAddress.endsWith( "/" ) ?
+                CoreConfig.webAddress.substring( 0, CoreConfig.webAddress.length() - 1 ) : CoreConfig.webAddress;
+        return new View404( webAddress + url );
     }
 
 }

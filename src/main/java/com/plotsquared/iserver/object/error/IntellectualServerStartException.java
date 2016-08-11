@@ -19,9 +19,11 @@
 
 package com.plotsquared.iserver.object.error;
 
-public class IntellectualServerStartException extends IntellectualServerException {
+public class IntellectualServerStartException extends IntellectualServerException
+{
 
-    public IntellectualServerStartException(String s, Throwable cause) {
-        super("Couldn't start IntellectualServer: " + s, cause);
+    public IntellectualServerStartException(String s, Throwable cause)
+    {
+        super( "Couldn't start IntellectualServer: " + s, cause );
     }
 }

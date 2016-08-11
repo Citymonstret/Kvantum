@@ -26,36 +26,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-final public class Session implements VariableProvider {
+final public class Session implements VariableProvider
+{
 
     private static long id = 0L;
     private final Map<String, Object> sessionStorage;
     private long sessionId = 0;
-    public Session() {
+
+    public Session()
+    {
         sessionStorage = new HashMap<>();
         sessionId = id++;
     }
 
-    public long getSessionId() {
+    public long getSessionId()
+    {
         return sessionId;
     }
 
-    public boolean contains(final String variable) {
-        Assert.notNull(variable);
+    public boolean contains(final String variable)
+    {
+        Assert.notNull( variable );
 
-        return sessionStorage.containsKey(variable.toLowerCase());
+        return sessionStorage.containsKey( variable.toLowerCase() );
     }
 
-    public Object get(final String variable) {
-        Assert.notNull(variable);
+    public Object get(final String variable)
+    {
+        Assert.notNull( variable );
 
-        return sessionStorage.get(variable.toLowerCase());
+        return sessionStorage.get( variable.toLowerCase() );
     }
 
-    public void set(final String s, final Object o) {
-        Assert.notNull(s, o);
+    public void set(final String s, final Object o)
+    {
+        Assert.notNull( s, o );
 
-        sessionStorage.put(s.toLowerCase(), o);
+        sessionStorage.put( s.toLowerCase(), o );
     }
 
 }

@@ -25,20 +25,24 @@ import com.plotsquared.iserver.util.CacheManager;
 
 import java.util.Map;
 
-public class CacheDump extends Command {
+public class CacheDump extends Command
+{
 
     @Override
-    public void handle(String[] args) {
+    public void handle(String[] args)
+    {
         CacheManager cacheManager = Server.getInstance().cacheManager;
-        StringBuilder output = new StringBuilder("Currently Cached Responses: ");
-        for (Map.Entry<String, CachedResponse> e : cacheManager.getAll().entrySet()) {
-            output.append(e.getKey()).append(" = ").append(e.getValue().isText() ? "text" : "bytes").append(", ");
+        StringBuilder output = new StringBuilder( "Currently Cached Responses: " );
+        for ( Map.Entry<String, CachedResponse> e : cacheManager.getAll().entrySet() )
+        {
+            output.append( e.getKey() ).append( " = " ).append( e.getValue().isText() ? "text" : "bytes" ).append( ", " );
         }
-        output.append("\n").append("Cached Includes: ");
-        for (String s : cacheManager.cachedIncludes.keySet()) {
-            output.append(s).append(", ");
+        output.append( "\n" ).append( "Cached Includes: " );
+        for ( String s : cacheManager.cachedIncludes.keySet() )
+        {
+            output.append( s ).append( ", " );
         }
-        Server.getInstance().log(output.toString());
+        Server.getInstance().log( output.toString() );
     }
 
 }

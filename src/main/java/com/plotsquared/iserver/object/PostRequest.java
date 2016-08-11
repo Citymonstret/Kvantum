@@ -24,48 +24,58 @@ import com.plotsquared.iserver.util.Assert;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class PostRequest {
+final public class PostRequest
+{
 
     public final String request;
     private final Map<String, String> vars;
 
-    public PostRequest(final String request) {
-        Assert.notNull(request);
+    public PostRequest(final String request)
+    {
+        Assert.notNull( request );
 
         this.request = request;
         this.vars = new HashMap<>();
-        for (final String s : request.split("&")) {
-            if (!s.isEmpty()) {
-                final String[] p = s.split("=");
-                if (p.length < 2) {
+        for ( final String s : request.split( "&" ) )
+        {
+            if ( !s.isEmpty() )
+            {
+                final String[] p = s.split( "=" );
+                if ( p.length < 2 )
+                {
                     continue;
                 }
-                vars.put(p[0], p[1].replace("+", " "));
+                vars.put( p[ 0 ], p[ 1 ].replace( "+", " " ) );
             }
         }
     }
 
-    String buildLog() {
+    String buildLog()
+    {
         final StringBuilder b = new StringBuilder();
-        for (final Map.Entry<String, String> e : vars.entrySet()) {
-            b.append(e.getKey()).append("=").append(e.getValue()).append("&");
+        for ( final Map.Entry<String, String> e : vars.entrySet() )
+        {
+            b.append( e.getKey() ).append( "=" ).append( e.getValue() ).append( "&" );
         }
         return b.toString();
     }
 
-    public String get(final String k) {
-        Assert.notNull(k);
+    public String get(final String k)
+    {
+        Assert.notNull( k );
 
-        return vars.get(k);
+        return vars.get( k );
     }
 
-    public boolean contains(final String k) {
-        Assert.notNull(k);
+    public boolean contains(final String k)
+    {
+        Assert.notNull( k );
 
-        return vars.containsKey(k);
+        return vars.containsKey( k );
     }
 
-    public Map<String, String> get() {
+    public Map<String, String> get()
+    {
         return vars;
     }
 

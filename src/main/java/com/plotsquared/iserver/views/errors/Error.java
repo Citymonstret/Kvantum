@@ -28,26 +28,30 @@ import com.plotsquared.iserver.views.View;
  *
  * @author Citymonstret
  */
-public class Error extends View {
+public class Error extends View
+{
 
     private final int code;
     private final String desc;
 
-    Error(final int code, final String desc) {
-        super("/", "error");
+    Error(final int code, final String desc)
+    {
+        super( "/", "error" );
         this.code = code;
         this.desc = desc;
     }
 
     @Override
-    public boolean passes(final Request request) {
+    public boolean passes(final Request request)
+    {
         return true;
     }
 
     @Override
-    public Response generate(final Request r) {
-        Response response = new Response(this);
-        response.setContent(String.format("<p><b>Error:</b> %d %s</p>", this.code, this.desc));
+    public Response generate(final Request r)
+    {
+        Response response = new Response( this );
+        response.setContent( String.format( "<p><b>Error:</b> %d %s</p>", this.code, this.desc ) );
         return response;
     }
 

@@ -32,7 +32,8 @@ import java.util.Set;
  *
  * @author Citymonstret
  */
-public class PluginClassLoader extends URLClassLoader {
+public class PluginClassLoader extends URLClassLoader
+{
 
     private final PluginLoader loader;
     private final PluginFile desc;
@@ -50,33 +51,41 @@ public class PluginClassLoader extends URLClassLoader {
      * @throws MalformedURLException If the jar location is invalid
      */
     public PluginClassLoader(final PluginLoader loader, final PluginFile desc,
-                             final File file) throws MalformedURLException {
-        super(new URL[]{file.toURI().toURL()}, loader.getClass()
-                .getClassLoader());
+                             final File file) throws MalformedURLException
+    {
+        super( new URL[]{ file.toURI().toURL() }, loader.getClass()
+                .getClassLoader() );
         this.loader = loader;
         this.desc = desc;
-        data = new File(file.getParent(), desc.name);
+        data = new File( file.getParent(), desc.name );
         classes = new HashMap<>();
         Class jar;
         Class plg;
-        try {
-            jar = Class.forName(desc.mainClass, true, this);
-        } catch (final ClassNotFoundException e) {
-            throw new RuntimeException("Could not find main class for plugin " + desc.name + ", main class: " + desc.mainClass);
+        try
+        {
+            jar = Class.forName( desc.mainClass, true, this );
+        } catch ( final ClassNotFoundException e )
+        {
+            throw new RuntimeException( "Could not find main class for plugin " + desc.name + ", main class: " + desc.mainClass );
         }
-        try {
-            plg = jar.asSubclass(Plugin.class);
-        } catch (final ClassCastException e) {
-            throw new RuntimeException("Plugin main class for " + desc.name + " is not instanceof Plugin");
+        try
+        {
+            plg = jar.asSubclass( Plugin.class );
+        } catch ( final ClassCastException e )
+        {
+            throw new RuntimeException( "Plugin main class for " + desc.name + " is not instanceof Plugin" );
         }
-        try {
+        try
+        {
             plugin = (Plugin) plg.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch ( InstantiationException | IllegalAccessException e )
+        {
             e.printStackTrace();
         }
     }
 
-    public File getData() {
+    public File getData()
+    {
         return data;
     }
 
@@ -85,49 +94,57 @@ public class PluginClassLoader extends URLClassLoader {
      *
      * @param file Jar file
      */
-    public void loadJar(final File file) throws MalformedURLException {
-        if (!file.getName().endsWith(".jar"))
+    public void loadJar(final File file) throws MalformedURLException
+    {
+        if ( !file.getName().endsWith( ".jar" ) )
             throw new IllegalArgumentException(
-                    file.getName() + " is of wrong type");
-        super.addURL(file.toURI().toURL());
+                    file.getName() + " is of wrong type" );
+        super.addURL( file.toURI().toURL() );
     }
 
     @Override
     protected Class<?> findClass(final String name)
-            throws ClassNotFoundException {
-        return this.findClass(name, true);
+            throws ClassNotFoundException
+    {
+        return this.findClass( name, true );
     }
 
     Class<?> findClass(final String name, final boolean global)
-            throws ClassNotFoundException {
+            throws ClassNotFoundException
+    {
         Class<?> clazz = null;
-        if (classes.containsKey(name))
-            clazz = classes.get(name);
-        else {
-            if (global)
-                clazz = loader.getClassByName(name);
-            if (clazz == null) {
-                clazz = super.findClass(name);
-                if (clazz != null)
-                    loader.setClass(name, clazz);
+        if ( classes.containsKey( name ) )
+            clazz = classes.get( name );
+        else
+        {
+            if ( global )
+                clazz = loader.getClassByName( name );
+            if ( clazz == null )
+            {
+                clazz = super.findClass( name );
+                if ( clazz != null )
+                    loader.setClass( name, clazz );
             }
-            classes.put(name, clazz);
+            classes.put( name, clazz );
         }
         return clazz;
     }
 
-    Set<String> getClasses() {
+    Set<String> getClasses()
+    {
         return classes.keySet();
     }
 
-    synchronized void create(final Plugin plugin) {
-        if (init != null)
-            throw new RuntimeException(plugin.getName() + " is already created");
+    synchronized void create(final Plugin plugin)
+    {
+        if ( init != null )
+            throw new RuntimeException( plugin.getName() + " is already created" );
         init = plugin;
-        plugin.create(desc, data, this);
+        plugin.create( desc, data, this );
     }
 
-    public PluginFile getDesc() {
+    public PluginFile getDesc()
+    {
         return desc;
     }
 }

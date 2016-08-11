@@ -24,7 +24,8 @@ package com.plotsquared.iserver.commands;
  *
  * @author Citymonstret
  */
-public abstract class Command {
+public abstract class Command
+{
 
     /**
      * Handle the command

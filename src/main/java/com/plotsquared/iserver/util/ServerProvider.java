@@ -23,18 +23,23 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.syntax.ProviderFactory;
 import com.plotsquared.iserver.object.syntax.VariableProvider;
 
-final public class ServerProvider implements ProviderFactory<ServerProvider>, VariableProvider {
+final public class ServerProvider implements ProviderFactory<ServerProvider>, VariableProvider
+{
 
-    public ServerProvider get(Request r) {
+    public ServerProvider get(Request r)
+    {
         return this;
     }
 
-    public String providerName() {
+    public String providerName()
+    {
         return "system";
     }
 
-    public boolean contains(String variable) {
-        switch (variable.toLowerCase()) {
+    public boolean contains(String variable)
+    {
+        switch ( variable.toLowerCase() )
+        {
             case "authors":
             case "filters":
             case "time":
@@ -49,24 +54,26 @@ final public class ServerProvider implements ProviderFactory<ServerProvider>, Va
         }
     }
 
-    public Object get(String variable) {
-        switch (variable.toLowerCase()) {
+    public Object get(String variable)
+    {
+        switch ( variable.toLowerCase() )
+        {
             case "time":
                 return TimeUtil.getHTTPTimeStamp();
             case "authors":
-                return new String[]{"Citymonstret", "IntellectualSites"};
+                return new String[]{ "Citymonstret", "IntellectualSites" };
             case "filters":
-                return new String[]{"LIST", "UPPERCASE", "LOWERCASE", "JAVASCRIPT"};
+                return new String[]{ "LIST", "UPPERCASE", "LOWERCASE", "JAVASCRIPT" };
             case "true":
                 return true;
             case "false":
                 return false;
             case "totalram":
-                return (Runtime.getRuntime().totalMemory() / 1024) / 1024;
+                return ( Runtime.getRuntime().totalMemory() / 1024 ) / 1024;
             case "usedram":
-                return ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024) / 1024;
+                return ( ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) / 1024 ) / 1024;
             case "freeram":
-                return (Runtime.getRuntime().freeMemory() / 1024) / 1024;
+                return ( Runtime.getRuntime().freeMemory() / 1024 ) / 1024;
             default:
                 return "";
         }

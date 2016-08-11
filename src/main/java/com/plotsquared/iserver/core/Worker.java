@@ -36,113 +36,140 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-class Worker {
+class Worker
+{
 
     private static byte[] empty = "NULL".getBytes();
     private static int idPool = 0;
 
     private final int id;
 
-    Worker() {
+    Worker()
+    {
         this.id = idPool++;
     }
 
-    public int getId() {
+    public int getId()
+    {
         return this.id;
     }
 
-    synchronized void start() {
-        Server.getInstance().log("Started thread: " + id);
+    synchronized void start()
+    {
+        Server.getInstance().log( "Started thread: " + id );
         final Server server = Server.getInstance();
-        ThreadManager.createThread(() -> {
-            if (!server.queue.isEmpty()) {
+        ThreadManager.createThread( () ->
+        {
+            if ( !server.queue.isEmpty() )
+            {
                 Socket current = server.queue.poll();
-                run(current, server);
+                run( current, server );
             }
-        });
+        } );
     }
 
-    private void handle(final Request request, final Server server, final BufferedOutputStream output) {
-        final RequestHandler requestHandler = server.requestManager.match(request);
+    private void handle(final Request request, final Server server, final BufferedOutputStream output)
+    {
+        final RequestHandler requestHandler = server.requestManager.match( request );
 
         String textContent = "";
         byte[] bytes = empty;
 
-        final Session session = server.sessionManager.getSession(request, output);
-        if (session != null) {
-            request.setSession(session);
-        } else {
-            request.setSession(server.sessionManager.createSession(request, output));
+        final Session session = server.sessionManager.getSession( request, output );
+        if ( session != null )
+        {
+            request.setSession( session );
+        } else
+        {
+            request.setSession( server.sessionManager.createSession( request, output ) );
         }
 
         boolean shouldCache = false;
         boolean cache = false;
         final ResponseBody body;
 
-        if (server.enableCaching && requestHandler instanceof CacheApplicable
-                && ((CacheApplicable) requestHandler).isApplicable(request)) {
+        if ( server.enableCaching && requestHandler instanceof CacheApplicable
+                && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
+        {
             cache = true;
-            if (!server.cacheManager.hasCache(requestHandler)) {
+            if ( !server.cacheManager.hasCache( requestHandler ) )
+            {
                 shouldCache = true;
             }
         }
 
-        if (!cache || shouldCache) { // Either it's a non-cached view, or there is no cache stored
-            body = requestHandler.handle(request);
-        } else { // Just read from memory
-            body = server.cacheManager.getCache(requestHandler);
+        if ( !cache || shouldCache )
+        { // Either it's a non-cached view, or there is no cache stored
+            body = requestHandler.handle( request );
+        } else
+        { // Just read from memory
+            body = server.cacheManager.getCache( requestHandler );
         }
 
         boolean skip = false;
-        if (body == null) {
-            final Object redirect = request.getMeta("internalRedirect");
-            if (redirect != null && redirect instanceof Request) {
+        if ( body == null )
+        {
+            final Object redirect = request.getMeta( "internalRedirect" );
+            if ( redirect != null && redirect instanceof Request )
+            {
                 final Request newRequest = (Request) redirect;
-                newRequest.removeMeta("internalRedirect");
-                handle(newRequest, server, output);
+                newRequest.removeMeta( "internalRedirect" );
+                handle( newRequest, server, output );
                 return;
-            } else {
+            } else
+            {
                 skip = true;
             }
         }
 
-        if (!skip) {
-            if (shouldCache) {
-                server.cacheManager.setCache(requestHandler, body);
+        if ( !skip )
+        {
+            if ( shouldCache )
+            {
+                server.cacheManager.setCache( requestHandler, body );
             }
 
-            if (body.isText()) {
+            if ( body.isText() )
+            {
                 textContent = body.getContent();
-            } else {
+            } else
+            {
                 bytes = body.getBytes();
             }
 
-            for (final Map.Entry<String, String> postponedCookie : request.postponedCookies.entrySet()) {
-                body.getHeader().setCookie(postponedCookie.getKey(), postponedCookie.getValue());
+            for ( final Map.Entry<String, String> postponedCookie : request.postponedCookies.entrySet() )
+            {
+                body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
             }
 
-            if (body.isText()) {
+            if ( body.isText() )
+            {
                 // Make sure to not use Crush when
                 // told not to
-                if (!(requestHandler instanceof IgnoreSyntax)) {
+                if ( !( requestHandler instanceof IgnoreSyntax ) )
+                {
                     // Provider factories are fun, and so is the
                     // global map. But we also need the view
                     // specific ones!
                     Map<String, ProviderFactory> factories = new HashMap<>();
-                    for (final ProviderFactory factory : server.providers) {
-                        factories.put(factory.providerName().toLowerCase(), factory);
+                    for ( final ProviderFactory factory : server.providers )
+                    {
+                        factories.put( factory.providerName().toLowerCase(), factory );
                     }
                     // Now make use of the view specific ProviderFactory
-                    ProviderFactory z = requestHandler.getFactory(request);
-                    if (z != null) {
-                        factories.put(z.providerName().toLowerCase(), z);
+                    ProviderFactory z = requestHandler.getFactory( request );
+                    if ( z != null )
+                    {
+                        factories.put( z.providerName().toLowerCase(), z );
                     }
-                    factories.put("request", request);
+                    factories.put( "request", request );
                     // This is how the crush engine works.
                     // Quite simple, yet powerful!
-                    for (Syntax syntax : server.syntaxes) {
-                        if (syntax.matches(textContent)) {
-                            textContent = syntax.handle(textContent, request, factories);
+                    for ( Syntax syntax : server.syntaxes )
+                    {
+                        if ( syntax.matches( textContent ) )
+                        {
+                            textContent = syntax.handle( textContent, request, factories );
                         }
                     }
                 }
@@ -150,35 +177,41 @@ class Worker {
                 bytes = textContent.getBytes();
             }
 
-            body.getHeader().apply(output);
+            body.getHeader().apply( output );
 
-            try {
-                output.write(bytes);
+            try
+            {
+                output.write( bytes );
                 output.flush();
-            } catch (final Exception e) {
+            } catch ( final Exception e )
+            {
                 e.printStackTrace();
             }
 
         }
 
-        if (!server.silent && !skip) {
-            server.log("Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
+        if ( !server.silent && !skip )
+        {
+            server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
                     requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length
             );
         }
 
-        request.setValid(false);
+        request.setValid( false );
     }
 
-    private void run(final Socket remote, final Server server) {
-        if (remote == null || remote.isClosed()) {
+    private void run(final Socket remote, final Server server)
+    {
+        if ( remote == null || remote.isClosed() )
+        {
             return; // TODO: Why?
         }
 
-        Assert.notNull(server);
+        Assert.notNull( server );
 
-        if (server.verbose) {         // Do we want to output a load of useless information?
-            server.log(Message.CONNECTION_ACCEPTED, remote.getInetAddress());
+        if ( CoreConfig.verbose )
+        {         // Do we want to output a load of useless information?
+            server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
         }
 
         final Request request;
@@ -187,38 +220,46 @@ class Worker {
 
         { // Read the actual request
             final StringBuilder rRaw = new StringBuilder();
-            try {
-                input = new BufferedReader(new InputStreamReader(remote.getInputStream()), server.bufferIn);
-                output = new BufferedOutputStream(remote.getOutputStream(), server.bufferOut);
+            try
+            {
+                input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), server.bufferIn );
+                output = new BufferedOutputStream( remote.getOutputStream(), server.bufferOut );
                 String str;
-                while ((str = input.readLine()) != null && !str.equals("")) {
-                    rRaw.append(str).append("|");
+                while ( ( str = input.readLine() ) != null && !str.equals( "" ) )
+                {
+                    rRaw.append( str ).append( "|" );
                 }
-                request = new Request(rRaw.toString(), remote);
+                request = new Request( rRaw.toString(), remote );
                 // Fetch the post request, if it exists
-                if (request.getQuery().getMethod() == Method.POST) {
+                if ( request.getQuery().getMethod() == Method.POST )
+                {
                     final StringBuilder pR = new StringBuilder();
-                    final int cl = Integer.parseInt(request.getHeader("Content-Length").substring(1));
-                    for (int i = 0; i < cl; i++) {
-                        pR.append((char) input.read());
+                    final int cl = Integer.parseInt( request.getHeader( "Content-Length" ).substring( 1 ) );
+                    for ( int i = 0; i < cl; i++ )
+                    {
+                        pR.append( (char) input.read() );
                     }
-                    request.setPostRequest(new PostRequest(pR.toString()));
+                    request.setPostRequest( new PostRequest( pR.toString() ) );
                 }
-            } catch (final Exception e) {
+            } catch ( final Exception e )
+            {
                 e.printStackTrace();
                 return;
             }
         }
 
-        if (!server.silent) {
-            server.log(request.buildLog());
+        if ( !server.silent )
+        {
+            server.log( request.buildLog() );
         }
 
-        handle(request, server, output);
+        handle( request, server, output );
 
-        try {
+        try
+        {
             input.close();
-        } catch (final Exception e) {
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
     }

@@ -19,6 +19,7 @@
 
 package com.plotsquared.iserver.object.syntax;
 
-public interface IgnoreSyntax {
+public interface IgnoreSyntax
+{
 
 }

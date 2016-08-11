@@ -26,7 +26,8 @@ package com.plotsquared.iserver.config;
  * @author Citymonstret
  */
 @SuppressWarnings("unused")
-public interface ConfigurationFile {
+public interface ConfigurationFile
+{
 
     /**
      * Reload the configuration file

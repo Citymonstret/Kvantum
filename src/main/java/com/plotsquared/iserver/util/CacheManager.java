@@ -30,7 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * The utility file that
  * handles all runtime caching
  */
-public class CacheManager {
+public class CacheManager
+{
 
     public final Map<String, String> cachedIncludes = new ConcurrentHashMap<>();
     private final Map<String, CachedResponse> cachedBodies = new ConcurrentHashMap<>();
@@ -41,11 +42,12 @@ public class CacheManager {
      * @param group Include block (matcher.group())
      * @return string|null
      */
-    public String getCachedInclude(final String group) {
-        Assert.notNull(group);
+    public String getCachedInclude(final String group)
+    {
+        Assert.notNull( group );
 
-        return this.cachedIncludes.containsKey(group) ?
-                cachedIncludes.get(group) : null;
+        return this.cachedIncludes.containsKey( group ) ?
+                cachedIncludes.get( group ) : null;
     }
 
     /**
@@ -54,10 +56,11 @@ public class CacheManager {
      * @param group    matcher.group()
      * @param document Generated document
      */
-    public void setCachedInclude(final String group, final String document) {
-        Assert.notNull(group, document);
+    public void setCachedInclude(final String group, final String document)
+    {
+        Assert.notNull( group, document );
 
-        this.cachedIncludes.put(group, document);
+        this.cachedIncludes.put( group, document );
     }
 
     /**
@@ -66,10 +69,11 @@ public class CacheManager {
      * @param view RequestHandler
      * @return true if there is a ResponseBody cached, else false
      */
-    public boolean hasCache(final RequestHandler view) {
-        Assert.notNull(view);
+    public boolean hasCache(final RequestHandler view)
+    {
+        Assert.notNull( view );
 
-        return this.cachedBodies.containsKey(view.toString());
+        return this.cachedBodies.containsKey( view.toString() );
     }
 
     /**
@@ -79,10 +83,11 @@ public class CacheManager {
      * @param responseBody ResponseBody (will generate a CachedResponseBody)
      * @see CachedResponse
      */
-    public void setCache(final RequestHandler view, final ResponseBody responseBody) {
-        Assert.notNull(view, responseBody);
+    public void setCache(final RequestHandler view, final ResponseBody responseBody)
+    {
+        Assert.notNull( view, responseBody );
 
-        this.cachedBodies.put(view.toString(), new CachedResponse(responseBody));
+        this.cachedBodies.put( view.toString(), new CachedResponse( responseBody ) );
     }
 
     /**
@@ -92,10 +97,11 @@ public class CacheManager {
      * @return the cached ResponseBody
      * @see #hasCache(RequestHandler) To check if the view has a cache
      */
-    public CachedResponse getCache(final RequestHandler view) {
-        Assert.notNull(view);
+    public CachedResponse getCache(final RequestHandler view)
+    {
+        Assert.notNull( view );
 
-        return this.cachedBodies.get(view.toString());
+        return this.cachedBodies.get( view.toString() );
     }
 
     /**
@@ -103,7 +109,8 @@ public class CacheManager {
      *
      * @return all cached ResponseBodys
      */
-    public Map<String, CachedResponse> getAll() {
+    public Map<String, CachedResponse> getAll()
+    {
         return this.cachedBodies;
     }
 }

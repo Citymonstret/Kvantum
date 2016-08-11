@@ -35,7 +35,8 @@ import java.util.UUID;
  *
  * @author Citymonstret
  */
-public class Plugin implements LogProvider {
+public class Plugin implements LogProvider
+{
 
     private final UUID uuid;
     protected String name, version, author, provider;
@@ -47,16 +48,18 @@ public class Plugin implements LogProvider {
     /**
      * Constructor
      */
-    public Plugin() {
+    public Plugin()
+    {
         uuid = UUID.randomUUID();
         enabled = false;
     }
 
     final public void create(final PluginFile desc, final File data,
-                             final PluginClassLoader classLoader) {
-        if (this.desc != null)
-            throw new RuntimeException("Plugin already created: " + desc.name);
-        Assert.notNull(desc, data, classLoader);
+                             final PluginClassLoader classLoader)
+    {
+        if ( this.desc != null )
+            throw new RuntimeException( "Plugin already created: " + desc.name );
+        Assert.notNull( desc, data, classLoader );
         this.desc = desc;
         this.classLoader = classLoader;
         name = desc.name;
@@ -70,7 +73,8 @@ public class Plugin implements LogProvider {
      *
      * @return Plugin class loader
      */
-    final public PluginClassLoader getClassLoader() {
+    final public PluginClassLoader getClassLoader()
+    {
         return classLoader;
     }
 
@@ -79,22 +83,26 @@ public class Plugin implements LogProvider {
      *
      * @throws RuntimeException If the plugin is already enabled, or if couldn't be enabled
      */
-    final public void enable() {
-        Assert.equals(enabled, false);
-        try {
+    final public void enable()
+    {
+        Assert.equals( enabled, false );
+        try
+        {
             enabled = true;
             onEnable();
-        } catch (final Exception e) {
+        } catch ( final Exception e )
+        {
             enabled = false;
-            throw new RuntimeException("Could not enable plugin", e);
+            throw new RuntimeException( "Could not enable plugin", e );
         }
     }
 
     /**
      * Used to disable the plugin
      */
-    final public void disable() {
-        Assert.equals(enabled, true);
+    final public void disable()
+    {
+        Assert.equals( enabled, true );
 
         enabled = false;
         onDisable();
@@ -103,14 +111,16 @@ public class Plugin implements LogProvider {
     /**
      * Listen to enable
      */
-    protected void onEnable() {
+    protected void onEnable()
+    {
         // Override!
     }
 
     /**
      * Listen to disable
      */
-    protected void onDisable() {
+    protected void onDisable()
+    {
         // Override!
     }
 
@@ -119,7 +129,8 @@ public class Plugin implements LogProvider {
      *
      * @return Plugin name
      */
-    final public String getName() {
+    final public String getName()
+    {
         return name;
     }
 
@@ -128,7 +139,8 @@ public class Plugin implements LogProvider {
      *
      * @return Plugin version
      */
-    public String getVersion() {
+    public String getVersion()
+    {
         return version;
     }
 
@@ -137,7 +149,8 @@ public class Plugin implements LogProvider {
      *
      * @return Plugin author
      */
-    public String getAuthor() {
+    public String getAuthor()
+    {
         return author;
     }
 
@@ -146,7 +159,8 @@ public class Plugin implements LogProvider {
      *
      * @return boolean (enabled)
      */
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
         return enabled;
     }
 
@@ -155,7 +169,8 @@ public class Plugin implements LogProvider {
      *
      * @return UUID
      */
-    final public UUID getUUID() {
+    final public UUID getUUID()
+    {
         return uuid;
     }
 
@@ -164,7 +179,8 @@ public class Plugin implements LogProvider {
      *
      * @return Plugin data folder
      */
-    public File getDataFolder() {
+    public File getDataFolder()
+    {
         return data;
     }
 
@@ -173,33 +189,39 @@ public class Plugin implements LogProvider {
      *
      * @return Plugin Desc. file
      */
-    public PluginFile getDesc() {
+    public PluginFile getDesc()
+    {
         return desc;
     }
 
     @Override
-    public boolean equals(final Object object) {
+    public boolean equals(final Object object)
+    {
         return object instanceof Plugin
-                && ((Plugin) object).getUUID().equals(getUUID());
+                && ( (Plugin) object ).getUUID().equals( getUUID() );
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return 3 * uuid.hashCode() + 37 * getName().toLowerCase().hashCode();
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return name;
     }
 
     @Override
-    public String getLogIdentifier() {
+    public String getLogIdentifier()
+    {
         return this.toString();
     }
 
-    public void log(String message) {
-        Server.getInstance().log(this, message);
+    public void log(String message)
+    {
+        Server.getInstance().log( this, message );
     }
 
 }

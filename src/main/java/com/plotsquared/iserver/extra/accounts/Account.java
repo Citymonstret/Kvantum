@@ -24,34 +24,42 @@ import com.plotsquared.iserver.object.syntax.VariableProvider;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class Account implements VariableProvider {
+public class Account implements VariableProvider
+{
 
     private int id;
     private UUID uuid;
     private String username;
     private byte[] password;
 
-    public Account(int id, String username, byte[] password) {
+    public Account(int id, String username, byte[] password)
+    {
         this.id = id;
         this.username = username;
         this.password = password;
         this.uuid = UUID.randomUUID();
     }
 
-    public String getUsername() {
+    public String getUsername()
+    {
         return username;
     }
 
-    public byte[] getPassword() {
+    public byte[] getPassword()
+    {
         return password;
     }
 
-    public boolean passwordMatches(final byte[] password) {
-        if (password.length != this.password.length) {
+    public boolean passwordMatches(final byte[] password)
+    {
+        if ( password.length != this.password.length )
+        {
             return false;
         }
-        for (int i = 0; i < password.length; i++) {
-            if (password[i] != this.password[i]) {
+        for ( int i = 0; i < password.length; i++ )
+        {
+            if ( password[ i ] != this.password[ i ] )
+            {
                 return false;
             }
         }
@@ -59,31 +67,38 @@ public class Account implements VariableProvider {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return this.id;
     }
 
-    public int getID() {
+    public int getID()
+    {
         return this.id;
     }
 
-    public UUID getUUID() {
+    public UUID getUUID()
+    {
         return this.uuid;
     }
 
     @Override
-    public boolean equals(Object o) {
-        return (o instanceof Account) && ((Account) o).getUUID().equals(getUUID());
+    public boolean equals(Object o)
+    {
+        return ( o instanceof Account ) && ( (Account) o ).getUUID().equals( getUUID() );
     }
 
     @Override
-    public boolean contains(String variable) {
-        return Arrays.asList("username", "id").contains(variable);
+    public boolean contains(String variable)
+    {
+        return Arrays.asList( "username", "id" ).contains( variable );
     }
 
     @Override
-    public Object get(String variable) {
-        switch (variable) {
+    public Object get(String variable)
+    {
+        switch ( variable )
+        {
             case "username":
                 return getUsername();
             case "id":

@@ -28,34 +28,41 @@ import com.plotsquared.iserver.object.syntax.VariableProvider;
  *
  * @author Citymonstret
  */
-public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider {
+public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider
+{
 
     private Request r;
 
-    public MetaProvider() {
+    public MetaProvider()
+    {
     }
 
-    private MetaProvider(final Request r) {
+    private MetaProvider(final Request r)
+    {
         this.r = r;
     }
 
     @Override
-    public MetaProvider get(Request r) {
-        return new MetaProvider(r);
+    public MetaProvider get(Request r)
+    {
+        return new MetaProvider( r );
     }
 
     @Override
-    public String providerName() {
+    public String providerName()
+    {
         return "meta";
     }
 
     @Override
-    public boolean contains(String variable) {
-        return r.getMeta("doc." + variable) != null;
+    public boolean contains(String variable)
+    {
+        return r.getMeta( "doc." + variable ) != null;
     }
 
     @Override
-    public Object get(String variable) {
-        return r.getMeta("doc." + variable);
+    public Object get(String variable)
+    {
+        return r.getMeta( "doc." + variable );
     }
 }

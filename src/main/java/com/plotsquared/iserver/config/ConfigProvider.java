@@ -27,7 +27,8 @@ import com.plotsquared.iserver.util.Assert;
  *
  * @author Citymonstret
  */
-public abstract class ConfigProvider implements ConfigurationFile {
+public abstract class ConfigProvider implements ConfigurationFile
+{
 
     private final String name;
 
@@ -36,15 +37,17 @@ public abstract class ConfigProvider implements ConfigurationFile {
      *
      * @param name Configuration file name
      */
-    public ConfigProvider(final String name) {
-        Assert.notEmpty(name);
+    public ConfigProvider(final String name)
+    {
+        Assert.notEmpty( name );
 
         this.name = name;
-        ConfigVariableProvider.getInstance().add(this);
+        ConfigVariableProvider.getInstance().add( this );
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return this.name;
     }
 

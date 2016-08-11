@@ -32,50 +32,59 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-final public class SessionManager implements ProviderFactory<VariableProvider> {
+final public class SessionManager implements ProviderFactory<VariableProvider>
+{
 
     private final Map<String, Session> sessions = new HashMap<>();
     private final Server server;
     private final SessionIdentifierProvider sessionIdentifierProvider;
 
-    public SessionManager(final Server server) {
+    public SessionManager(final Server server)
+    {
         this.server = server;
         final String i = "" + System.nanoTime();
         this.sessionIdentifierProvider = r -> i;
     }
 
-    public Session createSession(final Request r, final BufferedOutputStream out) {
-        String name = sessionIdentifierProvider.getIdentifier(r) + "session";
+    public Session createSession(final Request r, final BufferedOutputStream out)
+    {
+        String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
         String sessionID = UUID.randomUUID().toString();
-        r.postponedCookies.put(name, sessionID);
-        server.log("Set session (%s=%s)", name, sessionID);
+        r.postponedCookies.put( name, sessionID );
+        server.log( "Set session (%s=%s)", name, sessionID );
         Session session = new Session();
-        this.sessions.put(sessionID, session);
+        this.sessions.put( sessionID, session );
         return session;
     }
 
-    public void deleteSession(final Request r, final HeaderProvider re) {
-        String name = sessionIdentifierProvider.getIdentifier(r) + "session";
-        re.getHeader().setCookie(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
-        server.log("Deleted cookie");
+    public void deleteSession(final Request r, final HeaderProvider re)
+    {
+        String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
+        re.getHeader().setCookie( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
+        server.log( "Deleted cookie" );
     }
 
-    public Session getSession(final Request r, final OutputStream out) {
+    public Session getSession(final Request r, final OutputStream out)
+    {
         Session session = null;
 
         final Cookie[] cookies = r.getCookies();
-        final String name = sessionIdentifierProvider.getIdentifier(r) + "session";
+        final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
 
-        final Optional<Cookie> cookie = LambdaUtil.getFirst(cookies, c -> c.getName().equalsIgnoreCase(name));
-        if (cookie.isPresent()) {
+        final Optional<Cookie> cookie = LambdaUtil.getFirst( cookies, c -> c.getName().equalsIgnoreCase( name ) );
+        if ( cookie.isPresent() )
+        {
             final String sessionID = cookie.get().getValue();
-            if (sessions.containsKey(sessionID)) {
-                session = sessions.get(sessionID);
-                server.log("Found session (%s=%s)", session, sessionID);
-            } else {
-                if (out != null) {
-                    r.postponedCookies.put(name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
-                    server.log("Deleting invalid session cookie (%s)", cookie.get().getValue());
+            if ( sessions.containsKey( sessionID ) )
+            {
+                session = sessions.get( sessionID );
+                server.log( "Found session (%s=%s)", session, sessionID );
+            } else
+            {
+                if ( out != null )
+                {
+                    r.postponedCookies.put( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
+                    server.log( "Deleting invalid session cookie (%s)", cookie.get().getValue() );
                 }
             }
         }
@@ -83,11 +92,13 @@ final public class SessionManager implements ProviderFactory<VariableProvider> {
         return session;
     }
 
-    public VariableProvider get(final Request r) {
-        return getSession(r, null);
+    public VariableProvider get(final Request r)
+    {
+        return getSession( r, null );
     }
 
-    public String providerName() {
+    public String providerName()
+    {
         return "session";
     }
 

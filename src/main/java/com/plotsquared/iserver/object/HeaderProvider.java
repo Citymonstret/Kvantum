@@ -20,7 +20,8 @@
 package com.plotsquared.iserver.object;
 
 @FunctionalInterface
-public interface HeaderProvider {
+public interface HeaderProvider
+{
 
     Header getHeader();
 

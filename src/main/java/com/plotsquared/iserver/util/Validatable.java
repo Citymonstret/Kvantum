@@ -2,7 +2,8 @@ package com.plotsquared.iserver.util;
 
 @SuppressWarnings("unused")
 @FunctionalInterface
-public interface Validatable {
+public interface Validatable
+{
 
     boolean isValid();
 

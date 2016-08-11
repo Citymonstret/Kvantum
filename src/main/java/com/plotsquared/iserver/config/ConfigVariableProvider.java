@@ -32,45 +32,54 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class ConfigVariableProvider implements ProviderFactory<ConfigVariableProvider>, VariableProvider {
+public class ConfigVariableProvider implements ProviderFactory<ConfigVariableProvider>, VariableProvider
+{
 
     private static ConfigVariableProvider instance;
     private final Map<String, ConfigProvider> configurations;
 
-    private ConfigVariableProvider() {
+    private ConfigVariableProvider()
+    {
         configurations = new HashMap<>();
     }
 
-    public static ConfigVariableProvider getInstance() {
-        if (instance == null) {
+    public static ConfigVariableProvider getInstance()
+    {
+        if ( instance == null )
+        {
             instance = new ConfigVariableProvider();
         }
         return instance;
     }
 
-    public void add(final ConfigProvider provider) {
-        configurations.put(provider.toString(), provider);
+    public void add(final ConfigProvider provider)
+    {
+        configurations.put( provider.toString(), provider );
     }
 
     @Override
-    public ConfigVariableProvider get(Request r) {
+    public ConfigVariableProvider get(Request r)
+    {
         return this;
     }
 
     @Override
-    public String providerName() {
+    public String providerName()
+    {
         return "cfg";
     }
 
     @Override
-    public boolean contains(String variable) {
-        String[] parts = variable.split("@");
-        return configurations.containsKey(parts[0]) && configurations.get(parts[0]).contains(parts[1]);
+    public boolean contains(String variable)
+    {
+        String[] parts = variable.split( "@" );
+        return configurations.containsKey( parts[ 0 ] ) && configurations.get( parts[ 0 ] ).contains( parts[ 1 ] );
     }
 
     @Override
-    public Object get(String variable) {
-        String[] parts = variable.split("@");
-        return configurations.get(parts[0]).get(parts[1]);
+    public Object get(String variable)
+    {
+        String[] parts = variable.split( "@" );
+        return configurations.get( parts[ 0 ] ).get( parts[ 1 ] );
     }
 }

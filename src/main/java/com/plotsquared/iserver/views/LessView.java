@@ -35,35 +35,44 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class LessView extends View implements CacheApplicable {
+public class LessView extends View implements CacheApplicable
+{
 
     public static LessCompiler compiler;
 
-    public LessView(String filter, Map<String, Object> options) {
-        super(filter, "less", options);
+    public LessView(String filter, Map<String, Object> options)
+    {
+        super( filter, "less", options );
         super.relatedFolderPath = "./assets/less";
         super.fileName = "{2}.less";
     }
 
-    public static String getLess(File file, int buffer) {
+    public static String getLess(File file, int buffer)
+    {
         StringBuilder document = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file), buffer);
+        try
+        {
+            BufferedReader reader = new BufferedReader( new FileReader( file ), buffer );
             String line;
-            while ((line = reader.readLine()) != null) {
-                document.append(line).append("\n");
+            while ( ( line = reader.readLine() ) != null )
+            {
+                document.append( line ).append( "\n" );
             }
             reader.close();
-        } catch (final Exception e) {
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
 
-        if (compiler == null) {
+        if ( compiler == null )
+        {
             compiler = new LessCompiler();
         }
-        try {
-            return compiler.compile(document.toString());
-        } catch (final Exception e) {
+        try
+        {
+            return compiler.compile( document.toString() );
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
 
@@ -71,23 +80,26 @@ public class LessView extends View implements CacheApplicable {
     }
 
     @Override
-    public boolean passes(Request request) {
-        File file = getFile(request);
-        request.addMeta("less_file", file);
+    public boolean passes(Request request)
+    {
+        File file = getFile( request );
+        request.addMeta( "less_file", file );
         return file.exists();
     }
 
     @Override
-    public Response generate(final Request r) {
-        File file = (File) r.getMeta("less_file");
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS);
-        response.setContent(getLess(file, getBuffer()));
+    public Response generate(final Request r)
+    {
+        File file = (File) r.getMeta( "less_file" );
+        Response response = new Response( this );
+        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS );
+        response.setContent( getLess( file, getBuffer() ) );
         return response;
     }
 
     @Override
-    public boolean isApplicable(Request r) {
+    public boolean isApplicable(Request r)
+    {
         return true;
     }
 }

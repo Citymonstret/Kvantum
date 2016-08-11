@@ -23,25 +23,32 @@ import com.plotsquared.iserver.object.syntax.Filter;
 
 import java.util.Collection;
 
-final public class List extends Filter {
+final public class List extends Filter
+{
 
-    public List() {
-        super("list");
+    public List()
+    {
+        super( "list" );
     }
 
-    public Object handle(String objectName, Object o) {
+    public Object handle(String objectName, Object o)
+    {
         StringBuilder s = new StringBuilder();
-        s.append("<ul id='list-").append(objectName).append("'>");
-        if (o instanceof Object[]) {
-            for (Object oo : (Object[]) o) {
-                s.append("<li>").append(oo).append("</li>");
+        s.append( "<ul id='list-" ).append( objectName ).append( "'>" );
+        if ( o instanceof Object[] )
+        {
+            for ( Object oo : (Object[]) o )
+            {
+                s.append( "<li>" ).append( oo ).append( "</li>" );
             }
-        } else if (o instanceof Collection) {
-            for (Object oo : (Collection) o) {
-                s.append("<li>").append(oo).append("</li>");
+        } else if ( o instanceof Collection )
+        {
+            for ( Object oo : (Collection) o )
+            {
+                s.append( "<li>" ).append( oo ).append( "</li>" );
             }
         }
-        s.append("</ul>");
+        s.append( "</ul>" );
         return s.toString();
     }
 

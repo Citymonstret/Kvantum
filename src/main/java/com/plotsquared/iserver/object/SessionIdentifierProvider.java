@@ -20,7 +20,8 @@
 package com.plotsquared.iserver.object;
 
 @FunctionalInterface
-public interface SessionIdentifierProvider {
+public interface SessionIdentifierProvider
+{
 
     String getIdentifier(Request r);
 

@@ -33,37 +33,42 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class JSView extends View implements CacheApplicable {
+public class JSView extends View implements CacheApplicable
+{
 
-    public JSView(String filter, Map<String, Object> options) {
-        super(filter, "javascript", options);
+    public JSView(String filter, Map<String, Object> options)
+    {
+        super( filter, "javascript", options );
         super.relatedFolderPath = "/assets/js";
         super.fileName = "{2}.js";
     }
 
     @Override
-    public boolean passes(Request request) {
+    public boolean passes(Request request)
+    {
         Map<String, String> variables = request.getVariables();
-        String file = variables.get("file");
+        String file = variables.get( "file" );
 
-        if (!file.endsWith(".js"))
+        if ( !file.endsWith( ".js" ) )
             file = file + ".js";
-        request.addMeta("js_file", file);
-        return (new File(getFolder(), file)).exists();
+        request.addMeta( "js_file", file );
+        return ( new File( getFolder(), file ) ).exists();
     }
 
 
     @Override
-    public Response generate(final Request r) {
-        File file = new File(getFolder(), r.getMeta("js_file").toString());
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT);
-        response.setContent(FileUtils.getDocument(file, getBuffer()));
+    public Response generate(final Request r)
+    {
+        File file = new File( getFolder(), r.getMeta( "js_file" ).toString() );
+        Response response = new Response( this );
+        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT );
+        response.setContent( FileUtils.getDocument( file, getBuffer() ) );
         return response;
     }
 
     @Override
-    public boolean isApplicable(Request r) {
+    public boolean isApplicable(Request r)
+    {
         return true;
     }
 }

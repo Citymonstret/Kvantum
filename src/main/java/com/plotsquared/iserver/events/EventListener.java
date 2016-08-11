@@ -29,7 +29,8 @@ import java.lang.reflect.ParameterizedType;
  *
  * @param <T> Event type, that the listener should listen to
  */
-public abstract class EventListener<T extends Event> {
+public abstract class EventListener<T extends Event>
+{
 
     private final String listenTo;
     private final int accessor;
@@ -43,8 +44,9 @@ public abstract class EventListener<T extends Event> {
      * @see #EventListener(EventPriority) to choose another priority
      */
     @SuppressWarnings("ALL")
-    public EventListener() {
-        this(EventPriority.MEDIUM);
+    public EventListener()
+    {
+        this( EventPriority.MEDIUM );
     }
 
     /**
@@ -53,11 +55,12 @@ public abstract class EventListener<T extends Event> {
      * @param priority The priority in which the event should be called {@see EventPriority}
      */
     @SuppressWarnings("ALL")
-    public EventListener(final EventPriority priority) {
-        Assert.notNull(priority);
+    public EventListener(final EventPriority priority)
+    {
+        Assert.notNull( priority );
 
-        this.listenTo = ((Class<T>) ((ParameterizedType) getClass()
-                .getGenericSuperclass()).getActualTypeArguments()[0]).getName();
+        this.listenTo = ( (Class<T>) ( (ParameterizedType) getClass()
+                .getGenericSuperclass() ).getActualTypeArguments()[ 0 ] ).getName();
         this.accessor = this.listenTo.hashCode();
         this.priority = priority;
     }
@@ -67,7 +70,8 @@ public abstract class EventListener<T extends Event> {
      *
      * @return Event Priority
      */
-    public final EventPriority getPriority() {
+    public final EventPriority getPriority()
+    {
         return this.priority;
     }
 
@@ -84,7 +88,8 @@ public abstract class EventListener<T extends Event> {
      * @param q An object
      */
     @SuppressWarnings("ALL")
-    final public void sxsdd(final Object q) {
+    final public void sxsdd(final Object q)
+    {
         this.y = q;
     }
 
@@ -93,7 +98,8 @@ public abstract class EventListener<T extends Event> {
      *
      * @return An object
      */
-    final public Object sddww() {
+    final public Object sddww()
+    {
         return this.y;
     }
 
@@ -103,17 +109,20 @@ public abstract class EventListener<T extends Event> {
      *
      * @return Class name of the T class
      */
-    final String listeningTo() {
+    final String listeningTo()
+    {
         return this.listenTo;
     }
 
     @Override
-    final public String toString() {
+    final public String toString()
+    {
         return this.listeningTo();
     }
 
     @Override
-    final public int hashCode() {
+    final public int hashCode()
+    {
         return this.accessor;
     }
 }

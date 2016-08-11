@@ -21,10 +21,12 @@ package com.plotsquared.iserver.commands;
 
 import com.plotsquared.iserver.core.Server;
 
-public class Stop extends Command {
+public class Stop extends Command
+{
 
     @Override
-    public void handle(String[] args) {
+    public void handle(String[] args)
+    {
         Server.getInstance().stopServer();
     }
 

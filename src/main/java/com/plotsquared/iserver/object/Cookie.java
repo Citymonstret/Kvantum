@@ -19,27 +19,32 @@
 
 package com.plotsquared.iserver.object;
 
-public final class Cookie {
+public final class Cookie
+{
 
     private final String name;
 
     private final String value;
 
-    public Cookie(String name, String value) {
+    public Cookie(String name, String value)
+    {
 
         this.name = name;
         this.value = value;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getValue() {
+    public String getValue()
+    {
         return value;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return name + "=" + value;
     }
 

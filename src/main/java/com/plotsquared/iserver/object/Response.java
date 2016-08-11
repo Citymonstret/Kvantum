@@ -30,7 +30,8 @@ import com.plotsquared.iserver.views.RequestHandler;
  *
  * @author Citymonstret
  */
-public class Response implements ResponseBody {
+public class Response implements ResponseBody
+{
 
     private Header header;
     private String content;
@@ -43,20 +44,22 @@ public class Response implements ResponseBody {
      *
      * @param parent The view that generated this response
      */
-    public Response(final RequestHandler parent) {
+    public Response(final RequestHandler parent)
+    {
         this.parent = parent;
-        this.header = new Header(Header.STATUS_OK)
-                .set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML)
-                .set(Header.HEADER_SERVER, Header.POWERED_BY)
-                .set(Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp())
-                .set(Header.HEADER_STATUS, Header.STATUS_OK)
-                .set(Header.HEADER_X_POWERED_BY, Header.X_POWERED_BY);
+        this.header = new Header( Header.STATUS_OK )
+                .set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML )
+                .set( Header.HEADER_SERVER, Header.POWERED_BY )
+                .set( Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp() )
+                .set( Header.HEADER_STATUS, Header.STATUS_OK )
+                .set( Header.HEADER_X_POWERED_BY, Header.X_POWERED_BY );
         this.content = "";
-        this.bytes = new byte[0];
+        this.bytes = new byte[ 0 ];
     }
 
-    public Response() {
-        this(null);
+    public Response()
+    {
+        this( null );
     }
 
     /**
@@ -66,7 +69,8 @@ public class Response implements ResponseBody {
      * @see #isText() Should be false for this to work
      */
     @Override
-    public byte[] getBytes() {
+    public byte[] getBytes()
+    {
         return this.bytes;
     }
 
@@ -75,8 +79,9 @@ public class Response implements ResponseBody {
      *
      * @param bytes Bytes to send to the client
      */
-    public void setBytes(final byte[] bytes) {
-        Assert.notNull(bytes);
+    public void setBytes(final byte[] bytes)
+    {
+        Assert.notNull( bytes );
 
         this.bytes = bytes;
         this.isText = false;
@@ -89,7 +94,8 @@ public class Response implements ResponseBody {
      * @see #setHeader(Header) - To set the header
      */
     @Override
-    public Header getHeader() {
+    public Header getHeader()
+    {
         return this.header;
     }
 
@@ -98,8 +104,9 @@ public class Response implements ResponseBody {
      *
      * @param header Header file
      */
-    public Response setHeader(final Header header) {
-        Assert.notNull(header);
+    public Response setHeader(final Header header)
+    {
+        Assert.notNull( header );
 
         this.header = header;
         return this;
@@ -112,7 +119,8 @@ public class Response implements ResponseBody {
      * @see #isText() Should be true for this to work
      */
     @Override
-    public String getContent() {
+    public String getContent()
+    {
         return this.content;
     }
 
@@ -122,8 +130,9 @@ public class Response implements ResponseBody {
      * @param content The string content
      * @see #setBytes(byte[]) to send raw bytes
      */
-    public Response setContent(final String content) {
-        Assert.notNull(content);
+    public Response setContent(final String content)
+    {
+        Assert.notNull( content );
 
         this.content = content;
         this.isText = true;
@@ -138,18 +147,21 @@ public class Response implements ResponseBody {
      * @see #setBytes(byte[]) To set the byte content
      */
     @Override
-    public boolean isText() {
+    public boolean isText()
+    {
         return isText;
     }
 
-    public Response setParent(final RequestHandler parent) {
-        Assert.notNull(parent);
+    public Response setParent(final RequestHandler parent)
+    {
+        Assert.notNull( parent );
 
         this.parent = parent;
         return this;
     }
 
-    public boolean hasParent() {
+    public boolean hasParent()
+    {
         return this.parent != null;
     }
 }

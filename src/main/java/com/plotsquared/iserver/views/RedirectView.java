@@ -27,36 +27,43 @@ import com.plotsquared.iserver.object.syntax.IgnoreSyntax;
 import java.io.File;
 import java.util.Map;
 
-public class RedirectView extends View implements IgnoreSyntax {
+public class RedirectView extends View implements IgnoreSyntax
+{
 
     private final YamlConfiguration configuration;
 
-    public RedirectView(final String pattern, final Map<String, Object> options) {
-        super(pattern, "redirect", options);
+    public RedirectView(final String pattern, final Map<String, Object> options)
+    {
+        super( pattern, "redirect", options );
         super.relatedFolderPath = "./redirect";
-        final File file = new File(getFolder(), "redirect.yml");
-        try {
-            configuration = new YamlConfiguration("redirect", file);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
+        final File file = new File( getFolder(), "redirect.yml" );
+        try
+        {
+            configuration = new YamlConfiguration( "redirect", file );
+        } catch ( final Exception e )
+        {
+            throw new RuntimeException( e );
         }
         configuration.loadFile();
     }
 
     @Override
-    public boolean passes(Request request) {
+    public boolean passes(Request request)
+    {
         Map<String, String> variables = request.getVariables();
-        if (this.configuration.contains(variables.get("entry"))) {
-            request.addMeta("redirect_url", configuration.get(variables.get("entry")));
+        if ( this.configuration.contains( variables.get( "entry" ) ) )
+        {
+            request.addMeta( "redirect_url", configuration.get( variables.get( "entry" ) ) );
             return true;
         }
         return false;
     }
 
     @Override
-    public Response generate(final Request r) {
-        Response response = new Response(this);
-        response.getHeader().redirect(r.getMeta("redirect_url").toString());
+    public Response generate(final Request r)
+    {
+        Response response = new Response( this );
+        response.getHeader().redirect( r.getMeta( "redirect_url" ).toString() );
         return response;
     }
 }

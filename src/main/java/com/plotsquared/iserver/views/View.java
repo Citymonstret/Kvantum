@@ -39,7 +39,8 @@ import java.util.Map;
  * @author Citymonstret
  */
 @SuppressWarnings("ALL")
-public class View extends RequestHandler {
+public class View extends RequestHandler
+{
 
     private final Map<String, Object> options;
     private final String internalName;
@@ -56,8 +57,9 @@ public class View extends RequestHandler {
      * @param pattern used to decide whether or not to use this view
      * @see View(String, Map) - This is an alternate constructor
      */
-    public View(final String pattern, final String internalName) {
-        this(pattern, internalName, null);
+    public View(final String pattern, final String internalName)
+    {
+        this( pattern, internalName, null );
     }
 
     /**
@@ -66,19 +68,23 @@ public class View extends RequestHandler {
      * @param pattern Regex pattern that will decide whether or not to use this view
      * @param options Pre Stored options
      */
-    public View(final String pattern, final String internalName, final Map<String, Object> options) {
-        this(pattern, internalName, options, null);
+    public View(final String pattern, final String internalName, final Map<String, Object> options)
+    {
+        this( pattern, internalName, options, null );
     }
 
     public View(final String pattern, final String internalName, final Map<String, Object> options,
-                final ViewReturn viewReturn) {
-        if (options == null) {
+                final ViewReturn viewReturn)
+    {
+        if ( options == null )
+        {
             this.options = new HashMap<>();
-        } else {
+        } else
+        {
             this.options = options;
         }
         this.internalName = internalName;
-        this.viewPattern = new ViewPattern(pattern);
+        this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
     }
 
@@ -92,10 +98,11 @@ public class View extends RequestHandler {
      */
     @SuppressWarnings("ALL")
     @Final
-    final public <T> T getOption(final String s) {
-        Assert.notNull(s);
+    final public <T> T getOption(final String s)
+    {
+        Assert.notNull( s );
 
-        return ((T) options.get(s));
+        return ( (T) options.get( s ) );
     }
 
     /**
@@ -104,10 +111,12 @@ public class View extends RequestHandler {
      * @return options as string
      */
     @Final
-    final public String getOptionString() {
+    final public String getOptionString()
+    {
         final StringBuilder b = new StringBuilder();
-        for (final Map.Entry<String, Object> e : options.entrySet()) {
-            b.append(";").append(e.getKey()).append("=").append(e.getValue().toString());
+        for ( final Map.Entry<String, Object> e : options.entrySet() )
+        {
+            b.append( ";" ).append( e.getKey() ).append( "=" ).append( e.getValue().toString() );
         }
         return b.toString();
     }
@@ -119,20 +128,23 @@ public class View extends RequestHandler {
      * @return True if the option is stored, False if it isn't
      */
     @Final
-    final public boolean containsOption(final String s) {
-        Assert.notNull(s);
+    final public boolean containsOption(final String s)
+    {
+        Assert.notNull( s );
 
-        return options.containsKey(s);
+        return options.containsKey( s );
     }
 
     @Override
-    public final String getName() {
+    public final String getName()
+    {
         return this.internalName;
     }
 
     @Final
-    final public void register() {
-        Server.getInstance().getRequestManager().add(this);
+    final public void register()
+    {
+        Server.getInstance().getRequestManager().add( this );
     }
 
     /**
@@ -142,61 +154,80 @@ public class View extends RequestHandler {
      *
      * @return File
      */
-    protected File getFolder() {
-        if (this.folder == null) {
-            if (containsOption("folder")) {
-                this.folder = new File(getOption("folder").toString());
-            } else if (relatedFolderPath != null) {
-                this.folder = new File(Context.coreFolder, relatedFolderPath);
-            } else {
-                this.folder = new File(Context.coreFolder, "/" + internalName);
+    protected File getFolder()
+    {
+        if ( this.folder == null )
+        {
+            if ( containsOption( "folder" ) )
+            {
+                this.folder = new File( getOption( "folder" ).toString() );
+            } else if ( relatedFolderPath != null )
+            {
+                this.folder = new File( Context.coreFolder, relatedFolderPath );
+            } else
+            {
+                this.folder = new File( Context.coreFolder, "/" + internalName );
             }
-            if (!folder.exists()) {
-                if (!folder.mkdirs()) {
-                    System.out.println("Couldn't create the " + internalName + " folder...");
+            if ( !folder.exists() )
+            {
+                if ( !folder.mkdirs() )
+                {
+                    System.out.println( "Couldn't create the " + internalName + " folder..." );
                 }
             }
         }
         return this.folder;
     }
 
-    protected File getFile(final Request request) {
-        Assert.isValid(request);
+    protected File getFile(final Request request)
+    {
+        Assert.isValid( request );
 
-        final Map<String, String> variables = (Map<String, String>) request.getMeta("viewV");
-        if (internalFileName == null) {
-            if (containsOption("filepattern")) {
-                this.internalFileName = getOption("filepattern");
-            } else if (fileName != null) {
+        final Map<String, String> variables = (Map<String, String>) request.getMeta( "viewV" );
+        if ( internalFileName == null )
+        {
+            if ( containsOption( "filepattern" ) )
+            {
+                this.internalFileName = getOption( "filepattern" );
+            } else if ( fileName != null )
+            {
                 this.internalFileName = fileName;
-            } else {
-                throw new RuntimeException("getFile called without a filename set!");
+            } else
+            {
+                throw new RuntimeException( "getFile called without a filename set!" );
             }
         }
         String n = internalFileName;
         {
-            String t = variables.get("file");
-            n = n.replace("{1}", variables.get("folder"));
-            if (t == null || t.equals("")) {
-                if (internalDefaultFile == null) {
-                    if (containsOption("defaultfile")) {
-                        this.internalDefaultFile = getOption("defaultfile");
-                    } else if (defaultFile != null) {
+            String t = variables.get( "file" );
+            n = n.replace( "{1}", variables.get( "folder" ) );
+            if ( t == null || t.equals( "" ) )
+            {
+                if ( internalDefaultFile == null )
+                {
+                    if ( containsOption( "defaultfile" ) )
+                    {
+                        this.internalDefaultFile = getOption( "defaultfile" );
+                    } else if ( defaultFile != null )
+                    {
                         this.internalDefaultFile = defaultFile;
-                    } else {
-                        throw new RuntimeException("getFile called with empty file path, and no default file set!");
+                    } else
+                    {
+                        throw new RuntimeException( "getFile called with empty file path, and no default file set!" );
                     }
                 }
                 t = internalDefaultFile;
             }
-            n = n.replace("{2}", variables.get("file"));
-            if (variables.containsKey("extension")) {
-                n = n.replace("{3}", variables.get("extension").replace(".", ""));
-            } else {
-                n = n.replace("{3}", "");
+            n = n.replace( "{2}", variables.get( "file" ) );
+            if ( variables.containsKey( "extension" ) )
+            {
+                n = n.replace( "{3}", variables.get( "extension" ).replace( ".", "" ) );
+            } else
+            {
+                n = n.replace( "{3}", "" );
             }
         }
-        return new File(getFolder(), n);
+        return new File( getFolder(), n );
     }
 
     /**
@@ -205,11 +236,15 @@ public class View extends RequestHandler {
      * @return file buffer
      */
     @Final
-    final protected int getBuffer() {
-        if (this.buffer == -1) {
-            if (containsOption("buffer")) {
-                this.buffer = getOption("buffer");
-            } else {
+    final protected int getBuffer()
+    {
+        if ( this.buffer == -1 )
+        {
+            if ( containsOption( "buffer" ) )
+            {
+                this.buffer = getOption( "buffer" );
+            } else
+            {
                 this.buffer = 65536; // 64kb
             }
         }
@@ -225,15 +260,17 @@ public class View extends RequestHandler {
      */
     @Final
     @Override
-    final public boolean matches(final Request request) {
-        Assert.isValid(request);
+    final public boolean matches(final Request request)
+    {
+        Assert.isValid( request );
 
-        final Map<String, String> map = viewPattern.matches(request.getQuery().getFullRequest());
-        if (map != null) {
-            request.addMeta("variables", map);
+        final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
+        if ( map != null )
+        {
+            request.addMeta( "variables", map );
         }
-        Server.getInstance().log("Didn't match: " + viewPattern + " | " + (map == null));
-        return map != null && passes(request);
+        Server.getInstance().log( "Didn't match: " + viewPattern + " | " + ( map == null ) );
+        return map != null && passes( request );
     }
 
     /**
@@ -243,22 +280,27 @@ public class View extends RequestHandler {
      * @param request The request from which the URL is fetches
      * @return True if the request matches, false if not
      */
-    protected boolean passes(Request request) {
+    protected boolean passes(Request request)
+    {
         return true;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return this.viewPattern.toString();
     }
 
     @Override
-    public Response generate(final Request r) {
-        if (viewReturn != null) {
-            return viewReturn.get(r);
-        } else {
-            Response response = new Response(this);
-            response.setContent("<h1>Content!</h1>");
+    public Response generate(final Request r)
+    {
+        if ( viewReturn != null )
+        {
+            return viewReturn.get( r );
+        } else
+        {
+            Response response = new Response( this );
+            response.setContent( "<h1>Content!</h1>" );
             return response;
         }
     }

@@ -29,7 +29,8 @@ import com.plotsquared.iserver.util.Assert;
  *
  * @author Citymonstret
  */
-public abstract class Event {
+public abstract class Event
+{
 
     private final String name;
     private final int accessor;
@@ -40,15 +41,17 @@ public abstract class Event {
      *
      * @param name Event Name
      */
-    protected Event(final String name) {
-        Assert.notEmpty(name);
+    protected Event(final String name)
+    {
+        Assert.notEmpty( name );
 
         this.name = name;
         this.accessor = getClass().getName().hashCode();
     }
 
     @Override
-    public final String toString() {
+    public final String toString()
+    {
         return this.getClass().getName();
     }
 
@@ -57,17 +60,20 @@ public abstract class Event {
      *
      * @return Event name
      */
-    private String getName() {
+    private String getName()
+    {
         return this.name;
     }
 
     @Override
-    public final int hashCode() {
+    public final int hashCode()
+    {
         return this.accessor;
     }
 
     @Override
-    public final boolean equals(final Object o) {
-        return o instanceof Event && ((Event) o).getName().equals(getName());
+    public final boolean equals(final Object o)
+    {
+        return o instanceof Event && ( (Event) o ).getName().equals( getName() );
     }
 }

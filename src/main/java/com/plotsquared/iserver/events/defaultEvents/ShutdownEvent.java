@@ -26,9 +26,11 @@ import com.plotsquared.iserver.core.Server;
  *
  * @author Citymonstret
  */
-public class ShutdownEvent extends ServerEvent {
+public class ShutdownEvent extends ServerEvent
+{
 
-    public ShutdownEvent(Server server) {
-        super(server, "shutdown");
+    public ShutdownEvent(Server server)
+    {
+        super( server, "shutdown" );
     }
 }

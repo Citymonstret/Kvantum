@@ -32,7 +32,8 @@ package com.plotsquared.iserver.object.syntax;
  *
  * @author Citymonstret
  */
-public interface VariableProvider {
+public interface VariableProvider
+{
 
     /**
      * Does the provider contain this variable?

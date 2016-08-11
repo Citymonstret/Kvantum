@@ -24,11 +24,13 @@ package com.plotsquared.iserver.events;
  *
  * @author Citymonstret
  */
-public class DefaultEventCaller extends EventCaller {
+public class DefaultEventCaller extends EventCaller
+{
 
     @Override
-    public void callEvent(Event event) {
-        EventManager.getInstance().handle(event);
+    public void callEvent(Event event)
+    {
+        EventManager.getInstance().handle( event );
     }
 
 }

@@ -21,14 +21,17 @@ package com.plotsquared.iserver.object.filter;
 
 import com.plotsquared.iserver.object.syntax.Filter;
 
-final public class Uppercase extends Filter {
+final public class Uppercase extends Filter
+{
 
-    public Uppercase() {
-        super("uppercase");
+    public Uppercase()
+    {
+        super( "uppercase" );
     }
 
     @Override
-    public Object handle(String objectName, Object in) {
+    public Object handle(String objectName, Object in)
+    {
         return in.toString().toUpperCase();
     }
 

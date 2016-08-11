@@ -26,10 +26,12 @@ import com.plotsquared.iserver.core.Server;
  *
  * @author Citymonstret
  */
-public class StartupEvent extends ServerEvent {
+public class StartupEvent extends ServerEvent
+{
 
-    public StartupEvent(final Server server) {
-        super(server, "startup");
+    public StartupEvent(final Server server)
+    {
+        super( server, "startup" );
     }
 
 }

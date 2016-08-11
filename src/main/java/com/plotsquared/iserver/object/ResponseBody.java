@@ -1,6 +1,7 @@
 package com.plotsquared.iserver.object;
 
-public interface ResponseBody extends HeaderProvider {
+public interface ResponseBody extends HeaderProvider
+{
 
     byte[] getBytes();
 

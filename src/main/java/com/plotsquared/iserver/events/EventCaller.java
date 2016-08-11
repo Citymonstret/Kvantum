@@ -24,7 +24,8 @@ package com.plotsquared.iserver.events;
  *
  * @author Citymonstret
  */
-public abstract class EventCaller {
+public abstract class EventCaller
+{
 
     /**
      * Call an event

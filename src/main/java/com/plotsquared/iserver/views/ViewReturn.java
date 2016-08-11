@@ -23,7 +23,8 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 
 @FunctionalInterface
-public interface ViewReturn {
+public interface ViewReturn
+{
 
     Response get(Request r);
 

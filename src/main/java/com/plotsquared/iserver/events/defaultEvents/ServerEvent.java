@@ -27,7 +27,8 @@ import com.plotsquared.iserver.events.Event;
  *
  * @author Citymonstret
  */
-public abstract class ServerEvent extends Event {
+public abstract class ServerEvent extends Event
+{
 
     private final Server server;
 
@@ -37,8 +38,9 @@ public abstract class ServerEvent extends Event {
      * @param server The server instance
      * @param name   The event identifier
      */
-    public ServerEvent(final Server server, final String name) {
-        super("is::server::" + name);
+    public ServerEvent(final Server server, final String name)
+    {
+        super( "is::server::" + name );
         this.server = server;
     }
 
@@ -47,7 +49,8 @@ public abstract class ServerEvent extends Event {
      *
      * @return server instance
      */
-    public final Server getServer() {
+    public final Server getServer()
+    {
         return this.server;
     }
 }

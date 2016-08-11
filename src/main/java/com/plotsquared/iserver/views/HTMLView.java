@@ -36,67 +36,79 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class HTMLView extends View implements CacheApplicable {
+public class HTMLView extends View implements CacheApplicable
+{
 
-    public HTMLView(String filter, Map<String, Object> options) {
-        super(filter, "html", options);
+    public HTMLView(String filter, Map<String, Object> options)
+    {
+        super( filter, "html", options );
         super.fileName = "{2}.html";
         super.defaultFile = "index";
     }
 
     @Override
-    public boolean passes(Request request) {
-        File file = getFile(request);
-        request.addMeta("html_file", file);
+    public boolean passes(Request request)
+    {
+        File file = getFile( request );
+        request.addMeta( "html_file", file );
         return file.exists();
     }
 
     @Override
-    public Response generate(final Request r) {
-        File file = (File) r.getMeta("html_file");
+    public Response generate(final Request r)
+    {
+        File file = (File) r.getMeta( "html_file" );
 
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
-        response.setContent(FileUtils.getDocument(file, getBuffer()));
+        Response response = new Response( this );
+        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
+        response.setContent( FileUtils.getDocument( file, getBuffer() ) );
         return response;
     }
 
     @Override
-    public HTMLProvider getFactory(final Request r) {
-        return new HTMLProvider(r);
+    public HTMLProvider getFactory(final Request r)
+    {
+        return new HTMLProvider( r );
     }
 
     @Override
-    public boolean isApplicable(Request r) {
+    public boolean isApplicable(Request r)
+    {
         return true;
     }
 
-    public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider {
+    public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider
+    {
 
         private final Map<String, String> storage = new HashMap<>();
 
-        public HTMLProvider(final Request r) {
-            storage.put("name", r.getMeta("html_file") + ".html");
+        public HTMLProvider(final Request r)
+        {
+            storage.put( "name", r.getMeta( "html_file" ) + ".html" );
         }
 
         @Override
-        public HTMLProvider get(Request r) {
+        public HTMLProvider get(Request r)
+        {
             return this;
         }
 
         @Override
-        public String providerName() {
+        public String providerName()
+        {
             return "document";
         }
 
         @Override
-        public boolean contains(String variable) {
-            return storage.containsKey(variable);
+        public boolean contains(String variable)
+        {
+            return storage.containsKey( variable );
         }
 
         @Override
-        public Object get(String variable) {
-            return storage.get(variable);
+        public Object get(String variable)
+        {
+            return storage.get( variable );
         }
     }
 }

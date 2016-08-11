@@ -26,7 +26,8 @@ import com.plotsquared.iserver.object.Request;
  *
  * @author Citymonstret
  */
-public interface ProviderFactory<T extends VariableProvider> {
+public interface ProviderFactory<T extends VariableProvider>
+{
 
     T get(final Request r);
 

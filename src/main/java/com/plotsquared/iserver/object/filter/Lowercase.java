@@ -21,13 +21,16 @@ package com.plotsquared.iserver.object.filter;
 
 import com.plotsquared.iserver.object.syntax.Filter;
 
-final public class Lowercase extends Filter {
+final public class Lowercase extends Filter
+{
 
-    public Lowercase() {
-        super("lowercase");
+    public Lowercase()
+    {
+        super( "lowercase" );
     }
 
-    public Object handle(String objectName, Object in) {
+    public Object handle(String objectName, Object in)
+    {
         return in.toString().toLowerCase();
     }
 

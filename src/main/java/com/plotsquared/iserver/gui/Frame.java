@@ -9,30 +9,34 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-class Frame extends JFrame {
+class Frame extends JFrame
+{
 
-    Frame() {
-        super("IntellectualServer");
+    Frame()
+    {
+        super( "IntellectualServer" );
 
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.setVisible(true);
-        this.setSize(screenSize);
+        this.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE );
+        this.setVisible( true );
+        this.setSize( screenSize );
 
-        final Dimension consoleDimension = new Dimension(screenSize);
-        consoleDimension.setSize(consoleDimension.getWidth() * 0.7, consoleDimension.getHeight());
+        final Dimension consoleDimension = new Dimension( screenSize );
+        consoleDimension.setSize( consoleDimension.getWidth() * 0.7, consoleDimension.getHeight() );
 
-        Console.getConsole().setSize(consoleDimension);
-        this.getContentPane().add(Console.getConsole(), FlowLayout.LEFT);
+        Console.getConsole().setSize( consoleDimension );
+        this.getContentPane().add( Console.getConsole(), FlowLayout.LEFT );
 
-        addWindowListener(new WindowAdapter() {
+        addWindowListener( new WindowAdapter()
+        {
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(WindowEvent e)
+            {
                 Frame.this.dispose();
                 Server.getInstance().stopServer();
             }
-        });
+        } );
     }
 
 }

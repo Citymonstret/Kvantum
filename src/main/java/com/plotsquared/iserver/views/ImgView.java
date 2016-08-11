@@ -33,45 +33,55 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class ImgView extends View implements CacheApplicable {
+public class ImgView extends View implements CacheApplicable
+{
 
-    public ImgView(String filter, Map<String, Object> options) {
-        super(filter, "img", options);
+    public ImgView(String filter, Map<String, Object> options)
+    {
+        super( filter, "img", options );
         super.relatedFolderPath = "/assets/img";
     }
 
     @Override
-    public boolean passes(Request request) {
+    public boolean passes(Request request)
+    {
         Map<String, String> variables = request.getVariables();
-        String file = variables.get("file") + variables.get("extension");
+        String file = variables.get( "file" ) + variables.get( "extension" );
 
-        if (file.endsWith(".png")) {
-            request.addMeta("img_type", "png");
-        } else if (file.endsWith(".ico")) {
-            request.addMeta("img_type", "x-icon");
-        } else if (file.endsWith(".gif")) {
-            request.addMeta("img_type", "gif");
-        } else if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
-            request.addMeta("img_type", "jpeg");
-        } else {
+        if ( file.endsWith( ".png" ) )
+        {
+            request.addMeta( "img_type", "png" );
+        } else if ( file.endsWith( ".ico" ) )
+        {
+            request.addMeta( "img_type", "x-icon" );
+        } else if ( file.endsWith( ".gif" ) )
+        {
+            request.addMeta( "img_type", "gif" );
+        } else if ( file.endsWith( ".jpg" ) || file.endsWith( ".jpeg" ) )
+        {
+            request.addMeta( "img_type", "jpeg" );
+        } else
+        {
             return false;
         }
-        request.addMeta("img_file", file);
-        return (new File(getFolder(), file)).exists();
+        request.addMeta( "img_file", file );
+        return ( new File( getFolder(), file ) ).exists();
     }
 
     @Override
-    public Response generate(final Request r) {
-        File file = new File(getFolder(), r.getMeta("img_file").toString());
-        byte[] bytes = FileUtils.getBytes(file, getBuffer());
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, "image/" + r.getMeta("img_type") + "; charset=utf-8");
-        response.setBytes(bytes);
+    public Response generate(final Request r)
+    {
+        File file = new File( getFolder(), r.getMeta( "img_file" ).toString() );
+        byte[] bytes = FileUtils.getBytes( file, getBuffer() );
+        Response response = new Response( this );
+        response.getHeader().set( Header.HEADER_CONTENT_TYPE, "image/" + r.getMeta( "img_type" ) + "; charset=utf-8" );
+        response.setBytes( bytes );
         return response;
     }
 
     @Override
-    public boolean isApplicable(Request r) {
+    public boolean isApplicable(Request r)
+    {
         return false;
     }
 }

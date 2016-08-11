@@ -22,15 +22,20 @@ package com.plotsquared.iserver.commands;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.LogWrapper;
 
-public class Show extends Command {
+public class Show extends Command
+{
 
     @Override
-    public void handle(String[] args) {
-        if (args.length < 1) {
-            Server.getInstance().log("> Required Parameter Missing (`c`|`w`)");
-        } else {
-            String[] lines = new String[0];
-            switch (args[0].toLowerCase()) {
+    public void handle(String[] args)
+    {
+        if ( args.length < 1 )
+        {
+            Server.getInstance().log( "> Required Parameter Missing (`c`|`w`)" );
+        } else
+        {
+            String[] lines = new String[ 0 ];
+            switch ( args[ 0 ].toLowerCase() )
+            {
                 case "c":
                     lines = new String[]{
                             "",
@@ -262,12 +267,13 @@ public class Show extends Command {
                     };
                     break;
                 default:
-                    Server.getInstance().log("> Unknown Parameter `%s`", args[0].toLowerCase());
+                    Server.getInstance().log( "> Unknown Parameter `%s`", args[ 0 ].toLowerCase() );
                     break;
             }
             LogWrapper wrapper = Server.getInstance().logWrapper;
-            for (String line : lines) {
-                wrapper.log("  " + line);
+            for ( String line : lines )
+            {
+                wrapper.log( "  " + line );
             }
         }
     }

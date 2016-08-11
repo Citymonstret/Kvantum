@@ -26,74 +26,97 @@ import com.plotsquared.iserver.object.Session;
 
 import java.sql.SQLException;
 
-public class AccountCommand extends Command {
+public class AccountCommand extends Command
+{
 
     final ApplicationStructure structure;
 
-    public AccountCommand(final ApplicationStructure applicationStructure) {
+    public AccountCommand(final ApplicationStructure applicationStructure)
+    {
         this.structure = applicationStructure;
     }
 
     @Override
-    public void handle(String[] args) {
-        if (args.length < 1) {
-            send("Available Subcommands: create, setpassword, logout");
-        } else {
-            switch (args[0].toLowerCase()) {
-                case "create": {
-                    if (args.length < 3) {
-                        send("Syntax: account create [username] [password]");
-                    } else {
-                        String username = args[1];
-                        byte[] password = args[2].getBytes();
+    public void handle(String[] args)
+    {
+        if ( args.length < 1 )
+        {
+            send( "Available Subcommands: create, setpassword, logout" );
+        } else
+        {
+            switch ( args[ 0 ].toLowerCase() )
+            {
+                case "create":
+                {
+                    if ( args.length < 3 )
+                    {
+                        send( "Syntax: account create [username] [password]" );
+                    } else
+                    {
+                        String username = args[ 1 ];
+                        byte[] password = args[ 2 ].getBytes();
 
-                        if (structure.getAccountManager().getAccount(new Object[]{null, username}) != null) {
-                            send("There is already an account with that username!");
-                        } else {
-                            Account account = new Account(structure.getAccountManager().getNextId(), username, password);
-                            send("Account created (Username: " + username + ", ID: " + account.getID() + ")");
-                            try {
-                                structure.getAccountManager().createAccount(account);
-                            } catch (SQLException e) {
+                        if ( structure.getAccountManager().getAccount( new Object[]{ null, username } ) != null )
+                        {
+                            send( "There is already an account with that username!" );
+                        } else
+                        {
+                            Account account = new Account( structure.getAccountManager().getNextId(), username, password );
+                            send( "Account created (Username: " + username + ", ID: " + account.getID() + ")" );
+                            try
+                            {
+                                structure.getAccountManager().createAccount( account );
+                            } catch ( SQLException e )
+                            {
                                 e.printStackTrace();
                             }
                         }
                     }
                 }
                 break;
-                case "setpassword": {
-                    if (args.length < 3) {
-                        send("Syntax: account setpassword [username] [new password]");
+                case "setpassword":
+                {
+                    if ( args.length < 3 )
+                    {
+                        send( "Syntax: account setpassword [username] [new password]" );
                     }
                 }
                 break;
-                case "logout": {
-                    if (args.length < 2) {
-                        send("Syntax: account logout [username]");
-                    } else {
-                        Account account = structure.getAccountManager().getAccount(new Object[]{null, args[1]});
-                        if (account == null) {
-                            send("There is no such account");
-                        } else {
-                            Session session = structure.getAccountManager().getSession(account);
-                            if (session == null) {
-                                send("There is no such session");
-                            } else {
-                                structure.getAccountManager().unbindAccount(session);
-                                send("Session unbound!");
+                case "logout":
+                {
+                    if ( args.length < 2 )
+                    {
+                        send( "Syntax: account logout [username]" );
+                    } else
+                    {
+                        Account account = structure.getAccountManager().getAccount( new Object[]{ null, args[ 1 ] } );
+                        if ( account == null )
+                        {
+                            send( "There is no such account" );
+                        } else
+                        {
+                            Session session = structure.getAccountManager().getSession( account );
+                            if ( session == null )
+                            {
+                                send( "There is no such session" );
+                            } else
+                            {
+                                structure.getAccountManager().unbindAccount( session );
+                                send( "Session unbound!" );
                             }
                         }
                     }
                 }
                 break;
                 default:
-                    send("Unknown subcommand: " + args[0].toLowerCase());
+                    send( "Unknown subcommand: " + args[ 0 ].toLowerCase() );
                     break;
             }
         }
     }
 
-    void send(String s) {
-        Server.getInstance().log(s);
+    void send(String s)
+    {
+        Server.getInstance().log( s );
     }
 }

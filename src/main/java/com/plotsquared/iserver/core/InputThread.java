@@ -34,58 +34,72 @@ import java.util.Map;
  * @author Citymonstret
  */
 @SuppressWarnings("all")
-public class InputThread extends Thread {
+public class InputThread extends Thread
+{
 
     public final Map<String, Command> commands;
     private final Server server;
     public String currentString = "";
 
-    InputThread(Server server) {
+    InputThread(Server server)
+    {
         this.server = server;
         this.commands = new HashMap<>();
 
-        this.commands.put("stop", new Stop());
-        this.commands.put("cachedump", new CacheDump());
-        this.commands.put("show", new Show());
-        this.commands.put("dump", new Dump());
+        this.commands.put( "stop", new Stop() );
+        this.commands.put( "cachedump", new CacheDump() );
+        this.commands.put( "show", new Show() );
+        this.commands.put( "dump", new Dump() );
     }
 
     @Override
-    public void run() {
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    public void run()
+    {
+        try
+        {
+            BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
             String line;
-            for (; ; ) {
+            for ( ; ; )
+            {
                 line = in.readLine();
-                if (line == null || line.isEmpty()) {
+                if ( line == null || line.isEmpty() )
+                {
                     continue;
                 }
-                if (line.startsWith("/")) {
-                    line = line.replace("/", "").toLowerCase();
-                    String[] strings = line.split(" ");
+                if ( line.startsWith( "/" ) )
+                {
+                    line = line.replace( "/", "" ).toLowerCase();
+                    String[] strings = line.split( " " );
                     String[] args;
-                    if (strings.length > 1) {
-                        args = new String[strings.length - 1];
-                        System.arraycopy(strings, 1, args, 0, strings.length - 1);
-                    } else {
-                        args = new String[0];
+                    if ( strings.length > 1 )
+                    {
+                        args = new String[ strings.length - 1 ];
+                        System.arraycopy( strings, 1, args, 0, strings.length - 1 );
+                    } else
+                    {
+                        args = new String[ 0 ];
                     }
-                    String command = strings[0];
-                    if (commands.containsKey(command)) {
-                        commands.get(command).handle(args);
-                    } else {
-                        server.log("Unknown command '%s'", line);
+                    String command = strings[ 0 ];
+                    if ( commands.containsKey( command ) )
+                    {
+                        commands.get( command ).handle( args );
+                    } else
+                    {
+                        server.log( "Unknown command '%s'", line );
                     }
-                } else {
+                } else
+                {
                     currentString = line;
-                    Server.getInstance().handleEvent(new TextEvent(line));
+                    Server.getInstance().handleEvent( new TextEvent( line ) );
                 }
             }
-        } catch (final Exception ignored) {
+        } catch ( final Exception ignored )
+        {
         }
     }
 
-    public static class TextEvent extends Event {
+    public static class TextEvent extends Event
+    {
 
         private final String text;
 
@@ -95,12 +109,14 @@ public class InputThread extends Thread {
          *
          * @param name Event Name
          */
-        protected TextEvent(String text) {
-            super("inputtextevent");
+        protected TextEvent(String text)
+        {
+            super( "inputtextevent" );
             this.text = text;
         }
 
-        final public String getText() {
+        final public String getText()
+        {
             return this.text;
         }
     }

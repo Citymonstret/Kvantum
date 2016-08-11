@@ -21,7 +21,8 @@ package com.plotsquared.iserver.util;
 
 import java.io.File;
 
-public class Context {
+public class Context
+{
 
     public static File coreFolder;
 

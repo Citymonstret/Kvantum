@@ -33,7 +33,8 @@ import java.util.regex.Pattern;
  *
  * @author Citymonstret
  */
-public abstract class Syntax {
+public abstract class Syntax
+{
 
     private final Pattern pattern;
 
@@ -42,7 +43,8 @@ public abstract class Syntax {
      *
      * @param pattern The regex pattern used to match the code
      */
-    public Syntax(final Pattern pattern) {
+    public Syntax(final Pattern pattern)
+    {
         this.pattern = pattern;
     }
 
@@ -67,8 +69,9 @@ public abstract class Syntax {
      * @return Processed Input
      * @see #process(String, Matcher, Request, Map) Wraps around this
      */
-    public final String handle(final String in, final Request r, final Map<String, ProviderFactory> factories) {
-        return process(in, pattern.matcher(in), r, factories);
+    public final String handle(final String in, final Request r, final Map<String, ProviderFactory> factories)
+    {
+        return process( in, pattern.matcher( in ), r, factories );
     }
 
     /**
@@ -77,8 +80,9 @@ public abstract class Syntax {
      * @param in Code Input
      * @return True if the regex matches
      */
-    public final boolean matches(final String in) {
-        return this.pattern.matcher(in).find();
+    public final boolean matches(final String in)
+    {
+        return this.pattern.matcher( in ).find();
     }
 
     /**
@@ -86,7 +90,8 @@ public abstract class Syntax {
      *
      * @return Pattern
      */
-    public Pattern getPattern() {
+    public Pattern getPattern()
+    {
         return this.pattern;
     }
 }

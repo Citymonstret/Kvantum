@@ -26,10 +26,12 @@ import com.plotsquared.iserver.core.Server;
  *
  * @author Citymonstret
  */
-public class Dump extends Command {
+public class Dump extends Command
+{
 
     @Override
-    public void handle(String[] args) {
-        Server.getInstance().getRequestManager().dump(Server.getInstance());
+    public void handle(String[] args)
+    {
+        Server.getInstance().getRequestManager().dump( Server.getInstance() );
     }
 }

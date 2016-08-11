@@ -29,52 +29,62 @@ import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class RequestManager {
+public class RequestManager
+{
 
     private final List<RequestHandler> views;
 
-    public RequestManager() {
+    public RequestManager()
+    {
         this.views = new ArrayList<>();
     }
 
-    public void add(final RequestHandler view) {
-        Assert.notNull(view);
+    public void add(final RequestHandler view)
+    {
+        Assert.notNull( view );
 
-        final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst(views, v -> v.toString().equalsIgnoreCase(view.toString()));
-        if (illegalRequestHandler.isPresent()) {
-            throw new IllegalArgumentException("Duplicate view pattern!");
+        final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst( views, v -> v.toString().equalsIgnoreCase( view.toString() ) );
+        if ( illegalRequestHandler.isPresent() )
+        {
+            throw new IllegalArgumentException( "Duplicate view pattern!" );
         }
-        views.add(view);
+        views.add( view );
     }
 
-    public RequestHandler match(final Request request) {
-        Assert.notNull(request);
+    public RequestHandler match(final Request request)
+    {
+        Assert.notNull( request );
 
-        final Optional<RequestHandler> view = LambdaUtil.getFirst(views, request.matches);
-        if (view.isPresent()) {
+        final Optional<RequestHandler> view = LambdaUtil.getFirst( views, request.matches );
+        if ( view.isPresent() )
+        {
             return view.get();
         }
-        return View404.construct(request.getQuery().getFullRequest());
+        return View404.construct( request.getQuery().getFullRequest() );
     }
 
-    public void dump(final Server server) {
-        Assert.notNull(server);
+    public void dump(final Server server)
+    {
+        Assert.notNull( server );
 
-        ((IConsumer<RequestHandler>) view -> server.log("> RequestHandler - Class '%s', Regex: '%s'",
-                view.getClass().getSimpleName(), view.toString())).foreach(views);
+        ( (IConsumer<RequestHandler>) view -> server.log( "> RequestHandler - Class '%s', Regex: '%s'",
+                view.getClass().getSimpleName(), view.toString() ) ).foreach( views );
     }
 
-    public void remove(final RequestHandler view) {
-        Assert.notNull(view);
+    public void remove(final RequestHandler view)
+    {
+        Assert.notNull( view );
 
-        if (views.contains(view)) {
-            views.remove(view);
+        if ( views.contains( view ) )
+        {
+            views.remove( view );
         }
     }
 
-    public void clear() {
+    public void clear()
+    {
         this.views.clear();
-        Server.getInstance().log("Cleared views.");
+        Server.getInstance().log( "Cleared views." );
     }
 
 }

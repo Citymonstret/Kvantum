@@ -32,41 +32,49 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class DownloadView extends View {
+public class DownloadView extends View
+{
 
-    public DownloadView(String filter, Map<String, Object> options) {
-        super(filter, "download", options);
+    public DownloadView(String filter, Map<String, Object> options)
+    {
+        super( filter, "download", options );
         super.relatedFolderPath = "/assets/downloads";
     }
 
     @Override
-    public boolean passes(Request request) {
+    public boolean passes(Request request)
+    {
         Map<String, String> variables = request.getVariables();
-        String file = variables.get("file") + variables.get("extension");
-        if (file.endsWith(".zip")) {
-            request.addMeta("file_type", "zip");
-        } else if (file.endsWith(".txt")) {
-            request.addMeta("file_type", "txt");
-        } else if (file.endsWith(".pdf")) {
-            request.addMeta("file_type", "pdf");
-        } else {
+        String file = variables.get( "file" ) + variables.get( "extension" );
+        if ( file.endsWith( ".zip" ) )
+        {
+            request.addMeta( "file_type", "zip" );
+        } else if ( file.endsWith( ".txt" ) )
+        {
+            request.addMeta( "file_type", "txt" );
+        } else if ( file.endsWith( ".pdf" ) )
+        {
+            request.addMeta( "file_type", "pdf" );
+        } else
+        {
             return false;
         }
-        request.addMeta("zip_file", file);
-        return (new File(getFolder(), file)).exists();
+        request.addMeta( "zip_file", file );
+        return ( new File( getFolder(), file ) ).exists();
     }
 
 
     @Override
-    public Response generate(final Request r) {
-        File file = new File(getFolder(), r.getMeta("zip_file").toString());
-        byte[] bytes = FileUtils.getBytes(file, getBuffer());
-        Response response = new Response(this);
-        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_OCTET_STREAM);
-        response.getHeader().set(Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + r.getMeta("zip_file").toString() + "\"");
-        response.getHeader().set(Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary");
-        response.getHeader().set(Header.HEADER_CONTENT_LENGTH, "" + file.length());
-        response.setBytes(bytes);
+    public Response generate(final Request r)
+    {
+        File file = new File( getFolder(), r.getMeta( "zip_file" ).toString() );
+        byte[] bytes = FileUtils.getBytes( file, getBuffer() );
+        Response response = new Response( this );
+        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_OCTET_STREAM );
+        response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + r.getMeta( "zip_file" ).toString() + "\"" );
+        response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
+        response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + file.length() );
+        response.setBytes( bytes );
         return response;
     }
 

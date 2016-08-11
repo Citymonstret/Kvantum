@@ -20,6 +20,7 @@
 package com.plotsquared.iserver.object;
 
 import com.plotsquared.iserver.config.Message;
+import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.syntax.ProviderFactory;
 import com.plotsquared.iserver.object.syntax.VariableProvider;
@@ -43,9 +44,10 @@ import java.util.function.Predicate;
  *
  * @author Citymonstret
  */
-final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable {
+final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable
+{
 
-    final public Predicate<RequestHandler> matches = view -> view.matches(this);
+    final public Predicate<RequestHandler> matches = view -> view.matches( this );
     public Map<String, String> postponedCookies = new HashMap<>();
     private Map<String, Object> meta;
     private Map<String, String> headers;
@@ -56,7 +58,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private Session session;
     private boolean valid = true;
 
-    private Request() {
+    private Request()
+    {
     }
 
     /**
@@ -66,69 +69,83 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * @param socket  The socket which sent the request
      * @throws RuntimeException if the request doesn't contain a query
      */
-    public Request(final String request, final Socket socket) {
-        Assert.notNull(request, socket);
+    public Request(final String request, final Socket socket)
+    {
+        Assert.notNull( request, socket );
 
         this.socket = socket;
         this.headers = new HashMap<>();
-        final String[] parts = request.split("\\|");
-        for (final String part : parts) {
-            final String[] subParts = part.split(":");
-            if (subParts.length < 2) {
-                if (headers.containsKey("query")) {
+        final String[] parts = request.split( "\\|" );
+        for ( final String part : parts )
+        {
+            final String[] subParts = part.split( ":" );
+            if ( subParts.length < 2 )
+            {
+                if ( headers.containsKey( "query" ) )
+                {
                     // This fixes issues with Nginx and proxy_pass
                     continue;
                 }
-                if (Server.getInstance().verbose) {
-                    Server.getInstance().log("Query: " + subParts[0]);
+                if ( CoreConfig.verbose )
+                {
+                    Server.getInstance().log( "Query: " + subParts[ 0 ] );
                 }
-                headers.put("query", subParts[0]);
-            } else {
-                headers.put(subParts[0], subParts[1]);
+                headers.put( "query", subParts[ 0 ] );
+            } else
+            {
+                headers.put( subParts[ 0 ], subParts[ 1 ] );
             }
         }
-        if (!this.headers.containsKey("query")) {
-            throw new RuntimeException("Couldn't find query header...");
+        if ( !this.headers.containsKey( "query" ) )
+        {
+            throw new RuntimeException( "Couldn't find query header..." );
         }
         this.getResourceRequest();
-        this.cookies = CookieManager.getCookies(this);
+        this.cookies = CookieManager.getCookies( this );
         this.meta = new HashMap<>();
     }
 
-    public void removeMeta(String internalRedirect) {
-        this.meta.remove(internalRedirect);
+    public void removeMeta(String internalRedirect)
+    {
+        this.meta.remove( internalRedirect );
     }
 
     @Override
-    public Request get(Request r) {
+    public Request get(Request r)
+    {
         return this;
     }
 
     @Override
-    public String providerName() {
+    public String providerName()
+    {
         return null;
     }
 
     @Override
-    public boolean contains(String variable) {
-        Assert.notNull(variable);
+    public boolean contains(String variable)
+    {
+        Assert.notNull( variable );
 
-        return getVariables().containsKey(variable);
+        return getVariables().containsKey( variable );
     }
 
     @Override
-    public Object get(String variable) {
-        Assert.notNull(variable);
+    public Object get(String variable)
+    {
+        Assert.notNull( variable );
 
-        return getVariables().get(variable);
+        return getVariables().get( variable );
     }
 
     @Override
-    public boolean isValid() {
+    public boolean isValid()
+    {
         return this.valid;
     }
 
-    public void setValid(boolean valid) {
+    public void setValid(boolean valid)
+    {
         this.valid = valid;
     }
 
@@ -137,9 +154,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @return PostRequest if exists, null if not
      */
-    public PostRequest getPostRequest() {
-        if (this.postRequest == null) {
-            this.postRequest = new PostRequest("&");
+    public PostRequest getPostRequest()
+    {
+        if ( this.postRequest == null )
+        {
+            this.postRequest = new PostRequest( "&" );
         }
         return this.postRequest;
     }
@@ -149,20 +168,22 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @param postRequest The post request
      */
-    public void setPostRequest(final PostRequest postRequest) {
-        Assert.notNull(postRequest);
+    public void setPostRequest(final PostRequest postRequest)
+    {
+        Assert.notNull( postRequest );
 
         this.postRequest = postRequest;
     }
 
-    public Request newRequest(String query) {
-        Assert.notEmpty(query);
+    public Request newRequest(String query)
+    {
+        Assert.notEmpty( query );
 
         Request request = new Request();
-        request.headers = new HashMap<>(headers);
+        request.headers = new HashMap<>( headers );
         request.socket = socket;
-        request.query = new Query(Method.GET, query);
-        request.meta = new HashMap<>(meta);
+        request.query = new Query( Method.GET, query );
+        request.meta = new HashMap<>( meta );
         request.cookies = cookies;
         return request;
     }
@@ -172,7 +193,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @return Request cookies
      */
-    public Cookie[] getCookies() {
+    public Cookie[] getCookies()
+    {
         return this.cookies;
     }
 
@@ -185,24 +207,30 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * @param name Header Name
      * @return The header value, if the header exists. Otherwise an empty string will be returned.
      */
-    public String getHeader(final String name) {
-        Assert.notNull(name);
+    public String getHeader(final String name)
+    {
+        Assert.notNull( name );
 
-        if (this.headers.containsKey(name)) {
-            return this.headers.get(name);
+        if ( this.headers.containsKey( name ) )
+        {
+            return this.headers.get( name );
         }
         return "";
     }
 
-    public Query getResourceRequest() {
-        if (this.query != null) {
+    public Query getResourceRequest()
+    {
+        if ( this.query != null )
+        {
             return getQuery();
         }
-        final String[] parts = getHeader("query").split(" ");
-        if (parts.length < 3) {
-            this.query = new Query(Method.GET, "/");
-        } else {
-            this.query = new Query(parts[0].equalsIgnoreCase("GET") ? Method.GET : Method.POST, parts[1]);
+        final String[] parts = getHeader( "query" ).split( " " );
+        if ( parts.length < 3 )
+        {
+            this.query = new Query( Method.GET, "/" );
+        } else
+        {
+            this.query = new Query( parts[ 0 ].equalsIgnoreCase( "GET" ) ? Method.GET : Method.POST, parts[ 1 ] );
         }
         return this.query;
     }
@@ -212,7 +240,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @return Compiled query
      */
-    public Query getQuery() {
+    public Query getQuery()
+    {
         return this.query;
     }
 
@@ -221,11 +250,12 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @return Compiled string
      */
-    public String buildLog() {
+    public String buildLog()
+    {
         return "Request >\n\tAddress: " + socket.getRemoteSocketAddress().toString() +
-                "\n\tUser Agent: " + getHeader("User-Agent") + "\n\tRequest String: " +
-                getHeader("query") + "\n\tHost: " + getHeader("Host") + "\n\tQuery: " +
-                this.query.buildLog() + (postRequest != null ? "\n\tPost: " + postRequest.buildLog() : "");
+                "\n\tUser Agent: " + getHeader( "User-Agent" ) + "\n\tRequest String: " +
+                getHeader( "query" ) + "\n\tHost: " + getHeader( "Host" ) + "\n\tQuery: " +
+                this.query.buildLog() + ( postRequest != null ? "\n\tPost: " + postRequest.buildLog() : "" );
     }
 
     /**
@@ -238,17 +268,19 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * @param var  Value (Any object will do)
      * @see #getMeta(String) To get the value
      */
-    public void addMeta(final String name, final Object var) {
-        Assert.notNull(name, var);
+    public void addMeta(final String name, final Object var)
+    {
+        Assert.notNull( name, var );
 
-        meta.put(name, var);
+        meta.put( name, var );
     }
 
-    final public void internalRedirect(final String url) {
-        Assert.notNull(url);
+    final public void internalRedirect(final String url)
+    {
+        Assert.notNull( url );
 
-        this.addMeta("internalRedirect", newRequest(url));
-        Message.INTERNAL_REDIRECT.log(url);
+        this.addMeta( "internalRedirect", newRequest( url ) );
+        Message.INTERNAL_REDIRECT.log( url );
     }
 
     /**
@@ -258,18 +290,21 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * @return Meta value if exists, else null
      * @see #addMeta(String, Object) To set a meta value
      */
-    public Object getMeta(final String name) {
-        Assert.notNull(name);
+    public Object getMeta(final String name)
+    {
+        Assert.notNull( name );
 
-        if (!meta.containsKey(name)) {
+        if ( !meta.containsKey( name ) )
+        {
             return null;
         }
-        return meta.get(name);
+        return meta.get( name );
     }
 
     @Final
-    final public Map<String, String> getVariables() {
-        return (Map<String, String>) getMeta("variables");
+    final public Map<String, String> getVariables()
+    {
+        return (Map<String, String>) getMeta( "variables" );
     }
 
     /**
@@ -277,7 +312,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @return true|null
      */
-    public Session getSession() {
+    public Session getSession()
+    {
         return this.session;
     }
 
@@ -286,8 +322,9 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @param session Session
      */
-    public void setSession(final Session session) {
-        Assert.notNull(session);
+    public void setSession(final Session session)
+    {
+        Assert.notNull( session );
 
         this.session = session;
     }
@@ -296,7 +333,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * The query, for example:
      * "http://localhost/query?example=this"
      */
-    public static class Query {
+    public static class Query
+    {
 
         private final Method method;
         private final String resource;
@@ -308,31 +346,37 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
          * @param method   Request Method
          * @param resource The requested resource
          */
-        Query(Method method, String resource) {
-            Assert.notNull(method, resource);
+        Query(Method method, String resource)
+        {
+            Assert.notNull( method, resource );
 
             this.method = method;
-            if (resource.contains("?")) {
-                final String[] parts = resource.split("\\?");
-                final String[] subParts = parts[1].split("&");
-                resource = parts[0];
-                for (final String part : subParts) {
-                    final String[] subSubParts = part.split("=");
-                    this.parameters.put(subSubParts[0], subSubParts[1]);
+            if ( resource.contains( "?" ) )
+            {
+                final String[] parts = resource.split( "\\?" );
+                final String[] subParts = parts[ 1 ].split( "&" );
+                resource = parts[ 0 ];
+                for ( final String part : subParts )
+                {
+                    final String[] subSubParts = part.split( "=" );
+                    this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
                 }
             }
             this.resource = resource;
         }
 
-        public Method getMethod() {
+        public Method getMethod()
+        {
             return this.method;
         }
 
-        public String getResource() {
+        public String getResource()
+        {
             return this.resource;
         }
 
-        public Map<String, String> getParameters() {
+        public Map<String, String> getParameters()
+        {
             return this.parameters;
         }
 
@@ -341,12 +385,14 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
          *
          * @return compiled string
          */
-        String buildLog() {
+        String buildLog()
+        {
             return "Query >\n\t\tMethod: " + method.toString() + "\n\t\tResource: " + resource;
         }
 
-        public String getFullRequest() {
-            final String parameters = StringUtil.join(getParameters(), "=", "&");
+        public String getFullRequest()
+        {
+            final String parameters = StringUtil.join( getParameters(), "=", "&" );
             return parameters.isEmpty() ? resource : resource + "?" + parameters;
         }
 

@@ -27,7 +27,8 @@ package com.plotsquared.iserver.events;
  *
  * @author Citymonstret
  */
-public enum EventPriority {
+public enum EventPriority
+{
 
     /**
      * Low Priority

@@ -22,7 +22,8 @@ package com.plotsquared.iserver.object.cache;
 import com.plotsquared.iserver.object.Request;
 
 @FunctionalInterface
-public interface CacheApplicable {
+public interface CacheApplicable
+{
 
     boolean isApplicable(Request r);
 

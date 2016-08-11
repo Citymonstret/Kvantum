@@ -57,22 +57,12 @@ import java.util.*;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
 
-public class Server extends Thread implements IntellectualServer {
+public class Server extends Thread implements IntellectualServer
+{
 
-    /**
-     * This is the logging prefix
-     */
-    public static final String PREFIX = "Web";
     private static Server instance;
-    /**
-     * Verbose ouputs?
-     */
-    public final boolean verbose;
     public final LogWrapper logWrapper;
     final Queue<Socket> queue = new LinkedList<>();
-    //
-    // protected final
-    //
     final Collection<ProviderFactory> providers;
     private final boolean standalone;
     private final int port;
@@ -124,7 +114,6 @@ public class Server extends Thread implements IntellectualServer {
     // private
     //
     private boolean started;
-    private boolean ipv4;
     private boolean mysqlEnabled;
     private ServerSocket socket;
     private String hostName;
@@ -148,28 +137,31 @@ public class Server extends Thread implements IntellectualServer {
      * @throws IntellectualServerInitializationException If anything was to fail
      */
     protected Server(boolean standalone, File coreFolder, final LogWrapper logWrapper)
-            throws IntellectualServerInitializationException {
+            throws IntellectualServerInitializationException
+    {
         instance = this;
 
-        Assert.notNull(coreFolder, logWrapper);
+        Assert.notNull( coreFolder, logWrapper );
 
         { // This is due to the licensing nature of the code
-            logWrapper.log("");
-            logWrapper.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            logWrapper.log("> GNU GENERAL PUBLIC LICENSE NOTICE:");
-            logWrapper.log("> ");
-            logWrapper.log("> IntellectualServer, Copyright (C) 2015 IntellectualSites");
-            logWrapper.log("> IntellectualSites comes with ABSOLUTELY NO WARRANTY; for details type `/show w`");
-            logWrapper.log("> This is free software, and you are welcome to redistribute it");
-            logWrapper.log("> under certain conditions; type `/show c` for details.");
-            logWrapper.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            logWrapper.log("");
+            logWrapper.log( "" );
+            logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+            logWrapper.log( "> GNU GENERAL PUBLIC LICENSE NOTICE:" );
+            logWrapper.log( "> " );
+            logWrapper.log( "> IntellectualServer, Copyright (C) 2015 IntellectualSites" );
+            logWrapper.log( "> IntellectualSites comes with ABSOLUTELY NO WARRANTY; for details type `/show w`" );
+            logWrapper.log( "> This is free software, and you are welcome to redistribute it" );
+            logWrapper.log( "> under certain conditions; type `/show c` for details." );
+            logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+            logWrapper.log( "" );
         }
 
-        coreFolder = new File(coreFolder, ".iserver"); // Makes everything more portable
-        if (!coreFolder.exists()) {
-            if (!coreFolder.mkdirs()) {
-                throw new IntellectualServerInitializationException("Failed to create the core folder: " + coreFolder);
+        coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
+        if ( !coreFolder.exists() )
+        {
+            if ( !coreFolder.mkdirs() )
+            {
+                throw new IntellectualServerInitializationException( "Failed to create the core folder: " + coreFolder );
             }
         }
 
@@ -178,49 +170,59 @@ public class Server extends Thread implements IntellectualServer {
         this.standalone = standalone;
 
         // This adds the default view bindings
-        addViewBinding("html", HTMLView.class);
-        addViewBinding("css", CSSView.class);
-        addViewBinding("javascript", JSView.class);
-        addViewBinding("less", LessView.class);
-        addViewBinding("img", ImgView.class);
-        addViewBinding("download", DownloadView.class);
-        addViewBinding("redirect", RedirectView.class);
-        addViewBinding("std", StandardView.class);
+        addViewBinding( "html", HTMLView.class );
+        addViewBinding( "css", CSSView.class );
+        addViewBinding( "javascript", JSView.class );
+        addViewBinding( "less", LessView.class );
+        addViewBinding( "img", ImgView.class );
+        addViewBinding( "download", DownloadView.class );
+        addViewBinding( "redirect", RedirectView.class );
+        addViewBinding( "std", StandardView.class );
 
-        if (standalone) {
+        if ( standalone )
+        {
             // Makes the application closable in ze terminal
-            Signal.handle(new Signal("INT"), signal -> {
-                if (signal.toString().equals("SIGINT")) {
+            Signal.handle( new Signal( "INT" ), signal ->
+            {
+                if ( signal.toString().equals( "SIGINT" ) )
+                {
                     stopServer();
                 }
-            });
+            } );
             // Handles incoming commands
             // TODO: Replace the command system
-            (inputThread = new InputThread(this)).start();
+            ( inputThread = new InputThread( this ) ).start();
         }
 
-        final File logFolder = new File(coreFolder, "log");
-        if (!logFolder.exists()) {
-            if (!logFolder.mkdirs()) {
-                log(Message.COULD_NOT_CREATE_FOLDER, "log");
+        final File logFolder = new File( coreFolder, "log" );
+        if ( !logFolder.exists() )
+        {
+            if ( !logFolder.mkdirs() )
+            {
+                log( Message.COULD_NOT_CREATE_FOLDER, "log" );
             }
         }
-        try {
-            FileUtils.addToZip(new File(logFolder, "old.zip"),
-                    logFolder.listFiles((dir, name) -> name.endsWith(".txt")), true);
-            System.setOut(new PrintStream(new TeeOutputStream(System.out,
-                    new FileOutputStream(new File(logFolder, TimeUtil.getTimeStamp(TimeUtil.LogFileFormat) + ".txt")))));
-        } catch (final Exception e) {
+        try
+        {
+            FileUtils.addToZip( new File( logFolder, "old.zip" ),
+                    logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ), true );
+            System.setOut( new PrintStream( new TeeOutputStream( System.out,
+                    new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) ) ) );
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
 
-        try {
-            this.translations = new YamlConfiguration("translations",
-                    new File(new File(coreFolder, "config"), "translations.yml"));
+        try
+        {
+            this.translations = new YamlConfiguration( "translations",
+                    new File( new File( coreFolder, "config" ), "translations.yml" ) );
             this.translations.loadFile();
-            for (final Message message : Message.values()) {
+            for ( final Message message : Message.values() )
+            {
                 final String nameSpace;
-                switch (message.getMode()) {
+                switch ( message.getMode() )
+                {
                     case MODE_DEBUG:
                         nameSpace = "debug";
                         break;
@@ -237,99 +239,109 @@ public class Server extends Thread implements IntellectualServer {
                         nameSpace = "info";
                         break;
                 }
-                this.translations.setIfNotExists(nameSpace + "." + message.name().toLowerCase(), message.toString());
+                this.translations.setIfNotExists( nameSpace + "." + message.name().toLowerCase(), message.toString() );
             }
             this.translations.saveFile();
-        } catch (final Exception e) {
-            log(Message.CANNOT_LOAD_TRANSLATIONS);
+        } catch ( final Exception e )
+        {
+            log( Message.CANNOT_LOAD_TRANSLATIONS );
             e.printStackTrace();
         }
 
-        ConfigurationFactory.load(CoreConfig.class, new File(coreFolder, "config")).get();
+        ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
 
-        if (CoreConfig.debug) {
-            log(Message.DEBUG);
+        if ( CoreConfig.debug )
+        {
+            log( Message.DEBUG );
         }
 
         this.port = CoreConfig.port;
         this.hostName = CoreConfig.hostname;
         this.bufferIn = CoreConfig.Buffer.in;
         this.bufferOut = CoreConfig.Buffer.out;
-        this.ipv4 = CoreConfig.ipv4;
-        this.verbose = CoreConfig.verbose;
         this.enableCaching = CoreConfig.Cache.enabled;
         this.mysqlEnabled = CoreConfig.MySQL.enabled;
         String mainApplication = CoreConfig.Application.main;
 
-        this.workerThreads = LambdaUtil.arrayAssign(new Worker[CoreConfig.workers], Worker::new);
+        this.workerThreads = LambdaUtil.arrayAssign( new Worker[ CoreConfig.workers ], Worker::new );
 
         this.started = false;
         this.stopping = false;
 
         this.requestManager = new RequestManager();
-        this.sessionManager = new SessionManager(this);
+        this.sessionManager = new SessionManager( this );
         this.cacheManager = new CacheManager();
 
-        if (mysqlEnabled) {
+        if ( mysqlEnabled )
+        {
             this.mysqlConnManager = new MySQLConnManager();
         }
 
-        if (!CoreConfig.disableViews) {
-            try {
-                configViews = new YamlConfiguration("views", new File(new File(coreFolder, "config"), "views.yml"));
+        if ( !CoreConfig.disableViews )
+        {
+            try
+            {
+                configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ), "views.yml" ) );
                 configViews.loadFile();
                 // These are the default views
                 Map<String, Object> views = new HashMap<>();
                 // HTML View
                 Map<String, Object> view = new HashMap<>();
-                view.put("filter", "(\\/?[A-Za-z]*)\\/([A-Za-z0-9]*)\\.?([A-Za-z]?)");
-                view.put("type", "std");
+                view.put( "filter", "(\\/?[A-Za-z]*)\\/([A-Za-z0-9]*)\\.?([A-Za-z]?)" );
+                view.put( "type", "std" );
                 Map<String, Object> opts = new HashMap<>();
-                opts.put("folder", "./public");
-                view.put("options", opts);
-                views.put("std", view);
-                configViews.setIfNotExists("views", views);
+                opts.put( "folder", "./public" );
+                view.put( "options", opts );
+                views.put( "std", view );
+                configViews.setIfNotExists( "views", views );
                 configViews.saveFile();
-            } catch (final Exception e) {
-                throw new RuntimeException("Couldn't load in views");
+            } catch ( final Exception e )
+            {
+                throw new RuntimeException( "Couldn't load in views" );
             }
         }
 
         // Setup the provider factories
-        this.providers.add(this.sessionManager);
-        this.providers.add(new ServerProvider());
-        this.providers.add(ConfigVariableProvider.getInstance());
-        this.providers.add(new PostProviderFactory());
-        this.providers.add(new MetaProvider());
+        this.providers.add( this.sessionManager );
+        this.providers.add( new ServerProvider() );
+        this.providers.add( ConfigVariableProvider.getInstance() );
+        this.providers.add( new PostProviderFactory() );
+        this.providers.add( new MetaProvider() );
 
         // Setup the crush syntax-particles
         this.syntaxes = new LinkedHashSet<>();
-        syntaxes.add(new Include());
-        syntaxes.add(new Comment());
-        syntaxes.add(new MetaBlock());
-        syntaxes.add(new IfStatement());
-        syntaxes.add(new ForEachBlock());
-        syntaxes.add(new Variable());
+        syntaxes.add( new Include() );
+        syntaxes.add( new Comment() );
+        syntaxes.add( new MetaBlock() );
+        syntaxes.add( new IfStatement() );
+        syntaxes.add( new ForEachBlock() );
+        syntaxes.add( new Variable() );
 
-        ApplicationStructure applicationStructure = new ApplicationStructure("core");
+        ApplicationStructure applicationStructure = new ApplicationStructure( "core" );
         this.globalAccountManager = applicationStructure.getAccountManager();
         this.globalAccountManager.load();
-        this.inputThread.commands.put("account", new AccountCommand(applicationStructure));
-        this.providers.add(this.globalAccountManager);
+        this.inputThread.commands.put( "account", new AccountCommand( applicationStructure ) );
+        this.providers.add( this.globalAccountManager );
 
-        if (!mainApplication.isEmpty()) {
-            try {
-                Class temp = Class.forName(mainApplication);
-                if (temp.getSuperclass().equals(ApplicationStructure.class)) {
+        if ( !mainApplication.isEmpty() )
+        {
+            try
+            {
+                Class temp = Class.forName( mainApplication );
+                if ( temp.getSuperclass().equals( ApplicationStructure.class ) )
+                {
                     this.mainApplicationStructure = (ApplicationStructure) temp.newInstance();
-                } else {
-                    log(Message.APPLICATION_DOES_NOT_EXTEND, mainApplication);
+                } else
+                {
+                    log( Message.APPLICATION_DOES_NOT_EXTEND, mainApplication );
                 }
-            } catch (ClassNotFoundException e) {
-                log(Message.APPLICATION_CANNOT_FIND, mainApplication);
+            } catch ( ClassNotFoundException e )
+            {
+                log( Message.APPLICATION_CANNOT_FIND, mainApplication );
                 e.printStackTrace();
-            } catch (InstantiationException | IllegalAccessException e) {
-                log(Message.APPLICATION_CANNOT_INITIATE, mainApplication);
+            } catch ( InstantiationException | IllegalAccessException e )
+            {
+                log( Message.APPLICATION_CANNOT_INITIATE, mainApplication );
                 e.printStackTrace();
             }
         }
@@ -340,94 +352,117 @@ public class Server extends Thread implements IntellectualServer {
      *
      * @return this, literally... this!
      */
-    public static Server getInstance() {
+    public static Server getInstance()
+    {
         return instance;
     }
 
     @Override
-    public boolean isMysqlEnabled() {
+    public boolean isMysqlEnabled()
+    {
         return this.mysqlEnabled;
     }
 
     @Override
-    public void addViewBinding(final String key, final Class<? extends View> c) {
-        Assert.notNull(c);
-        Assert.notEmpty(key);
-        viewBindings.put(key, c);
+    public void addViewBinding(final String key, final Class<? extends View> c)
+    {
+        Assert.notNull( c );
+        Assert.notEmpty( key );
+        viewBindings.put( key, c );
     }
 
     @Override
-    public AccountManager getAccountManager() {
+    public AccountManager getAccountManager()
+    {
         return this.globalAccountManager;
     }
 
     @Override
-    public void validateViews() {
+    public void validateViews()
+    {
         final List<String> toRemove = new ArrayList<>();
-        for (final Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet()) {
+        for ( final Map.Entry<String, Class<? extends View>> e : viewBindings.entrySet() )
+        {
             final Class<? extends View> vc = e.getValue();
-            try {
-                vc.getDeclaredConstructor(String.class, Map.class);
-            } catch (final Exception ex) {
-                log(Message.INVALID_VIEW, e.getKey());
-                toRemove.add(e.getKey());
+            try
+            {
+                vc.getDeclaredConstructor( String.class, Map.class );
+            } catch ( final Exception ex )
+            {
+                log( Message.INVALID_VIEW, e.getKey() );
+                toRemove.add( e.getKey() );
             }
         }
-        toRemove.forEach(viewBindings::remove);
+        toRemove.forEach( viewBindings::remove );
     }
 
     @Override
-    public void handleEvent(final Event event) {
-        Assert.notNull(event);
-        if (standalone) {
-            EventManager.getInstance().handle(event);
-        } else {
-            if (eventCaller != null) {
-                eventCaller.callEvent(event);
-            } else {
-                log(Message.STANDALONE_NO_EVENT_CALLER);
+    public void handleEvent(final Event event)
+    {
+        Assert.notNull( event );
+        if ( standalone )
+        {
+            EventManager.getInstance().handle( event );
+        } else
+        {
+            if ( eventCaller != null )
+            {
+                eventCaller.callEvent( event );
+            } else
+            {
+                log( Message.STANDALONE_NO_EVENT_CALLER );
             }
         }
     }
 
     @Override
-    public void setEventCaller(final EventCaller caller) {
-        Assert.notNull(caller);
+    public void setEventCaller(final EventCaller caller)
+    {
+        Assert.notNull( caller );
         this.eventCaller = caller;
     }
 
     @Override
-    public void addProviderFactory(final ProviderFactory factory) {
-        Assert.notNull(factory);
-        this.providers.add(factory);
+    public void addProviderFactory(final ProviderFactory factory)
+    {
+        Assert.notNull( factory );
+        this.providers.add( factory );
     }
 
     @Override
-    public void loadPlugins() {
-        if (standalone) {
-            final File file = new File(coreFolder, "plugins");
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    log(Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file);
+    public void loadPlugins()
+    {
+        if ( standalone )
+        {
+            final File file = new File( coreFolder, "plugins" );
+            if ( !file.exists() )
+            {
+                if ( !file.mkdirs() )
+                {
+                    log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
                     return;
                 }
             }
-            pluginLoader = new PluginLoader(new PluginManager());
-            pluginLoader.loadAllPlugins(file);
+            pluginLoader = new PluginLoader( new PluginManager() );
+            pluginLoader.loadAllPlugins( file );
             pluginLoader.enableAllPlugins();
-        } else {
-            log(Message.STANDALONE_NOT_LOADING_PLUGINS);
+        } else
+        {
+            log( Message.STANDALONE_NOT_LOADING_PLUGINS );
         }
     }
 
     @SuppressWarnings("ALL")
     @Override
-    public void start() {
-        try {
-            Assert.equals(this.started, false,
-                    new IntellectualServerStartException("Cannot start the server, it is already started",
-                            new RuntimeException("Cannot restart server singleton")));
-        } catch (IntellectualServerStartException e) {
+    public void start()
+    {
+        try
+        {
+            Assert.equals( this.started, false,
+                    new IntellectualServerStartException( "Cannot start the server, it is already started",
+                            new RuntimeException( "Cannot restart server singleton" ) ) );
+        } catch ( IntellectualServerStartException e )
+        {
             e.printStackTrace();
             return;
         }
@@ -436,167 +471,198 @@ public class Server extends Thread implements IntellectualServer {
         this.loadPlugins();
         EventManager.getInstance().bake();
 
-        this.log(Message.CALLING_EVENT, "startup");
-        this.handleEvent(new StartupEvent(this));
+        this.log( Message.CALLING_EVENT, "startup" );
+        this.handleEvent( new StartupEvent( this ) );
 
-        if (mysqlEnabled) {
-            this.log(Message.MYSQL_INIT);
+        if ( mysqlEnabled )
+        {
+            this.log( Message.MYSQL_INIT );
             this.mysqlConnManager.init();
         }
 
         // Validating views
-        this.log(Message.VALIDATING_VIEWS);
+        this.log( Message.VALIDATING_VIEWS );
         this.validateViews();
 
-        if (!CoreConfig.disableViews) {
-            this.log(Message.LOADING_VIEWS);
-            final Map<String, Map<String, Object>> views = configViews.get("views");
-            Assert.notNull(views);
-            views.entrySet().forEach(entry -> {
+        if ( !CoreConfig.disableViews )
+        {
+            this.log( Message.LOADING_VIEWS );
+            final Map<String, Map<String, Object>> views = configViews.get( "views" );
+            Assert.notNull( views );
+            views.entrySet().forEach( entry ->
+            {
                 final Map<String, Object> view = entry.getValue();
-                String type = "html", filter = view.get("filter").toString();
-                if (view.containsKey("type")) {
-                    type = view.get("type").toString();
+                String type = "html", filter = view.get( "filter" ).toString();
+                if ( view.containsKey( "type" ) )
+                {
+                    type = view.get( "type" ).toString();
                 }
                 final Map<String, Object> options;
-                if (view.containsKey("options")) {
-                    options = (HashMap<String, Object>) view.get("options");
-                } else {
+                if ( view.containsKey( "options" ) )
+                {
+                    options = (HashMap<String, Object>) view.get( "options" );
+                } else
+                {
                     options = new HashMap<>();
                 }
 
-                if (viewBindings.containsKey(type.toLowerCase())) {
-                    final Class<? extends View> vc = viewBindings.get(type.toLowerCase());
-                    try {
-                        final View vv = vc.getDeclaredConstructor(String.class, Map.class).newInstance(filter, options);
-                        requestManager.add(vv);
-                    } catch (final Exception e) {
+                if ( viewBindings.containsKey( type.toLowerCase() ) )
+                {
+                    final Class<? extends View> vc = viewBindings.get( type.toLowerCase() );
+                    try
+                    {
+                        final View vv = vc.getDeclaredConstructor( String.class, Map.class ).newInstance( filter, options );
+                        requestManager.add( vv );
+                    } catch ( final Exception e )
+                    {
                         e.printStackTrace();
                     }
                 }
-            });
-        } else {
+            } );
+        } else
+        {
             Message.VIEWS_DISABLED.log();
         }
 
-        if (mainApplicationStructure != null) {
-            mainApplicationStructure.registerViews(this);
+        if ( mainApplicationStructure != null )
+        {
+            mainApplicationStructure.registerViews( this );
         }
 
-        requestManager.dump(this);
+        requestManager.dump( this );
 
-        if (this.ipv4) {
-            log("ipv4 is true - Using IPv4 stack");
-            System.setProperty("java.net.preferIPv4Stack", "true");
-        }
-        if (!this.enableCaching) {
-            log(Message.CACHING_DISABLED);
-        } else {
-            log(Message.CACHING_ENABLED);
+        if ( !this.enableCaching )
+        {
+            log( Message.CACHING_DISABLED );
+        } else
+        {
+            log( Message.CACHING_ENABLED );
         }
 
-        log(Message.STARTING_ON_PORT, this.port);
+        log( Message.STARTING_ON_PORT, this.port );
         this.started = true;
-        try {
-            socket = new ServerSocket(this.port);
-            log(Message.SERVER_STARTED);
-        } catch (final Exception e) {
+        try
+        {
+            socket = new ServerSocket( this.port );
+            log( Message.SERVER_STARTED );
+        } catch ( final Exception e )
+        {
             // throw new RuntimeException("Couldn't start the server...", e);
             boolean run = true;
 
             int port = this.port + 1;
-            while (run) {
-                try {
-                    socket = new ServerSocket(port++);
+            while ( run )
+            {
+                try
+                {
+                    socket = new ServerSocket( port++ );
                     run = false;
-                    log("Specified port was occupied, running on " + port + " instead");
+                    log( "Specified port was occupied, running on " + port + " instead" );
 
-                    Field portField = getClass().getDeclaredField("port");
-                    portField.setAccessible(true);
-                    portField.set(this, port);
-                } catch (final Exception ex) {
+                    Field portField = getClass().getDeclaredField( "port" );
+                    portField.setAccessible( true );
+                    portField.set( this, port );
+                } catch ( final Exception ex )
+                {
                     continue;
                 }
             }
         }
 
         // Start the workers
-        LambdaUtil.arrayForeach(workerThreads, Worker::start);
+        LambdaUtil.arrayForeach( workerThreads, Worker::start );
 
-        log(Message.ACCEPTING_CONNECTIONS_ON, hostName + (this.port == 80 ? "" : ":" + port) + "/'");
-        log(Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024);
+        log( Message.ACCEPTING_CONNECTIONS_ON, hostName + ( this.port == 80 ? "" : ":" + port ) + "/'" );
+        log( Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024 );
 
         // Pre-Steps
         {
-            if (globalAccountManager.getAccount(new Object[]{null, "admin", null}) == null) {
-                log("There is no admin account as of yet. So, well, let's create one! Please enter a password!");
+            if ( globalAccountManager.getAccount( new Object[]{ null, "admin", null } ) == null )
+            {
+                log( "There is no admin account as of yet. So, well, let's create one! Please enter a password!" );
                 pause = true;
                 EventManager.getInstance()
-                        .addListener(new com.plotsquared.iserver.events.EventListener<InputThread.TextEvent>() {
+                        .addListener( new com.plotsquared.iserver.events.EventListener<InputThread.TextEvent>()
+                        {
                             @Override
-                            public void listen(InputThread.TextEvent event) {
+                            public void listen(InputThread.TextEvent event)
+                            {
                                 String password = event.getText();
-                                try {
-                                    globalAccountManager.createAccount(new Account(globalAccountManager.getNextId(), "admin", password.getBytes()));
-                                    log("Great, you've got yourself an admin account. The username is \"admin\".");
+                                try
+                                {
+                                    globalAccountManager.createAccount( new Account( globalAccountManager.getNextId(), "admin", password.getBytes() ) );
+                                    log( "Great, you've got yourself an admin account. The username is \"admin\"." );
                                     pause = false;
-                                } catch (SQLException e) {
+                                } catch ( SQLException e )
+                                {
                                     e.printStackTrace();
                                 }
                             }
-                        });
+                        } );
                 EventManager.getInstance().bake();
             }
         }
 
-        this.handleEvent(new ServerReadyEvent(this));
+        this.handleEvent( new ServerReadyEvent( this ) );
 
         // Main Loop
-        for (; ; ) {
-            if (this.stopping) {
-                log(Message.SHUTTING_DOWN);
+        for ( ; ; )
+        {
+            if ( this.stopping )
+            {
+                log( Message.SHUTTING_DOWN );
                 break;
             }
-            if (pause) {
+            if ( pause )
+            {
                 continue;
             }
-            try {
+            try
+            {
                 tick();
-            } catch (final Exception e) {
-                log(Message.TICK_ERROR);
+            } catch ( final Exception e )
+            {
+                log( Message.TICK_ERROR );
                 e.printStackTrace();
             }
         }
     }
 
     @Override
-    public void tick() {
+    public void tick()
+    {
         // Recently remade to use worker threads, rather than
         // creating a new thread for each request - this saves time
         // and makes sure to use all resources to their fullest potential
-        try {
+        try
+        {
             final Socket s = socket.accept();
-            queue.add(s);
-        } catch (final Exception e) {
+            queue.add( s );
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void log(Message message, final Object... args) {
-        this.log(message.toString(), message.getMode(), args);
+    public void log(Message message, final Object... args)
+    {
+        this.log( message.toString(), message.getMode(), args );
     }
 
     @Override
-    public synchronized void log(String message, int mode, final Object... args) {
+    public synchronized void log(String message, int mode, final Object... args)
+    {
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
         // to limit to only error messages or such
-        if (mode < lowestLevel || mode > highestLevel) {
+        if ( mode < lowestLevel || mode > highestLevel )
+        {
             return;
         }
         String prefix;
-        switch (mode) {
+        switch ( mode )
+        {
             case MODE_DEBUG:
                 prefix = "Debug";
                 break;
@@ -613,55 +679,67 @@ public class Server extends Thread implements IntellectualServer {
                 prefix = "Info";
                 break;
         }
-        for (final Object a : args) {
-            message = message.replaceFirst("%s", a.toString());
+        for ( final Object a : args )
+        {
+            message = message.replaceFirst( "%s", a.toString() );
         }
-        logWrapper.log(PREFIX, prefix, TimeUtil.getTimeStamp(), message, Thread.currentThread().getName());
+        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), message, Thread.currentThread().getName() );
         // logWrapper.log(String.format("[%s][%s][%s] %s", PREFIX, prefix, TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
     }
 
     @Override
-    public synchronized void log(String message, final Object... args) {
-        this.log(message, MODE_INFO, args);
+    public synchronized void log(String message, final Object... args)
+    {
+        this.log( message, MODE_INFO, args );
     }
 
     @Override
-    public void log(final LogProvider provider, String message, final Object... args) {
-        for (final Object a : args) {
-            message = message.replaceFirst("%s", a.toString());
+    public void log(final LogProvider provider, String message, final Object... args)
+    {
+        for ( final Object a : args )
+        {
+            message = message.replaceFirst( "%s", a.toString() );
         }
-        logWrapper.log(PREFIX, provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message, Thread.currentThread().getName());
+        logWrapper.log( CoreConfig.logPrefix, provider.getLogIdentifier(), TimeUtil.getTimeStamp(),
+                message, Thread.currentThread().getName() );
         // void log(String prefix, String prefix1, String timeStamp, String message);
         // logWrapper.log(String.format("[%s][%s] %s", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
         // System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
     }
 
     @Override
-    public synchronized void stopServer() {
-        log(Message.SHUTTING_DOWN);
-
-        EventManager.getInstance().handle(new ShutdownEvent(this));
-
-        // Close all database connections
-        SQLiteManager.sessions.forEach(SQLiteManager::close);
-
-        if (pluginLoader != null) {
+    public synchronized void stopServer()
+    {
+        log( Message.SHUTTING_DOWN );
+        EventManager.getInstance().handle( new ShutdownEvent( this ) );
+        SQLiteManager.sessions.forEach( SQLiteManager::close );
+        try
+        {
+            socket.close();
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        if ( pluginLoader != null )
+        {
             pluginLoader.disableAllPlugins();
         }
-
-        if (standalone) {
-            System.exit(0);
+        if ( standalone )
+        {
+            System.exit( 0 );
         }
     }
 
     @Override
-    public SessionManager getSessionManager() {
+    public SessionManager getSessionManager()
+    {
         return this.sessionManager;
     }
 
     @Override
-    public RequestManager getRequestManager() {
+    public RequestManager getRequestManager()
+    {
         return requestManager;
     }
 }

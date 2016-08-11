@@ -31,16 +31,21 @@ import java.util.Map;
  * This is a booster, I.E, it's the strap on a boot.
  */
 @Bootstrap
-public class IntellectualServerMain {
+public class IntellectualServerMain
+{
 
-    private static Map<String, String> getOptions(final String[] args) {
+    private static Map<String, String> getOptions(final String[] args)
+    {
         Map<String, String> out = new HashMap<>();
-        for (final String arg : args) {
-            String[] parts = arg.split("=");
-            if (parts.length < 2) {
-                out.put(parts[0].toLowerCase(), null);
-            } else {
-                out.put(parts[0].toLowerCase(), parts[1]);
+        for ( final String arg : args )
+        {
+            String[] parts = arg.split( "=" );
+            if ( parts.length < 2 )
+            {
+                out.put( parts[ 0 ].toLowerCase(), null );
+            } else
+            {
+                out.put( parts[ 0 ].toLowerCase(), parts[ 1 ] );
             }
         }
         return out;
@@ -51,29 +56,37 @@ public class IntellectualServerMain {
      *
      * @param args arguments
      */
-    public static void main(String[] args) {
-        Map<String, String> options = getOptions(args);
+    public static void main(String[] args)
+    {
+        Map<String, String> options = getOptions( args );
         File file;
-        if (options.containsKey("gui")) {
-            GuiMain.main(args);
-        } else {
-            if (options.containsKey("folder")) {
+        if ( options.containsKey( "gui" ) )
+        {
+            GuiMain.main( args );
+        } else
+        {
+            if ( options.containsKey( "folder" ) )
+            {
                 // folder=./this/new/path
                 // folder=/web/intellectualserver/
                 // and etc.
-                file = new File(options.get("folder"));
-            } else {
-                file = new File("./");
+                file = new File( options.get( "folder" ) );
+            } else
+            {
+                file = new File( "./" );
             }
-            startServer(true, file, new DefaultLogWrapper());
+            startServer( true, file, new DefaultLogWrapper() );
         }
     }
 
-    public static Server createServer(final boolean standalone, final File coreFolder, final LogWrapper wrapper) {
+    public static Server createServer(final boolean standalone, final File coreFolder, final LogWrapper wrapper)
+    {
         Server server = null;
-        try {
-            server = new Server(standalone, coreFolder, wrapper);
-        } catch (final Exception e) {
+        try
+        {
+            server = new Server( standalone, coreFolder, wrapper );
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
         return server;
@@ -85,12 +98,15 @@ public class IntellectualServerMain {
      * @param standalone Should it run as a standalone application, or be integrated
      * @return the started server | null
      */
-    public static Server startServer(boolean standalone, File coreFolder, LogWrapper wrapper) {
+    public static Server startServer(boolean standalone, File coreFolder, LogWrapper wrapper)
+    {
         Server server = null;
-        try {
-            server = createServer(standalone, coreFolder, wrapper);
+        try
+        {
+            server = createServer( standalone, coreFolder, wrapper );
             server.start();
-        } catch (final Exception e) {
+        } catch ( final Exception e )
+        {
             e.printStackTrace();
         }
         return server;

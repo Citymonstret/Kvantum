@@ -22,7 +22,8 @@ package com.plotsquared.iserver.logging;
 /**
  * These are the logging modes
  */
-public class LogModes {
+public class LogModes
+{
 
     /**
      * Send debug data

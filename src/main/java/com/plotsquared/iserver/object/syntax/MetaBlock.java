@@ -25,20 +25,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final public class MetaBlock extends Syntax {
+final public class MetaBlock extends Syntax
+{
 
     private final MetaBlockStatement statement;
 
-    public MetaBlock() {
-        super(Pattern.compile("\\{\\{:([\\S\\s]*?):\\}\\}"));
+    public MetaBlock()
+    {
+        super( Pattern.compile( "\\{\\{:([\\S\\s]*?):\\}\\}" ) );
         this.statement = new MetaBlockStatement();
     }
 
     @Override
-    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories) {
-        while (matcher.find()) {
-            statement.handle(in, r, factories);
-            in = in.replace(matcher.group(), "");
+    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    {
+        while ( matcher.find() )
+        {
+            statement.handle( in, r, factories );
+            in = in.replace( matcher.group(), "" );
         }
         return in;
     }

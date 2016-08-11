@@ -29,43 +29,51 @@ import com.plotsquared.iserver.object.syntax.VariableProvider;
  *
  * @author Citymonstret
  */
-public class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider {
+public class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider
+{
 
     private PostRequest p;
 
-    public PostProviderFactory() {
+    public PostProviderFactory()
+    {
     }
 
-    private PostProviderFactory(final PostRequest p) {
+    private PostProviderFactory(final PostRequest p)
+    {
         this.p = p;
     }
 
     @Override
-    public PostProviderFactory get(final Request r) {
-        Assert.notNull(r);
+    public PostProviderFactory get(final Request r)
+    {
+        Assert.notNull( r );
 
-        if (r.getPostRequest() == null) {
+        if ( r.getPostRequest() == null )
+        {
             return null;
         }
-        return new PostProviderFactory(r.getPostRequest());
+        return new PostProviderFactory( r.getPostRequest() );
     }
 
     @Override
-    public String providerName() {
+    public String providerName()
+    {
         return "post";
     }
 
     @Override
-    public boolean contains(final String variable) {
-        Assert.notNull(variable);
+    public boolean contains(final String variable)
+    {
+        Assert.notNull( variable );
 
-        return p.contains(variable);
+        return p.contains( variable );
     }
 
     @Override
-    public Object get(final String variable) {
-        Assert.notNull(variable);
+    public Object get(final String variable)
+    {
+        Assert.notNull( variable );
 
-        return p.get(variable);
+        return p.get( variable );
     }
 }

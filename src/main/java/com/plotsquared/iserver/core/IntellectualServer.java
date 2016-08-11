@@ -35,7 +35,8 @@ import com.plotsquared.iserver.views.View;
  * for the server to work
  */
 @SuppressWarnings("unused")
-interface IntellectualServer {
+interface IntellectualServer
+{
 
     /**
      * Check if mysql is enabled

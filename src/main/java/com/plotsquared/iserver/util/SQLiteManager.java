@@ -27,7 +27,8 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SQLiteManager {
+public class SQLiteManager
+{
 
     public static Set<SQLiteManager> sessions = new HashSet<>();
 
@@ -35,42 +36,53 @@ public class SQLiteManager {
     private final Connection connection;
     private final File file;
 
-    public SQLiteManager(final String name) throws IOException, SQLException {
-        sessions.add(this);
+    public SQLiteManager(final String name) throws IOException, SQLException
+    {
+        sessions.add( this );
 
         this.name = name + ".db";
-        this.file = new File(new File(Server.getInstance().coreFolder, "storage"), this.name);
-        if (!file.exists()) {
-            if (!(file.getParentFile().exists() || file.getParentFile().mkdir()) || !file.createNewFile()) {
-                throw new RuntimeException("Couldn't create: " + name);
+        this.file = new File( new File( Server.getInstance().coreFolder, "storage" ), this.name );
+        if ( !file.exists() )
+        {
+            if ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file.createNewFile() )
+            {
+                throw new RuntimeException( "Couldn't create: " + name );
             }
         }
-        this.connection = DriverManager.getConnection("jdbc:sqlite:" + file.getAbsolutePath());
+        this.connection = DriverManager.getConnection( "jdbc:sqlite:" + file.getAbsolutePath() );
     }
 
-    public void executeUpdate(String sql) throws SQLException {
+    public void executeUpdate(String sql) throws SQLException
+    {
         Statement statement = this.connection.createStatement();
-        statement.executeUpdate(sql);
+        statement.executeUpdate( sql );
         statement.close();
     }
 
-    public PreparedStatement prepareStatement(String statement) throws SQLException {
-        return connection.prepareStatement(statement);
+    public PreparedStatement prepareStatement(String statement) throws SQLException
+    {
+        return connection.prepareStatement( statement );
     }
 
-    public Blob createBlob() {
-        try {
+    public Blob createBlob()
+    {
+        try
+        {
             return connection.createBlob();
-        } catch (SQLException e) {
+        } catch ( SQLException e )
+        {
             e.printStackTrace();
         }
         return null;
     }
 
-    public void close() {
-        try {
+    public void close()
+    {
+        try
+        {
             connection.close();
-        } catch (SQLException e) {
+        } catch ( SQLException e )
+        {
             e.printStackTrace();
         }
     }

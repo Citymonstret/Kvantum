@@ -20,7 +20,8 @@
 package com.plotsquared.iserver.logging;
 
 @FunctionalInterface
-public interface LogProvider {
+public interface LogProvider
+{
 
     String getLogIdentifier();
 

@@ -34,14 +34,16 @@ import java.util.stream.Collectors;
  *
  * @author Citymonstret
  */
-public class PluginManager {
+public class PluginManager
+{
 
     private final Map<String, Plugin> plugins;
 
     /**
      * Constructor
      */
-    public PluginManager() {
+    public PluginManager()
+    {
         plugins = new HashMap<>();
     }
 
@@ -51,9 +53,10 @@ public class PluginManager {
      *
      * @param plugin Plugin to add
      */
-    public void addPlugin(final Plugin plugin) {
-        Assert.notNull(plugin);
-        plugins.put(plugin.toString(), plugin);
+    public void addPlugin(final Plugin plugin)
+    {
+        Assert.notNull( plugin );
+        plugins.put( plugin.toString(), plugin );
     }
 
     /**
@@ -61,14 +64,16 @@ public class PluginManager {
      *
      * @param plugin Plugin to remove
      */
-    public void removePlugin(final Plugin plugin) {
-        Assert.notNull(plugin);
-        if (plugins.containsKey(plugin.toString()))
-            plugins.remove(plugin.toString());
+    public void removePlugin(final Plugin plugin)
+    {
+        Assert.notNull( plugin );
+        if ( plugins.containsKey( plugin.toString() ) )
+            plugins.remove( plugin.toString() );
     }
 
-    public Plugin getPlugin(final String providerName) {
-        return this.plugins.get(providerName);
+    public Plugin getPlugin(final String providerName)
+    {
+        return this.plugins.get( providerName );
     }
 
     /**
@@ -78,11 +83,12 @@ public class PluginManager {
      * @throws java.lang.RuntimeException if the plugin is not added to the plugin list {@see
      *                                    #addPlugin(com.marine.Plugin)}
      */
-    protected void enablePlugin(final Plugin plugin) {
-        Assert.notNull(plugin);
-        if (!plugins.containsKey(plugin.toString()))
-            throw new RuntimeException("Plugin: " + plugin.getName()
-                    + " is not added to the plugin list, can't enable");
+    protected void enablePlugin(final Plugin plugin)
+    {
+        Assert.notNull( plugin );
+        if ( !plugins.containsKey( plugin.toString() ) )
+            throw new RuntimeException( "Plugin: " + plugin.getName()
+                    + " is not added to the plugin list, can't enable" );
         plugin.enable();
     }
 
@@ -93,11 +99,12 @@ public class PluginManager {
      * @throws java.lang.RuntimeException if the plugin is not added to the plugin list {@see
      *                                    #addPlugin(com.marine.Plugin)}
      */
-    protected void disablePlugin(final Plugin plugin) {
-        Assert.notNull(plugin);
-        if (!plugins.containsKey(plugin.toString()))
-            throw new RuntimeException("Plugin: " + plugin.getName()
-                    + " is not added to the plugin list, can't disable");
+    protected void disablePlugin(final Plugin plugin)
+    {
+        Assert.notNull( plugin );
+        if ( !plugins.containsKey( plugin.toString() ) )
+            throw new RuntimeException( "Plugin: " + plugin.getName()
+                    + " is not added to the plugin list, can't disable" );
         plugin.disable();
     }
 
@@ -106,7 +113,8 @@ public class PluginManager {
      *
      * @return all plugins
      */
-    public Collection<Plugin> getPlugins() {
+    public Collection<Plugin> getPlugins()
+    {
         return plugins.values();
     }
 
@@ -115,8 +123,9 @@ public class PluginManager {
      *
      * @return A collection containing the names of the plugins
      */
-    public Collection<String> getPluginNames() {
-        return plugins.values().stream().map(Plugin::getName).collect(Collectors.toList());
+    public Collection<String> getPluginNames()
+    {
+        return plugins.values().stream().map( Plugin::getName ).collect( Collectors.toList() );
     }
 
     /**
@@ -124,7 +133,8 @@ public class PluginManager {
      *
      * @return all enabled plugins
      */
-    public Collection<Plugin> getEnabledPlugins() {
-        return this.plugins.values().stream().filter(Plugin::isEnabled).collect(Collectors.toCollection(ArrayList::new));
+    public Collection<Plugin> getEnabledPlugins()
+    {
+        return this.plugins.values().stream().filter( Plugin::isEnabled ).collect( Collectors.toCollection( ArrayList::new ) );
     }
 }

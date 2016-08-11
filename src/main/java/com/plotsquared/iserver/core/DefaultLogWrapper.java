@@ -9,24 +9,30 @@ import print.color.ColoredPrinterWIN;
 
 import java.text.SimpleDateFormat;
 
-public class DefaultLogWrapper implements LogWrapper {
+public class DefaultLogWrapper implements LogWrapper
+{
 
     private final ColoredPrinterI coloredPrinter;
 
-    public DefaultLogWrapper() {
-        if (System.getProperty("os.name").startsWith("win")) {
-            this.coloredPrinter = new ColoredPrinterWIN.Builder(Logger.INFO, false)
-                    .withFormat(new SimpleDateFormat()).build();
-        } else {
-            this.coloredPrinter = new ColoredPrinter.Builder(Logger.INFO, false)
-                    .withFormat(new SimpleDateFormat()).build();
+    public DefaultLogWrapper()
+    {
+        if ( System.getProperty( "os.name" ).startsWith( "win" ) )
+        {
+            this.coloredPrinter = new ColoredPrinterWIN.Builder( Logger.INFO, false )
+                    .withFormat( new SimpleDateFormat() ).build();
+        } else
+        {
+            this.coloredPrinter = new ColoredPrinter.Builder( Logger.INFO, false )
+                    .withFormat( new SimpleDateFormat() ).build();
         }
     }
 
     @Override
-    public void log(String prefix, String prefix1, String timeStamp, String message, String thread) {
+    public void log(String prefix, String prefix1, String timeStamp, String message, String thread)
+    {
         final Ansi.FColor priorityColor;
-        switch (prefix1) {
+        switch ( prefix1 )
+        {
             case "Debug":
                 priorityColor = Ansi.FColor.CYAN;
                 break;
@@ -44,19 +50,19 @@ public class DefaultLogWrapper implements LogWrapper {
                 break;
         }
 
-        coloredPrinter.print("[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print(prefix, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE);
-        coloredPrinter.print("]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print("[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print(thread, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE);
-        coloredPrinter.print("]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print("[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print(timeStamp, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE);
-        coloredPrinter.print("] ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print(prefix1, Ansi.Attribute.BOLD, priorityColor, Ansi.BColor.NONE);
-        coloredPrinter.print(" > ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE);
-        coloredPrinter.print(message, Ansi.Attribute.NONE, Ansi.FColor.NONE, Ansi.BColor.NONE);
-        coloredPrinter.print(System.lineSeparator());
+        coloredPrinter.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( prefix, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
+        coloredPrinter.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( thread, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
+        coloredPrinter.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( timeStamp, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
+        coloredPrinter.print( "] ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( prefix1, Ansi.Attribute.BOLD, priorityColor, Ansi.BColor.NONE );
+        coloredPrinter.print( " > ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        coloredPrinter.print( message, Ansi.Attribute.NONE, Ansi.FColor.NONE, Ansi.BColor.NONE );
+        coloredPrinter.print( System.lineSeparator() );
         coloredPrinter.clear();
 
         // System.out.printf("[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator());
@@ -64,8 +70,9 @@ public class DefaultLogWrapper implements LogWrapper {
     }
 
     @Override
-    public void log(String s) {
-        System.out.println(s);
+    public void log(String s)
+    {
+        System.out.println( s );
     }
 
 }

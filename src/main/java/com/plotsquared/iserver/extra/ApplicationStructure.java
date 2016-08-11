@@ -31,30 +31,37 @@ import java.sql.SQLException;
  *
  * @author Citymonstret
  */
-public class ApplicationStructure {
+public class ApplicationStructure
+{
 
     private final AccountManager accountManager;
     private final String applicationName;
     private SQLiteManager database;
 
-    public ApplicationStructure(final String applicationName) {
+    public ApplicationStructure(final String applicationName)
+    {
         this.applicationName = applicationName;
-        try {
-            this.database = new SQLiteManager(this.applicationName);
-        } catch (final IOException | SQLException e) {
-            throw new RuntimeException(e);
+        try
+        {
+            this.database = new SQLiteManager( this.applicationName );
+        } catch ( final IOException | SQLException e )
+        {
+            throw new RuntimeException( e );
         }
-        this.accountManager = new AccountManager(database);
+        this.accountManager = new AccountManager( database );
     }
 
-    public AccountManager getAccountManager() {
+    public AccountManager getAccountManager()
+    {
         return this.accountManager;
     }
 
-    public SQLiteManager getDatabaseManager() {
+    public SQLiteManager getDatabaseManager()
+    {
         return this.database;
     }
 
-    public void registerViews(Server server) {
+    public void registerViews(Server server)
+    {
     }
 }

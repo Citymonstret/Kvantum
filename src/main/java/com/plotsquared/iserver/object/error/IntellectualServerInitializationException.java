@@ -20,14 +20,17 @@
 package com.plotsquared.iserver.object.error;
 
 
-public class IntellectualServerInitializationException extends IntellectualServerException {
+public class IntellectualServerInitializationException extends IntellectualServerException
+{
 
-    public IntellectualServerInitializationException(String s, Throwable cause) {
-        super("Couldn't load IntellectualServer: " + s, cause);
+    public IntellectualServerInitializationException(String s, Throwable cause)
+    {
+        super( "Couldn't load IntellectualServer: " + s, cause );
     }
 
-    public IntellectualServerInitializationException(String s) {
-        super("Couldn't load IntellectualServer: " + s);
+    public IntellectualServerInitializationException(String s)
+    {
+        super( "Couldn't load IntellectualServer: " + s );
     }
 
 }

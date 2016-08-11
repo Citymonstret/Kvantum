@@ -12,11 +12,13 @@ import com.plotsquared.iserver.views.requesthandler.MiddlewareQueuePopulator;
  * A handler which uses an incoming
  * request to generate a response
  */
-public abstract class RequestHandler {
+public abstract class RequestHandler
+{
 
     protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
-    public MiddlewareQueuePopulator getMiddlewareQueuePopulator() {
+    public MiddlewareQueuePopulator getMiddlewareQueuePopulator()
+    {
         return middlewareQueuePopulator;
     }
 
@@ -30,16 +32,18 @@ public abstract class RequestHandler {
      */
     abstract public boolean matches(final Request request);
 
-    final public Response handle(final Request request) {
-        Assert.isValid(request);
+    final public Response handle(final Request request)
+    {
+        Assert.isValid( request );
 
         final MiddlewareQueue middlewareQueue = middlewareQueuePopulator.generateQueue();
-        middlewareQueue.handle(request);
-        if (!middlewareQueue.finished()) {
-            Server.getInstance().log("Skipping request as a middleware broke the chain!");
+        middlewareQueue.handle( request );
+        if ( !middlewareQueue.finished() )
+        {
+            Server.getInstance().log( "Skipping request as a middleware broke the chain!" );
             return null;
         }
-        return generate(request);
+        return generate( request );
     }
 
     /**
@@ -56,7 +60,8 @@ public abstract class RequestHandler {
      * @param r Request IN
      * @return Null by default, or the ProviderFactory (if set by the view)
      */
-    public ProviderFactory getFactory(final Request r) {
+    public ProviderFactory getFactory(final Request r)
+    {
         return null;
     }
 

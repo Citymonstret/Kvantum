@@ -23,40 +23,48 @@ import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.ResponseBody;
 import com.plotsquared.iserver.util.Assert;
 
-public class CachedResponse implements ResponseBody {
+public class CachedResponse implements ResponseBody
+{
 
     public final byte[] bytes; //, headerBytes;
     public final Header header;
 
-    public CachedResponse(final ResponseBody parent) {
-        Assert.notNull(parent);
+    public CachedResponse(final ResponseBody parent)
+    {
+        Assert.notNull( parent );
 
         this.header = parent.getHeader();
         // this.headerBytes = parent.getHeader().getBytes();
-        if (parent.isText()) {
+        if ( parent.isText() )
+        {
             this.bytes = parent.getContent().getBytes();
-        } else {
+        } else
+        {
             this.bytes = parent.getBytes();
         }
     }
 
     @Override
-    public byte[] getBytes() {
+    public byte[] getBytes()
+    {
         return bytes;
     }
 
     @Override
-    public Header getHeader() {
+    public Header getHeader()
+    {
         return header;
     }
 
     @Override
-    public String getContent() {
-        throw new RuntimeException("getContent" /* TODO: Make better */);
+    public String getContent()
+    {
+        throw new RuntimeException( "getContent" /* TODO: Make better */ );
     }
 
     @Override
-    public boolean isText() {
+    public boolean isText()
+    {
         return false;
     }
 

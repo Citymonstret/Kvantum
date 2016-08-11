@@ -1,7 +1,8 @@
 package com.plotsquared.iserver.thread;
 
 @FunctionalInterface
-public interface ThreadTask {
+public interface ThreadTask
+{
 
     void run();
 

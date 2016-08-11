@@ -19,7 +19,8 @@
 
 package com.plotsquared.iserver.object;
 
-public interface LogWrapper {
+public interface LogWrapper
+{
 
     void log(String prefix, String prefix1, String timeStamp, String message, String thread);
 
