@@ -22,16 +22,14 @@ public class APITest
             "user2@example.com" ) );
 
     @ViewMatcher(filter = "user", cache = false, name = "Users")
-    public Response users(final Request request)
+    public void users(final Request request, final Response response)
     {
         final JSONArray array = new JSONArray(  );
         for ( final User user : users )
         {
             array.put( userToJson( user ) );
         }
-        final Response response = new Response().setContent( array.toString() );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
-        return response;
+        response.setContent( array.toString() ).getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
     }
 
     @ViewMatcher(filter = "no/such/user", cache = true, name = "NoSuchUser")
@@ -41,12 +39,11 @@ public class APITest
     }
 
     @ViewMatcher(filter = "user/<username>", cache = false, name = "User", middlewares = { UserMiddleware.class } )
-    public Response user(final Request request)
+    public void user(final Request request, final Response response)
     {
         final User user = (User) request.getMeta( "apiUser" );
-        final Response response = new Response().setContent( userToJson( user ).toString() );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
-        return response;
+        response.setContent( userToJson( user ).toString() ).getHeader().set( Header.HEADER_CONTENT_TYPE, Header
+            .CONTENT_TYPE_JSON );
     }
 
     private JSONObject userToJson(final User user)
@@ -62,7 +59,7 @@ public class APITest
     {
 
         @Override
-        public void handle(Request request, MiddlewareQueue queue)
+        public void handle(final Request request, final MiddlewareQueue queue)
         {
             final Optional<User> user = users.stream().filter( u -> u.name.equalsIgnoreCase( request.getVariables()
                 .get( "username" ) ) ).findAny();
