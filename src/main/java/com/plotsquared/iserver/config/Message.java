@@ -28,9 +28,10 @@ import static com.plotsquared.iserver.logging.LogModes.*;
  */
 public enum Message
 {
+    SYNTAX_STATUS( "Syntax Enabled: %s", MODE_INFO ),
     DISABLING_PLUGINS( "Disabling all plugins", MODE_INFO ),
     DISABLED_PLUGIN( "Disabled plugin '%s'", MODE_INFO ),
-    MD5_DIGEST_NOT_FOUND ( "Could not load the MD5 MessageDigest Instance %s", MODE_ERROR ),
+    MD5_DIGEST_NOT_FOUND( "Could not load the MD5 MessageDigest Instance %s", MODE_ERROR ),
     CLIENT_NOT_ACCEPTING_GZIP( "The client does not accept GZIP encoding %s", MODE_DEBUG ),
     SSL_NOT_ENOUGH_WORKERS( "SSL is enabled. It is recommended to use at least 3 worker threads ( Not Required )", MODE_WARNING ),
     COULD_NOT_CREATE_FOLDER( "Couldn't create the %s folder", MODE_WARNING ),
@@ -85,7 +86,7 @@ public enum Message
     @Override
     public String toString()
     {
-        if ( Server.getInstance() != null && ((Server) Server.getInstance()).translations != null )
+        if ( Server.getInstance() != null && ( (Server) Server.getInstance() ).translations != null )
         {
             String nameSpace;
             switch ( this.getMode() )
@@ -106,9 +107,9 @@ public enum Message
                     nameSpace = "info";
                     break;
             }
-            if ( ((Server) Server.getInstance()).translations.contains( nameSpace + "." + this.name().toLowerCase() ) )
+            if ( ( (Server) Server.getInstance() ).translations.contains( nameSpace + "." + this.name().toLowerCase() ) )
             {
-                return ((Server) Server.getInstance()).translations.get( nameSpace + "." + this.name().toLowerCase() );
+                return ( (Server) Server.getInstance() ).translations.get( nameSpace + "." + this.name().toLowerCase() );
             }
         }
         return this.message;

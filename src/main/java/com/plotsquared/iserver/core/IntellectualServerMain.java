@@ -29,24 +29,10 @@ import com.plotsquared.iserver.util.TimeUtil;
 
 import java.io.File;
 
-@SuppressWarnings( "ALL" )
+@SuppressWarnings("ALL")
 @Bootstrap
 public class IntellectualServerMain
 {
-
-    private static class Options
-    {
-
-        @Parameter( names = "-gui", description = "Launch with a GUI ( W.I.P )" )
-        private boolean gui = false;
-
-        @Parameter( names = "-folder", description = "Application base folder path" )
-        private String folder = "./";
-
-        @Parameter( names = "-help", description = "Show this list" )
-        private boolean help = false;
-
-    }
 
     /**
      * Launcher method
@@ -111,5 +97,19 @@ public class IntellectualServerMain
             e.printStackTrace();
         }
         return server;
+    }
+
+    private static class Options
+    {
+
+        @Parameter(names = "-gui", description = "Launch with a GUI ( W.I.P )")
+        private boolean gui = false;
+
+        @Parameter(names = "-folder", description = "Application base folder path")
+        private String folder = "./";
+
+        @Parameter(names = "-help", description = "Show this list")
+        private boolean help = false;
+
     }
 }

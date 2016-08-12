@@ -26,8 +26,8 @@ import com.plotsquared.iserver.util.Assert;
 public class CachedResponse implements ResponseBody
 {
 
-    private final byte[] bytes;
     public final Header header;
+    private final byte[] bytes;
 
     public CachedResponse(final ResponseBody parent)
     {

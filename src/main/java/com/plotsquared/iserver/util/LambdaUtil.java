@@ -43,7 +43,7 @@ public final class LambdaUtil
     }
 
     @SafeVarargs
-    public static <T> void arrayForeach(final Consumer<T> consumer, final T ... array)
+    public static <T> void arrayForeach(final Consumer<T> consumer, final T... array)
     {
         Assert.notNull( array, consumer );
 

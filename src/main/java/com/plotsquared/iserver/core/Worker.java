@@ -70,6 +70,25 @@ class Worker
         }
     }
 
+    private static byte[] compress(final byte[] data) throws IOException
+    {
+        Assert.notNull( data );
+
+        final byte[] compressedData;
+        try ( final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( data.length ) )
+        {
+            try ( final GZIPOutputStream gzipOutputStream = new GZIPOutputStream( byteArrayOutputStream ) )
+            {
+                gzipOutputStream.write( data );
+            }
+            compressedData = byteArrayOutputStream.toByteArray();
+        }
+
+        Assert.equals( compressedData != null && compressedData.length > 0, true );
+
+        return compressedData;
+    }
+
     synchronized void start()
     {
         Server.getInstance().log( "Started thread: " + id );
@@ -104,7 +123,7 @@ class Worker
         boolean cache = false;
         final ResponseBody body;
 
-        if ( server.enableCaching && requestHandler instanceof CacheApplicable
+        if ( CoreConfig.Cache.enabled && requestHandler instanceof CacheApplicable
                 && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
         {
             cache = true;
@@ -160,32 +179,35 @@ class Worker
 
             if ( body.isText() )
             {
-                // Make sure to not use Crush when
-                // told not to
-                if ( !( requestHandler instanceof IgnoreSyntax ) )
+                if ( CoreConfig.enableSyntax )
                 {
-                    // Provider factories are fun, and so is the
-                    // global map. But we also need the view
-                    // specific ones!
-                    final Map<String, ProviderFactory> factories = new HashMap<>();
-                    for ( final ProviderFactory factory : server.providers )
+                    // Make sure to not use Crush when
+                    // told not to
+                    if ( !( requestHandler instanceof IgnoreSyntax ) )
                     {
-                        factories.put( factory.providerName().toLowerCase(), factory );
-                    }
-                    // Now make use of the view specific ProviderFactory
-                    final ProviderFactory z = requestHandler.getFactory( request );
-                    if ( z != null )
-                    {
-                        factories.put( z.providerName().toLowerCase(), z );
-                    }
-                    factories.put( "request", request );
-                    // This is how the crush engine works.
-                    // Quite simple, yet powerful!
-                    for ( final Syntax syntax : server.syntaxes )
-                    {
-                        if ( syntax.matches( textContent ) )
+                        // Provider factories are fun, and so is the
+                        // global map. But we also need the view
+                        // specific ones!
+                        final Map<String, ProviderFactory> factories = new HashMap<>();
+                        for ( final ProviderFactory factory : server.providers )
                         {
-                            textContent = syntax.handle( textContent, request, factories );
+                            factories.put( factory.providerName().toLowerCase(), factory );
+                        }
+                        // Now make use of the view specific ProviderFactory
+                        final ProviderFactory z = requestHandler.getFactory( request );
+                        if ( z != null )
+                        {
+                            factories.put( z.providerName().toLowerCase(), z );
+                        }
+                        factories.put( "request", request );
+                        // This is how the crush engine works.
+                        // Quite simple, yet powerful!
+                        for ( final Syntax syntax : server.syntaxes )
+                        {
+                            if ( syntax.matches( textContent ) )
+                            {
+                                textContent = syntax.handle( textContent, request, factories );
+                            }
                         }
                     }
                 }
@@ -194,7 +216,8 @@ class Worker
             }
 
             boolean gzip = false;
-            if ( CoreConfig.gzip ) {
+            if ( CoreConfig.gzip )
+            {
                 if ( request.getHeader( "Accept-Encoding" ).contains( "gzip" ) )
                 {
                     gzip = true;
@@ -272,8 +295,8 @@ class Worker
             final StringBuilder rRaw = new StringBuilder();
             try
             {
-                input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), server.bufferIn );
-                output = new BufferedOutputStream( remote.getOutputStream(), server.bufferOut );
+                input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), CoreConfig.Buffer.in );
+                output = new BufferedOutputStream( remote.getOutputStream(), CoreConfig.Buffer.out );
                 String str;
                 while ( ( str = input.readLine() ) != null && !str.equals( "" ) )
                 {
@@ -312,24 +335,6 @@ class Worker
         {
             e.printStackTrace();
         }
-    }
-
-    private static byte[] compress(final byte[] data) throws IOException {
-        Assert.notNull( data );
-
-        byte[] compressedData;
-        try ( final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( data.length ) )
-        {
-            try ( final GZIPOutputStream gzipOutputStream = new GZIPOutputStream( byteArrayOutputStream ) )
-            {
-                gzipOutputStream.write( data );
-            }
-            compressedData = byteArrayOutputStream.toByteArray();
-        }
-
-        Assert.equals( compressedData != null && compressedData.length > 0, true );
-
-        return compressedData;
     }
 
     private String md5Checksum(final byte[] input)

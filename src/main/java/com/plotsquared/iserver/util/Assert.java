@@ -130,8 +130,8 @@ public class Assert
     /**
      * Will only pass if a is equal to b
      *
-     * @param a Boolean A
-     * @param b Boolean B
+     * @param a       Boolean A
+     * @param b       Boolean B
      * @param message Error message
      * @throws AssertionError If not passing the test
      */

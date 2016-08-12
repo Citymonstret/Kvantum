@@ -39,15 +39,6 @@ public class Response implements ResponseBody
     private boolean isText;
     private byte[] bytes;
 
-    public void copyFrom(Response handle)
-    {
-        this.header = handle.header;
-        this.content = handle.content;
-        this.parent = handle.parent;
-        this.isText = handle.isText;
-        this.bytes = handle.bytes;
-    }
-
     /**
      * Constructor
      *
@@ -69,6 +60,15 @@ public class Response implements ResponseBody
     public Response()
     {
         this( null );
+    }
+
+    public void copyFrom(Response handle)
+    {
+        this.header = handle.header;
+        this.content = handle.content;
+        this.parent = handle.parent;
+        this.isText = handle.isText;
+        this.bytes = handle.bytes;
     }
 
     /**

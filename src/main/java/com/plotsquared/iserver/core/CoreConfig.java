@@ -9,6 +9,17 @@ import com.intellectualsites.configurable.annotations.Configuration;
 public class CoreConfig
 {
 
+    public static int port = 80;
+    public static String webAddress = "http://localhost";
+    public static String logPrefix = "Web";
+    public static String hostname = "localhost";
+    public static boolean verbose = false;
+    public static int workers = 1;
+    public static boolean disableViews = false;
+    public static boolean debug = true;
+    public static boolean gzip = true;
+    public static boolean enableSyntax = true;
+    public static boolean contentMd5 = true;
     private static boolean preConfigured = false;
 
     public static boolean isPreConfigured()
@@ -20,17 +31,6 @@ public class CoreConfig
     {
         CoreConfig.preConfigured = preConfigured;
     }
-
-    public static int port = 80;
-    public static String webAddress = "http://localhost";
-    public static String logPrefix = "Web";
-    public static String hostname = "localhost";
-    public static boolean verbose = false;
-    public static int workers = 1;
-    public static boolean disableViews = false;
-    public static boolean debug = true;
-    public static boolean gzip = true;
-    public static boolean contentMd5 = true;
 
     @ConfigSection(name = "buffer")
     public static class Buffer

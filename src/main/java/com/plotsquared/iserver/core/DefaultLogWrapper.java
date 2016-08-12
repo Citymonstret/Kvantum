@@ -65,7 +65,7 @@ public class DefaultLogWrapper implements LogWrapper
         coloredPrinter.print( System.lineSeparator() );
         coloredPrinter.clear();
 
-        ((Server) Server.getInstance()).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
+        ( (Server) Server.getInstance() ).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
                 message, System.lineSeparator() );
         // System.out.printf("[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator());
         // coloredPrinter.println("Hello", Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.YELLOW)
@@ -75,7 +75,7 @@ public class DefaultLogWrapper implements LogWrapper
     public void log(String s)
     {
         System.out.println( s );
-        ((Server) Server.getInstance()).logStream.println( s );
+        ( (Server) Server.getInstance() ).logStream.println( s );
     }
 
 }

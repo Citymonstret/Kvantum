@@ -48,12 +48,12 @@ public class CookieManager
             return new Cookie[ 0 ];
         }
         raw = raw.replaceFirst( " ", "" );
-        String[] pieces = raw.split( "; " );
-        Cookie[] cookies = new Cookie[ pieces.length ];
+        final String[] pieces = raw.split( "; " );
+        final Cookie[] cookies = new Cookie[ pieces.length ];
         for ( int i = 0; i < pieces.length; i++ )
         {
-            String piece = pieces[ i ];
-            String[] piecePieces = piece.split( "=" );
+            final String piece = pieces[ i ];
+            final String[] piecePieces = piece.split( "=" );
             if ( piecePieces.length == 1 )
             {
                 cookies[ i ] = new Cookie( piecePieces[ 0 ], "" );

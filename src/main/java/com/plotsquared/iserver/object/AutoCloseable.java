@@ -13,17 +13,17 @@ public abstract class AutoCloseable implements java.lang.AutoCloseable
         closeable.add( this );
     }
 
+    public static void closeAll()
+    {
+        closeable.forEach( AutoCloseable::handleClose );
+    }
+
     protected abstract void handleClose();
 
     public void close()
     {
         this.handleClose();
         closeable.remove( this );
-    }
-
-    public static void closeAll()
-    {
-        closeable.forEach( AutoCloseable::handleClose );
     }
 
 }

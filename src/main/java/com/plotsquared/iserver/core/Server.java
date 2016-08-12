@@ -47,7 +47,6 @@ import com.plotsquared.iserver.views.*;
 import sun.misc.Signal;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -58,41 +57,38 @@ import static com.plotsquared.iserver.logging.LogModes.*;
 
 /**
  * The implementation of {@link IntellectualServer}
- * @see com.plotsquared.iserver.core.IntellectualServer
  *
  * @author Citymonstret | Sauilitired
+ * @see com.plotsquared.iserver.core.IntellectualServer
  */
 public final class Server extends Thread implements IntellectualServer
 {
 
+    // Private Static
+    private static Server instance;
+    // Package-Protected Final
+    final Queue<Socket> queue = new LinkedList<>();
+    final Collection<ProviderFactory> providers;
+    // Private Final
+    private final LogWrapper logWrapper;
+    private final boolean standalone;
+    private final Map<String, Class<? extends View>> viewBindings;
+    // Public
     public ConfigurationFile translations;
-
-    // Package-Protected
-    boolean enableCaching;
-    private File coreFolder;
     volatile CacheManager cacheManager;
     boolean silent = false;
     Set<Syntax> syntaxes;
     RequestManager requestManager;
     SessionManager sessionManager;
-    int bufferIn, bufferOut;
-
-    // Package-Protected Final
-    final Queue<Socket> queue = new LinkedList<>();
-    final Collection<ProviderFactory> providers;
-
-    // Private Static
-    private static Server instance;
-
     // Private
     PrintStream logStream;
+    // Package-Protected
+    private File coreFolder;
     private boolean pause = false;
     private boolean stopping;
     private InputThread inputThread;
     private boolean started;
-    private boolean mysqlEnabled;
     private ServerSocket socket;
-    private String hostName;
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
@@ -100,31 +96,9 @@ public final class Server extends Thread implements IntellectualServer
     private Worker[] workerThreads;
     private AccountManager globalAccountManager;
 
-    // Private Final
-    private final LogWrapper logWrapper;
-    private final boolean standalone;
-    private final int port;
-    private final Map<String, Class<? extends View>> viewBindings;
     {
         viewBindings = new HashMap<>();
         providers = new ArrayList<>();
-    }
-
-    private void printLicenseInfo()
-    {
-        final LogWrapper.LogEntryFormatter prefix = msg -> "> " + msg;
-        logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
-        LambdaUtil.arrayForeach( string -> logWrapper.log( prefix, string ),
-                "GNU GENERAL PUBLIC LICENSE NOTICE:",
-                "",
-                "IntellectualServer, Copyright (C) 2015 IntellectualSites",
-                "IntellectualSites comes with ABSOLUTELY NO WARRANTY; for details type `/show w`",
-                "This is free software, and you are welcome to redistribute it",
-                "under certain conditions; type `/show c` for details.",
-                ""
-        );
-        logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
-        logWrapper.log();
     }
 
     /**
@@ -168,7 +142,8 @@ public final class Server extends Thread implements IntellectualServer
             this.logStream = new PrintStream( new FileOutputStream( new File( logFolder,
                     TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) );
             // Extremely hacky solution that enables file logging for exceptions
-            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream() {
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+            {
                 @Override
                 public void flush() throws IOException
                 {
@@ -192,15 +167,20 @@ public final class Server extends Thread implements IntellectualServer
 
         printLicenseInfo();
 
-        // This adds the default view bindings
-        addViewBinding( "html", HTMLView.class );
-        addViewBinding( "css", CSSView.class );
-        addViewBinding( "javascript", JSView.class );
-        addViewBinding( "less", LessView.class );
-        addViewBinding( "img", ImgView.class );
-        addViewBinding( "download", DownloadView.class );
-        addViewBinding( "redirect", RedirectView.class );
-        addViewBinding( "std", StandardView.class );
+        Message.SYNTAX_STATUS.log( CoreConfig.enableSyntax );
+
+        if ( CoreConfig.enableSyntax )
+        {
+            // This adds the default view bindings
+            addViewBinding( "html", HTMLView.class );
+            addViewBinding( "css", CSSView.class );
+            addViewBinding( "javascript", JSView.class );
+            addViewBinding( "less", LessView.class );
+            addViewBinding( "img", ImgView.class );
+            addViewBinding( "download", DownloadView.class );
+            addViewBinding( "redirect", RedirectView.class );
+            addViewBinding( "std", StandardView.class );
+        }
 
         if ( standalone )
         {
@@ -267,7 +247,7 @@ public final class Server extends Thread implements IntellectualServer
             e.printStackTrace();
         }
 
-        if ( CoreConfig.isPreConfigured() )
+        if ( !CoreConfig.isPreConfigured() )
         {
             ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
         }
@@ -276,14 +256,6 @@ public final class Server extends Thread implements IntellectualServer
         {
             log( Message.DEBUG );
         }
-
-        this.port = CoreConfig.port;
-        this.hostName = CoreConfig.hostname;
-        this.bufferIn = CoreConfig.Buffer.in;
-        this.bufferOut = CoreConfig.Buffer.out;
-        this.enableCaching = CoreConfig.Cache.enabled;
-        this.mysqlEnabled = CoreConfig.MySQL.enabled;
-        String mainApplication = CoreConfig.Application.main;
 
         this.workerThreads = LambdaUtil.arrayAssign( new Worker[ CoreConfig.workers ], Worker::new );
 
@@ -294,7 +266,7 @@ public final class Server extends Thread implements IntellectualServer
         this.sessionManager = new SessionManager( this );
         this.cacheManager = new CacheManager();
 
-        if ( mysqlEnabled )
+        if ( CoreConfig.MySQL.enabled )
         {
             this.mysqlConnManager = new MySQLConnManager();
         }
@@ -323,20 +295,23 @@ public final class Server extends Thread implements IntellectualServer
             }
         }
 
-        // Setup the provider factories
-        this.providers.add( this.sessionManager );
-        this.providers.add( ConfigVariableProvider.getInstance() );
-        this.providers.add( new PostProviderFactory() );
-        this.providers.add( new MetaProvider() );
+        if ( CoreConfig.enableSyntax )
+        {
+            // Setup the provider factories
+            this.providers.add( this.sessionManager );
+            this.providers.add( ConfigVariableProvider.getInstance() );
+            this.providers.add( new PostProviderFactory() );
+            this.providers.add( new MetaProvider() );
 
-        // Setup the crush syntax-particles
-        this.syntaxes = new LinkedHashSet<>();
-        syntaxes.add( new Include() );
-        syntaxes.add( new Comment() );
-        syntaxes.add( new MetaBlock() );
-        syntaxes.add( new IfStatement() );
-        syntaxes.add( new ForEachBlock() );
-        syntaxes.add( new Variable() );
+            // Setup the crush syntax-particles
+            this.syntaxes = new LinkedHashSet<>();
+            syntaxes.add( new Include() );
+            syntaxes.add( new Comment() );
+            syntaxes.add( new MetaBlock() );
+            syntaxes.add( new IfStatement() );
+            syntaxes.add( new ForEachBlock() );
+            syntaxes.add( new Variable() );
+        }
 
         if ( standalone )
         {
@@ -347,25 +322,25 @@ public final class Server extends Thread implements IntellectualServer
             this.providers.add( this.globalAccountManager );
         }
 
-        if ( !mainApplication.isEmpty() )
+        if ( !CoreConfig.Application.main.isEmpty() )
         {
             try
             {
-                Class temp = Class.forName( mainApplication );
+                Class temp = Class.forName( CoreConfig.Application.main );
                 if ( temp.getSuperclass().equals( ApplicationStructure.class ) )
                 {
                     this.mainApplicationStructure = (ApplicationStructure) temp.newInstance();
                 } else
                 {
-                    log( Message.APPLICATION_DOES_NOT_EXTEND, mainApplication );
+                    log( Message.APPLICATION_DOES_NOT_EXTEND, CoreConfig.Application.main );
                 }
             } catch ( ClassNotFoundException e )
             {
-                log( Message.APPLICATION_CANNOT_FIND, mainApplication );
+                log( Message.APPLICATION_CANNOT_FIND, CoreConfig.Application.main );
                 e.printStackTrace();
             } catch ( InstantiationException | IllegalAccessException e )
             {
-                log( Message.APPLICATION_CANNOT_INITIATE, mainApplication );
+                log( Message.APPLICATION_CANNOT_INITIATE, CoreConfig.Application.main );
                 e.printStackTrace();
             }
         }
@@ -381,10 +356,27 @@ public final class Server extends Thread implements IntellectualServer
         return instance;
     }
 
+    private void printLicenseInfo()
+    {
+        final LogWrapper.LogEntryFormatter prefix = msg -> "> " + msg;
+        logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+        LambdaUtil.arrayForeach( string -> logWrapper.log( prefix, string ),
+                "GNU GENERAL PUBLIC LICENSE NOTICE:",
+                "",
+                "IntellectualServer, Copyright (C) 2015 IntellectualSites",
+                "IntellectualSites comes with ABSOLUTELY NO WARRANTY; for details type `/show w`",
+                "This is free software, and you are welcome to redistribute it",
+                "under certain conditions; type `/show c` for details.",
+                ""
+        );
+        logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+        logWrapper.log();
+    }
+
     @Override
     public boolean isMysqlEnabled()
     {
-        return this.mysqlEnabled;
+        return CoreConfig.MySQL.enabled;
     }
 
     @Override
@@ -392,6 +384,7 @@ public final class Server extends Thread implements IntellectualServer
     {
         Assert.notNull( c );
         Assert.notEmpty( key );
+
         viewBindings.put( key, c );
     }
 
@@ -498,7 +491,7 @@ public final class Server extends Thread implements IntellectualServer
         this.log( Message.CALLING_EVENT, "startup" );
         this.handleEvent( new StartupEvent( this ) );
 
-        if ( mysqlEnabled )
+        if ( CoreConfig.MySQL.enabled )
         {
             this.log( Message.MYSQL_INIT );
             this.mysqlConnManager.init();
@@ -555,7 +548,7 @@ public final class Server extends Thread implements IntellectualServer
 
         requestManager.dump( this );
 
-        if ( !this.enableCaching )
+        if ( !CoreConfig.Cache.enabled )
         {
             log( Message.CACHING_DISABLED );
         } else
@@ -563,18 +556,18 @@ public final class Server extends Thread implements IntellectualServer
             log( Message.CACHING_ENABLED );
         }
 
-        log( Message.STARTING_ON_PORT, this.port );
+        log( Message.STARTING_ON_PORT, CoreConfig.port );
         this.started = true;
         try
         {
-            socket = new ServerSocket( this.port );
+            socket = new ServerSocket( CoreConfig.port );
             log( Message.SERVER_STARTED );
         } catch ( final Exception e )
         {
             // throw new RuntimeException("Couldn't start the server...", e);
             boolean run = true;
 
-            int port = this.port + 1;
+            int port = CoreConfig.port + 1;
             while ( run )
             {
                 try
@@ -583,9 +576,7 @@ public final class Server extends Thread implements IntellectualServer
                     run = false;
                     log( "Specified port was occupied, running on " + port + " instead" );
 
-                    Field portField = getClass().getDeclaredField( "port" );
-                    portField.setAccessible( true );
-                    portField.set( this, port );
+                    CoreConfig.port = port;
                 } catch ( final Exception ex )
                 {
                     continue;
@@ -596,11 +587,13 @@ public final class Server extends Thread implements IntellectualServer
         // Start the workers
         LambdaUtil.arrayForeach( workerThreads, Worker::start );
 
-        log( Message.ACCEPTING_CONNECTIONS_ON, hostName + ( this.port == 80 ? "" : ":" + port ) + "/'" );
-        log( Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024 );
+        log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.hostname + ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) +
+                "/'" );
+        log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
 
         // Pre-Steps
-        if ( standalone ) {
+        if ( standalone )
+        {
             if ( globalAccountManager.getAccount( new Object[]{ null, "admin", null } ) == null )
             {
                 log( "There is no admin account as of yet. So, well, let's create one! Please enter a password!" );

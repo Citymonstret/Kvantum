@@ -24,7 +24,6 @@ import com.plotsquared.iserver.matching.ViewPattern;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.Assert;
-import com.plotsquared.iserver.util.Context;
 import com.plotsquared.iserver.util.Final;
 
 import java.io.File;
@@ -163,10 +162,10 @@ public class View extends RequestHandler
                 this.folder = new File( getOption( "folder" ).toString() );
             } else if ( relatedFolderPath != null )
             {
-                this.folder = new File( Context.coreFolder, relatedFolderPath );
+                this.folder = new File( Server.getInstance().getCoreFolder(), relatedFolderPath );
             } else
             {
-                this.folder = new File( Context.coreFolder, "/" + internalName );
+                this.folder = new File( Server.getInstance().getCoreFolder(), "/" + internalName );
             }
             if ( !folder.exists() )
             {

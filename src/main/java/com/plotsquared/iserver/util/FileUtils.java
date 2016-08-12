@@ -42,24 +42,28 @@ public class FileUtils
      * @param delete  If the original files should be deleted
      * @throws Exception If anything goes wrong
      */
-    public static void addToZip(File zipFile, File[] files, boolean delete) throws Exception
+    public static void addToZip(final File zipFile, final File[] files, final boolean delete) throws Exception
     {
         Assert.notNull( zipFile, files );
 
         if ( !zipFile.exists() )
         {
-            zipFile.createNewFile();
+            if ( !zipFile.createNewFile() )
+            {
+                throw new RuntimeException( "Couldn't create " + zipFile );
+            }
         }
 
-        File temporary = File.createTempFile( zipFile.getName(), "" );
+        final File temporary = File.createTempFile( zipFile.getName(), "" );
+        //noinspection ResultOfMethodCallIgnored
         temporary.delete();
 
         if ( !zipFile.renameTo( temporary ) )
         {
-            throw new RuntimeException( "Couldn't rename " + zipFile + " to " + zipFile );
+            throw new RuntimeException( "Couldn't rename " + zipFile + " to " + temporary );
         }
 
-        byte[] buffer = new byte[ 1024 * 16 ]; // 16mb
+        final byte[] buffer = new byte[ 1024 * 16 ]; // 16mb
 
         ZipInputStream zis = new ZipInputStream( new FileInputStream( temporary ) );
         ZipOutputStream zos = new ZipOutputStream( new FileOutputStream( zipFile ) );
