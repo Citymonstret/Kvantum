@@ -13,6 +13,7 @@ final public class ResponseMethod implements BiConsumer<Request, Response>
 
     private final Method method;
     private final Object instance;
+    private final boolean passResponse;
 
     public ResponseMethod(final Method method, final Object instance)
     {
@@ -21,6 +22,7 @@ final public class ResponseMethod implements BiConsumer<Request, Response>
         this.method = method;
         this.method.setAccessible( true );
         this.instance = instance;
+        this.passResponse = method.getReturnType() == Void.TYPE;
     }
 
     public Response handle(final Request r)
@@ -29,6 +31,12 @@ final public class ResponseMethod implements BiConsumer<Request, Response>
 
         try
         {
+            if ( passResponse )
+            {
+                final Response response = new Response();
+                this.method.invoke( instance, r, response );
+                return response;
+            }
             return (Response) this.method.invoke( instance, r );
         } catch ( IllegalAccessException | InvocationTargetException e )
         {

@@ -35,9 +35,9 @@ public class APITest
     }
 
     @ViewMatcher(filter = "no/such/user", cache = true, name = "NoSuchUser")
-    public Response userNotFound(final Request request)
+    public void userNotFound(final Request request, final Response response)
     {
-        return new Response().setContent( "<h1>There is no such user!</h1>" );
+        response.setContent( "<h1>There is no such user!</h1>" );
     }
 
     @ViewMatcher(filter = "user/<username>", cache = false, name = "User", middlewares = { UserMiddleware.class } )

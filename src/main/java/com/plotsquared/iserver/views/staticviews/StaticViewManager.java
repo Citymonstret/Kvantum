@@ -18,6 +18,7 @@ final public class StaticViewManager
 {
 
     private static final Class<?>[] parameters = new Class<?>[]{ Request.class };
+    private static final Class<?>[] alternativeParameters = new Class<?>[] { Request.class, Response.class };
 
     public static void generate(final Object viewDeclaration) throws Exception
     {
@@ -26,12 +27,14 @@ final public class StaticViewManager
         ( (IConsumer<ReflectionUtils.AnnotatedMethod>) annotatedMethod ->
         {
             final Method m = annotatedMethod.getMethod();
-            if ( !Response.class.equals( m.getReturnType() ) )
+            final boolean usesAlternate = Arrays.equals( m.getParameterTypes(), alternativeParameters );
+
+            if ( !usesAlternate && !Response.class.equals( m.getReturnType() ) )
             {
                 new IllegalArgumentException( "M doesn't return response" ).printStackTrace();
             } else
             {
-                if ( !Arrays.equals( m.getParameterTypes(), parameters ) )
+                if ( !usesAlternate && !Arrays.equals( m.getParameterTypes(), parameters ) )
                 {
                     new IllegalArgumentException( "M has wrong parameter types" ).printStackTrace();
                 } else
