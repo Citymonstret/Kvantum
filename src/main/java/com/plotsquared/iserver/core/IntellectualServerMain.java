@@ -19,35 +19,33 @@
 
 package com.plotsquared.iserver.core;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import com.plotsquared.iserver.gui.GuiMain;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.Bootstrap;
+import com.plotsquared.iserver.util.TimeUtil;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 @SuppressWarnings( "ALL" )
 @Bootstrap
 public class IntellectualServerMain
 {
 
-    private static Map<String, String> getOptions(final String[] args)
+    public static class Options
     {
-        final Map<String, String> out = new HashMap<>();
-        for ( final String arg : args )
-        {
-            final String[] parts = arg.split( "=" );
-            if ( parts.length < 2 )
-            {
-                out.put( parts[ 0 ].toLowerCase(), null );
-            } else
-            {
-                out.put( parts[ 0 ].toLowerCase(), parts[ 1 ] );
-            }
-        }
-        return out;
+
+        @Parameter( names = "-gui", description = "Launch with a GUI ( W.I.P )" )
+        private boolean gui = false;
+
+        @Parameter( names = "-folder", description = "Application base folder path" )
+        private String folder = "./";
+
+        @Parameter( names = "-help", description = "Show this list" )
+        private boolean help = false;
+
     }
 
     /**
@@ -57,24 +55,26 @@ public class IntellectualServerMain
      */
     public static void main(String[] args)
     {
-        final Map<String, String> options = getOptions( args );
-        final File file;
-        if ( options.containsKey( "gui" ) )
+        final Options options = new Options();
+        final JCommander jCommander = new JCommander( options, args );
+        jCommander.setProgramName( "IntellectualServer" );
+
+        if ( options.help )
         {
-            GuiMain.main( args );
+            final LogWrapper logWrapper = new DefaultLogWrapper();
+            final StringBuilder message = new StringBuilder();
+            jCommander.usage( message );
+            logWrapper.log( "Help", "Info", TimeUtil.getTimeStamp(), message.toString(), "Main" );
         } else
         {
-            if ( options.containsKey( "folder" ) )
+            final File file = new File( options.folder );
+            if ( options.gui )
             {
-                // folder=./this/new/path
-                // folder=/web/intellectualserver/
-                // and etc.
-                file = new File( options.get( "folder" ) );
+                GuiMain.main( args, file );
             } else
             {
-                file = new File( "./" );
+                startServer( true, file, new DefaultLogWrapper() );
             }
-            startServer( true, file, new DefaultLogWrapper() );
         }
     }
 

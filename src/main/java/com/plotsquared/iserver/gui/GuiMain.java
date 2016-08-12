@@ -16,10 +16,8 @@ public class GuiMain extends Thread
         super.setName( "GUI-Thread" );
     }
 
-    public static void main(final String[] args)
+    public static void main(final String[] args, final File file)
     {
-        final File file = new File( "." );
-
         new GuiMain().start();
 
         IntellectualServerMain.startServer( true, file, new DefaultLogWrapper()

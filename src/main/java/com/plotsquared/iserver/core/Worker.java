@@ -167,13 +167,13 @@ class Worker
                     // Provider factories are fun, and so is the
                     // global map. But we also need the view
                     // specific ones!
-                    Map<String, ProviderFactory> factories = new HashMap<>();
+                    final Map<String, ProviderFactory> factories = new HashMap<>();
                     for ( final ProviderFactory factory : server.providers )
                     {
                         factories.put( factory.providerName().toLowerCase(), factory );
                     }
                     // Now make use of the view specific ProviderFactory
-                    ProviderFactory z = requestHandler.getFactory( request );
+                    final ProviderFactory z = requestHandler.getFactory( request );
                     if ( z != null )
                     {
                         factories.put( z.providerName().toLowerCase(), z );
@@ -181,7 +181,7 @@ class Worker
                     factories.put( "request", request );
                     // This is how the crush engine works.
                     // Quite simple, yet powerful!
-                    for ( Syntax syntax : server.syntaxes )
+                    for ( final Syntax syntax : server.syntaxes )
                     {
                         if ( syntax.matches( textContent ) )
                         {
