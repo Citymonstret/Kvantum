@@ -8,6 +8,7 @@ import com.plotsquared.iserver.util.ReflectionUtils;
 import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.decl.ResponseMethod;
 import com.plotsquared.iserver.views.decl.ViewMatcher;
+import com.plotsquared.iserver.views.requesthandler.Middleware;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -44,6 +45,12 @@ final public class StaticViewManager
                     {
                         view = new StaticView( matcher, new ResponseMethod( m, viewDeclaration ) );
                     }
+
+                    for ( final Class<? extends Middleware> middleware : matcher.middlewares() )
+                    {
+                        view.getMiddlewareQueuePopulator().add( middleware );
+                    }
+
                     Server.getInstance().getRequestManager().add( view );
                 }
             }

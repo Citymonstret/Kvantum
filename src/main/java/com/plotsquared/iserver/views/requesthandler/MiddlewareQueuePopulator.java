@@ -13,6 +13,10 @@ public final class MiddlewareQueuePopulator
 
     public void add(final Class<? extends Middleware> middleware)
     {
+        if ( Middleware.class == middleware )
+        {
+            return;
+        }
         try
         {
             middleware.getConstructor();

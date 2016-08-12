@@ -38,5 +38,10 @@ public enum Method
     /**
      *
      */
-    PUT
+    PUT,
+
+    /**
+     *
+     */
+    DELETE
 }

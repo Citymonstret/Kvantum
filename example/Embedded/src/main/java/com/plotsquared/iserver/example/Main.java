@@ -54,6 +54,7 @@ public class Main
         try
         {
             StaticViewManager.generate( instance );
+            StaticViewManager.generate( new APITest() );
         } catch ( Exception e )
         {
             e.printStackTrace();

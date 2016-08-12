@@ -1,5 +1,7 @@
 package com.plotsquared.iserver.views.decl;
 
+import com.plotsquared.iserver.views.requesthandler.Middleware;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,6 +15,8 @@ public @interface ViewMatcher
     String filter();
 
     String name();
+
+    Class<? extends Middleware>[] middlewares() default Middleware.class;
 
     boolean cache() default true;
 
