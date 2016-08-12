@@ -49,7 +49,9 @@ public class MySQLConnManager
     {
         try
         {
-            YamlConfiguration config = new YamlConfiguration( "mysql", new File( new File( Server.getInstance().coreFolder, "config" ), "mysql.yml" ) );
+            YamlConfiguration config = new YamlConfiguration( "mysql", new File( new File( Server.getInstance()
+                    .getCoreFolder(),
+                    "config" ), "mysql.yml" ) );
             config.loadFile();
             this.host = config.get( "mysql.host", "127.0.0.1" );
             this.pass = config.get( "mysql.pass", "password" );

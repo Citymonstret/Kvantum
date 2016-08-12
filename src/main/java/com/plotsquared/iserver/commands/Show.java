@@ -270,7 +270,7 @@ public class Show extends Command
                     Server.getInstance().log( "> Unknown Parameter `%s`", args[ 0 ].toLowerCase() );
                     break;
             }
-            LogWrapper wrapper = Server.getInstance().logWrapper;
+            LogWrapper wrapper = Server.getInstance().getLogWrapper();
             for ( String line : lines )
             {
                 wrapper.log( "  " + line );

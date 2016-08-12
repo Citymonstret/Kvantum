@@ -31,7 +31,7 @@ public class CacheDump extends Command
     @Override
     public void handle(String[] args)
     {
-        CacheManager cacheManager = Server.getInstance().cacheManager;
+        CacheManager cacheManager = Server.getInstance().getCacheManager();
         StringBuilder output = new StringBuilder( "Currently Cached Responses: " );
         for ( Map.Entry<String, CachedResponse> e : cacheManager.getAll().entrySet() )
         {

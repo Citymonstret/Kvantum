@@ -73,7 +73,7 @@ class Worker
     synchronized void start()
     {
         Server.getInstance().log( "Started thread: " + id );
-        final Server server = Server.getInstance();
+        final Server server = (Server) Server.getInstance();
         ThreadManager.createThread( () ->
         {
             if ( !server.queue.isEmpty() )

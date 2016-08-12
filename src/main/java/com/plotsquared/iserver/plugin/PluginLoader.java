@@ -19,7 +19,8 @@
 
 package com.plotsquared.iserver.plugin;
 
-import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.config.Message;
+import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.FileUtils;
 import org.yaml.snakeyaml.Yaml;
@@ -40,7 +41,7 @@ import java.util.jar.JarFile;
  * other project
  * (MarineStandalone)
  */
-public class PluginLoader
+public class PluginLoader extends AutoCloseable
 {
 
     private final ConcurrentMap<String, PluginClassLoader> loaders;
@@ -141,6 +142,7 @@ public class PluginLoader
      */
     public void disableAllPlugins()
     {
+        Message.DISABLING_PLUGINS.log();
         for ( final Plugin plugin : manager.getPlugins() )
             try
             {
@@ -262,7 +264,7 @@ public class PluginLoader
             // TODO Replace this
             // EventManager.getInstance().removeAll(plugin);
             // Marine.getServer().getScheduler().removeAll(plugin);
-            Server.getInstance().log( "Disabled %s", plugin );
+            Message.DISABLED_PLUGIN.log( plugin );
         } else
             throw new UnsupportedOperationException(
                     "Cannot disable an already disabled plugin" );
@@ -379,5 +381,11 @@ public class PluginLoader
             }
         }
         return false;
+    }
+
+    @Override
+    protected void handleClose()
+    {
+        this.disableAllPlugins();
     }
 }

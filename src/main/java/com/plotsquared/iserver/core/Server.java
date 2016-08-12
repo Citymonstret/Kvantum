@@ -35,6 +35,7 @@ import com.plotsquared.iserver.extra.accounts.Account;
 import com.plotsquared.iserver.extra.accounts.AccountCommand;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.logging.LogProvider;
+import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.error.IntellectualServerInitializationException;
 import com.plotsquared.iserver.object.error.IntellectualServerStartException;
@@ -43,76 +44,51 @@ import com.plotsquared.iserver.plugin.PluginLoader;
 import com.plotsquared.iserver.plugin.PluginManager;
 import com.plotsquared.iserver.util.*;
 import com.plotsquared.iserver.views.*;
-import org.apache.commons.io.output.TeeOutputStream;
 import sun.misc.Signal;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
 
-public class Server extends Thread implements IntellectualServer
+/**
+ * The implementation of {@link IntellectualServer}
+ * @see com.plotsquared.iserver.core.IntellectualServer
+ *
+ * @author Citymonstret | Sauilitired
+ */
+public final class Server extends Thread implements IntellectualServer
 {
 
-    private static Server instance;
-    public final LogWrapper logWrapper;
-    final Queue<Socket> queue = new LinkedList<>();
-    final Collection<ProviderFactory> providers;
-    private final boolean standalone;
-    private final int port;
-    private final Map<String, Class<? extends View>> viewBindings;
-    private final AccountManager globalAccountManager;
-    /**
-     * This is the configuration file
-     * used for translations of logging messages
-     */
     public ConfigurationFile translations;
-    /**
-     * Whether or not to cache view responses
-     */
-    public boolean enableCaching;
-    /**
-     * The core folder for the server
-     */
-    public File coreFolder;
-    /**
-     * The cache manager
-     */
-    public volatile CacheManager cacheManager;
-    /**
-     * Running in silent mode means that the server
-     * wont output anything, anywhere - not recommended
-     * for obvious reasons
-     */
+
+    // Package-Protected
+    boolean enableCaching;
+    private File coreFolder;
+    volatile CacheManager cacheManager;
     boolean silent = false;
-    /**
-     * All the syntaxtes used by the Crush Engine
-     */
     Set<Syntax> syntaxes;
-    //
-    // protected
-    //
     RequestManager requestManager;
     SessionManager sessionManager;
     int bufferIn, bufferOut;
+
+    // Package-Protected Final
+    final Queue<Socket> queue = new LinkedList<>();
+    final Collection<ProviderFactory> providers;
+
+    // Private Static
+    private static Server instance;
+
+    // Private
+    PrintStream logStream;
     private boolean pause = false;
-    /**
-     * Set to true to stop the server
-     */
     private boolean stopping;
-    /**
-     * The thread handing user input
-     */
     private InputThread inputThread;
-    //
-    // private
-    //
     private boolean started;
     private boolean mysqlEnabled;
     private ServerSocket socket;
@@ -120,13 +96,36 @@ public class Server extends Thread implements IntellectualServer
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
-    private PluginLoader pluginLoader;
     private ApplicationStructure mainApplicationStructure;
     private Worker[] workerThreads;
+
+    // Private Final
+    private final LogWrapper logWrapper;
+    private final boolean standalone;
+    private final int port;
+    private final Map<String, Class<? extends View>> viewBindings;
+    private final AccountManager globalAccountManager;
 
     {
         viewBindings = new HashMap<>();
         providers = new ArrayList<>();
+    }
+
+    private void printLicenseInfo()
+    {
+        final LogWrapper.LogEntryFormatter prefix = msg -> "> " + msg;
+        logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+        LambdaUtil.arrayForeach( string -> logWrapper.log( prefix, string ),
+                "GNU GENERAL PUBLIC LICENSE NOTICE:",
+                "",
+                "IntellectualServer, Copyright (C) 2015 IntellectualSites",
+                "IntellectualSites comes with ABSOLUTELY NO WARRANTY; for details type `/show w`",
+                "This is free software, and you are welcome to redistribute it",
+                "under certain conditions; type `/show c` for details.",
+                ""
+        );
+        logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+        logWrapper.log();
     }
 
     /**
@@ -136,25 +135,12 @@ public class Server extends Thread implements IntellectualServer
      * @param logWrapper The log implementation
      * @throws IntellectualServerInitializationException If anything was to fail
      */
-    protected Server(boolean standalone, File coreFolder, final LogWrapper logWrapper)
+    protected Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper)
             throws IntellectualServerInitializationException
     {
-        instance = this;
-
         Assert.notNull( coreFolder, logWrapper );
 
-        { // This is due to the licensing nature of the code
-            logWrapper.log( "" );
-            logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
-            logWrapper.log( "> GNU GENERAL PUBLIC LICENSE NOTICE:" );
-            logWrapper.log( "> " );
-            logWrapper.log( "> IntellectualServer, Copyright (C) 2015 IntellectualSites" );
-            logWrapper.log( "> IntellectualSites comes with ABSOLUTELY NO WARRANTY; for details type `/show w`" );
-            logWrapper.log( "> This is free software, and you are welcome to redistribute it" );
-            logWrapper.log( "> under certain conditions; type `/show c` for details." );
-            logWrapper.log( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
-            logWrapper.log( "" );
-        }
+        instance = this; // EW
 
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
         if ( !coreFolder.exists() )
@@ -168,6 +154,44 @@ public class Server extends Thread implements IntellectualServer
         this.coreFolder = coreFolder;
         this.logWrapper = logWrapper;
         this.standalone = standalone;
+
+        final File logFolder = new File( coreFolder, "log" );
+        if ( !logFolder.exists() )
+        {
+            if ( !logFolder.mkdirs() )
+            {
+                log( Message.COULD_NOT_CREATE_FOLDER, "log" );
+            }
+        }
+
+        try
+        {
+            this.logStream = new PrintStream( new FileOutputStream( new File( logFolder,
+                    TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) );
+            // Extremely hacky solution that enables file logging for exceptions
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream() {
+                @Override
+                public void flush() throws IOException
+                {
+                    String message = new String( toByteArray(), StandardCharsets.UTF_8 );
+                    if ( message.endsWith( System.lineSeparator() ) )
+                    {
+                        message = message.substring( 0, message.length() - System.lineSeparator().length() );
+                    }
+                    if ( !message.isEmpty() )
+                    {
+                        logWrapper.log( new String( toByteArray(), StandardCharsets.UTF_8 ) );
+                    }
+                    super.reset();
+                }
+            };
+            System.setErr( new PrintStream( byteArrayOutputStream, true ) );
+        } catch ( FileNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+
+        printLicenseInfo();
 
         // This adds the default view bindings
         addViewBinding( "html", HTMLView.class );
@@ -194,20 +218,12 @@ public class Server extends Thread implements IntellectualServer
             ( inputThread = new InputThread( this ) ).start();
         }
 
-        final File logFolder = new File( coreFolder, "log" );
-        if ( !logFolder.exists() )
-        {
-            if ( !logFolder.mkdirs() )
-            {
-                log( Message.COULD_NOT_CREATE_FOLDER, "log" );
-            }
-        }
         try
         {
             FileUtils.addToZip( new File( logFolder, "old.zip" ),
                     logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ), true );
-            System.setOut( new PrintStream( new TeeOutputStream( System.out,
-                    new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) ) ) );
+            // System.setOut( new PrintStream( new TeeOutputStream( System.out,
+            //         new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) ) ) );
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -215,9 +231,13 @@ public class Server extends Thread implements IntellectualServer
 
         try
         {
-            this.translations = new YamlConfiguration( "translations",
+            /*
+      This is the configuration file
+      used for translations of logging messages
+     */
+            translations = new YamlConfiguration( "translations",
                     new File( new File( coreFolder, "config" ), "translations.yml" ) );
-            this.translations.loadFile();
+            translations.loadFile();
             for ( final Message message : Message.values() )
             {
                 final String nameSpace;
@@ -239,9 +259,9 @@ public class Server extends Thread implements IntellectualServer
                         nameSpace = "info";
                         break;
                 }
-                this.translations.setIfNotExists( nameSpace + "." + message.name().toLowerCase(), message.toString() );
+                translations.setIfNotExists( nameSpace + "." + message.name().toLowerCase(), message.toString() );
             }
-            this.translations.saveFile();
+            translations.saveFile();
         } catch ( final Exception e )
         {
             log( Message.CANNOT_LOAD_TRANSLATIONS );
@@ -351,7 +371,7 @@ public class Server extends Thread implements IntellectualServer
      *
      * @return this, literally... this!
      */
-    public static Server getInstance()
+    public static IntellectualServer getInstance()
     {
         return instance;
     }
@@ -442,7 +462,7 @@ public class Server extends Thread implements IntellectualServer
                     return;
                 }
             }
-            pluginLoader = new PluginLoader( new PluginManager() );
+            PluginLoader pluginLoader = new PluginLoader( new PluginManager() );
             pluginLoader.loadAllPlugins( file );
             pluginLoader.enableAllPlugins();
         } else
@@ -639,6 +659,10 @@ public class Server extends Thread implements IntellectualServer
             queue.add( s );
         } catch ( final Exception e )
         {
+            if ( e.getMessage().toLowerCase().contains( "closed" ) )
+            {
+                return;
+            }
             e.printStackTrace();
         }
     }
@@ -688,6 +712,32 @@ public class Server extends Thread implements IntellectualServer
     }
 
     @Override
+    public CacheManager getCacheManager()
+    {
+        return cacheManager;
+    }
+
+    @Override
+    public LogWrapper getLogWrapper()
+    {
+
+        return logWrapper;
+    }
+
+    @Override
+    public ConfigurationFile getTranslations()
+    {
+
+        return translations;
+    }
+
+    @Override
+    public File getCoreFolder()
+    {
+        return coreFolder;
+    }
+
+    @Override
     public synchronized void log(String message, final Object... args)
     {
         this.log( message, MODE_INFO, args );
@@ -700,6 +750,7 @@ public class Server extends Thread implements IntellectualServer
         {
             message = message.replaceFirst( "%s", a.toString() );
         }
+
         logWrapper.log( CoreConfig.logPrefix, provider.getLogIdentifier(), TimeUtil.getTimeStamp(),
                 message, Thread.currentThread().getName() );
         // void log(String prefix, String prefix1, String timeStamp, String message);
@@ -710,9 +761,12 @@ public class Server extends Thread implements IntellectualServer
     @Override
     public synchronized void stopServer()
     {
-        log( Message.SHUTTING_DOWN );
+        Message.SHUTTING_DOWN.log();
         EventManager.getInstance().handle( new ShutdownEvent( this ) );
-        SQLiteManager.sessions.forEach( SQLiteManager::close );
+
+        // Handled by AutoCloseable
+        // SQLiteManager.sessions.forEach( SQLiteManager::close );
+
         try
         {
             socket.close();
@@ -720,9 +774,15 @@ public class Server extends Thread implements IntellectualServer
         {
             e.printStackTrace();
         }
-        if ( pluginLoader != null )
+
+        AutoCloseable.closeAll();
+
+        try
         {
-            pluginLoader.disableAllPlugins();
+            this.logStream.close();
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
         }
         if ( standalone )
         {

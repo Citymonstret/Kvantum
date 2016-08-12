@@ -20,6 +20,7 @@
 package com.plotsquared.iserver.util;
 
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.object.AutoCloseable;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,7 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SQLiteManager
+public class SQLiteManager extends AutoCloseable
 {
 
     public static Set<SQLiteManager> sessions = new HashSet<>();
@@ -41,7 +42,7 @@ public class SQLiteManager
         sessions.add( this );
 
         this.name = name + ".db";
-        this.file = new File( new File( Server.getInstance().coreFolder, "storage" ), this.name );
+        this.file = new File( new File( Server.getInstance().getCoreFolder(), "storage" ), this.name );
         if ( !file.exists() )
         {
             if ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file.createNewFile() )
@@ -76,7 +77,8 @@ public class SQLiteManager
         return null;
     }
 
-    public void close()
+    @Override
+    public void handleClose()
     {
         try
         {

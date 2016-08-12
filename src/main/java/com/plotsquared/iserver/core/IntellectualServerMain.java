@@ -34,7 +34,7 @@ import java.io.File;
 public class IntellectualServerMain
 {
 
-    public static class Options
+    private static class Options
     {
 
         @Parameter( names = "-gui", description = "Launch with a GUI ( W.I.P )" )
@@ -58,7 +58,6 @@ public class IntellectualServerMain
         final Options options = new Options();
         final JCommander jCommander = new JCommander( options, args );
         jCommander.setProgramName( "IntellectualServer" );
-
         if ( options.help )
         {
             final LogWrapper logWrapper = new DefaultLogWrapper();

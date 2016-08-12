@@ -19,15 +19,20 @@
 
 package com.plotsquared.iserver.core;
 
+import com.plotsquared.iserver.config.ConfigurationFile;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.events.Event;
 import com.plotsquared.iserver.events.EventCaller;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.logging.LogProvider;
+import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.syntax.ProviderFactory;
+import com.plotsquared.iserver.util.CacheManager;
 import com.plotsquared.iserver.util.RequestManager;
 import com.plotsquared.iserver.util.SessionManager;
 import com.plotsquared.iserver.views.View;
+
+import java.io.File;
 
 /**
  * Core server interface, contains
@@ -35,7 +40,7 @@ import com.plotsquared.iserver.views.View;
  * for the server to work
  */
 @SuppressWarnings("unused")
-interface IntellectualServer
+public interface IntellectualServer
 {
 
     /**
@@ -94,6 +99,14 @@ interface IntellectualServer
     void log(Message message, Object... args);
 
     void log(String message, int mode, Object... args);
+
+    CacheManager getCacheManager();
+
+    LogWrapper getLogWrapper();
+
+    ConfigurationFile getTranslations();
+
+    File getCoreFolder();
 
     /**
      * Log a message

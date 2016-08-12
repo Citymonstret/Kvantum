@@ -39,7 +39,17 @@ public final class LambdaUtil
         Assert.notNull( array, consumer );
 
         Arrays.stream( array ).forEach( consumer );
+
     }
+
+    @SafeVarargs
+    public static <T> void arrayForeach(final Consumer<T> consumer, final T ... array)
+    {
+        Assert.notNull( array, consumer );
+
+        Arrays.stream( array ).forEach( consumer );
+    }
+
 
     public static <T> void arrayForeach(final T[] array, final Predicate<T> filter, final Consumer<T> consumer)
     {

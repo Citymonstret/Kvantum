@@ -19,6 +19,7 @@
 
 package com.plotsquared.iserver.object.syntax;
 
+import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.util.CacheManager;
@@ -44,9 +45,9 @@ final public class Include extends Syntax
         while ( matcher.find() )
         {
             boolean setCache = false;
-            if ( Server.getInstance().enableCaching )
+            if ( CoreConfig.Cache.enabled )
             {
-                CacheManager manager = Server.getInstance().cacheManager;
+                CacheManager manager = Server.getInstance().getCacheManager();
                 String s = manager.getCachedInclude( matcher.group() );
                 if ( s != null )
                 {
@@ -58,7 +59,7 @@ final public class Include extends Syntax
                 }
             }
 
-            File file = new File( Server.getInstance().coreFolder, matcher.group( 1 ) );
+            File file = new File( Server.getInstance().getCoreFolder(), matcher.group( 1 ) );
             if ( file.exists() )
             {
                 StringBuilder c = new StringBuilder();
@@ -76,7 +77,9 @@ final public class Include extends Syntax
 
                 if ( setCache )
                 {
-                    Server.getInstance().cacheManager.setCachedInclude( matcher.group(), file.getName().endsWith( ".css" ) ? "<style>\n" + c + "<style>" : c.toString() );
+                    Server.getInstance().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
+                            ( ".css" ) ?
+                            "<style>\n" + c + "<style>" : c.toString() );
                 }
 
                 if ( file.getName().endsWith( ".css" ) )

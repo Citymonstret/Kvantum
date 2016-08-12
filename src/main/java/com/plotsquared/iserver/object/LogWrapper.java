@@ -26,4 +26,24 @@ public interface LogWrapper
 
     void log(String s);
 
+    default void log()
+    {
+        log( "" );
+    }
+
+    default void log(final LogEntryFormatter formatter, final String s)
+    {
+        if ( formatter != null )
+        {
+            log( formatter.process( s ) );
+        }
+    }
+
+    interface LogEntryFormatter
+    {
+
+        String process(String in);
+
+    }
+
 }
