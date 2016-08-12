@@ -6,6 +6,9 @@ It is the perfect choice, if you need a an embedded web server to ship with your
 run as both an integrated and standalone application. It supports both programmed views, and configuration of 
 pre-made ones - To use it just like you'd use any other web server. It's almost magic.
 
+##Maven
+We are using JitPack as our maven repo
+
 ##Wiki/Information
 ( **OUTDATED** ) More information can be found in our [wiki](https://github.com/IntellectualSites/IntellectualServer/wiki)
 
@@ -14,6 +17,7 @@ Major:
 - Easy to use API (including Middlewares, Annotation based view declaration, Functional View Declaration, Object 
 oriented View Declaration)
 - Easy configuration of views (see `Views`)
+- Plugin System
 - LOTS MORE (... to be continued ...)
 
 Minor:
