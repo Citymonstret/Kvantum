@@ -8,6 +8,20 @@ pre-made ones - To use it just like you'd use any other web server. It's almost 
 
 ##Maven
 We are using JitPack as our maven repo
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.IntellectualSites</groupId>
+    <artifactId>IntellectualServer</artifactId>
+    <version>1.2.0</version>
+</dependency>
+```
 
 ##Wiki/Information
 ( **OUTDATED** ) More information can be found in our [wiki](https://github.com/IntellectualSites/IntellectualServer/wiki)
