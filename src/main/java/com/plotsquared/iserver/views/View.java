@@ -269,7 +269,7 @@ public class View extends RequestHandler
         {
             request.addMeta( "variables", map );
         }
-        Server.getInstance().log( "Didn't match: " + viewPattern + " | " + ( map == null ) );
+
         return map != null && passes( request );
     }
 

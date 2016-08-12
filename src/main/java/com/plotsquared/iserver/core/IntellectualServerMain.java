@@ -99,7 +99,7 @@ public class IntellectualServerMain
      * @param standalone Should it run as a standalone application, or be integrated
      * @return the started server | null
      */
-    public static Server startServer(boolean standalone, File coreFolder, LogWrapper wrapper)
+    public static IntellectualServer startServer(boolean standalone, File coreFolder, LogWrapper wrapper)
     {
         Server server = null;
         try

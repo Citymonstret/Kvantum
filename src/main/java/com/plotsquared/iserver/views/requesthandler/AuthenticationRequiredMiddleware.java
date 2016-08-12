@@ -9,12 +9,18 @@ public class AuthenticationRequiredMiddleware extends Middleware
     @Override
     public void handle(Request request, MiddlewareQueue queue)
     {
-        if ( Server.getInstance().getAccountManager().getAccount( request.getSession() ) == null )
+        if ( Server.getInstance().getAccountManager() == null )
         {
             request.internalRedirect( "login" );
         } else
         {
-            queue.handle( request );
+            if ( Server.getInstance().getAccountManager().getAccount( request.getSession() ) == null )
+            {
+                request.internalRedirect( "login" );
+            } else
+            {
+                queue.handle( request );
+            }
         }
     }
 

@@ -9,6 +9,18 @@ import com.intellectualsites.configurable.annotations.Configuration;
 public class CoreConfig
 {
 
+    private static boolean preConfigured = false;
+
+    public static boolean isPreConfigured()
+    {
+        return preConfigured;
+    }
+
+    public static void setPreConfigured(boolean preConfigured)
+    {
+        CoreConfig.preConfigured = preConfigured;
+    }
+
     public static int port = 80;
     public static String webAddress = "http://localhost";
     public static String logPrefix = "Web";

@@ -98,14 +98,13 @@ public final class Server extends Thread implements IntellectualServer
     private EventCaller eventCaller;
     private ApplicationStructure mainApplicationStructure;
     private Worker[] workerThreads;
+    private AccountManager globalAccountManager;
 
     // Private Final
     private final LogWrapper logWrapper;
     private final boolean standalone;
     private final int port;
     private final Map<String, Class<? extends View>> viewBindings;
-    private final AccountManager globalAccountManager;
-
     {
         viewBindings = new HashMap<>();
         providers = new ArrayList<>();
@@ -268,7 +267,10 @@ public final class Server extends Thread implements IntellectualServer
             e.printStackTrace();
         }
 
-        ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
+        if ( CoreConfig.isPreConfigured() )
+        {
+            ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
+        }
 
         if ( CoreConfig.debug )
         {
@@ -336,11 +338,14 @@ public final class Server extends Thread implements IntellectualServer
         syntaxes.add( new ForEachBlock() );
         syntaxes.add( new Variable() );
 
-        ApplicationStructure applicationStructure = new ApplicationStructure( "core" );
-        this.globalAccountManager = applicationStructure.getAccountManager();
-        this.globalAccountManager.load();
-        this.inputThread.commands.put( "account", new AccountCommand( applicationStructure ) );
-        this.providers.add( this.globalAccountManager );
+        if ( standalone )
+        {
+            ApplicationStructure applicationStructure = new ApplicationStructure( "core" );
+            this.globalAccountManager = applicationStructure.getAccountManager();
+            this.globalAccountManager.load();
+            this.inputThread.commands.put( "account", new AccountCommand( applicationStructure ) );
+            this.providers.add( this.globalAccountManager );
+        }
 
         if ( !mainApplication.isEmpty() )
         {
@@ -595,7 +600,7 @@ public final class Server extends Thread implements IntellectualServer
         log( Message.OUTPUT_BUFFER_INFO, bufferOut / 1024, bufferIn / 1024 );
 
         // Pre-Steps
-        {
+        if ( standalone ) {
             if ( globalAccountManager.getAccount( new Object[]{ null, "admin", null } ) == null )
             {
                 log( "There is no admin account as of yet. So, well, let's create one! Please enter a password!" );

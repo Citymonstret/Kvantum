@@ -52,6 +52,12 @@ public class SimpleRequestHandler extends RequestHandler
     }
 
     @Override
+    public String toString()
+    {
+        return this.pattern;
+    }
+
+    @Override
     public boolean matches(final Request request)
     {
         if ( CoreConfig.debug )

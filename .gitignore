@@ -5,6 +5,7 @@ src/main/java/org/*
 fresh/
 
 .iserver/
+testOtput/
 
 *.iml
 

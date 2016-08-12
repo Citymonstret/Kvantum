@@ -67,7 +67,7 @@ public class RequestManager
     {
         Assert.notNull( server );
 
-        ( (IConsumer<RequestHandler>) view -> server.log( "> RequestHandler - Class '%s', Regex: '%s'",
+        ( (IConsumer<RequestHandler>) view -> server.log( "> RequestHandler - Class '%s', Pattern: '%s'",
                 view.getClass().getSimpleName(), view.toString() ) ).foreach( views ); // TODO: Fix
     }
 

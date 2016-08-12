@@ -9,6 +9,8 @@ import java.util.*;
 public class ViewPattern
 {
 
+    private static final boolean debug = false;
+
     private final List<Part> parts;
     private final String raw;
 
@@ -70,10 +72,10 @@ public class ViewPattern
                 name += c;
             }
         }
-
-
-        Server.getInstance().log( parts.toString() );
-
+        if ( !name.isEmpty() )
+        {
+            parts.add( new Static( name ) );
+        }
     }
 
     public Map<String, String> matches(final String in)
@@ -123,6 +125,8 @@ public class ViewPattern
 
         Part lastPart = null;
 
+        final List<Part> passed = new ArrayList<>();
+
         for ( final Part part : parts )
         {
 
@@ -136,6 +140,10 @@ public class ViewPattern
                 {
                     if ( !has )
                     {
+                        if ( debug )
+                        {
+                            Server.getInstance().log( "Missing required type: " + part );
+                        }
                         return null;
                     }
                 }
@@ -143,11 +151,20 @@ public class ViewPattern
             {
                 if ( !has )
                 {
+                    if ( debug )
+                    {
+                        Server.getInstance().log( "Missing static type: " + part );
+                    }
                     return null;
                 } else
                 {
                     if ( !next.equalsIgnoreCase( part.toString() ) )
                     {
+                        if ( debug )
+                        {
+                            Server.getInstance().log( "Non-Matching static type: " + part + " | " + next + " | " +
+                                    this.parts + " | " + url + " | " + passed );
+                        }
                         return null;
                     }
                 }
@@ -158,9 +175,16 @@ public class ViewPattern
                 final Variable variable = (Variable) part;
                 variables.put( variable.getName(), next );
             }
+
+            passed.add( part );
         }
         if ( stringIterator.hasNext() )
         {
+            if ( debug )
+            {
+                Server.getInstance().log( "Too Many: " + stringIterator.next() + " | " +
+                        this.parts + " | " + url + " | " + passed + " | " + this.raw );
+            }
             return null;
         }
         return variables;

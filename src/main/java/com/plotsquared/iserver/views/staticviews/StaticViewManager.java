@@ -5,7 +5,7 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.IConsumer;
 import com.plotsquared.iserver.util.ReflectionUtils;
-import com.plotsquared.iserver.views.View;
+import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.decl.ResponseMethod;
 import com.plotsquared.iserver.views.decl.ViewMatcher;
 
@@ -36,7 +36,7 @@ final public class StaticViewManager
                 } else
                 {
                     final ViewMatcher matcher = (ViewMatcher) annotatedMethod.getAnnotation();
-                    final View view;
+                    final RequestHandler view;
                     if ( matcher.cache() )
                     {
                         view = new CachedStaticView( matcher, new ResponseMethod( m, viewDeclaration ) );

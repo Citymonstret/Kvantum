@@ -6,8 +6,9 @@ import com.plotsquared.iserver.util.Assert;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.function.BiConsumer;
 
-final public class ResponseMethod
+final public class ResponseMethod implements BiConsumer<Request, Response>
 {
 
     private final Method method;
@@ -36,4 +37,9 @@ final public class ResponseMethod
         return null;
     }
 
+    @Override
+    public void accept(Request request, Response response)
+    {
+        response.copyFrom( handle( request ) );
+    }
 }
