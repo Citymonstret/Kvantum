@@ -126,4 +126,17 @@ public class Assert
     {
         equals( a, b, new AssertionError( a, "a != b" ) );
     }
+
+    /**
+     * Will only pass if a is equal to b
+     *
+     * @param a Boolean A
+     * @param b Boolean B
+     * @param message Error message
+     * @throws AssertionError If not passing the test
+     */
+    public static void equals(final boolean a, final boolean b, String message)
+    {
+        equals( a, b, new AssertionError( a, message ) );
+    }
 }

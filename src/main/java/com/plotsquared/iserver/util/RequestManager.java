@@ -53,7 +53,7 @@ public class RequestManager
 
     public RequestHandler match(final Request request)
     {
-        Assert.notNull( request );
+        Assert.isValid( request );
 
         final Optional<RequestHandler> view = LambdaUtil.getFirst( views, request.matches );
         if ( view.isPresent() )
@@ -68,7 +68,7 @@ public class RequestManager
         Assert.notNull( server );
 
         ( (IConsumer<RequestHandler>) view -> server.log( "> RequestHandler - Class '%s', Regex: '%s'",
-                view.getClass().getSimpleName(), view.toString() ) ).foreach( views );
+                view.getClass().getSimpleName(), view.toString() ) ).foreach( views ); // TODO: Fix
     }
 
     public void remove(final RequestHandler view)
@@ -84,7 +84,7 @@ public class RequestManager
     public void clear()
     {
         this.views.clear();
-        Server.getInstance().log( "Cleared views." );
+        Server.getInstance().log( "Cleared views." ); // TODO: Fix
     }
 
 }

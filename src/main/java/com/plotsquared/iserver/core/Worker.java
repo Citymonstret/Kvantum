@@ -28,13 +28,15 @@ import com.plotsquared.iserver.object.syntax.Syntax;
 import com.plotsquared.iserver.thread.ThreadManager;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.views.RequestHandler;
+import sun.misc.BASE64Encoder;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 class Worker
 {
@@ -43,15 +45,29 @@ class Worker
     private static int idPool = 0;
 
     private final int id;
+    private final MessageDigest messageDigestMd5;
+    private final BASE64Encoder encoder;
 
     Worker()
     {
         this.id = idPool++;
-    }
-
-    public int getId()
-    {
-        return this.id;
+        if ( CoreConfig.contentMd5 )
+        {
+            MessageDigest temporary = null;
+            try
+            {
+                temporary = MessageDigest.getInstance( "MD5" );
+            } catch ( final NoSuchAlgorithmException e )
+            {
+                Message.MD5_DIGEST_NOT_FOUND.log( e.getMessage() );
+            }
+            messageDigestMd5 = temporary;
+            encoder = new BASE64Encoder();
+        } else
+        {
+            messageDigestMd5 = null;
+            encoder = null;
+        }
     }
 
     synchronized void start()
@@ -177,17 +193,51 @@ class Worker
                 bytes = textContent.getBytes();
             }
 
+            boolean gzip = false;
+            if ( CoreConfig.gzip ) {
+                if ( request.getHeader( "Accept-Encoding" ).contains( "gzip" ) )
+                {
+                    gzip = true;
+                    body.getHeader().set( Header.HEADER_CONTENT_ENCODING, "gzip" );
+                } else
+                {
+                    Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
+                }
+            }
+
+            if ( CoreConfig.contentMd5 )
+            {
+                body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Checksum( bytes ) );
+            }
+
             body.getHeader().apply( output );
 
             try
             {
+                if ( gzip )
+                {
+                    try
+                    {
+                        bytes = compress( bytes );
+                    } catch ( final IOException e )
+                    {
+                        new RuntimeException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
+                    }
+                }
                 output.write( bytes );
+            } catch ( final Exception e )
+            {
+                new RuntimeException( "Failed to write to the client", e )
+                        .printStackTrace();
+            }
+            try
+            {
                 output.flush();
             } catch ( final Exception e )
             {
-                e.printStackTrace();
+                new RuntimeException( "Failed to flush to the client", e )
+                        .printStackTrace();
             }
-
         }
 
         if ( !server.silent && !skip )
@@ -262,5 +312,32 @@ class Worker
         {
             e.printStackTrace();
         }
+    }
+
+    private static byte[] compress(final byte[] data) throws IOException {
+        Assert.notNull( data );
+
+        byte[] compressedData;
+        try ( final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( data.length ) )
+        {
+            try ( final GZIPOutputStream gzipOutputStream = new GZIPOutputStream( byteArrayOutputStream ) )
+            {
+                gzipOutputStream.write( data );
+            }
+            compressedData = byteArrayOutputStream.toByteArray();
+        }
+
+        Assert.equals( compressedData != null && compressedData.length > 0, true );
+
+        return compressedData;
+    }
+
+    private String md5Checksum(final byte[] input)
+    {
+        Assert.notNull( input );
+
+        messageDigestMd5.reset();
+        messageDigestMd5.update( input );
+        return encoder.encode( messageDigestMd5.digest() );
     }
 }

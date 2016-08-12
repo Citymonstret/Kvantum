@@ -303,7 +303,6 @@ public class Server extends Thread implements IntellectualServer
 
         // Setup the provider factories
         this.providers.add( this.sessionManager );
-        this.providers.add( new ServerProvider() );
         this.providers.add( ConfigVariableProvider.getInstance() );
         this.providers.add( new PostProviderFactory() );
         this.providers.add( new MetaProvider() );

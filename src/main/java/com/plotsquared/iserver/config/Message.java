@@ -28,6 +28,8 @@ import static com.plotsquared.iserver.logging.LogModes.*;
  */
 public enum Message
 {
+    MD5_DIGEST_NOT_FOUND ( "Could not load the MD5 MessageDigest Instance %s", MODE_ERROR ),
+    CLIENT_NOT_ACCEPTING_GZIP( "The client does not accept GZIP encoding %s", MODE_DEBUG ),
     SSL_NOT_ENOUGH_WORKERS( "SSL is enabled. It is recommended to use at least 3 worker threads ( Not Required )", MODE_WARNING ),
     COULD_NOT_CREATE_FOLDER( "Couldn't create the %s folder", MODE_WARNING ),
     INVALID_VIEW( "Invalid view ('%s') - - Constructor has to be #(String.class, Map.class)", MODE_WARNING ),

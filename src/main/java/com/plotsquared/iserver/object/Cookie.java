@@ -19,6 +19,8 @@
 
 package com.plotsquared.iserver.object;
 
+import com.plotsquared.iserver.util.Assert;
+
 public final class Cookie
 {
 
@@ -28,6 +30,7 @@ public final class Cookie
 
     public Cookie(String name, String value)
     {
+        Assert.notNull( name, value );
 
         this.name = name;
         this.value = value;

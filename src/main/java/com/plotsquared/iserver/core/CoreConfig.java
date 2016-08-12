@@ -17,6 +17,8 @@ public class CoreConfig
     public static int workers = 1;
     public static boolean disableViews = false;
     public static boolean debug = true;
+    public static boolean gzip = true;
+    public static boolean contentMd5 = true;
 
     @ConfigSection(name = "buffer")
     public static class Buffer

@@ -26,7 +26,7 @@ import com.plotsquared.iserver.util.Assert;
 public class CachedResponse implements ResponseBody
 {
 
-    public final byte[] bytes; //, headerBytes;
+    private final byte[] bytes;
     public final Header header;
 
     public CachedResponse(final ResponseBody parent)
@@ -34,7 +34,6 @@ public class CachedResponse implements ResponseBody
         Assert.notNull( parent );
 
         this.header = parent.getHeader();
-        // this.headerBytes = parent.getHeader().getBytes();
         if ( parent.isText() )
         {
             this.bytes = parent.getContent().getBytes();

@@ -269,6 +269,7 @@ final public class Header
     public Header set(final HeaderOption key, final String value)
     {
         Assert.notNull( key, value );
+
         this.headers.put( key, value );
         return this;
     }
@@ -288,6 +289,7 @@ final public class Header
     public Header apply(final OutputStream out)
     {
         Assert.notNull( out );
+
         try
         {
             out.write( ( this.format + " " + this.status + "\n" ).getBytes() );
@@ -295,8 +297,8 @@ final public class Header
             {
                 out.write( ( entry.getKey() + ": " + entry.getValue() + "\n" ).getBytes() );
             }
-            // Print one empty line to indicate that the header sending is finished, this is important as the content would otherwise
-            // be classed as headers, which really isn't optimal <3
+            // Print one empty line to indicate that the header sending is finished, this is important as the content
+            // would otherwise be classed as headers, which really isn't optimal <3
             out.write( "\n".getBytes() );
         } catch ( final Exception e )
         {
@@ -330,7 +332,7 @@ final public class Header
     {
         Assert.notNull( cookie, value );
 
-        String v;
+        final String v;
         if ( this.headers.containsKey( HEADER_SET_COOKIE ) )
         {
             v = this.headers.get( HEADER_SET_COOKIE ) + "," + cookie + "=" + value;

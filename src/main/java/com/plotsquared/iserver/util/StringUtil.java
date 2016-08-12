@@ -8,6 +8,8 @@ public final class StringUtil
 
     public static <K, V> String join(final Map<K, V> map, final String combiner, final String separator)
     {
+        Assert.notNull( map, combiner, separator );
+
         final StringBuilder builder = new StringBuilder();
         final Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
         while ( iterator.hasNext() )

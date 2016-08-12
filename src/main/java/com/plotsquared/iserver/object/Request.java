@@ -188,6 +188,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return request;
     }
 
+    public Map<String, String> getHeaders()
+    {
+        return headers;
+    }
+
     /**
      * Get all request cookies
      *

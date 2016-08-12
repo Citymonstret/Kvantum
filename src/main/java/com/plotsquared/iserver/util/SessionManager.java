@@ -48,24 +48,33 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
 
     public Session createSession(final Request r, final BufferedOutputStream out)
     {
-        String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
-        String sessionID = UUID.randomUUID().toString();
+        Assert.isValid( r );
+
+        final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
+        final String sessionID = UUID.randomUUID().toString();
+
         r.postponedCookies.put( name, sessionID );
-        server.log( "Set session (%s=%s)", name, sessionID );
-        Session session = new Session();
+        server.log( "Set session (%s=%s)", name, sessionID ); // TODO: Fix
+
+        final Session session = new Session();
         this.sessions.put( sessionID, session );
+
         return session;
     }
 
     public void deleteSession(final Request r, final HeaderProvider re)
     {
-        String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
+        Assert.notNull( r, re );
+
+        final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
         re.getHeader().setCookie( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
-        server.log( "Deleted cookie" );
+        server.log( "Deleted cookie" ); // TODO: Fix
     }
 
     public Session getSession(final Request r, final OutputStream out)
     {
+        Assert.isValid( r );
+
         Session session = null;
 
         final Cookie[] cookies = r.getCookies();
@@ -78,13 +87,13 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
             if ( sessions.containsKey( sessionID ) )
             {
                 session = sessions.get( sessionID );
-                server.log( "Found session (%s=%s)", session, sessionID );
+                server.log( "Found session (%s=%s)", session, sessionID ); // TODO: Fix
             } else
             {
                 if ( out != null )
                 {
                     r.postponedCookies.put( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
-                    server.log( "Deleting invalid session cookie (%s)", cookie.get().getValue() );
+                    server.log( "Deleting invalid session cookie (%s)", cookie.get().getValue() ); // TODO: Fix
                 }
             }
         }

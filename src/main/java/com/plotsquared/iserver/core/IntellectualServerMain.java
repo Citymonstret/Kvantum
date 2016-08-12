@@ -21,25 +21,24 @@ package com.plotsquared.iserver.core;
 
 import com.plotsquared.iserver.gui.GuiMain;
 import com.plotsquared.iserver.object.LogWrapper;
+import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.Bootstrap;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * This is a booster, I.E, it's the strap on a boot.
- */
+@SuppressWarnings( "ALL" )
 @Bootstrap
 public class IntellectualServerMain
 {
 
     private static Map<String, String> getOptions(final String[] args)
     {
-        Map<String, String> out = new HashMap<>();
+        final Map<String, String> out = new HashMap<>();
         for ( final String arg : args )
         {
-            String[] parts = arg.split( "=" );
+            final String[] parts = arg.split( "=" );
             if ( parts.length < 2 )
             {
                 out.put( parts[ 0 ].toLowerCase(), null );
@@ -58,8 +57,8 @@ public class IntellectualServerMain
      */
     public static void main(String[] args)
     {
-        Map<String, String> options = getOptions( args );
-        File file;
+        final Map<String, String> options = getOptions( args );
+        final File file;
         if ( options.containsKey( "gui" ) )
         {
             GuiMain.main( args );
@@ -81,6 +80,9 @@ public class IntellectualServerMain
 
     public static Server createServer(final boolean standalone, final File coreFolder, final LogWrapper wrapper)
     {
+        Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
+                "Cannot use a folder with '!' path as core folder" );
+
         Server server = null;
         try
         {
