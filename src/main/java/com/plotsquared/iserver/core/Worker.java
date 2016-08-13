@@ -77,6 +77,7 @@ class Worker
 
     /**
      * Compress bytes using gzip
+     *
      * @param data Bytes to compress
      * @return GZIP compressed data
      * @throws IOException If compression fails
@@ -132,44 +133,49 @@ class Worker
 
         boolean shouldCache = false;
         boolean cache = false;
-        final ResponseBody body;
+        ResponseBody body;
 
-        if ( CoreConfig.Cache.enabled && requestHandler instanceof CacheApplicable
-                && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
+        try
         {
-            cache = true;
-            if ( !server.cacheManager.hasCache( requestHandler ) )
+            if ( CoreConfig.Cache.enabled && requestHandler instanceof CacheApplicable
+                    && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
             {
-                shouldCache = true;
+                cache = true;
+                if ( !server.cacheManager.hasCache( requestHandler ) )
+                {
+                    shouldCache = true;
+                }
             }
-        }
 
-        if ( !cache || shouldCache )
-        { // Either it's a non-cached view, or there is no cache stored
-            body = requestHandler.handle( request );
-        } else
-        { // Just read from memory
-            body = server.cacheManager.getCache( requestHandler );
-        }
-
-        boolean skip = false;
-        if ( body == null )
-        {
-            final Object redirect = request.getMeta( "internalRedirect" );
-            if ( redirect != null && redirect instanceof Request )
-            {
-                final Request newRequest = (Request) redirect;
-                newRequest.removeMeta( "internalRedirect" );
-                handle( newRequest, server, output );
-                return;
+            if ( !cache || shouldCache )
+            { // Either it's a non-cached view, or there is no cache stored
+                body = requestHandler.handle( request );
             } else
-            {
-                skip = true;
+            { // Just read from memory
+                body = server.cacheManager.getCache( requestHandler );
             }
-        }
 
-        if ( !skip )
-        {
+            boolean skip = false;
+            if ( body == null )
+            {
+                final Object redirect = request.getMeta( "internalRedirect" );
+                if ( redirect != null && redirect instanceof Request )
+                {
+                    final Request newRequest = (Request) redirect;
+                    newRequest.removeMeta( "internalRedirect" );
+                    handle( newRequest, server, output );
+                    return;
+                } else
+                {
+                    skip = true;
+                }
+            }
+
+            if ( skip )
+            {
+                return;
+            }
+
             if ( shouldCache )
             {
                 server.cacheManager.setCache( requestHandler, body );
@@ -198,7 +204,7 @@ class Worker
             }
 
             final Collection<WorkerProcedure.Handler> handlers = workerProcedureInstance.getHandlers().stream()
-                    .filter( handlerFilter ).collect( Collectors.toList());
+                    .filter( handlerFilter ).collect( Collectors.toList() );
 
             if ( body.isText() )
             {
@@ -209,56 +215,60 @@ class Worker
                 bytes = textContent.getBytes();
             }
             //  TODO: Implement byte handlers
+        } catch ( final Exception e )
+        {
+            body = new com.plotsquared.iserver.views.errors.Exception( e ).generate( request );
+            bytes = body.getContent().getBytes();
+        }
 
-            boolean gzip = false;
-            if ( CoreConfig.gzip )
+        boolean gzip = false;
+        if ( CoreConfig.gzip )
+        {
+            if ( request.getHeader( "Accept-Encoding" ).contains( "gzip" ) )
             {
-                if ( request.getHeader( "Accept-Encoding" ).contains( "gzip" ) )
-                {
-                    gzip = true;
-                    body.getHeader().set( Header.HEADER_CONTENT_ENCODING, "gzip" );
-                } else
-                {
-                    Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
-                }
-            }
-
-            if ( CoreConfig.contentMd5 )
+                gzip = true;
+                body.getHeader().set( Header.HEADER_CONTENT_ENCODING, "gzip" );
+            } else
             {
-                body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Checksum( bytes ) );
-            }
-
-            body.getHeader().apply( output );
-
-            try
-            {
-                if ( gzip )
-                {
-                    try
-                    {
-                        bytes = compress( bytes );
-                    } catch ( final IOException e )
-                    {
-                        new RuntimeException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
-                    }
-                }
-                output.write( bytes );
-            } catch ( final Exception e )
-            {
-                new RuntimeException( "Failed to write to the client", e )
-                        .printStackTrace();
-            }
-            try
-            {
-                output.flush();
-            } catch ( final Exception e )
-            {
-                new RuntimeException( "Failed to flush to the client", e )
-                        .printStackTrace();
+                Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
             }
         }
 
-        if ( !server.silent && !skip )
+        if ( CoreConfig.contentMd5 )
+        {
+            body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Checksum( bytes ) );
+        }
+
+        body.getHeader().apply( output );
+
+        try
+        {
+            if ( gzip )
+            {
+                try
+                {
+                    bytes = compress( bytes );
+                } catch ( final IOException e )
+                {
+                    new RuntimeException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
+                }
+            }
+            output.write( bytes );
+        } catch ( final Exception e )
+        {
+            new RuntimeException( "Failed to write to the client", e )
+                    .printStackTrace();
+        }
+        try
+        {
+            output.flush();
+        } catch ( final Exception e )
+        {
+            new RuntimeException( "Failed to flush to the client", e )
+                    .printStackTrace();
+        }
+
+        if ( !server.silent )
         {
             server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
                     requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length

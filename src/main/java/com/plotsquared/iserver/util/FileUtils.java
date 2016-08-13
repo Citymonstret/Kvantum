@@ -19,6 +19,7 @@
 
 package com.plotsquared.iserver.util;
 
+import com.plotsquared.iserver.core.Server;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -184,6 +185,8 @@ public class FileUtils
 
     public static String getDocument(final File file, int buffer, boolean create)
     {
+        Server.getInstance().log( "Trying to find file : " + file );
+
         StringBuilder document = new StringBuilder();
         try
         {
