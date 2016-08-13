@@ -406,18 +406,14 @@ public final class Server extends Thread implements IntellectualServer
     public void handleEvent(final Event event)
     {
         Assert.notNull( event );
-        if ( standalone )
+
+        if ( standalone || eventCaller == null )
         {
             EventManager.getInstance().handle( event );
-        } else
+        }
+        else
         {
-            if ( eventCaller != null )
-            {
-                eventCaller.callEvent( event );
-            } else
-            {
-                log( Message.STANDALONE_NO_EVENT_CALLER );
-            }
+            eventCaller.callEvent( event );
         }
     }
 
