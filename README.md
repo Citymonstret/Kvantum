@@ -4,8 +4,9 @@
 * [Description](#description)
 * [Wiki/Information](#wikiinformation)
 * [Features](#features)
-* [Crush](#crush)
+* [Crush / Templating Engine](#templates)
 * [Views](#views)
+* [Configuration](https://github.com/IntellectualSites/IntellectualServer/wiki/config-server.yml)
 * [**Development**](#development)
 * [Maven](#maven)
 * [Building](#building)
@@ -35,7 +36,7 @@ Minor:
 - GZIP Compression
 - MD5 Checksum
 
-##Crush
+##Templates
 CrushTemplate is a templating engine that is shipped with the core of the server. It allows for things that you just cannot do with normal webservers.
 
 Current Crush Features:
@@ -51,11 +52,6 @@ Current Crush Features:
 Put `CrushEngine/CrushEngine-1.2.0.jar` in your `iserver/plugins` folder in order to enable the engine.
 
 ##Views
-IntellectualServer uses a special view setup, so you can freely design the pattern that you want for your website.
- For example: `user/<user>`, where `<user>` is a required parameter. Or, `user/<username>/posts/[page]`, where 
- `<username>` is a required parameter, and `[page]` is optional
- 
-###Official Views
 IntellectualServer officially supports:
 - CSS
 - LESS
