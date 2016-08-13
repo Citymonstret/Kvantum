@@ -17,21 +17,61 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.filter;
+package com.plotsquared.iserver.crush.syntax.filter;
 
-import com.plotsquared.iserver.object.syntax.Filter;
+import com.plotsquared.iserver.crush.syntax.Filter;
 
-final public class Lowercase extends Filter
+import java.util.Arrays;
+import java.util.Iterator;
+
+final public class Javascript extends Filter
 {
 
-    public Lowercase()
+    public Javascript()
     {
-        super( "lowercase" );
+        super( "javascript" );
     }
 
-    public Object handle(String objectName, Object in)
+    public Object handle(String objectName, Object o)
     {
-        return in.toString().toLowerCase();
+        StringBuilder s = new StringBuilder();
+        s.append( "var " ).append( objectName ).append( " = " );
+        if ( o instanceof Object[] )
+        {
+            Object[] oo = (Object[]) o;
+            s.append( "[\n" );
+            Iterator iterator = Arrays.asList( oo ).iterator();
+            while ( iterator.hasNext() )
+            {
+                Object ooo = iterator.next();
+                handleObject( s, ooo );
+                if ( iterator.hasNext() )
+                {
+                    s.append( ",\n" );
+                }
+            }
+            s.append( "]" );
+        } else
+        {
+            handleObject( s, o );
+        }
+        return s.append( ";" ).toString();
     }
 
+    private void handleObject(StringBuilder s, Object o)
+    {
+        if ( o instanceof Number || o instanceof Boolean )
+        {
+            s.append( o );
+        } else if ( o instanceof Object[] )
+        {
+            for ( Object oo : (Object[]) o )
+            {
+                handleObject( s, oo );
+            }
+        } else
+        {
+            s.append( "\"" ).append( o.toString() ).append( "\"" );
+        }
+    }
 }

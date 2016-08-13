@@ -28,8 +28,11 @@ import com.plotsquared.iserver.util.Bootstrap;
 import com.plotsquared.iserver.util.TimeUtil;
 
 import java.io.File;
+import java.util.Optional;
 
-@SuppressWarnings("ALL")
+/**
+ * The main bootstrap class
+ */
 @Bootstrap
 public class IntellectualServerMain
 {
@@ -37,9 +40,9 @@ public class IntellectualServerMain
     /**
      * Launcher method
      *
-     * @param args arguments
+     * @param args Command line arguments
      */
-    public static void main(String[] args)
+    public static void main(final String[] args)
     {
         final Options options = new Options();
         final JCommander jCommander = new JCommander( options, args );
@@ -58,11 +61,24 @@ public class IntellectualServerMain
                 GuiMain.main( args, file );
             } else
             {
-                startServer( true, file, new DefaultLogWrapper() );
+                start( true, file, new DefaultLogWrapper() );
             }
         }
     }
 
+    /**
+     * Create a server instance (Always a singleton)
+     * @param standalone If the server should run as a singleton application,
+     *                   or if its embedded as a library
+     * @param coreFolder The core folder, in which the ".isites" folder is created
+     * @param wrapper The log wrapper / handler
+     * @return The server instance, if sucessfully created, else null
+     *
+     * @see #create(boolean, File, LogWrapper) For new method
+     *
+     * @deprecated
+     */
+    @Deprecated
     public static Server createServer(final boolean standalone, final File coreFolder, final LogWrapper wrapper)
     {
         Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
@@ -80,11 +96,41 @@ public class IntellectualServerMain
     }
 
     /**
+     * Create a server instance (Always a singleton)
+     * @param standalone If the server should run as a singleton application,
+     *                   or if its embedded as a library
+     * @param coreFolder The core folder, in which the ".isites" folder is created
+     * @param wrapper The log wrapper / handler
+     * @return Optional of nullable server
+     */
+    public static Optional<Server> create(final boolean standalone, final File coreFolder, final LogWrapper wrapper)
+    {
+        Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
+                "Cannot use a folder with '!' path as core folder" );
+
+        Server server = null;
+        try
+        {
+            server = new Server( standalone, coreFolder, wrapper );
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        return Optional.ofNullable( server );
+    }
+
+
+    /**
      * Start a server, and get the instance
      *
      * @param standalone Should it run as a standalone application, or be integrated
      * @return the started server | null
+     *
+     * @see #start(boolean, File, LogWrapper)
+     *
+     * @deprecated
      */
+    @Deprecated
     public static IntellectualServer startServer(boolean standalone, File coreFolder, LogWrapper wrapper)
     {
         Server server = null;
@@ -99,6 +145,33 @@ public class IntellectualServerMain
         return server;
     }
 
+    /**
+     * Create & Start the server
+     * @param standalone If the server should run as a singleton application,
+     *                   or if its embedded as a library
+     * @param coreFolder The core folder, in which the ".isites" folder is created
+     * @param wrapper The log wrapper / handler
+     * @return Optional of nullable server
+     */
+    public static Optional<? extends IntellectualServer> start(boolean standalone, File coreFolder, LogWrapper wrapper)
+    {
+        Optional<? extends IntellectualServer> server = create( standalone, coreFolder, wrapper );
+        try
+        {
+            if ( server.isPresent() )
+            {
+                server.get().start();
+            }
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        return server;
+    }
+
+    /**
+     * Command line arguments
+     */
     private static class Options
     {
 

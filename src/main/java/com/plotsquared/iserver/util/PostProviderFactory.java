@@ -21,8 +21,8 @@ package com.plotsquared.iserver.util;
 
 import com.plotsquared.iserver.object.PostRequest;
 import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
-import com.plotsquared.iserver.object.syntax.VariableProvider;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
+import com.plotsquared.iserver.crush.syntax.VariableProvider;
 
 /**
  * Created 2015-04-25 for IntellectualServer

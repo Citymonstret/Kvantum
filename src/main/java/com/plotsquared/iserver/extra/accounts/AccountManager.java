@@ -22,7 +22,7 @@ package com.plotsquared.iserver.extra.accounts;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Session;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.SQLiteManager;
 

@@ -17,9 +17,23 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax;
 
-public interface IgnoreSyntax
+public abstract class Filter
 {
 
+    private final String key;
+
+    public Filter(final String key)
+    {
+        this.key = key.toUpperCase();
+    }
+
+    public abstract Object handle(final String objectName, final Object in);
+
+    @Override
+    public final String toString()
+    {
+        return this.key;
+    }
 }

@@ -17,20 +17,26 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax;
 
+import com.plotsquared.iserver.core.CoreConfig;
+import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.util.CacheManager;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final public class Comment extends Syntax
+final public class Include extends Syntax
 {
 
-    public Comment()
+    public Include()
     {
-        super( Pattern.compile( "(/\\*[\\S\\s]*?\\*/)" ) );
+        super( Pattern.compile( "\\{\\{include:([/A-Za-z\\.\\-]*)\\}\\}" ) );
     }
 
     @Override
@@ -38,7 +44,55 @@ final public class Comment extends Syntax
     {
         while ( matcher.find() )
         {
-            in = in.replace( matcher.group( 1 ), "" );
+            boolean setCache = false;
+            if ( CoreConfig.Cache.enabled )
+            {
+                CacheManager manager = Server.getInstance().getCacheManager();
+                String s = manager.getCachedInclude( matcher.group() );
+                if ( s != null )
+                {
+                    in = in.replace( matcher.group(), s );
+                    continue;
+                } else
+                {
+                    setCache = true;
+                }
+            }
+
+            File file = new File( Server.getInstance().getCoreFolder(), matcher.group( 1 ) );
+            if ( file.exists() )
+            {
+                StringBuilder c = new StringBuilder();
+                String line;
+                try
+                {
+                    BufferedReader reader = new BufferedReader( new FileReader( file ) );
+                    while ( ( line = reader.readLine() ) != null )
+                        c.append( line ).append( "\n" );
+                    reader.close();
+                } catch ( final Exception e )
+                {
+                    e.printStackTrace();
+                }
+
+                if ( setCache )
+                {
+                    Server.getInstance().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
+                            ( ".css" ) ?
+                            "<style>\n" + c + "<style>" : c.toString() );
+                }
+
+                if ( file.getName().endsWith( ".css" ) )
+                {
+                    in = in.replace( matcher.group(), "<style>\n" + c + "</style>" );
+                } else
+                {
+                    in = in.replace( matcher.group(), c.toString() );
+                }
+            } else
+            {
+                Server.getInstance().log( "Couldn't find file for '%s'", matcher.group() );
+            }
         }
         return in;
     }

@@ -20,7 +20,6 @@
 package com.plotsquared.iserver.core;
 
 import com.intellectualsites.configurable.ConfigurationFactory;
-import com.plotsquared.iserver.config.ConfigVariableProvider;
 import com.plotsquared.iserver.config.ConfigurationFile;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.config.YamlConfiguration;
@@ -39,7 +38,6 @@ import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.error.IntellectualServerInitializationException;
 import com.plotsquared.iserver.object.error.IntellectualServerStartException;
-import com.plotsquared.iserver.object.syntax.*;
 import com.plotsquared.iserver.plugin.PluginLoader;
 import com.plotsquared.iserver.plugin.PluginManager;
 import com.plotsquared.iserver.util.*;
@@ -68,16 +66,15 @@ public final class Server extends Thread implements IntellectualServer
     private static Server instance;
     // Package-Protected Final
     final Queue<Socket> queue = new LinkedList<>();
-    final Collection<ProviderFactory> providers;
     // Private Final
     private final LogWrapper logWrapper;
     private final boolean standalone;
     private final Map<String, Class<? extends View>> viewBindings;
+    private final WorkerProcedure workerProcedure = new WorkerProcedure();
     // Public
     public ConfigurationFile translations;
     volatile CacheManager cacheManager;
     boolean silent = false;
-    Set<Syntax> syntaxes;
     RequestManager requestManager;
     SessionManager sessionManager;
     // Private
@@ -98,7 +95,6 @@ public final class Server extends Thread implements IntellectualServer
 
     {
         viewBindings = new HashMap<>();
-        providers = new ArrayList<>();
     }
 
     /**
@@ -194,7 +190,7 @@ public final class Server extends Thread implements IntellectualServer
             } );
             // Handles incoming commands
             // TODO: Replace the command system
-            ( inputThread = new InputThread( this ) ).start();
+            ( inputThread = new InputThread() ).start();
         }
 
         try
@@ -295,31 +291,12 @@ public final class Server extends Thread implements IntellectualServer
             }
         }
 
-        if ( CoreConfig.enableSyntax )
-        {
-            // Setup the provider factories
-            this.providers.add( this.sessionManager );
-            this.providers.add( ConfigVariableProvider.getInstance() );
-            this.providers.add( new PostProviderFactory() );
-            this.providers.add( new MetaProvider() );
-
-            // Setup the crush syntax-particles
-            this.syntaxes = new LinkedHashSet<>();
-            syntaxes.add( new Include() );
-            syntaxes.add( new Comment() );
-            syntaxes.add( new MetaBlock() );
-            syntaxes.add( new IfStatement() );
-            syntaxes.add( new ForEachBlock() );
-            syntaxes.add( new Variable() );
-        }
-
         if ( standalone )
         {
             ApplicationStructure applicationStructure = new ApplicationStructure( "core" );
             this.globalAccountManager = applicationStructure.getAccountManager();
             this.globalAccountManager.load();
             this.inputThread.commands.put( "account", new AccountCommand( applicationStructure ) );
-            this.providers.add( this.globalAccountManager );
         }
 
         if ( !CoreConfig.Application.main.isEmpty() )
@@ -389,9 +366,9 @@ public final class Server extends Thread implements IntellectualServer
     }
 
     @Override
-    public AccountManager getAccountManager()
+    public Optional<AccountManager> getAccountManager()
     {
-        return this.globalAccountManager;
+        return Optional.ofNullable( this.globalAccountManager );
     }
 
     @Override
@@ -437,13 +414,6 @@ public final class Server extends Thread implements IntellectualServer
     {
         Assert.notNull( caller );
         this.eventCaller = caller;
-    }
-
-    @Override
-    public void addProviderFactory(final ProviderFactory factory)
-    {
-        Assert.notNull( factory );
-        this.providers.add( factory );
     }
 
     @Override
@@ -663,6 +633,12 @@ public final class Server extends Thread implements IntellectualServer
             }
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public WorkerProcedure getProcedure()
+    {
+        return this.workerProcedure;
     }
 
     @Override

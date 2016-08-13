@@ -22,7 +22,7 @@ package com.plotsquared.iserver.views;
 import com.plotsquared.iserver.config.YamlConfiguration;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
-import com.plotsquared.iserver.object.syntax.IgnoreSyntax;
+import com.plotsquared.iserver.crush.syntax.IgnoreSyntax;
 
 import java.io.File;
 import java.util.Map;

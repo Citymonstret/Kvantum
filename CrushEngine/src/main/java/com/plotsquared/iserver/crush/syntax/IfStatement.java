@@ -17,23 +17,61 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax;
 
-public abstract class Filter
+import com.plotsquared.iserver.object.Request;
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+final public class IfStatement extends Syntax
 {
 
-    private final String key;
-
-    public Filter(final String key)
+    public IfStatement()
     {
-        this.key = key.toUpperCase();
+        super( Pattern.compile( "\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}" ) );
     }
 
-    public abstract Object handle(final String objectName, final Object in);
-
     @Override
-    public final String toString()
+    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
     {
-        return this.key;
+        while ( matcher.find() )
+        {
+            String neg = matcher.group( 2 ), namespace = matcher.group( 3 ), variable = matcher.group( 4 );
+            if ( factories.containsKey( namespace.toLowerCase() ) )
+            {
+                VariableProvider p = factories.get( namespace.toLowerCase() ).get( r );
+                if ( p != null )
+                {
+                    if ( p.contains( variable ) )
+                    {
+                        Object o = p.get( variable );
+                        boolean b;
+                        if ( o instanceof Boolean )
+                        {
+                            b = (Boolean) o;
+                        } else if ( o instanceof String )
+                        {
+                            b = o.toString().toLowerCase().equals( "true" );
+                        } else
+                            b = o instanceof Number && ( (Number) o ).intValue() == 1;
+                        if ( neg.contains( "!" ) )
+                        {
+                            b = !b;
+                        }
+
+                        if ( b )
+                        {
+                            in = in.replace( matcher.group(), matcher.group( 5 ) );
+                        } else
+                        {
+                            in = in.replace( matcher.group(), "" );
+                        }
+                    }
+                }
+            }
+        }
+        return in;
     }
 }

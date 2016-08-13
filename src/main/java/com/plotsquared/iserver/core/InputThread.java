@@ -34,18 +34,17 @@ import java.util.Map;
  * @author Citymonstret
  */
 @SuppressWarnings("all")
-public class InputThread extends Thread
+public final class InputThread extends Thread
 {
 
     public final Map<String, Command> commands;
     private final Server server;
     public String currentString = "";
 
-    InputThread(Server server)
+    InputThread()
     {
-        this.server = server;
+        this.server = (Server) Server.getInstance();
         this.commands = new HashMap<>();
-
         this.commands.put( "stop", new Stop() );
         this.commands.put( "cachedump", new CacheDump() );
         this.commands.put( "show", new Show() );
@@ -55,9 +54,8 @@ public class InputThread extends Thread
     @Override
     public void run()
     {
-        try
+        try ( BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) ) )
         {
-            BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
             String line;
             for ( ; ; )
             {
@@ -69,8 +67,8 @@ public class InputThread extends Thread
                 if ( line.startsWith( "/" ) )
                 {
                     line = line.replace( "/", "" ).toLowerCase();
-                    String[] strings = line.split( " " );
-                    String[] args;
+                    final String[] strings = line.split( " " );
+                    final String[] args;
                     if ( strings.length > 1 )
                     {
                         args = new String[ strings.length - 1 ];
@@ -79,7 +77,7 @@ public class InputThread extends Thread
                     {
                         args = new String[ 0 ];
                     }
-                    String command = strings[ 0 ];
+                    final String command = strings[ 0 ];
                     if ( commands.containsKey( command ) )
                     {
                         commands.get( command ).handle( args );

@@ -1,7 +1,10 @@
 package com.plotsquared.iserver.views.requesthandler;
 
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.object.Request;
+
+import java.util.Optional;
 
 public class AuthenticationRequiredMiddleware extends Middleware
 {
@@ -9,18 +12,13 @@ public class AuthenticationRequiredMiddleware extends Middleware
     @Override
     public void handle(Request request, MiddlewareQueue queue)
     {
-        if ( Server.getInstance().getAccountManager() == null )
+        final Optional<AccountManager> accountManager = Server.getInstance().getAccountManager();
+        if ( accountManager.isPresent() && accountManager.get().getAccount( request.getSession() ) != null )
         {
-            request.internalRedirect( "login" );
+            queue.handle( request );
         } else
         {
-            if ( Server.getInstance().getAccountManager().getAccount( request.getSession() ) == null )
-            {
-                request.internalRedirect( "login" );
-            } else
-            {
-                queue.handle( request );
-            }
+            request.internalRedirect( "login" );
         }
     }
 

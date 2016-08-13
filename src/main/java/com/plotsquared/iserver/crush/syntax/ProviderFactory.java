@@ -17,61 +17,20 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax;
 
 import com.plotsquared.iserver.object.Request;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-final public class IfStatement extends Syntax
+/**
+ * Created 2015-04-20 for IntellectualServer
+ *
+ * @author Citymonstret
+ */
+public interface ProviderFactory<T extends VariableProvider>
 {
 
-    public IfStatement()
-    {
-        super( Pattern.compile( "\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}" ) );
-    }
+    T get(final Request r);
 
-    @Override
-    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
-    {
-        while ( matcher.find() )
-        {
-            String neg = matcher.group( 2 ), namespace = matcher.group( 3 ), variable = matcher.group( 4 );
-            if ( factories.containsKey( namespace.toLowerCase() ) )
-            {
-                VariableProvider p = factories.get( namespace.toLowerCase() ).get( r );
-                if ( p != null )
-                {
-                    if ( p.contains( variable ) )
-                    {
-                        Object o = p.get( variable );
-                        boolean b;
-                        if ( o instanceof Boolean )
-                        {
-                            b = (Boolean) o;
-                        } else if ( o instanceof String )
-                        {
-                            b = o.toString().toLowerCase().equals( "true" );
-                        } else
-                            b = o instanceof Number && ( (Number) o ).intValue() == 1;
-                        if ( neg.contains( "!" ) )
-                        {
-                            b = !b;
-                        }
+    String providerName();
 
-                        if ( b )
-                        {
-                            in = in.replace( matcher.group(), matcher.group( 5 ) );
-                        } else
-                        {
-                            in = in.replace( matcher.group(), "" );
-                        }
-                    }
-                }
-            }
-        }
-        return in;
-    }
 }

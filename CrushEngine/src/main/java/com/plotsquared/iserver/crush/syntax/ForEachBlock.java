@@ -17,82 +17,82 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax;
 
+import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.filter.Javascript;
-import com.plotsquared.iserver.object.filter.List;
-import com.plotsquared.iserver.object.filter.Lowercase;
-import com.plotsquared.iserver.object.filter.Uppercase;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final public class Variable extends Syntax
+final public class ForEachBlock extends Syntax
 {
 
-    private final Map<String, Filter> filters;
-
-    public Variable()
+    public ForEachBlock()
     {
-        super( Pattern.compile( "\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}" ) );
-        filters = new HashMap<>();
-        Set<Filter> preFilters = new LinkedHashSet<>();
-        preFilters.add( new Uppercase() );
-        preFilters.add( new Lowercase() );
-        preFilters.add( new List() );
-        preFilters.add( new Javascript() );
-        for ( final Filter filter : preFilters )
-        {
-            filters.put( filter.toString(), filter );
-        }
+        super( Pattern.compile( "\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([A-Za-z0-9<>\"'-_\\/\\\\ }{}\\n\\s]*)\\{\\/foreach\\}" ) );
     }
 
-    @Override
     public String process(String content, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
     {
         while ( matcher.find() )
         {
             String provider = matcher.group( 1 );
             String variable = matcher.group( 2 );
+            String variableName = matcher.group( 3 );
+            String forContent = matcher.group( 4 );
 
-            String filter = "";
-            if ( matcher.group().contains( " || " ) )
+            try
             {
-                filter = matcher.group().split( " \\|\\| " )[ 1 ].replace( "}}", "" );
-            }
-            if ( factories.containsKey( provider.toLowerCase() ) )
-            {
-                try
+                if ( factories.containsKey( provider.toLowerCase() ) )
                 {
                     VariableProvider p = factories.get( provider.toLowerCase() ).get( r );
                     if ( p != null )
                     {
-                        if ( p.contains( variable ) )
+                        if ( !p.contains( variable ) )
+                        {
+                            content = content.replace( matcher.group(), "" );
+                        } else
                         {
                             Object o = p.get( variable );
-                            if ( !filter.equals( "" ) )
+
+                            StringBuilder totalContent = new StringBuilder();
+                            if ( o instanceof Object[] )
                             {
-                                o = filters.get( filter.toUpperCase() ).handle( variable, o );
+                                for ( Object oo : (Object[]) o )
+                                {
+                                    if ( oo == null )
+                                    {
+                                        continue;
+                                    }
+                                    totalContent.append( forContent.replace( "{{" + variableName + "}}", oo.toString() ) );
+                                }
+                            } else if ( o instanceof Collection )
+                            {
+                                for ( Object oo : (Collection) o )
+                                {
+                                    if ( oo == null )
+                                    {
+                                        continue;
+                                    }
+                                    totalContent.append( forContent.replace( "{{" + variableName + "}}", oo.toString() ) );
+                                }
                             }
-                            content = content.replace( matcher.group(), o.toString() );
+                            content = content.replace( matcher.group(), totalContent.toString() );
                         }
                     } else
                     {
                         content = content.replace( matcher.group(), "" );
                     }
-                } catch ( final Throwable e )
+                } else
                 {
-                    e.printStackTrace();
                     content = content.replace( matcher.group(), "" );
                 }
-            } else
+            } catch ( final Exception e )
             {
-                content = content.replace( matcher.group(), "" );
+                Server.getInstance().log( "Failed to finish the foor loop (" + provider + "." + variable + " -> " + variableName + ") -> " + e.getMessage() );
             }
         }
         return content;

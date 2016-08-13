@@ -3,7 +3,7 @@ package com.plotsquared.iserver.views;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.views.requesthandler.MiddlewareQueue;
 import com.plotsquared.iserver.views.requesthandler.MiddlewareQueuePopulator;

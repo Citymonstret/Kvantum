@@ -17,33 +17,39 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax.filter;
 
-import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.crush.syntax.Filter;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Collection;
 
-final public class MetaBlock extends Syntax
+final public class List extends Filter
 {
 
-    private final MetaBlockStatement statement;
-
-    public MetaBlock()
+    public List()
     {
-        super( Pattern.compile( "\\{\\{:([\\S\\s]*?):\\}\\}" ) );
-        this.statement = new MetaBlockStatement();
+        super( "list" );
     }
 
-    @Override
-    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    public Object handle(String objectName, Object o)
     {
-        while ( matcher.find() )
+        StringBuilder s = new StringBuilder();
+        s.append( "<ul id='list-" ).append( objectName ).append( "'>" );
+        if ( o instanceof Object[] )
         {
-            statement.handle( in, r, factories );
-            in = in.replace( matcher.group(), "" );
+            for ( Object oo : (Object[]) o )
+            {
+                s.append( "<li>" ).append( oo ).append( "</li>" );
+            }
+        } else if ( o instanceof Collection )
+        {
+            for ( Object oo : (Collection) o )
+            {
+                s.append( "<li>" ).append( oo ).append( "</li>" );
+            }
         }
-        return in;
+        s.append( "</ul>" );
+        return s.toString();
     }
+
 }

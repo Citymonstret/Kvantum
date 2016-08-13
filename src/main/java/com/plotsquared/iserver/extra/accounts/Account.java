@@ -19,7 +19,7 @@
 
 package com.plotsquared.iserver.extra.accounts;
 
-import com.plotsquared.iserver.object.syntax.VariableProvider;
+import com.plotsquared.iserver.crush.syntax.VariableProvider;
 
 import java.util.Arrays;
 import java.util.UUID;

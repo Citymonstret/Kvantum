@@ -20,8 +20,8 @@
 package com.plotsquared.iserver.config;
 
 import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
-import com.plotsquared.iserver.object.syntax.VariableProvider;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
+import com.plotsquared.iserver.crush.syntax.VariableProvider;
 
 import java.util.HashMap;
 import java.util.Map;

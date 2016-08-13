@@ -22,9 +22,6 @@ package com.plotsquared.iserver.core;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.object.syntax.IgnoreSyntax;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
-import com.plotsquared.iserver.object.syntax.Syntax;
 import com.plotsquared.iserver.thread.ThreadManager;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.views.RequestHandler;
@@ -34,10 +31,16 @@ import java.io.*;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * This is the worker that is responsible for nearly everything.
+ * Feel no pressure, buddy.
+ */
 class Worker
 {
 
@@ -47,6 +50,7 @@ class Worker
     private final int id;
     private final MessageDigest messageDigestMd5;
     private final BASE64Encoder encoder;
+    private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
 
     Worker()
     {
@@ -68,8 +72,15 @@ class Worker
             messageDigestMd5 = null;
             encoder = null;
         }
+        this.workerProcedureInstance = Server.getInstance().getProcedure().getInstance();
     }
 
+    /**
+     * Compress bytes using gzip
+     * @param data Bytes to compress
+     * @return GZIP compressed data
+     * @throws IOException If compression fails
+     */
     private static byte[] compress(final byte[] data) throws IOException
     {
         Assert.notNull( data );
@@ -177,43 +188,27 @@ class Worker
                 body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
             }
 
+            final Predicate<WorkerProcedure.Handler> handlerFilter;
             if ( body.isText() )
             {
-                if ( CoreConfig.enableSyntax )
+                handlerFilter = handler -> handler.getType() == String.class;
+            } else
+            {
+                handlerFilter = handler -> handler.getType() == Byte[].class;
+            }
+
+            final Collection<WorkerProcedure.Handler> handlers = workerProcedureInstance.getHandlers().stream()
+                    .filter( handlerFilter ).collect( Collectors.toList());
+
+            if ( body.isText() )
+            {
+                for ( final WorkerProcedure.Handler<String> handler : handlers )
                 {
-                    // Make sure to not use Crush when
-                    // told not to
-                    if ( !( requestHandler instanceof IgnoreSyntax ) )
-                    {
-                        // Provider factories are fun, and so is the
-                        // global map. But we also need the view
-                        // specific ones!
-                        final Map<String, ProviderFactory> factories = new HashMap<>();
-                        for ( final ProviderFactory factory : server.providers )
-                        {
-                            factories.put( factory.providerName().toLowerCase(), factory );
-                        }
-                        // Now make use of the view specific ProviderFactory
-                        final ProviderFactory z = requestHandler.getFactory( request );
-                        if ( z != null )
-                        {
-                            factories.put( z.providerName().toLowerCase(), z );
-                        }
-                        factories.put( "request", request );
-                        // This is how the crush engine works.
-                        // Quite simple, yet powerful!
-                        for ( final Syntax syntax : server.syntaxes )
-                        {
-                            if ( syntax.matches( textContent ) )
-                            {
-                                textContent = syntax.handle( textContent, request, factories );
-                            }
-                        }
-                    }
+                    textContent = handler.act( requestHandler, request, textContent );
                 }
-                // Now, finally, let's get the bytes.
                 bytes = textContent.getBytes();
             }
+            //  TODO: Implement byte handlers
 
             boolean gzip = false;
             if ( CoreConfig.gzip )

@@ -23,8 +23,8 @@ import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
-import com.plotsquared.iserver.object.syntax.VariableProvider;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
+import com.plotsquared.iserver.crush.syntax.VariableProvider;
 import com.plotsquared.iserver.util.FileUtils;
 
 import java.io.File;

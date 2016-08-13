@@ -1,0 +1,4 @@
+name: CrushEngine
+main: com.plotsquared.iserver.crush.CrushEngine
+author: Citymonstret
+version: 0.0.1

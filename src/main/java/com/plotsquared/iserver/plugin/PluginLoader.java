@@ -354,7 +354,7 @@ public class PluginLoader extends AutoCloseable
     {
         JarFile jar;
         jar = new JarFile( file );
-        final JarEntry desc = jar.getJarEntry( "desc.json" );
+        final JarEntry desc = jar.getJarEntry( "desc.yml" );
         if ( desc == null )
             throw new RuntimeException( "Couldn't find desc for " + file );
         InputStream stream;

@@ -19,7 +19,7 @@
 
 package com.plotsquared.iserver.object;
 
-import com.plotsquared.iserver.object.syntax.VariableProvider;
+import com.plotsquared.iserver.crush.syntax.VariableProvider;
 import com.plotsquared.iserver.util.Assert;
 
 import java.util.HashMap;

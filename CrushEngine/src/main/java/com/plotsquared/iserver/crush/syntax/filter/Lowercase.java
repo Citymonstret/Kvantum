@@ -17,39 +17,21 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.filter;
+package com.plotsquared.iserver.crush.syntax.filter;
 
-import com.plotsquared.iserver.object.syntax.Filter;
+import com.plotsquared.iserver.crush.syntax.Filter;
 
-import java.util.Collection;
-
-final public class List extends Filter
+final public class Lowercase extends Filter
 {
 
-    public List()
+    public Lowercase()
     {
-        super( "list" );
+        super( "lowercase" );
     }
 
-    public Object handle(String objectName, Object o)
+    public Object handle(String objectName, Object in)
     {
-        StringBuilder s = new StringBuilder();
-        s.append( "<ul id='list-" ).append( objectName ).append( "'>" );
-        if ( o instanceof Object[] )
-        {
-            for ( Object oo : (Object[]) o )
-            {
-                s.append( "<li>" ).append( oo ).append( "</li>" );
-            }
-        } else if ( o instanceof Collection )
-        {
-            for ( Object oo : (Collection) o )
-            {
-                s.append( "<li>" ).append( oo ).append( "</li>" );
-            }
-        }
-        s.append( "</ul>" );
-        return s.toString();
+        return in.toString().toLowerCase();
     }
 
 }

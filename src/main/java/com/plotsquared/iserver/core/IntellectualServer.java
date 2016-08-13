@@ -26,13 +26,13 @@ import com.plotsquared.iserver.events.EventCaller;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.LogWrapper;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
 import com.plotsquared.iserver.util.CacheManager;
 import com.plotsquared.iserver.util.RequestManager;
 import com.plotsquared.iserver.util.SessionManager;
 import com.plotsquared.iserver.views.View;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * Core server interface, contains
@@ -43,11 +43,6 @@ import java.io.File;
 public interface IntellectualServer
 {
 
-    /**
-     * Check if mysql is enabled
-     *
-     * @return true|false
-     */
     boolean isMysqlEnabled();
 
     /**
@@ -59,7 +54,7 @@ public interface IntellectualServer
      */
     void addViewBinding(String key, Class<? extends View> c);
 
-    AccountManager getAccountManager();
+    Optional<AccountManager> getAccountManager();
 
     /**
      * Validate the views, and make sure they
@@ -82,13 +77,8 @@ public interface IntellectualServer
     void setEventCaller(EventCaller caller);
 
     /**
-     * Add a provider factory to the core provider
-     *
-     * @param factory Factory to add
+     * Load all plugins
      */
-    void addProviderFactory(final ProviderFactory factory);
-
-
     void loadPlugins();
 
     @SuppressWarnings("ALL")
@@ -96,8 +86,21 @@ public interface IntellectualServer
 
     void tick();
 
+    WorkerProcedure getProcedure();
+
+    /**
+     * Send a message (Replaces %s with arg#toString)
+     * @param message Message
+     * @param args Arguments
+     */
     void log(Message message, Object... args);
 
+    /**
+     * Send a message (Replaces %s with arg#toString)
+     * @param message Message
+     * @param mode Log Mode {@link com.plotsquared.iserver.logging.LogModes}
+     * @param args Arguments
+     */
     void log(String message, int mode, Object... args);
 
     CacheManager getCacheManager();
@@ -109,13 +112,18 @@ public interface IntellectualServer
     File getCoreFolder();
 
     /**
-     * Log a message
-     *
-     * @param message String message to log
-     * @param args    Arguments to be sent (replaces %s with arg#toString)
+     * Send a message (Replaces %s with arg#toString)
+     * @param message Message
+     * @param args Arguments
      */
     void log(String message, Object... args);
 
+    /**
+     * Send a message (Replaces %s with arg#toString)
+     * @param provider Log Provider
+     * @param message Message
+     * @param args Arguments
+     */
     void log(LogProvider provider, String message, Object... args);
 
     /**

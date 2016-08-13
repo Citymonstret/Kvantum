@@ -17,20 +17,22 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                                           /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package com.plotsquared.iserver.object.syntax;
+package com.plotsquared.iserver.crush.syntax.filter;
 
-import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.crush.syntax.Filter;
 
-/**
- * Created 2015-04-20 for IntellectualServer
- *
- * @author Citymonstret
- */
-public interface ProviderFactory<T extends VariableProvider>
+final public class Uppercase extends Filter
 {
 
-    T get(final Request r);
+    public Uppercase()
+    {
+        super( "uppercase" );
+    }
 
-    String providerName();
+    @Override
+    public Object handle(String objectName, Object in)
+    {
+        return in.toString().toUpperCase();
+    }
 
 }

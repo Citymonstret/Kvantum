@@ -21,10 +21,18 @@ package com.plotsquared.iserver.object.cache;
 
 import com.plotsquared.iserver.object.Request;
 
+/**
+ * Marks something that is able to save an instance for re-use
+ */
 @FunctionalInterface
 public interface CacheApplicable
 {
 
+    /**
+     * Test if the current instance allows caching
+     * @param r Incoming request
+     * @return True if cache can be saved, otherwise false
+     */
     boolean isApplicable(Request r);
 
 }

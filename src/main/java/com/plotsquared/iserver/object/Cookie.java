@@ -21,14 +21,16 @@ package com.plotsquared.iserver.object;
 
 import com.plotsquared.iserver.util.Assert;
 
+/**
+ * A very simple representation of a cookie
+ */
 public final class Cookie
 {
 
     private final String name;
-
     private final String value;
 
-    public Cookie(String name, String value)
+    public Cookie(final String name, final String value)
     {
         Assert.notNull( name, value );
 
@@ -46,6 +48,10 @@ public final class Cookie
         return value;
     }
 
+    /**
+     * Get the full cookie, as per the HTTP protocol format
+     * @return name=value
+     */
     public String toString()
     {
         return name + "=" + value;

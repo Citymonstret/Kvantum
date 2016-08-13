@@ -21,8 +21,8 @@ package com.plotsquared.iserver.util;
 
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.*;
-import com.plotsquared.iserver.object.syntax.ProviderFactory;
-import com.plotsquared.iserver.object.syntax.VariableProvider;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
+import com.plotsquared.iserver.crush.syntax.VariableProvider;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
