@@ -20,7 +20,7 @@
 package com.plotsquared.iserver.logging;
 
 /**
- * These are the logging modes
+ * Determines the level of the message that is to be sent
  */
 public class LogModes
 {

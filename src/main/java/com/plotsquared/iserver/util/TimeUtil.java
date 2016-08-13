@@ -22,12 +22,6 @@ package com.plotsquared.iserver.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-/**
- * A time utility class
- *
- * @author Citymonstret
- */
 public class TimeUtil
 {
 

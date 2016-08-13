@@ -20,6 +20,7 @@ public class CoreConfig
     public static boolean gzip = true;
     public static boolean enableSyntax = true;
     public static boolean contentMd5 = true;
+    public static boolean enableSecurityManager = true;
     private static boolean preConfigured = false;
 
     public static boolean isPreConfigured()

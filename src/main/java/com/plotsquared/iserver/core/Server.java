@@ -248,6 +248,18 @@ public final class Server extends Thread implements IntellectualServer
             ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
         }
 
+
+        if ( CoreConfig.enableSecurityManager )
+        {
+            try
+            {
+                System.setOut( ServerSecurityManager.SecurePrintStream.construct( System.out ) );
+            } catch ( Exception e )
+            {
+                e.printStackTrace();
+            }
+        }
+
         if ( CoreConfig.debug )
         {
             log( Message.DEBUG );

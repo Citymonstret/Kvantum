@@ -175,7 +175,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         this.postRequest = postRequest;
     }
 
-    public Request newRequest(String query)
+    private Request newRequest(String query)
     {
         Assert.notEmpty( query );
 

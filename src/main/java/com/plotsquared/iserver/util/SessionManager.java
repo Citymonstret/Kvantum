@@ -71,7 +71,7 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
         server.log( "Deleted cookie" ); // TODO: Fix
     }
 
-    public Session getSession(final Request r, final OutputStream out)
+    public Optional<Session> getSession(final Request r, final OutputStream out)
     {
         Assert.isValid( r );
 
@@ -98,12 +98,12 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
             }
         }
 
-        return session;
+        return Optional.ofNullable( session );
     }
 
     public VariableProvider get(final Request r)
     {
-        return getSession( r, null );
+        return OptionalUtil.getOrNull( getSession( r, null ) );
     }
 
     public String providerName()

@@ -5,31 +5,58 @@ import com.plotsquared.iserver.util.Assert;
 
 import java.util.*;
 
+/**
+ * <p>
+ *  ViewPattern will be referred to as filter
+ * </p>
+ * <p>
+ *  Filters are used to determine which view gets to serve the incoming requests.
+ *  Each filter is made up of different parts, and there are four types of parts:
+ *  <ul>
+ *      <li>Separator - / - Used like a path separator</li>
+ *      <li>Static - Example: user - A static string</li>
+ *      <li>Required Variable - Example: &lt;username&gt;</li>
+ *      <li>Optional Variable - Example: [page]</li>
+ *  </ul>
+ * </p>
+ * <p>
+ *     <b>Examples</b>
+ * </p>
+ * <p>
+ *     <b>user/&lt;username&gt;</b> - Serves user/Citymonstret, but not user/ or user/Citymonstret/other
+ * </p>
+ * <p>
+ *     <b>news/[page]</b> - Serves news, news/1, news/foo, but not news/foo/bar
+ * </p>
+ * <p>
+ *     <b>user/&lt;username&gt;/posts/[page]</b> - Serves user/Citymonstret/posts and user/Citymonstrst/posts/10
+ * </p>
+ */
 @SuppressWarnings("unused")
 public class ViewPattern
 {
 
+    // Compiler variable: Show debug messages
     private static final boolean debug = false;
 
     private final List<Part> parts;
     private final String raw;
 
+    /**
+     * Generate a list of parts from the provided string
+     * @param in String to compile
+     */
     public ViewPattern(final String in)
     {
         Assert.notNull( in );
 
         this.raw = in;
-
         final SmartString string = new SmartString( raw.toLowerCase() );
-
         string.replaceLastIf( '/', SmartString.nil );
-
-        parts = new ArrayList<>();
-
+        this.parts = new ArrayList<>();
         boolean openOptional = false;
         boolean openRequired = false;
         boolean first = true;
-
         String name = "";
         for ( final char c : string )
         {
@@ -78,6 +105,12 @@ public class ViewPattern
         }
     }
 
+    /**
+     * Test if a string matches the pattern
+     * @param in String to test for
+     * @return A map containing the variables extracted from the string.
+     *         If there was no match, the map will be null
+     */
     public Map<String, String> matches(final String in)
     {
         Assert.notNull( in );
@@ -378,7 +411,7 @@ public class ViewPattern
         private final String name;
         private final int type;
 
-        public Variable(String name, int type)
+        Variable(String name, int type)
         {
             this.name = name;
             this.type = type;

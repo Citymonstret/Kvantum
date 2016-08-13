@@ -33,6 +33,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
@@ -122,10 +123,10 @@ class Worker
         String textContent = "";
         byte[] bytes = empty;
 
-        final Session session = server.sessionManager.getSession( request, output );
-        if ( session != null )
+        final Optional<Session> session = server.sessionManager.getSession( request, output );
+        if ( session.isPresent() )
         {
-            request.setSession( session );
+            request.setSession( session.get() );
         } else
         {
             request.setSession( server.sessionManager.createSession( request, output ) );

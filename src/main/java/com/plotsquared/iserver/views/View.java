@@ -171,7 +171,7 @@ public class View extends RequestHandler
             {
                 if ( !folder.mkdirs() )
                 {
-                    System.out.println( "Couldn't create the " + internalName + " folder..." );
+                    Server.getInstance().log( "Couldn't create the " + internalName + " folder..." );
                 }
             }
         }

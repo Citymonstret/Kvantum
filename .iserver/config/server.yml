@@ -1,3 +1,4 @@
+enableSecurityManager: true
 contentMd5: true
 cache:
   enabled: true
