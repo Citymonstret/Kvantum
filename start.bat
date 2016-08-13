@@ -1,6 +1,6 @@
 @ECHO OFF
 
-:: Configurations
+:: Configuration
 SET version=1.2.0
 SET minRam=256
 SET maxRam=1024
