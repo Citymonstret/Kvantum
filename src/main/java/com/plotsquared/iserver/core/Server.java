@@ -562,7 +562,7 @@ public final class Server extends Thread implements IntellectualServer
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
 
         // Pre-Steps
-        if ( standalone )
+        if ( standalone && false /* TODO: Re-Implement */ )
         {
             if ( globalAccountManager.getAccount( new Object[]{ null, "admin", null } ) == null )
             {
