@@ -52,6 +52,8 @@ Current Crush Features:
  - If Statements `{#if provider.variable} {/if}`
  - Inverted If Statements `{#if !provider.variable} {/if}`
 
+Put `CrushEngine/CrushEngine-1.2.0.jar` in your `iserver/plugins` folder in order to enable the engine.
+
 ##Building
 You build IntellectualServer using gradle. Use `gradlew build` to download all dependencies and build the compiled 
 output.
