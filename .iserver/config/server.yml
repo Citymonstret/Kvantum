@@ -1,11 +1,11 @@
 contentMd5: true
 cache:
-  enabled: false
+  enabled: true
 debug: true
 webAddress: http://localhost
 logPrefix: Web
 gzip: true
-verbose: true
+verbose: false
 hostname: localhost
 enableSyntax: true
 application:

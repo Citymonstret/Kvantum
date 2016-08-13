@@ -1,3 +1,5 @@
+@ECHO OFF
+
 :: Configurations
 SET version=1.2.0
 SET minRam=256
