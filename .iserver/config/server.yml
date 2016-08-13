@@ -1,0 +1,21 @@
+contentMd5: true
+cache:
+  enabled: false
+debug: true
+webAddress: http://localhost
+logPrefix: Web
+gzip: true
+verbose: true
+hostname: localhost
+enableSyntax: true
+application:
+  main: ''
+port: 80
+preConfigured: false
+mysql:
+  enabled: false
+buffer:
+  in: 1048576
+  out: 1048576
+workers: 1
+disableViews: false

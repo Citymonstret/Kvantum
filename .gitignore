@@ -4,10 +4,11 @@
 src/main/java/org/*
 fresh/
 
-.iserver/
-!.iserver/plugins
 
 testOtput/
+
+.iserver/log
+.iserver/config/translations.yml
 
 *.iml
 

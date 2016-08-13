@@ -1,0 +1,6 @@
+views:
+  std:
+    filter: <file>[extension]
+    options:
+      folder: ./public
+    type: std
