@@ -27,6 +27,7 @@ import com.plotsquared.iserver.crush.syntax.VariableProvider;
 import com.plotsquared.iserver.util.*;
 import com.plotsquared.iserver.views.RequestHandler;
 
+import javax.net.ssl.SSLSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 {
 
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
+    private ProtocolType protocolType;
     public Map<String, String> postponedCookies = new HashMap<>();
     private Map<String, Object> meta;
     private Map<String, String> headers;
@@ -72,6 +74,14 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public Request(final String request, final Socket socket)
     {
         Assert.notNull( request, socket );
+
+        if ( socket instanceof SSLSocket )
+        {
+            protocolType  = ProtocolType.HTTPS;
+        } else
+        {
+            protocolType = ProtocolType.HTTP;
+        }
 
         this.socket = socket;
         this.headers = new HashMap<>();
@@ -185,6 +195,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         request.query = new Query( Method.GET, query );
         request.meta = new HashMap<>( meta );
         request.cookies = cookies;
+        request.protocolType = protocolType;
         return request;
     }
 
@@ -201,6 +212,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public Cookie[] getCookies()
     {
         return this.cookies;
+    }
+
+    public ProtocolType getProtocolType()
+    {
+        return this.protocolType;
     }
 
     /**
