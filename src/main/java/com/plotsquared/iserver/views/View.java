@@ -268,7 +268,6 @@ public class View extends RequestHandler
         {
             request.addMeta( "variables", map );
         }
-
         return map != null && passes( request );
     }
 

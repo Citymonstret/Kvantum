@@ -295,7 +295,7 @@ public final class Server extends Thread implements IntellectualServer
                 Map<String, Object> views = new HashMap<>();
                 // HTML View
                 Map<String, Object> view = new HashMap<>();
-                view.put( "filter", "(\\/?[A-Za-z]*)\\/([A-Za-z0-9]*)\\.?([A-Za-z]?)" );
+                view.put( "filter", "<file>[extension]" );
                 view.put( "type", "std" );
                 Map<String, Object> opts = new HashMap<>();
                 opts.put( "folder", "./public" );

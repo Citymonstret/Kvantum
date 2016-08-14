@@ -61,7 +61,7 @@ IntellectualServer officially supports:
 - Downloads
 - Redirect
 - HTML (with templating)
-- Mixed (CSS/LESS, JavaScript, Images, HTML)
+- Mixed (CSS/LESS, JavaScript, Images, HTML) - [WIKI](https://github.com/IntellectualSites/IntellectualServer/wiki/view-std.yml)
 
 You can also expand upon this yourself, with the easy to use API!
 
