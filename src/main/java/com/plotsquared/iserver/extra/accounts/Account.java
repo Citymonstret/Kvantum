@@ -20,7 +20,10 @@
 package com.plotsquared.iserver.extra.accounts;
 
 import com.plotsquared.iserver.crush.syntax.VariableProvider;
+import com.plotsquared.iserver.util.Assert;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -31,12 +34,19 @@ public class Account implements VariableProvider
     private UUID uuid;
     private String username;
     private byte[] password;
+    private byte[] salt;
 
-    public Account(int id, String username, byte[] password)
+    public Account(final int id, final String username, final byte[] password, final byte[] salt)
     {
+        Assert.notEmpty( username );
+        Assert.notEmpty( password );
+        Assert.notEmpty( salt );
+        Assert.isPositive( id );
+
         this.id = id;
         this.username = username;
         this.password = password;
+        this.salt = salt;
         this.uuid = UUID.randomUUID();
     }
 
@@ -50,20 +60,19 @@ public class Account implements VariableProvider
         return password;
     }
 
-    public boolean passwordMatches(final byte[] password)
+    public boolean passwordMatches(final String password)
     {
-        if ( password.length != this.password.length )
+        Assert.notEmpty( password );
+
+        try
         {
-            return false;
-        }
-        for ( int i = 0; i < password.length; i++ )
+            final byte[] encryptedPassword = PasswordUtil.encryptPassword( password, salt );
+            return Arrays.equals( encryptedPassword, this.password );
+        } catch ( final NoSuchAlgorithmException | InvalidKeySpecException e )
         {
-            if ( password[ i ] != this.password[ i ] )
-            {
-                return false;
-            }
+            e.printStackTrace();
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -77,7 +86,7 @@ public class Account implements VariableProvider
         return this.id;
     }
 
-    public UUID getUUID()
+    private UUID getUUID()
     {
         return this.uuid;
     }
@@ -106,5 +115,10 @@ public class Account implements VariableProvider
             default:
                 return null;
         }
+    }
+
+    byte[] getSalt()
+    {
+        return salt;
     }
 }

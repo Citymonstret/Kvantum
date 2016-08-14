@@ -64,6 +64,16 @@ public class Assert
         return in;
     }
 
+    public static void notEmpty(final Object[] array)
+    {
+        equals( array != null && array.length > 0, true );
+    }
+
+    public static void isPositive(final Number number)
+    {
+        equals( number.intValue() >= 0, true );
+    }
+
     /**
      * Will only pass if the object isn't null
      *
@@ -138,5 +148,10 @@ public class Assert
     public static void equals(final boolean a, final boolean b, String message)
     {
         equals( a, b, new AssertionError( a, message ) );
+    }
+
+    public static void notEmpty(byte[] password)
+    {
+        equals( password != null && password.length > 0, true );
     }
 }

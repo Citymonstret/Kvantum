@@ -19,6 +19,7 @@
 
 package com.plotsquared.iserver.util;
 
+import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.views.RequestHandler;
@@ -83,8 +84,7 @@ public class RequestManager
 
     public void clear()
     {
-        this.views.clear();
-        Server.getInstance().log( "Cleared views." ); // TODO: Fix
+        Message.CLEARED_VIEWS.log( CollectionUtil.clear( this.views ) );
     }
 
 }

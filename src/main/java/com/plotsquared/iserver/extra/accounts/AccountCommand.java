@@ -24,8 +24,6 @@ import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.extra.ApplicationStructure;
 import com.plotsquared.iserver.object.Session;
 
-import java.sql.SQLException;
-
 public class AccountCommand extends Command
 {
 
@@ -54,19 +52,23 @@ public class AccountCommand extends Command
                     } else
                     {
                         String username = args[ 1 ];
-                        byte[] password = args[ 2 ].getBytes();
+                        String password = args[ 2 ];
 
                         if ( structure.getAccountManager().getAccount( new Object[]{ null, username } ) != null )
                         {
                             send( "There is already an account with that username!" );
                         } else
                         {
-                            Account account = new Account( structure.getAccountManager().getNextId(), username, password );
-                            send( "Account created (Username: " + username + ", ID: " + account.getID() + ")" );
                             try
                             {
+                                final byte[] salt = PasswordUtil.getSalt();
+                                final byte[] encryptedPassword = PasswordUtil.encryptPassword( password, salt );
+
+                                Account account = new Account( structure.getAccountManager().getNextId(), username,
+                                        encryptedPassword, salt );
+                                send( "Account created (Username: " + username + ", ID: " + account.getID() + ")" );
                                 structure.getAccountManager().createAccount( account );
-                            } catch ( SQLException e )
+                            } catch ( final Exception e )
                             {
                                 e.printStackTrace();
                             }

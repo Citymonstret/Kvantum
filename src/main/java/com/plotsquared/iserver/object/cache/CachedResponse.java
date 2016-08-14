@@ -58,7 +58,7 @@ public class CachedResponse implements ResponseBody
     @Override
     public String getContent()
     {
-        throw new RuntimeException( "getContent" /* TODO: Make better */ );
+        throw new RuntimeException( "Cannot access text content in cached response" );
     }
 
     @Override

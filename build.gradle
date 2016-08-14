@@ -41,6 +41,8 @@ repositories {
 }
 
 dependencies {
+    testCompile 'junit:junit:4.12'
+
     compile group: 'com.cedarsoftware', name: 'json-io', version:'2.9.3'
     compile 'com.github.Sauilitired:Configurable:0.0.3'
     compile group: 'org.yaml', name: 'snakeyaml', version:'1.14'

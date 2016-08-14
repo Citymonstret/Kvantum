@@ -65,5 +65,4 @@ crashlytics-build.properties
 /public/
 .gradle/
 build/
-src/test/
 storage/

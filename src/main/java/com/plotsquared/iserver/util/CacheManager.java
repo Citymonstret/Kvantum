@@ -105,9 +105,9 @@ public class CacheManager
     }
 
     /**
-     * Get all cached ResponseBodys
+     * Get all cached ResponseBodies
      *
-     * @return all cached ResponseBodys
+     * @return all cached ResponseBodies
      */
     public Map<String, CachedResponse> getAll()
     {

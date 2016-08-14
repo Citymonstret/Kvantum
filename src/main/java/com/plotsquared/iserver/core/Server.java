@@ -33,6 +33,7 @@ import com.plotsquared.iserver.extra.ApplicationStructure;
 import com.plotsquared.iserver.extra.accounts.Account;
 import com.plotsquared.iserver.extra.accounts.AccountCommand;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
+import com.plotsquared.iserver.extra.accounts.PasswordUtil;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
@@ -48,6 +49,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -247,7 +250,6 @@ public final class Server extends Thread implements IntellectualServer
         {
             ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
         }
-
 
         if ( CoreConfig.enableSecurityManager )
         {
@@ -570,7 +572,7 @@ public final class Server extends Thread implements IntellectualServer
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
 
         // Pre-Steps
-        if ( standalone && false /* TODO: Re-Implement */ )
+        if ( standalone )
         {
             if ( globalAccountManager.getAccount( new Object[]{ null, "admin", null } ) == null )
             {
@@ -585,9 +587,22 @@ public final class Server extends Thread implements IntellectualServer
                                 String password = event.getText();
                                 try
                                 {
-                                    globalAccountManager.createAccount( new Account( globalAccountManager.getNextId(), "admin", password.getBytes() ) );
-                                    log( "Great, you've got yourself an admin account. The username is \"admin\"." );
-                                    pause = false;
+                                    try
+                                    {
+                                        final byte[] salt = PasswordUtil.getSalt();
+                                        final byte[] encryptedPassword = PasswordUtil.encryptPassword( password, salt );
+                                        globalAccountManager.createAccount( new Account( globalAccountManager.getNextId()
+                                                , "admin", encryptedPassword, salt ) );
+                                        log( "Great, you've got yourself an admin account. The username is \"admin\"." );
+                                    } catch ( NoSuchAlgorithmException e )
+                                    {
+                                        e.printStackTrace();
+                                    } catch ( InvalidKeySpecException e )
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    log( "The server has to restart, so I'll shut it down for you!" );
+                                    Server.this.stopServer();
                                 } catch ( SQLException e )
                                 {
                                     e.printStackTrace();

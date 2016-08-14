@@ -61,7 +61,33 @@ public class IntellectualServerMain
                 GuiMain.main( args, file );
             } else
             {
-                start( true, file, new DefaultLogWrapper() );
+                final Optional<Server> server = create( true, file, new DefaultLogWrapper() );
+                if ( server.isPresent() )
+                {
+                    if ( !options.debug.isEmpty() )
+                    {
+                        CoreConfig.debug = true;
+                        CoreConfig.verbose = true;
+                    }
+                    if ( options.port != - 1 )
+                    {
+                        CoreConfig.port = options.port;
+                    }
+                    if ( options.workers != -1 )
+                    {
+                        CoreConfig.workers = options.workers;
+                    }
+                    try
+                    {
+                        server.get().start();
+                    } catch ( final Exception e )
+                    {
+                        throw new RuntimeException( "Failed to start the server instance" );
+                    }
+                } else
+                {
+                    throw new RuntimeException( "Failed to create a server instance" );
+                }
             }
         }
     }
@@ -183,6 +209,15 @@ public class IntellectualServerMain
 
         @Parameter(names = "-help", description = "Show this list")
         private boolean help = false;
+
+        @Parameter(names = "-port", description = "The server port")
+        private int port = -1;
+
+        @Parameter(names = "-debug", description = "Enable debugging")
+        private String debug = "";
+
+        @Parameter(names = "-workers", description = "Number of workers")
+        private int workers = -1;
 
     }
 }

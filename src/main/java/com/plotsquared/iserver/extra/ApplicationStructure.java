@@ -21,6 +21,7 @@ package com.plotsquared.iserver.extra;
 
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
+import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.SQLiteManager;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.sql.SQLException;
  *
  * @author Citymonstret
  */
+@SuppressWarnings( "unused" )
 public class ApplicationStructure
 {
 
@@ -40,6 +42,8 @@ public class ApplicationStructure
 
     public ApplicationStructure(final String applicationName)
     {
+        Assert.notNull( applicationName );
+
         this.applicationName = applicationName;
         try
         {
@@ -61,7 +65,14 @@ public class ApplicationStructure
         return this.database;
     }
 
+    @Override
+    public String toString()
+    {
+        return this.applicationName;
+    }
+
     public void registerViews(Server server)
     {
+        // Override me!
     }
 }

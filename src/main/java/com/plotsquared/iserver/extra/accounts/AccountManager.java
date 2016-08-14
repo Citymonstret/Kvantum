@@ -20,9 +20,9 @@
 package com.plotsquared.iserver.extra.accounts;
 
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Session;
-import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.SQLiteManager;
 
@@ -44,6 +44,8 @@ public class AccountManager implements ProviderFactory<Account>
 
     public AccountManager(final SQLiteManager databaseManager)
     {
+        Assert.notNull( databaseManager );
+
         this.accountList = Collections.synchronizedList( new ArrayList<Account>() );
         this.sessionAccountMap = new ConcurrentHashMap<>();
         this.databaseManager = databaseManager;
@@ -53,7 +55,8 @@ public class AccountManager implements ProviderFactory<Account>
     {
         try
         {
-            databaseManager.executeUpdate( "CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR(32), password VARCHAR(256))" );
+            databaseManager.executeUpdate( "CREATE TABLE IF NOT EXISTS account(id INTEGER PRIMARY KEY, name VARCHAR" +
+                    "(32), password VARCHAR(256), `salt` VARCHAR(256))" );
             PreparedStatement loadAccounts = databaseManager.prepareStatement( "SELECT * FROM account" );
             ResultSet results = loadAccounts.executeQuery();
             while ( results.next() )
@@ -62,7 +65,8 @@ public class AccountManager implements ProviderFactory<Account>
                 int id = results.getInt( "id" );
                 String username = results.getString( "name" );
                 String password = results.getString( "password" );
-                Account account = new Account( id, username, password.getBytes() );
+                String salt = results.getString( "salt" );
+                Account account = new Account( id, username, password.getBytes(), salt.getBytes() );
                 registerAccount( account );
             }
             results.close();
@@ -72,9 +76,11 @@ public class AccountManager implements ProviderFactory<Account>
 
             if ( accountList.isEmpty() )
             {
-                createAccount( new Account( getNextId(), "test", "test".getBytes() ) );
+                final byte[] salt = PasswordUtil.getSalt();
+                final byte[] encryptedPassword = PasswordUtil.encryptPassword( "test", salt );
+                createAccount( new Account( getNextId(), "test", encryptedPassword, salt ) );
             }
-        } catch ( SQLException e )
+        } catch ( Exception e )
         {
             e.printStackTrace();
             return false;
@@ -89,9 +95,13 @@ public class AccountManager implements ProviderFactory<Account>
 
     public void createAccount(final Account account) throws SQLException
     {
-        PreparedStatement statement = databaseManager.prepareStatement( "INSERT INTO account(name, password) VALUES(?, ?)" );
+        Assert.notNull( account );
+
+        PreparedStatement statement = databaseManager.prepareStatement( "INSERT INTO account(name, password, `salt`) " +
+                "VALUES(?, ?, ?)" );
         statement.setString( 1, account.getUsername() );
         statement.setString( 2, new String( account.getPassword() ) );
+        statement.setString( 3, new String( account.getSalt() ) );
         statement.executeUpdate();
         statement.close();
         registerAccount( account );
@@ -99,6 +109,8 @@ public class AccountManager implements ProviderFactory<Account>
 
     public synchronized Account getAccount(Session session)
     {
+        Assert.notNull( session );
+
         if ( !sessionAccountMap.containsKey( session ) )
         {
             return null;
@@ -113,6 +125,7 @@ public class AccountManager implements ProviderFactory<Account>
         // 2 = email
         // ...
         Assert.equals( objects.length >= 2, true );
+
         if ( objects[ 0 ] != null )
         {
             return getAccountById( (Integer) objects[ 0 ] );
@@ -124,9 +137,11 @@ public class AccountManager implements ProviderFactory<Account>
         return null;
     }
 
-    protected Account getAccountById(int id)
+    public Account getAccountById(final int id)
     {
-        for ( Account account : accountList )
+        Assert.isPositive( id );
+
+        for ( final Account account : accountList )
         {
             if ( account.getID() == id )
             {
@@ -136,9 +151,11 @@ public class AccountManager implements ProviderFactory<Account>
         return null;
     }
 
-    protected Account getAccountByUsername(String username)
+    public Account getAccountByUsername(final String username)
     {
-        for ( Account account : accountList )
+        Assert.notEmpty( username );
+
+        for ( final Account account : accountList )
         {
             if ( account.getUsername().equals( username ) )
             {
@@ -148,26 +165,34 @@ public class AccountManager implements ProviderFactory<Account>
         return null;
     }
 
-    public void unbindAccount(Session session)
+    public void unbindAccount(final Session session)
     {
+        Assert.notNull( session );
+
         if ( sessionAccountMap.containsKey( session ) )
         {
             sessionAccountMap.remove( session );
         }
     }
 
-    public synchronized void bindAccount(Session session, Account account)
+    public synchronized void bindAccount(final Session session, final Account account)
     {
+        Assert.notNull( session, account );
+
         sessionAccountMap.put( session, account );
     }
 
-    public void registerAccount(Account account)
+    public void registerAccount(final Account account)
     {
+        Assert.notNull( account );
+
         accountList.add( account );
     }
 
-    public Session getSession(Account account)
+    public Session getSession(final Account account)
     {
+        Assert.notNull( account );
+
         if ( !sessionAccountMap.containsValue( account ) )
         {
             return null;
