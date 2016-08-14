@@ -4,26 +4,48 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
+/**
+ * A very simple (and restrictive) file system
+ */
+@SuppressWarnings( "unused" )
 public class FileSystem
 {
 
     final File coreFolder;
-    final Path corePath;
+    private final Path corePath;
 
+    /**
+     * @param coreFolder The core folder (zero point) for this file system,
+     *                   you cannot access any paths below it
+     */
     public FileSystem(final File coreFolder)
     {
         this.coreFolder = coreFolder;
         this.corePath = new Path( this, "/", true );
     }
 
-    public Path getPath(final String name) throws IllegalPathException, PathNotFoundException
+    /**
+     * Get a path from a string, using the core folder as the parent
+     * @param rawPath The raw path to the file
+     * @return The created path
+     * @throws IllegalPathException If the path tries to access a file outside of the allowed scope (such as ../)
+     * @see #getPath(Path, String) To access files with a defined parent path
+     */
+    public Path getPath(final String rawPath) throws IllegalPathException
     {
-        return this.getPath( corePath, name );
+        return this.getPath( corePath, rawPath );
     }
 
-    public Path getPath(final Path parent, String name) throws IllegalPathException, PathNotFoundException
+    /**
+     * Get a path from a string
+     * @param parent Parent path (folder), use {@link #getPath(String)} to access files within the core folder
+     * @param rawPath The raw path to the file (relative to the parent)
+     * @return The created path
+     * @throws IllegalPathException If the path tries to access a file outside of the allowed scope (such as ../)
+     */
+    public Path getPath(final Path parent, String rawPath) throws IllegalPathException
     {
-        final String[] parts = name.split( "((?<=/)|(?=/))" );
+        final String[] parts = rawPath.split( "((?<=/)|(?=/))" );
         if ( parts.length < 1 )
         {
             return corePath;
@@ -32,34 +54,21 @@ public class FileSystem
         {
             if ( parts.length >= 2 && parts[1].equals( "/" ) )
             {
-                name = name.substring( 2 );
+                rawPath = rawPath.substring( 2 );
             } else
             {
-                name = name.substring( 1 );
+                rawPath = rawPath.substring( 1 );
             }
         }
         for ( final String part : parts )
         {
             if ( StringUtils.countMatches( part, '.' ) > 1 )
             {
-                throw new IllegalPathException( name );
+                throw new IllegalPathException( rawPath );
             }
         }
         final String lastPart = parts[parts.length - 1];
-        final Path path = new Path( this, parent.toString() + name, lastPart.indexOf( '.' ) == -1 );
-        if ( !path.getFile().exists() )
-        {
-            throw new PathNotFoundException( path.toString() );
-        }
-        return path;
-    }
-
-    public static final class PathNotFoundException extends RuntimeException
-    {
-        PathNotFoundException(final String path)
-        {
-            super( "Could not find path: \"" + path + "\"" );
-        }
+        return new Path( this, parent.toString() + rawPath, lastPart.indexOf( '.' ) == -1 );
     }
 
     public static final class IllegalPathException extends RuntimeException
