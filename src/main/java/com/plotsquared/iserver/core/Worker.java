@@ -215,6 +215,11 @@ class Worker
         {
             body = new com.plotsquared.iserver.views.errors.Exception( e ).generate( request );
             bytes = body.getContent().getBytes();
+
+            if ( CoreConfig.verbose )
+            {
+                e.printStackTrace();
+            }
         }
 
         boolean gzip = false;

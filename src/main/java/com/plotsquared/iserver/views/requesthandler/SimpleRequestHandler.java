@@ -1,6 +1,5 @@
 package com.plotsquared.iserver.views.requesthandler;
 
-import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.matching.ViewPattern;
 import com.plotsquared.iserver.object.Request;
@@ -9,7 +8,6 @@ import com.plotsquared.iserver.util.Final;
 import com.plotsquared.iserver.views.RequestHandler;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
@@ -22,14 +20,6 @@ public class SimpleRequestHandler extends RequestHandler
     private final BiConsumer<Request, Response> generator;
     private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
     private ViewPattern compiledPattern;
-
-    {
-        if ( CoreConfig.debug )
-        {
-            Server.getInstance().log( "Adding DebugMiddleware to SimpleRequestHandler" );
-            this.middlewareQueuePopulator.add( DebugMiddleware.class );
-        }
-    }
 
     public SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator)
     {
@@ -60,10 +50,6 @@ public class SimpleRequestHandler extends RequestHandler
     @Override
     public boolean matches(final Request request)
     {
-        if ( CoreConfig.debug )
-        {
-            request.addMeta( "zmetakey", UUID.randomUUID().toString() );
-        }
         final Map<String, String> map = getPattern().matches( request.getQuery().getFullRequest() );
         if ( map != null )
         {

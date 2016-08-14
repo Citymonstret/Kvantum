@@ -1,7 +1,7 @@
 enableSecurityManager: true
 contentMd5: true
 cache:
-  enabled: true
+  enabled: false
 debug: true
 webAddress: http://localhost
 logPrefix: Web

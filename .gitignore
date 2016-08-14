@@ -66,3 +66,4 @@ crashlytics-build.properties
 .gradle/
 build/
 storage/
+/.iserver/config/server.yml

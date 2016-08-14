@@ -49,6 +49,9 @@ import java.util.function.Predicate;
 final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable
 {
 
+    public static final String ALTERNATE_OUTCOME = "alternateOutcome";
+    public static final String INTERNAL_REDIRECT = "internalRedirect";
+
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
     private ProtocolType protocolType;
     public Map<String, String> postponedCookies = new HashMap<>();
@@ -147,6 +150,13 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         Assert.notNull( variable );
 
         return getVariables().get( variable );
+    }
+
+    public void useAlternateOutcome(final String identifier)
+    {
+        Assert.notEmpty( identifier );
+
+        this.addMeta( ALTERNATE_OUTCOME, identifier );
     }
 
     @Override
@@ -306,7 +316,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     {
         Assert.notNull( url );
 
-        this.addMeta( "internalRedirect", newRequest( url ) );
+        this.addMeta( INTERNAL_REDIRECT, newRequest( url ) );
         Message.INTERNAL_REDIRECT.log( url );
     }
 
@@ -360,6 +370,13 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public String toString()
     {
         return this.socket.getInetAddress().getHostName();
+    }
+
+    public boolean hasMeta(final String key)
+    {
+        Assert.notEmpty( key );
+
+        return this.meta.containsKey( key );
     }
 
     /**
