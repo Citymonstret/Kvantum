@@ -1,5 +1,4 @@
 # TODO
-
 ## Features
 - Remake default views (make sure they all work) ( *Might move views to separate plugins* )
 - Document default views
@@ -14,3 +13,4 @@ allow for proper authentication and user storage as well :D )
 
 ## Plugins
 - Add additional template engines
+
