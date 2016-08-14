@@ -6,6 +6,11 @@ debug: true
 webAddress: http://localhost
 logPrefix: Web
 gzip: true
+ssl:
+  port: 443
+  keyStorePassword: password
+  enable: false
+  keyStore: 'keyStore'
 verbose: false
 hostname: localhost
 enableSyntax: true

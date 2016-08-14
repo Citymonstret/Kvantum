@@ -45,6 +45,8 @@ import com.plotsquared.iserver.util.*;
 import com.plotsquared.iserver.views.*;
 import sun.misc.Signal;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -53,6 +55,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
 
@@ -68,7 +71,7 @@ public final class Server extends Thread implements IntellectualServer
     // Private Static
     private static Server instance;
     // Package-Protected Final
-    final Queue<Socket> queue = new LinkedList<>();
+    final Queue<Socket> queue = new ConcurrentLinkedQueue<>();
     // Private Final
     private final LogWrapper logWrapper;
     private final boolean standalone;
@@ -89,6 +92,7 @@ public final class Server extends Thread implements IntellectualServer
     private InputThread inputThread;
     private boolean started;
     private ServerSocket socket;
+    private SSLServerSocket sslSocket;
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
@@ -564,6 +568,22 @@ public final class Server extends Thread implements IntellectualServer
             }
         }
 
+        if ( CoreConfig.SSL.enable )
+        {
+            log( Message.STARTING_SSL_ON_PORT, CoreConfig.SSL.port );
+            try
+            {
+                System.setProperty( "javax.net.ssl.keyStore", CoreConfig.SSL.keyStore );
+                System.setProperty( "javax.net.ssl.keyStorePassword", CoreConfig.SSL.keyStorePassword );
+
+                final SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+                this.sslSocket = (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port );
+            } catch ( final Exception e )
+            {
+                new RuntimeException( "Failed to start HTTPS server", e ).printStackTrace();
+            }
+        }
+
         // Start the workers
         LambdaUtil.arrayForeach( workerThreads, Worker::start );
 
@@ -614,6 +634,39 @@ public final class Server extends Thread implements IntellectualServer
         }
 
         this.handleEvent( new ServerReadyEvent( this ) );
+
+        if ( CoreConfig.SSL.enable && sslSocket != null )
+        {
+            Thread thread = new Thread( "SSL-Runner" )
+            {
+
+                @Override
+                public void run()
+                {
+                    for ( ; ; )
+                    {
+                        if ( Server.this.stopping )
+                        {
+                            break;
+                        }
+                        if ( Server.this.pause )
+                        {
+                            continue;
+                        }
+                        try
+                        {
+                            final Socket socket = sslSocket.accept();
+                            queue.add( socket );
+                        } catch ( final Exception e )
+                        {
+                            Server.this.log( Message.TICK_ERROR );
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            };
+            thread.start();
+        }
 
         // Main Loop
         for ( ; ; )
@@ -767,6 +820,10 @@ public final class Server extends Thread implements IntellectualServer
         try
         {
             socket.close();
+            if ( CoreConfig.SSL.enable )
+            {
+                sslSocket.close();
+            }
         } catch ( final Exception e )
         {
             e.printStackTrace();
