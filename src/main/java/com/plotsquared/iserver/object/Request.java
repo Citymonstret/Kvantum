@@ -31,6 +31,7 @@ import javax.net.ssl.SSLSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -251,7 +252,12 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             this.query = new Query( Method.GET, "/" );
         } else
         {
-            this.query = new Query( parts[ 0 ].equalsIgnoreCase( "GET" ) ? Method.GET : Method.POST, parts[ 1 ] );
+            final Optional<Method> methodOptional = Method.getByName( parts[ 0 ] );
+            if ( !methodOptional.isPresent() )
+            {
+                throw new RuntimeException( "Unknown request method: " + parts[ 0 ] );
+            }
+            this.query = new Query( methodOptional.get(), parts[ 1 ] );
         }
         return this.query;
     }

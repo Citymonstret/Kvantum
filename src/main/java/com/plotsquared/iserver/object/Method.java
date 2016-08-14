@@ -19,6 +19,10 @@
 
 package com.plotsquared.iserver.object;
 
+import com.plotsquared.iserver.util.LambdaUtil;
+
+import java.util.Optional;
+
 @SuppressWarnings("ALL")
 public enum Method
 {
@@ -43,5 +47,11 @@ public enum Method
     /**
      *
      */
-    DELETE
+    DELETE;
+
+    public static Optional<Method> getByName(final String name)
+    {
+        return LambdaUtil.getFirst( values(), method -> method.name().equalsIgnoreCase( name ) );
+    }
+
 }
