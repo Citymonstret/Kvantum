@@ -24,6 +24,7 @@ import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.events.Event;
 import com.plotsquared.iserver.events.EventCaller;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
+import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.util.CacheManager;
@@ -68,6 +69,8 @@ public interface IntellectualServer
      * @param event Event to handle
      */
     void handleEvent(Event event);
+
+    FileSystem getFileSystem();
 
     /**
      * Set the engine event caller

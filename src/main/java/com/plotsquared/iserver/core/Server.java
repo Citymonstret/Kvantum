@@ -34,6 +34,7 @@ import com.plotsquared.iserver.extra.accounts.Account;
 import com.plotsquared.iserver.extra.accounts.AccountCommand;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.extra.accounts.PasswordUtil;
+import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
@@ -99,6 +100,7 @@ public final class Server extends Thread implements IntellectualServer
     private ApplicationStructure mainApplicationStructure;
     private Worker[] workerThreads;
     private AccountManager globalAccountManager;
+    private FileSystem fileSystem;
 
     {
         viewBindings = new HashMap<>();
@@ -130,6 +132,8 @@ public final class Server extends Thread implements IntellectualServer
         this.coreFolder = coreFolder;
         this.logWrapper = logWrapper;
         this.standalone = standalone;
+
+        this.fileSystem = new FileSystem( coreFolder );
 
         final File logFolder = new File( coreFolder, "log" );
         if ( !logFolder.exists() )
@@ -421,6 +425,12 @@ public final class Server extends Thread implements IntellectualServer
         {
             eventCaller.callEvent( event );
         }
+    }
+
+    @Override
+    public FileSystem getFileSystem()
+    {
+        return null;
     }
 
     @Override

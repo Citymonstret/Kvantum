@@ -211,7 +211,6 @@ class Worker
                 }
                 bytes = ArrayUtils.toPrimitive( wrapper );
             }
-            //  TODO: Implement byte handlers
         } catch ( final Exception e )
         {
             body = new com.plotsquared.iserver.views.errors.Exception( e ).generate( request );
