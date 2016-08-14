@@ -25,6 +25,7 @@ pre-made ones - To use it just like you'd use any other web server. It's almost 
 
 ##Features
 Major:
+- Supports both HTTP and HTTPS
 - Easy to use API (including Middlewares, Annotation based view declaration, Functional View Declaration, Object 
 oriented View Declaration)
 - Easy configuration of views (see `Views`)
@@ -64,6 +65,16 @@ IntellectualServer officially supports:
 
 You can also expand upon this yourself, with the easy to use API!
 
+##SSL
+The server supports SSL. You just have to enable it in `.iserver/config/server.yml`
+```yml
+ssl:
+  port: 443 # The SSL port
+  keyStorePassword: password # The keystore password
+  enable: true # Set to true to enable the SSL socket
+  keyStore: './path/to/your/keystore.jks' # Full path to the keystore
+```
+
 ##Development
 
 ###Maven
@@ -85,7 +96,8 @@ We are using JitPack as our maven repo
 
 ###Building
 You build IntellectualServer using gradle. Use `gradlew build` to download all dependencies and build the compiled 
-output.
+output. To build a jar containing all dependencies, use `gradlew shadowJar`. And finally, to run the tests, use 
+`gradlew test`
 
 ###Example
 More examples can be found in the "example" folder

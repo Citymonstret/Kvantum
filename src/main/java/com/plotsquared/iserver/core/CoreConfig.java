@@ -33,6 +33,17 @@ public class CoreConfig
         CoreConfig.preConfigured = preConfigured;
     }
 
+    @ConfigSection(name = "ssl")
+    public static class SSL
+    {
+
+        public static boolean enable = false;
+        public static int port = 443;
+        public static String keyStore = "keyStore";
+        public static String keyStorePassword = "password";
+
+    }
+
     @ConfigSection(name = "buffer")
     public static class Buffer
     {
