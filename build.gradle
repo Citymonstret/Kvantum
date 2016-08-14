@@ -53,4 +53,5 @@ dependencies {
     compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.13'
     compile name: 'JCDP-1.25-win'
     compile group: 'com.beust', name: 'jcommander', version: '1.48'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
 }

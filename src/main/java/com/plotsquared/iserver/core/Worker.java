@@ -25,17 +25,15 @@ import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.thread.ThreadManager;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.views.RequestHandler;
+import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.BASE64Encoder;
 
 import java.io.*;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -195,25 +193,23 @@ class Worker
                 body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
             }
 
-            final Predicate<WorkerProcedure.Handler> handlerFilter;
             if ( body.isText() )
             {
-                handlerFilter = handler -> handler.getType() == String.class;
-            } else
-            {
-                handlerFilter = handler -> handler.getType() == Byte[].class;
-            }
-
-            final Collection<WorkerProcedure.Handler> handlers = workerProcedureInstance.getHandlers().stream()
-                    .filter( handlerFilter ).collect( Collectors.toList() );
-
-            if ( body.isText() )
-            {
-                for ( final WorkerProcedure.Handler<String> handler : handlers )
+                for ( final WorkerProcedure.Handler<String> handler : workerProcedureInstance.getStringHandlers() )
                 {
                     textContent = handler.act( requestHandler, request, textContent );
                 }
                 bytes = textContent.getBytes();
+            }
+
+            if ( !workerProcedureInstance.getByteHandlers().isEmpty() )
+            {
+                Byte[] wrapper = ArrayUtils.toObject( bytes );
+                for ( final WorkerProcedure.Handler<Byte[]> handler : workerProcedureInstance.getByteHandlers() )
+                {
+                    wrapper = handler.act( requestHandler, request, wrapper );
+                }
+                bytes = ArrayUtils.toPrimitive( wrapper );
             }
             //  TODO: Implement byte handlers
         } catch ( final Exception e )

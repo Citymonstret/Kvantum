@@ -23,12 +23,20 @@ public class WorkerProcedure
 
     }
 
+    public static abstract class ByteHandler implements Handler<Byte[]>
+    {
+
+        @Override
+        public Class<Byte[]> getType()
+        {
+            return Byte[].class;
+        }
+    }
+
     public static abstract class StringHandler implements Handler<String>
     {
 
         @Override
-        public abstract String act(RequestHandler requestHandler, Request request, String in);
-
         public final Class<String> getType()
         {
             return String.class;
@@ -85,12 +93,27 @@ public class WorkerProcedure
 
     private synchronized void setChanged()
     {
+        final Collection<StringHandler> stringHandlers = new ArrayList<>();
+        final Collection<ByteHandler> byteHandlers = new ArrayList<>();
+
+        for ( final Handler handler : handlers.values() )
+        {
+            if ( handler instanceof StringHandler )
+            {
+                stringHandlers.add( ( StringHandler ) handler );
+            } else
+            {
+                byteHandlers.add( ( ByteHandler ) handler );
+            }
+        }
+
         for ( final WeakReference<WorkerProcedureInstance> instanceReference : instances )
         {
             final WorkerProcedureInstance instance = instanceReference.get();
             if ( instance != null )
             {
-                instance.cache = handlers.values();
+                instance.byteHandlers = byteHandlers;
+                instance.stringHandlers = stringHandlers;
             }
         }
     }
@@ -98,17 +121,32 @@ public class WorkerProcedure
     public class WorkerProcedureInstance
     {
 
-        private Collection<Handler> cache;
+        private volatile Collection<StringHandler> stringHandlers = new ArrayList<>();
+        private volatile Collection<ByteHandler> byteHandlers = new ArrayList<>();
 
         WorkerProcedureInstance()
         {
             instances.add( new WeakReference<>( this ) );
-            cache = handlers.values();
+            for ( final Handler handler : handlers.values() )
+            {
+                if ( handler instanceof StringHandler )
+                {
+                    stringHandlers.add( ( StringHandler ) handler );
+                } else
+                {
+                    byteHandlers.add( ( ByteHandler ) handler );
+                }
+            }
         }
 
-        public Collection<Handler> getHandlers()
+        public Collection<StringHandler> getStringHandlers()
         {
-            return this.cache;
+            return this.stringHandlers;
+        }
+
+        public Collection<ByteHandler> getByteHandlers()
+        {
+            return this.byteHandlers;
         }
     }
 
