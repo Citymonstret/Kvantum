@@ -63,7 +63,8 @@ public enum Message
     CACHING_ENABLED( "Caching is enabled, beware that this increases memory usage - So keep an eye on it", MODE_WARNING ),
     APPLICATION_DOES_NOT_EXTEND( "Application '%s' does not extend ApplicationStructure.class", MODE_WARNING ),
     INITIALIZING_LOCATION_SERVICES( "Initializing location services", MODE_INFO ),
-    CLEARED_VIEWS( "Cleared views ( %s )", MODE_INFO );
+    CLEARED_VIEWS( "Cleared views ( %s )", MODE_INFO ),
+    REQUEST_HANDLER_DUMP( "> RequestHandler - Class '%s', Pattern: '%s'" );
 
     private final String message;
     private final int mode;

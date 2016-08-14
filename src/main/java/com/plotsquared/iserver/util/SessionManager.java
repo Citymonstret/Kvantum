@@ -19,6 +19,7 @@
 
 package com.plotsquared.iserver.util;
 
+import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
@@ -68,7 +69,6 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
 
         final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
         re.getHeader().setCookie( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
-        server.log( "Deleted cookie" ); // TODO: Fix
     }
 
     public Optional<Session> getSession(final Request r, final OutputStream out)
@@ -87,13 +87,20 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
             if ( sessions.containsKey( sessionID ) )
             {
                 session = sessions.get( sessionID );
-                server.log( "Found session (%s=%s)", session, sessionID ); // TODO: Fix
+                if ( CoreConfig.debug )
+                {
+                    server.log( "Found session (%s=%s) for request %s", session, sessionID, r ); // TODO: Fix
+                }
             } else
             {
                 if ( out != null )
                 {
                     r.postponedCookies.put( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
-                    server.log( "Deleting invalid session cookie (%s)", cookie.get().getValue() ); // TODO: Fix
+                    if ( CoreConfig.debug )
+                    {
+                        server.log( "Deleting invalid session cookie (%s) for request %s", cookie.get().getValue(),
+                                r );
+                    }
                 }
             }
         }

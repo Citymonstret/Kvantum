@@ -356,6 +356,12 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         this.session = session;
     }
 
+    @Override
+    public String toString()
+    {
+        return this.socket.getInetAddress().getHostName();
+    }
+
     /**
      * The query, for example:
      * "http://localhost/query?example=this"

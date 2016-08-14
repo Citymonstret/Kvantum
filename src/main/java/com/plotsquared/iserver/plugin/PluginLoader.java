@@ -261,9 +261,6 @@ public class PluginLoader extends AutoCloseable
             loaders.remove( plugin.getName() );
             final PluginClassLoader loader = plugin.getClassLoader();
             loader.getClasses().forEach( this::removeClass );
-            // TODO Replace this
-            // EventManager.getInstance().removeAll(plugin);
-            // Marine.getServer().getScheduler().removeAll(plugin);
             Message.DISABLED_PLUGIN.log( plugin );
         } else
             throw new UnsupportedOperationException(

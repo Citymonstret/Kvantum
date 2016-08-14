@@ -278,7 +278,12 @@ class Worker
     {
         if ( remote == null || remote.isClosed() )
         {
-            return; // TODO: Why?
+            /*
+                I assume this can be caused by the client closing the connecting before
+                it reaches the handler, which is really stupid. Might be worth looking into
+                a better fix for this ::> TODO: Re-Evaluate this
+             */
+            return;
         }
 
         Assert.notNull( server );

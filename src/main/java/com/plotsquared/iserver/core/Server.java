@@ -201,6 +201,7 @@ public final class Server extends Thread implements IntellectualServer
             } );
             // Handles incoming commands
             // TODO: Replace the command system
+            // https://github.com/IntellectualSites/CommandAPI
             ( inputThread = new InputThread() ).start();
         }
 

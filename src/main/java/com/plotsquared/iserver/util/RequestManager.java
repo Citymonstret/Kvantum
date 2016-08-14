@@ -68,8 +68,8 @@ public class RequestManager
     {
         Assert.notNull( server );
 
-        ( (IConsumer<RequestHandler>) view -> server.log( "> RequestHandler - Class '%s', Pattern: '%s'",
-                view.getClass().getSimpleName(), view.toString() ) ).foreach( views ); // TODO: Fix
+        ( (IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP.log( view.getClass().getSimpleName(), view
+                .toString() ) ).foreach( views );
     }
 
     public void remove(final RequestHandler view)
