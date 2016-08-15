@@ -6,8 +6,6 @@ import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.IConsumer;
 import com.plotsquared.iserver.util.ReflectionUtils;
 import com.plotsquared.iserver.views.RequestHandler;
-import com.plotsquared.iserver.views.decl.ResponseMethod;
-import com.plotsquared.iserver.views.decl.ViewMatcher;
 import com.plotsquared.iserver.views.requesthandler.Middleware;
 
 import java.lang.reflect.Method;

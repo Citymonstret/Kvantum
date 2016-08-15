@@ -19,7 +19,7 @@
 
 /**
  * These are the default events, these are
- * shipped natively with IntellectualSites and
+ * shipped natively with IntellectualServer and
  * are called from within the core application
  *
  * @author Citymonstret

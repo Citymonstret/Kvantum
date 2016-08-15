@@ -4,8 +4,6 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.views.View;
-import com.plotsquared.iserver.views.decl.ResponseMethod;
-import com.plotsquared.iserver.views.decl.ViewMatcher;
 
 class CachedStaticView extends View implements CacheApplicable
 {

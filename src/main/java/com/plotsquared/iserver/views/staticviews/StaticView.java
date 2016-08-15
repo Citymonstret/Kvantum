@@ -1,7 +1,5 @@
 package com.plotsquared.iserver.views.staticviews;
 
-import com.plotsquared.iserver.views.decl.ResponseMethod;
-import com.plotsquared.iserver.views.decl.ViewMatcher;
 import com.plotsquared.iserver.views.requesthandler.SimpleRequestHandler;
 
 class StaticView extends SimpleRequestHandler

@@ -1,6 +1,7 @@
 package com.plotsquared.iserver.views.requesthandler;
 
 import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.views.staticviews.ViewMatcher;
 
 /**
  * <p>
@@ -45,7 +46,7 @@ import com.plotsquared.iserver.object.Request;
  * <pre>
  * requestHandler.getMiddlewareQueuePopulator().add( ExampleMiddleware.class );
  * </pre>
- * Or add it to your {@literal @}{@link com.plotsquared.iserver.views.decl.ViewMatcher} like this:
+ * Or add it to your {@literal @}{@link ViewMatcher} like this:
  * <pre>
  * {@literal @}ViewMatcher(filter = "your/filter", cache = false, name = "Identifier", middlewares = { YourMiddleware.class }
  * </pre>

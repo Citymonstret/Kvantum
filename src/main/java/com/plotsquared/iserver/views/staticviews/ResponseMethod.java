@@ -1,4 +1,4 @@
-package com.plotsquared.iserver.views.decl;
+package com.plotsquared.iserver.views.staticviews;
 
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
