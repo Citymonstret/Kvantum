@@ -33,6 +33,10 @@ public class FileSystem
      */
     public Path getPath(final String rawPath) throws IllegalPathException
     {
+        if ( rawPath == null || rawPath.isEmpty() )
+        {
+            return this.corePath;
+        }
         return this.getPath( corePath, rawPath );
     }
 

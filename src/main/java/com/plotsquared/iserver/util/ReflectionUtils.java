@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ReflectionUtils
+final public class ReflectionUtils
 {
 
     public static List<AnnotatedMethod> getAnnotatedMethods(final Class<? extends Annotation> a, final Class<?> clazz)
@@ -19,7 +19,8 @@ public class ReflectionUtils
         {
             final List<Method> allMethods = new ArrayList<>( Arrays.asList( c.getDeclaredMethods() ) );
             allMethods.stream().filter( method -> method.isAnnotationPresent( a ) ).forEach( method ->
-                    LambdaUtil.arrayForeach( method.getAnnotations(), a::isInstance, an -> annotatedMethods.add( new AnnotatedMethod( an, method ) ) ) );
+                    LambdaUtil.arrayForeach( method.getAnnotations(), a::isInstance, an -> annotatedMethods.add( new
+                            AnnotatedMethod( an, method ) ) ) );
             c = c.getSuperclass();
         }
         return annotatedMethods;

@@ -21,6 +21,7 @@ package com.plotsquared.iserver.util;
 
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.object.Generator;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.errors.View404;
@@ -34,17 +35,42 @@ public class RequestManager
 {
 
     private final List<RequestHandler> views;
+    private Generator<Request, RequestHandler> error404Generator = (request) -> View404.construct( request.getQuery()
+            .getFullRequest() );
 
     public RequestManager()
     {
         this.views = new ArrayList<>();
     }
 
+    public Generator<Request, RequestHandler> getError404Generator()
+    {
+        return error404Generator;
+    }
+
+    /**
+     * This allows you to replace the Error 404 generator, for a custom 404 screen
+     * The default one uses {@link View404}, which allows you to use a custom html file
+     *
+     * @param generator New generator
+     */
+    public void setError404Generator(final Generator<Request, RequestHandler> generator)
+    {
+        Assert.notNull( generator );
+
+        this.error404Generator = generator;
+    }
+
+    /**
+     * Register a view to the request manager
+     * @param view The view to register
+     */
     public void add(final RequestHandler view)
     {
         Assert.notNull( view );
 
-        final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst( views, v -> v.toString().equalsIgnoreCase( view.toString() ) );
+        final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst( views, v -> v.toString()
+                .equalsIgnoreCase( view.toString() ) );
         if ( illegalRequestHandler.isPresent() )
         {
             throw new IllegalArgumentException( "Duplicate view pattern!" );
@@ -52,6 +78,11 @@ public class RequestManager
         views.add( view );
     }
 
+    /**
+     * Try to find the request handler that matches the request
+     * @param request Incoming request
+     * @return Matching request handler, or {@link #getError404Generator()} if none was found
+     */
     public RequestHandler match(final Request request)
     {
         Assert.isValid( request );
@@ -61,7 +92,7 @@ public class RequestManager
         {
             return view.get();
         }
-        return View404.construct( request.getQuery().getFullRequest() );
+        return error404Generator.generate( request );
     }
 
     public void dump(final Server server)

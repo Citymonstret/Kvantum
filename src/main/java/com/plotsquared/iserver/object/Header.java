@@ -238,7 +238,7 @@ final public class Header
     private String status;
     private String format;
 
-    public Header(String status, String format)
+    public Header(final String status, final String format)
     {
         this.status = status;
         this.format = format;
