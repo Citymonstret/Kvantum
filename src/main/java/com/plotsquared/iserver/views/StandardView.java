@@ -25,6 +25,17 @@ public class StandardView extends View implements CacheApplicable
         fileName = variables.get( "file" );
         extension = variables.get( "extension" ).replace( ".", "" );
 
+        if ( fileName.isEmpty() )
+        {
+            if ( containsOption( "defaultFile" ) )
+            {
+                fileName = getOption( "fileName" );
+            } else
+            {
+                fileName = "index";
+            }
+        }
+
         if ( extension.isEmpty() )
         {
             if ( containsOption( "defaultExt" ) )

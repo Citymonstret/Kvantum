@@ -62,7 +62,6 @@ crashlytics-build.properties
 .project
 *.classpath
 *.prefs
-/public/
 .gradle/
 build/
 storage/
