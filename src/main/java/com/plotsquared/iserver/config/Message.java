@@ -28,6 +28,7 @@ import static com.plotsquared.iserver.logging.LogModes.*;
  */
 public enum Message
 {
+    WAITING_FOR_EXECUTOR_SERVICE( "Waiting for the executor service to shutdown", MODE_INFO ),
     SYNTAX_STATUS( "Syntax Enabled: %s", MODE_INFO ),
     DISABLING_PLUGINS( "Disabling all plugins", MODE_INFO ),
     DISABLED_PLUGIN( "Disabled plugin '%s'", MODE_INFO ),

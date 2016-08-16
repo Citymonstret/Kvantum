@@ -40,7 +40,7 @@ public class CSSView extends View implements CacheApplicable
     {
         super( filter, "css", options );
         super.relatedFolderPath = "/assets/css";
-        super.fileName = "{2}.css";
+        super.fileName = "{file}.css";
     }
 
     @Override

@@ -56,7 +56,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
 
@@ -66,18 +68,17 @@ import static com.plotsquared.iserver.logging.LogModes.*;
  * @author Citymonstret | Sauilitired
  * @see com.plotsquared.iserver.core.IntellectualServer
  */
-public final class Server extends Thread implements IntellectualServer
+public final class Server implements IntellectualServer
 {
 
     // Private Static
     private static Server instance;
-    // Package-Protected Final
-    final Queue<Socket> queue = new ConcurrentLinkedQueue<>();
     // Private Final
     private final LogWrapper logWrapper;
     private final boolean standalone;
     private final Map<String, Class<? extends View>> viewBindings;
     private final WorkerProcedure workerProcedure = new WorkerProcedure();
+    private final ExecutorService executorService;
     // Public
     public ConfigurationFile translations;
     volatile CacheManager cacheManager;
@@ -98,7 +99,6 @@ public final class Server extends Thread implements IntellectualServer
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
     private ApplicationStructure mainApplicationStructure;
-    private Worker[] workerThreads;
     private AccountManager globalAccountManager;
     private FileSystem fileSystem;
 
@@ -276,7 +276,8 @@ public final class Server extends Thread implements IntellectualServer
             log( Message.DEBUG );
         }
 
-        this.workerThreads = LambdaUtil.arrayAssign( new Worker[ CoreConfig.workers ], Worker::new );
+        this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
+        Worker.setup( CoreConfig.workers );
 
         this.started = false;
         this.stopping = false;
@@ -431,13 +432,14 @@ public final class Server extends Thread implements IntellectualServer
     @Override
     public FileSystem getFileSystem()
     {
-        return null;
+        return fileSystem;
     }
 
     @Override
     public void setEventCaller(final EventCaller caller)
     {
         Assert.notNull( caller );
+
         this.eventCaller = caller;
     }
 
@@ -595,9 +597,6 @@ public final class Server extends Thread implements IntellectualServer
             }
         }
 
-        // Start the workers
-        LambdaUtil.arrayForeach( workerThreads, Worker::start );
-
         log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.hostname + ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) +
                 "/'" );
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
@@ -666,8 +665,7 @@ public final class Server extends Thread implements IntellectualServer
                         }
                         try
                         {
-                            final Socket socket = sslSocket.accept();
-                            queue.add( socket );
+                            acceptSocket( sslSocket.accept() );
                         } catch ( final Exception e )
                         {
                             Server.this.log( Message.TICK_ERROR );
@@ -693,7 +691,7 @@ public final class Server extends Thread implements IntellectualServer
             }
             try
             {
-                tick();
+                acceptSocket( socket.accept() );
             } catch ( final Exception e )
             {
                 log( Message.TICK_ERROR );
@@ -702,24 +700,9 @@ public final class Server extends Thread implements IntellectualServer
         }
     }
 
-    @Override
-    public void tick()
+    private void acceptSocket(final Socket s)
     {
-        // Recently remade to use worker threads, rather than
-        // creating a new thread for each request - this saves time
-        // and makes sure to use all resources to their fullest potential
-        try
-        {
-            final Socket s = socket.accept();
-            queue.add( s );
-        } catch ( final Exception e )
-        {
-            if ( e.getMessage().toLowerCase().contains( "closed" ) )
-            {
-                return;
-            }
-            e.printStackTrace();
-        }
+        this.executorService.execute( () -> Worker.getAvailableWorker().run( s, Server.this ) );
     }
 
     @Override
@@ -836,6 +819,15 @@ public final class Server extends Thread implements IntellectualServer
                 sslSocket.close();
             }
         } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            Message.WAITING_FOR_EXECUTOR_SERVICE.log();
+            this.executorService.awaitTermination( 30, TimeUnit.SECONDS );
+        } catch ( final InterruptedException e )
         {
             e.printStackTrace();
         }

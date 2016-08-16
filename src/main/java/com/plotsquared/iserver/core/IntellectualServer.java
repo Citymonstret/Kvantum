@@ -87,8 +87,6 @@ public interface IntellectualServer
     @SuppressWarnings("ALL")
     void start();
 
-    void tick();
-
     WorkerProcedure getProcedure();
 
     /**

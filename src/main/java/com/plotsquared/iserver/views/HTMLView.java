@@ -42,7 +42,7 @@ public class HTMLView extends View implements CacheApplicable
     public HTMLView(String filter, Map<String, Object> options)
     {
         super( filter, "html", options );
-        super.fileName = "{2}.html";
+        super.fileName = "{file}.html";
         super.defaultFile = "index";
     }
 

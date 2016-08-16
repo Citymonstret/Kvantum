@@ -44,7 +44,7 @@ public class LessView extends View implements CacheApplicable
     {
         super( filter, "less", options );
         super.relatedFolderPath = "./assets/less";
-        super.fileName = "{2}.less";
+        super.fileName = "{file}.less";
     }
 
     public static String getLess(File file, int buffer)

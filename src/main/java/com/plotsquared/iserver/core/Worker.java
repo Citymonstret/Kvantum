@@ -22,7 +22,6 @@ package com.plotsquared.iserver.core;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.thread.ThreadManager;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.views.RequestHandler;
 import org.apache.commons.lang3.ArrayUtils;
@@ -32,8 +31,10 @@ import java.io.*;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -44,16 +45,12 @@ class Worker
 {
 
     private static byte[] empty = "NULL".getBytes();
-    private static int idPool = 0;
-
-    private final int id;
+    private static Queue<Worker> availableWorkers;
     private final MessageDigest messageDigestMd5;
     private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
-
-    Worker()
+    private Worker()
     {
-        this.id = idPool++;
         if ( CoreConfig.contentMd5 )
         {
             MessageDigest temporary = null;
@@ -72,6 +69,25 @@ class Worker
             encoder = null;
         }
         this.workerProcedureInstance = Server.getInstance().getProcedure().getInstance();
+    }
+
+    static void setup(final int n)
+    {
+        availableWorkers = new ArrayDeque<>( n );
+        for ( int i = 0; i < n; i++ )
+        {
+            availableWorkers.add( new Worker() );
+        }
+    }
+
+    static Worker getAvailableWorker()
+    {
+        Worker worker = availableWorkers.poll();
+        while ( worker == null )
+        {
+            worker = availableWorkers.poll();
+        }
+        return worker;
     }
 
     /**
@@ -98,20 +114,6 @@ class Worker
         Assert.equals( compressedData != null && compressedData.length > 0, true );
 
         return compressedData;
-    }
-
-    synchronized void start()
-    {
-        Server.getInstance().log( "Started thread: " + id );
-        final Server server = (Server) Server.getInstance();
-        ThreadManager.createThread( () ->
-        {
-            if ( !server.queue.isEmpty() )
-            {
-                Socket current = server.queue.poll();
-                run( current, server );
-            }
-        } );
     }
 
     private void handle(final Request request, final Server server, final BufferedOutputStream output)
@@ -279,7 +281,7 @@ class Worker
         request.setValid( false );
     }
 
-    private void run(final Socket remote, final Server server)
+    void run(final Socket remote, final Server server)
     {
         if ( remote == null || remote.isClosed() )
         {
@@ -346,6 +348,8 @@ class Worker
         {
             e.printStackTrace();
         }
+
+        availableWorkers.add( this );
     }
 
     private String md5Checksum(final byte[] input)

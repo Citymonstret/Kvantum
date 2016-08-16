@@ -40,7 +40,7 @@ public class JSView extends View implements CacheApplicable
     {
         super( filter, "javascript", options );
         super.relatedFolderPath = "/assets/js";
-        super.fileName = "{2}.js";
+        super.fileName = "{file}.js";
     }
 
     @Override

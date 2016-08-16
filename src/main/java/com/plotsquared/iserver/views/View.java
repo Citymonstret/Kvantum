@@ -19,6 +19,7 @@
 
 package com.plotsquared.iserver.views;
 
+import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.matching.ViewPattern;
 import com.plotsquared.iserver.object.Request;
@@ -40,6 +41,35 @@ import java.util.Map;
 @SuppressWarnings("ALL")
 public class View extends RequestHandler
 {
+
+    /**
+     * Variable corrensponding to {@link #PATTERN_VARIABLE_FILE}
+     */
+    public static final String VARIABLE_FILE = "file";
+    /**
+     * Variable corrensponding to {@link #PATTERN_VARIABLE_FOLDER}
+     */
+    public static final String VARIABLE_FOLDER = "folder";
+    /**
+     * Variable corrensponding to {@link #PATTERN_VARIABLE_EXTENSION}
+     */
+    public static final String VARIABLE_EXTENSION = "extension";
+
+    /**
+     * Pattern corrensponding to {@link #VARIABLE_FILE}
+     */
+    public static final String PATTERN_VARIABLE_FILE = "{file}";
+    /**
+     * Pattern corrensponding to {@link #VARIABLE_FOLDER}
+     */
+    public static final String PATTERN_VARIABLE_FOLDER = "{folder}";
+    /**
+     * Pattern corrensponding to {@link #VARIABLE_EXTENSION}
+     */
+    public static final String PATTERN_VARIABLE_EXTENSION = "{extension}";
+
+    public static final String CONSTANT_BUFFER = "buffer";
+    public static final String CONSTANT_VARIABLES = "variables";
 
     private final Map<String, Object> options;
     private final String internalName;
@@ -171,13 +201,34 @@ public class View extends RequestHandler
             {
                 if ( !folder.mkdirs() )
                 {
-                    Server.getInstance().log( "Couldn't create the " + internalName + " folder..." );
+                    Message.COULD_NOT_CREATE_FOLDER.log( folder );
                 }
             }
         }
         return this.folder;
     }
 
+    /**
+     * <p>
+     * Get a file from the {@link #getFolder()} folder, based on request
+     * variables and the {@link #fileName} or {@link #getOption(String)} "filepattern", pattern
+     * </p>
+     * <p>
+     * This uses {@literal {pattern}}'s: {@literal {file}}, {@literal {folder}} and {@literal {extension}}
+     * <br>
+     * For example: <pre>/{folder}/{filename}}.{extension}</pre>
+     * </p>
+     *
+     * @param request
+     * @return The file (use {@link File#exists()}!)
+     * @see #PATTERN_VARIABLE_EXTENSION
+     * @see #PATTERN_VARIABLE_FILE
+     * @see #PATTERN_VARIABLE_FOLDER
+     * @see #VARIABLE_EXTENSION
+     * @see #VARIABLE_FILE
+     * @see #VARIABLE_FOLDER
+     * @see #getFolder()
+     */
     protected File getFile(final Request request)
     {
         Assert.isValid( request );
@@ -198,8 +249,8 @@ public class View extends RequestHandler
         }
         String n = internalFileName;
         {
-            String t = variables.get( "file" );
-            n = n.replace( "{1}", variables.get( "folder" ) );
+            String t = variables.get( VARIABLE_FILE );
+            n = n.replace( PATTERN_VARIABLE_FOLDER, variables.get( VARIABLE_FOLDER ) );
             if ( t == null || t.equals( "" ) )
             {
                 if ( internalDefaultFile == null )
@@ -217,13 +268,13 @@ public class View extends RequestHandler
                 }
                 t = internalDefaultFile;
             }
-            n = n.replace( "{2}", variables.get( "file" ) );
-            if ( variables.containsKey( "extension" ) )
+            n = n.replace( PATTERN_VARIABLE_FILE, variables.get( VARIABLE_FILE ) );
+            if ( variables.containsKey( VARIABLE_EXTENSION ) )
             {
-                n = n.replace( "{3}", variables.get( "extension" ).replace( ".", "" ) );
+                n = n.replace( PATTERN_VARIABLE_EXTENSION, variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) );
             } else
             {
-                n = n.replace( "{3}", "" );
+                n = n.replace( PATTERN_VARIABLE_EXTENSION, "" );
             }
         }
         return new File( getFolder(), n );
@@ -239,9 +290,9 @@ public class View extends RequestHandler
     {
         if ( this.buffer == -1 )
         {
-            if ( containsOption( "buffer" ) )
+            if ( containsOption( CONSTANT_BUFFER ) )
             {
-                this.buffer = getOption( "buffer" );
+                this.buffer = getOption( CONSTANT_BUFFER );
             } else
             {
                 this.buffer = 65536; // 64kb
@@ -266,7 +317,7 @@ public class View extends RequestHandler
         final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
         if ( map != null )
         {
-            request.addMeta( "variables", map );
+            request.addMeta( CONSTANT_VARIABLES, map );
         }
         return map != null && passes( request );
     }
