@@ -66,3 +66,4 @@ crashlytics-build.properties
 build/
 storage/
 /.iserver/config/server.yml
+/.iserver/
