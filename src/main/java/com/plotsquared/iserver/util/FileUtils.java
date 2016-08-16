@@ -122,6 +122,22 @@ public class FileUtils
         }
     }
 
+    public static void copyFile(final File in, final File out)
+    {
+        try ( final FileInputStream inStream = new FileInputStream( in ) )
+        {
+            try ( final FileOutputStream outStream = new FileOutputStream( out ) )
+            {
+                copyFile( inStream, outStream, 16 * 1024 );
+            } catch ( final Exception ee )
+            {
+                ee.printStackTrace();
+            }
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Copy a file from one location to another
@@ -133,7 +149,8 @@ public class FileUtils
     public static void copyFile(final InputStream in, final OutputStream out,
                                 final int size)
     {
-        Assert.notNull( in, out, size );
+        Assert.notNull( in );
+        Assert.notNull( out );
         try
         {
             final byte[] buffer = new byte[ size ];

@@ -1,7 +1,7 @@
 enableSecurityManager: true
 contentMd5: true
 cache:
-  enabled: false
+  enabled: true
 debug: true
 webAddress: http://localhost
 logPrefix: Web
@@ -10,7 +10,7 @@ ssl:
   port: 443
   keyStorePassword: password
   enable: false
-  keyStore: 'keyStore'
+  keyStore: keyStore
 verbose: false
 hostname: localhost
 enableSyntax: true
@@ -23,5 +23,5 @@ mysql:
 buffer:
   in: 1048576
   out: 1048576
-workers: 2
+workers: 1
 disableViews: false

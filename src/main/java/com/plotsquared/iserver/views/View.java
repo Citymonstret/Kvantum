@@ -189,7 +189,7 @@ public class View extends RequestHandler
         {
             if ( containsOption( "folder" ) )
             {
-                this.folder = new File( getOption( "folder" ).toString() );
+                this.folder = new File( Server.getInstance().getCoreFolder(), getOption( "folder" ).toString() );
             } else if ( relatedFolderPath != null )
             {
                 this.folder = new File( Server.getInstance().getCoreFolder(), relatedFolderPath );

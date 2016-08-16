@@ -35,6 +35,7 @@ import com.plotsquared.iserver.extra.accounts.AccountCommand;
 import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.extra.accounts.PasswordUtil;
 import com.plotsquared.iserver.files.FileSystem;
+import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
@@ -297,21 +298,33 @@ public final class Server implements IntellectualServer
             {
                 configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ), "views.yml" ) );
                 configViews.loadFile();
-                // These are the default views
-                Map<String, Object> views = new HashMap<>();
-                // HTML View
-                Map<String, Object> view = new HashMap<>();
-                view.put( "filter", "[file][extension]" );
-                view.put( "type", "std" );
-                Map<String, Object> opts = new HashMap<>();
-                opts.put( "folder", "./public" );
-                view.put( "options", opts );
-                views.put( "std", view );
-                configViews.setIfNotExists( "views", views );
+                    // These are the default views
+                    Map<String, Object> views = new HashMap<>();
+                    // HTML View
+                    Map<String, Object> view = new HashMap<>();
+                    view.put( "filter", "[file][extension]" );
+                    view.put( "type", "std" );
+                    Map<String, Object> opts = new HashMap<>();
+                    opts.put( "folder", "./public" );
+                    view.put( "options", opts );
+                    views.put( "std", view );
+                    configViews.setIfNotExists( "views", views );
+                    final Path path = getFileSystem().getPath( "public" );
+                    if ( !path.exists() )
+                    {
+                        path.create();
+                    }
+                    try ( final OutputStream out = new FileOutputStream( new File( path.getFile(), "index.html" ) ) )
+                    {
+                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
+                    } catch ( final Exception e )
+                    {
+                        e.printStackTrace();
+                    }
                 configViews.saveFile();
             } catch ( final Exception e )
             {
-                throw new RuntimeException( "Couldn't load in views" );
+                throw new RuntimeException( "Couldn't load in views", e );
             }
         }
 
@@ -826,7 +839,7 @@ public final class Server implements IntellectualServer
         try
         {
             Message.WAITING_FOR_EXECUTOR_SERVICE.log();
-            this.executorService.awaitTermination( 30, TimeUnit.SECONDS );
+            this.executorService.awaitTermination( 5, TimeUnit.SECONDS );
         } catch ( final InterruptedException e )
         {
             e.printStackTrace();
@@ -841,6 +854,7 @@ public final class Server implements IntellectualServer
         {
             e.printStackTrace();
         }
+
         if ( standalone )
         {
             System.exit( 0 );
