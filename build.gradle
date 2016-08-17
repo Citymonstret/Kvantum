@@ -1,9 +1,13 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
     }
 }
 
@@ -15,6 +19,8 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: "com.github.hierynomus.license"
+
 
 group = 'com.intellectualsites'
 version = '2.0.0'
@@ -31,6 +37,10 @@ jar {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+license {
+    header rootProject.file('HEADER')
+}
 
 repositories {
      maven { url "https://jitpack.io" }
