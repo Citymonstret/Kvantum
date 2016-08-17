@@ -78,6 +78,9 @@ ssl:
 ##Development
 
 ###Maven
+[![](https://jitpack.io/v/IntellectualSites/IntellectualServer.svg)](https://jitpack.io/#IntellectualSites/IntellectualServer)
+
+
 We are using JitPack as our maven repo
 ```xml
 <repositories>
