@@ -18,8 +18,8 @@
  */
 package com.plotsquared.iserver.views.errors;
 
+import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.Server;
-import com.plotsquared.iserver.logging.LogModes;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.FileUtils;
@@ -50,7 +50,8 @@ public class Error extends View
             {
                 if ( !file.mkdir() )
                 {
-                    Server.getInstance().log( "Failed to create template folder :(", LogModes.MODE_ERROR );
+
+                    Message.COULD_NOT_CREATE_FOLDER.log( file );
                 }
             }
             file = new File( file, "error.html" );

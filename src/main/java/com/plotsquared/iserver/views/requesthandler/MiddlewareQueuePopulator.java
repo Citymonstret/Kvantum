@@ -18,9 +18,6 @@
  */
 package com.plotsquared.iserver.views.requesthandler;
 
-import com.plotsquared.iserver.core.Server;
-import com.plotsquared.iserver.logging.LogModes;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -40,8 +37,7 @@ public final class MiddlewareQueuePopulator
             middleware.getConstructor();
         } catch ( final Exception e )
         {
-            Server.getInstance().log( "Middleware '" + middleware + "' doesn't have a default constructor, skipping it!",
-                    LogModes.MODE_WARNING );
+            e.printStackTrace();
             return;
         }
         this.middlewares.add( middleware );
