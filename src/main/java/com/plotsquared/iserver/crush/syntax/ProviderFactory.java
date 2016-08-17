@@ -21,11 +21,6 @@ package com.plotsquared.iserver.crush.syntax;
 
 import com.plotsquared.iserver.object.Request;
 
-/**
- * Created 2015-04-20 for IntellectualServer
- *
- * @author Citymonstret
- */
 public interface ProviderFactory<T extends VariableProvider>
 {
 

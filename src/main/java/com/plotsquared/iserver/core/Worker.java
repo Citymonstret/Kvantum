@@ -19,7 +19,9 @@
 
 package com.plotsquared.iserver.core;
 
+import com.codahale.metrics.Timer;
 import com.plotsquared.iserver.config.Message;
+import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.util.Assert;
@@ -35,20 +37,25 @@ import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.CRC32;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 /**
  * This is the worker that is responsible for nearly everything.
  * Feel no pressure, buddy.
  */
-class Worker
+class Worker extends AutoCloseable
 {
 
     private static byte[] empty = "NULL".getBytes();
     private static Queue<Worker> availableWorkers;
+
     private final MessageDigest messageDigestMd5;
     private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
+    private final ReusableGzipOutputStream reusableGzipOutputStream;
+
     private Worker()
     {
         if ( CoreConfig.contentMd5 )
@@ -68,11 +75,37 @@ class Worker
             messageDigestMd5 = null;
             encoder = null;
         }
+
+        if ( CoreConfig.gzip )
+        {
+            this.reusableGzipOutputStream = new ReusableGzipOutputStream();
+        } else
+        {
+            this.reusableGzipOutputStream = null;
+        }
+
         this.workerProcedureInstance = Server.getInstance().getProcedure().getInstance();
+    }
+
+    @Override
+    protected void handleClose()
+    {
+        if ( CoreConfig.gzip )
+        {
+            try
+            {
+                this.reusableGzipOutputStream.close();
+            } catch ( final Exception e )
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     static void setup(final int n)
     {
+        Assert.isPositive( n );
+
         availableWorkers = new ArrayDeque<>( n );
         for ( int i = 0; i < n; i++ )
         {
@@ -80,6 +113,11 @@ class Worker
         }
     }
 
+    /**
+     * Poll the worker queue until a worker is available
+     *
+     * @return The next available worker
+     */
     static Worker getAvailableWorker()
     {
         Worker worker = availableWorkers.poll();
@@ -97,23 +135,20 @@ class Worker
      * @return GZIP compressed data
      * @throws IOException If compression fails
      */
-    private static byte[] compress(final byte[] data) throws IOException
+    private byte[] compress(final byte[] data) throws IOException
     {
         Assert.notNull( data );
 
-        final byte[] compressedData;
-        try ( final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( data.length ) )
-        {
-            try ( final GZIPOutputStream gzipOutputStream = new GZIPOutputStream( byteArrayOutputStream ) )
-            {
-                gzipOutputStream.write( data );
-            }
-            compressedData = byteArrayOutputStream.toByteArray();
-        }
+        reusableGzipOutputStream.reset();
+        reusableGzipOutputStream.write( data );
+        reusableGzipOutputStream.finish();
+        reusableGzipOutputStream.flush();
 
-        Assert.equals( compressedData != null && compressedData.length > 0, true );
+        final byte[] compressed = reusableGzipOutputStream.getData();
 
-        return compressedData;
+        Assert.equals( compressed != null && compressed.length > 0, true, "Failed to compress data" );
+
+        return compressed;
     }
 
     private void handle(final Request request, final Server server, final BufferedOutputStream output)
@@ -293,6 +328,7 @@ class Worker
             return;
         }
 
+        final Timer.Context context = Server.getInstance().getMetrics().registerRequestHandling();
         Assert.notNull( server );
 
         if ( CoreConfig.verbose )
@@ -350,6 +386,7 @@ class Worker
         }
 
         availableWorkers.add( this );
+        context.stop();
     }
 
     private String md5Checksum(final byte[] input)
@@ -360,4 +397,122 @@ class Worker
         messageDigestMd5.update( input );
         return encoder.encode( messageDigestMd5.digest() );
     }
+
+    /**
+     * Borrowed from https://github.com/oakes/Nightweb/
+     */
+    private static class ReusableGzipOutputStream extends DeflaterOutputStream
+    {
+        private static final byte[] HEADER = new byte[] {
+                (byte)0x1F, (byte)0x8b, // magic bytes
+                0x08,                   // compression format == DEFLATE
+                0x00,                   // flags (NOT using CRC16, filename, etc)
+                0x00, 0x00, 0x00, 0x00, // no modification time available (don't leak this!)
+                0x02,                   // maximum compression
+                (byte)0xFF              // unknown creator OS (!!!)
+        };
+
+        private boolean headerWritten;
+        private long writtenSize;
+
+        private final ByteArrayOutputStream bufferStream;
+
+        private final CRC32 crc32;
+
+        private boolean written = false;
+
+        private ReusableGzipOutputStream()
+        {
+            super( new ByteArrayOutputStream(), new Deflater( 9, true ) );
+            this.crc32 = new CRC32();
+            this.bufferStream = (ByteArrayOutputStream) out;
+        }
+
+        private void reset()
+        {
+            if ( this.written )
+            {
+                this.def.reset();
+                this.crc32.reset();
+                this.writtenSize = 0;
+                this.headerWritten = false;
+                this.bufferStream.reset();
+                this.def.setLevel( Deflater.BEST_SPEED );
+                this.written = false;
+            }
+        }
+
+        private byte[] getData()
+        {
+            return this.bufferStream.toByteArray();
+        }
+
+        private void ensureWritten() throws IOException
+        {
+            if ( headerWritten )
+            {
+                return;
+            }
+            this.out.write( HEADER );
+            this.headerWritten = true;
+        }
+
+        private void writeFooter() throws IOException
+        {
+            final long crcVal = this.crc32.getValue();
+            out.write((int)(crcVal & 0xFF));
+            out.write((int)((crcVal >>> 8) & 0xFF));
+            out.write((int)((crcVal >>> 16) & 0xFF));
+            out.write((int)((crcVal >>> 24) & 0xFF));
+
+            final long sizeVal = this.writtenSize;
+            out.write((int)(sizeVal & 0xFF));
+            out.write((int)((sizeVal >>> 8) & 0xFF));
+            out.write((int)((sizeVal >>> 16) & 0xFF));
+            out.write((int)((sizeVal >>> 24) & 0xFF));
+            out.flush();
+        }
+
+        @Override
+        public void close() throws IOException
+        {
+            finish();
+            super.close();
+        }
+
+        @Override
+        public void finish() throws IOException
+        {
+            ensureWritten();
+            super.finish();
+            writeFooter();
+        }
+
+        @Override
+        public void write(int b) throws IOException
+        {
+            this.written = true;
+            this.ensureWritten();
+            this.crc32.update( b );
+            this.writtenSize++;
+            super.write( b );
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException
+        {
+            write( b, 0, b.length );
+        }
+
+        @Override
+        public void write(byte[] buf, int off, int len) throws IOException
+        {
+            this.written = true;
+            this.ensureWritten();
+            this.crc32.update( buf, off, len );
+            this.writtenSize += len;
+            super.write( buf, off, len );
+        }
+    }
+
 }

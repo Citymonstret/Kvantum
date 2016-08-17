@@ -19,6 +19,10 @@
 
 package com.plotsquared.iserver.crush.syntax;
 
+/**
+ * Use this to indicate that this
+ * should be skipped by syntax processors (such as Crush)
+ */
 public interface IgnoreSyntax
 {
 

@@ -46,9 +46,9 @@ public final class InputThread extends Thread
         this.server = (Server) Server.getInstance();
         this.commands = new HashMap<>();
         this.commands.put( "stop", new Stop() );
-        this.commands.put( "cachedump", new CacheDump() );
         this.commands.put( "show", new Show() );
         this.commands.put( "dump", new Dump() );
+        this.commands.put( "metrics", new Metrics() );
     }
 
     @Override

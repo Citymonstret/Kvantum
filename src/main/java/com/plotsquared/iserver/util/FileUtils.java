@@ -23,6 +23,7 @@ import com.plotsquared.iserver.core.Server;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -204,6 +205,12 @@ public class FileUtils
     {
         Server.getInstance().log( "Trying to find file : " + file );
 
+        final Optional<String> cacheEntry = Server.getInstance().getCacheManager().getCachedFile( file.toString() );
+        if ( cacheEntry.isPresent() )
+        {
+            return cacheEntry.get();
+        }
+
         StringBuilder document = new StringBuilder();
         try
         {
@@ -231,7 +238,10 @@ public class FileUtils
         {
             e.printStackTrace();
         }
-        return document.toString();
+
+        final String content = document.toString();
+        Server.getInstance().getCacheManager().setCachedFile( file.toString(), content );
+        return content;
     }
 
     /**

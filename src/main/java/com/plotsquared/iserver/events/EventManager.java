@@ -26,9 +26,8 @@ import java.util.stream.Collectors;
 
 /**
  * The event manager
- *
- * @author Citymonstret
  */
+@SuppressWarnings( "unused" )
 public class EventManager
 {
 
@@ -52,6 +51,8 @@ public class EventManager
 
     public void addListener(final EventListener listener)
     {
+        Assert.notNull( listener );
+
         synchronized ( listeners )
         {
             if ( !listeners.containsKey( listener.hashCode() ) )
@@ -63,6 +64,8 @@ public class EventManager
 
     public Collection<EventListener> getAll(final Object y)
     {
+        Assert.notNull( y );
+
         synchronized ( listeners )
         {
             final List<EventListener> l = new ArrayList<>();
@@ -77,6 +80,8 @@ public class EventManager
 
     public void removeAll(final Object y)
     {
+        Assert.notNull( y );
+
         synchronized ( listeners )
         {
             for ( final Deque<EventListener> listeners : this.listeners.values() )
@@ -91,6 +96,7 @@ public class EventManager
     public void removeListener(final EventListener listener)
     {
         Assert.notNull( listener );
+
         synchronized ( listeners )
         {
             for ( final Deque<EventListener> ll : listeners.values() )
@@ -100,6 +106,8 @@ public class EventManager
 
     public void handle(final Event event)
     {
+        Assert.notNull( event );
+
         synchronized ( this )
         {
             call( event );
@@ -152,6 +160,7 @@ public class EventManager
     private void call(final Event event) throws NullPointerException
     {
         Assert.notNull( event );
+
         if ( bakedListeners == null
                 || !bakedListeners.containsKey( event.hashCode() ) )
             return;

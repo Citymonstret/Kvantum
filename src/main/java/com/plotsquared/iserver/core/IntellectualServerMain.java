@@ -145,7 +145,6 @@ public class IntellectualServerMain
         return Optional.ofNullable( server );
     }
 
-
     /**
      * Start a server, and get the instance
      *
@@ -169,6 +168,16 @@ public class IntellectualServerMain
             e.printStackTrace();
         }
         return server;
+    }
+
+    public static Optional<? extends IntellectualServer> start(File coreFolder)
+    {
+        return start( false, coreFolder, new DefaultLogWrapper() );
+    }
+
+    public static Optional<? extends IntellectualServer> start()
+    {
+        return start( new File( "./" ) );
     }
 
     /**

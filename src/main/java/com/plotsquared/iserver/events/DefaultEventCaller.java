@@ -24,7 +24,7 @@ package com.plotsquared.iserver.events;
  *
  * @author Citymonstret
  */
-public class DefaultEventCaller extends EventCaller
+public final class DefaultEventCaller implements EventCaller
 {
 
     @Override

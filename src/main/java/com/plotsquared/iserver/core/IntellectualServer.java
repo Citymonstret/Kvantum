@@ -27,13 +27,18 @@ import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.LogWrapper;
+import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.CacheManager;
+import com.plotsquared.iserver.util.Metrics;
 import com.plotsquared.iserver.util.RequestManager;
 import com.plotsquared.iserver.util.SessionManager;
+import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.View;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * Core server interface, contains
@@ -71,6 +76,20 @@ public interface IntellectualServer
     void handleEvent(Event event);
 
     FileSystem getFileSystem();
+
+    /**
+     * Create and register a simple request handler
+     * @param filter View filter - {@link com.plotsquared.iserver.matching.ViewPattern}
+     * @param generator The response generator
+     * @return The handler implementation
+     */
+    RequestHandler createSimpleRequestHandler(String filter, BiConsumer<Request, Response> generator);
+
+    /**
+     * Get the metric manager
+     * @return Metric manager
+     */
+    Metrics getMetrics();
 
     /**
      * Set the engine event caller

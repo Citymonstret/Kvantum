@@ -39,12 +39,15 @@ import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
+import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.error.IntellectualServerInitializationException;
 import com.plotsquared.iserver.object.error.IntellectualServerStartException;
 import com.plotsquared.iserver.plugin.PluginLoader;
 import com.plotsquared.iserver.plugin.PluginManager;
 import com.plotsquared.iserver.util.*;
 import com.plotsquared.iserver.views.*;
+import com.plotsquared.iserver.views.requesthandler.SimpleRequestHandler;
 import sun.misc.Signal;
 
 import javax.net.ssl.SSLServerSocket;
@@ -60,6 +63,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
 
@@ -80,6 +84,7 @@ public final class Server implements IntellectualServer
     private final Map<String, Class<? extends View>> viewBindings;
     private final WorkerProcedure workerProcedure = new WorkerProcedure();
     private final ExecutorService executorService;
+    private final Metrics metrics = new Metrics();
     // Public
     public ConfigurationFile translations;
     volatile CacheManager cacheManager;
@@ -298,29 +303,29 @@ public final class Server implements IntellectualServer
             {
                 configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ), "views.yml" ) );
                 configViews.loadFile();
-                    // These are the default views
-                    Map<String, Object> views = new HashMap<>();
-                    // HTML View
-                    Map<String, Object> view = new HashMap<>();
-                    view.put( "filter", "[file][extension]" );
-                    view.put( "type", "std" );
-                    Map<String, Object> opts = new HashMap<>();
-                    opts.put( "folder", "./public" );
-                    view.put( "options", opts );
-                    views.put( "std", view );
-                    configViews.setIfNotExists( "views", views );
-                    final Path path = getFileSystem().getPath( "public" );
-                    if ( !path.exists() )
-                    {
-                        path.create();
-                    }
-                    try ( final OutputStream out = new FileOutputStream( new File( path.getFile(), "index.html" ) ) )
-                    {
-                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
-                    } catch ( final Exception e )
-                    {
-                        e.printStackTrace();
-                    }
+                // These are the default views
+                Map<String, Object> views = new HashMap<>();
+                // HTML View
+                Map<String, Object> view = new HashMap<>();
+                view.put( "filter", "[file][extension]" );
+                view.put( "type", "std" );
+                Map<String, Object> opts = new HashMap<>();
+                opts.put( "folder", "./public" );
+                view.put( "options", opts );
+                views.put( "std", view );
+                configViews.setIfNotExists( "views", views );
+                final Path path = getFileSystem().getPath( "public" );
+                if ( !path.exists() )
+                {
+                    path.create();
+                }
+                try ( final OutputStream out = new FileOutputStream( new File( path.getFile(), "index.html" ) ) )
+                {
+                    FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
+                } catch ( final Exception e )
+                {
+                    e.printStackTrace();
+                }
                 configViews.saveFile();
             } catch ( final Exception e )
             {
@@ -368,6 +373,12 @@ public final class Server implements IntellectualServer
     public static IntellectualServer getInstance()
     {
         return instance;
+    }
+
+    @Override
+    public Metrics getMetrics()
+    {
+        return metrics;
     }
 
     private void printLicenseInfo()
@@ -435,8 +446,7 @@ public final class Server implements IntellectualServer
         if ( standalone || eventCaller == null )
         {
             EventManager.getInstance().handle( event );
-        }
-        else
+        } else
         {
             eventCaller.callEvent( event );
         }
@@ -871,5 +881,13 @@ public final class Server implements IntellectualServer
     public RequestManager getRequestManager()
     {
         return requestManager;
+    }
+
+    @Override
+    public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<Request, Response> generator)
+    {
+        final RequestHandler handler = new SimpleRequestHandler( filter, generator );
+        this.getRequestManager().add( handler );
+        return handler;
     }
 }

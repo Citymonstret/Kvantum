@@ -54,4 +54,6 @@ dependencies {
     compile name: 'JCDP-1.25-win'
     compile group: 'com.beust', name: 'jcommander', version: '1.48'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile 'org.ehcache:ehcache:3.1.1'
+    compile 'io.dropwizard.metrics:metrics-core:3.1.0'
 }

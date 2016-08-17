@@ -38,7 +38,7 @@ public abstract class ServerEvent extends Event
      * @param server The server instance
      * @param name   The event identifier
      */
-    public ServerEvent(final Server server, final String name)
+    ServerEvent(final Server server, final String name)
     {
         super( "is::server::" + name );
         this.server = server;

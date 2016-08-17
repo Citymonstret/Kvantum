@@ -24,7 +24,8 @@ package com.plotsquared.iserver.events;
  *
  * @author Citymonstret
  */
-public abstract class EventCaller
+@FunctionalInterface
+public interface EventCaller
 {
 
     /**
@@ -32,6 +33,6 @@ public abstract class EventCaller
      *
      * @param event Event to call
      */
-    public abstract void callEvent(final Event event);
+    void callEvent(final Event event);
 
 }

@@ -19,12 +19,21 @@
 
 package com.plotsquared.iserver.util;
 
+import com.plotsquared.iserver.core.CoreConfig;
+import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.ResponseBody;
 import com.plotsquared.iserver.object.cache.CachedResponse;
 import com.plotsquared.iserver.views.RequestHandler;
+import org.ehcache.Cache;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.MemoryUnit;
+import org.ehcache.expiry.Duration;
+import org.ehcache.expiry.Expirations;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The utility file that
@@ -33,8 +42,33 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheManager
 {
 
-    public final Map<String, String> cachedIncludes = new ConcurrentHashMap<>();
-    private final Map<String, CachedResponse> cachedBodies = new ConcurrentHashMap<>();
+    private Cache<String, String> cachedIncludes;
+    private Cache<String, String> cachedFiles;
+    private Cache<String, CachedResponse> cachedBodies;
+
+    public CacheManager()
+    {
+        org.ehcache.CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                .withCache( "cachedIncludes", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
+                        String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache.cachedIncludesHeapMB,
+                                MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration( Duration.of(
+                                        CoreConfig.Cache.cachedIncludesExpiry, TimeUnit.SECONDS ))
+                ) )
+                .withCache( "cachedBodies", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
+                        CachedResponse.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
+                                        .cachedBodiesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
+                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS ))
+                ) )
+                .withCache( "cachedFiles", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
+                        String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
+                                        .cachedFilesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
+                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS ))
+                ) )
+                .build( true );
+        this.cachedIncludes = cacheManager.getCache( "cachedIncludes", String.class, String.class );
+        this.cachedFiles = cacheManager.getCache( "cachedFiles", String.class, String.class );
+        this.cachedBodies = cacheManager.getCache( "cachedBodies", String.class, CachedResponse.class );
+    }
 
     /**
      * Get a cached include block
@@ -48,6 +82,35 @@ public class CacheManager
 
         return this.cachedIncludes.containsKey( group ) ?
                 cachedIncludes.get( group ) : null;
+    }
+
+    public Optional<String> getCachedFile(final String file)
+    {
+        Assert.notEmpty( file );
+
+        if ( CoreConfig.debug )
+        {
+            Server.getInstance().log( "Accessing cached file: " + file );
+        }
+
+        if ( !CoreConfig.Cache.enabled )
+        {
+            return Optional.empty();
+        }
+
+        if ( cachedFiles.containsKey( file ) )
+        {
+            return Optional.of( cachedFiles.get( file ) );
+        }
+        return Optional.empty();
+    }
+
+    public void setCachedFile(final String file, final String content)
+    {
+        Assert.notEmpty( file );
+        Assert.notNull( content );
+
+        cachedFiles.put( file, content );
     }
 
     /**
@@ -101,16 +164,11 @@ public class CacheManager
     {
         Assert.notNull( view );
 
-        return this.cachedBodies.get( view.toString() );
-    }
+        if ( CoreConfig.debug )
+        {
+            Server.getInstance().log( "Accessing cached body: " + view );
+        }
 
-    /**
-     * Get all cached ResponseBodies
-     *
-     * @return all cached ResponseBodies
-     */
-    public Map<String, CachedResponse> getAll()
-    {
-        return this.cachedBodies;
+        return this.cachedBodies.get( view.toString() );
     }
 }
