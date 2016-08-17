@@ -1,8 +1,8 @@
 @echo off &setlocal
 
-:: gradlew :licenseFormatMain
-:: gradlew :build
-:: gradlew :shadowJar
+call gradlew :licenseFormatMain
+call gradlew :build
+call gradlew :shadowJar
 
 set /p oldVersion=< old-version.txt
 set /p newVersion=< version.txt
@@ -14,6 +14,10 @@ echo Old version: %oldVersion%
 echo New version: %newVersion%
 
 call:DoReplace "%oldVersion%" "%newVersion%" README.md README.md
+
+copy /Y .\build\libs\IntellectualServer-%newVersion%-all.jar .\
+
+git add IntellectualServer-%newVersion%-all.jar
 
 exit /b
 
