@@ -23,7 +23,7 @@ apply plugin: "com.github.hierynomus.license"
 
 
 group = 'com.intellectualsites'
-version = '2.0.0'
+version = '2.0.1'
 
 description = """"""
 
@@ -48,6 +48,12 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+}
+
+task writeVersionToFile << {
+    File file = new File(projectDir, "version.txt");
+    new File(projectDir, "old-version.txt").text = file.text;
+    file.text = version;
 }
 
 dependencies {
