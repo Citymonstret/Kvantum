@@ -1,27 +1,29 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.extra.accounts;
+package com.plotsquared.iserver.account;
 
 import com.plotsquared.iserver.commands.Command;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.extra.ApplicationStructure;
-import com.plotsquared.iserver.object.Session;
+import com.plotsquared.iserver.util.StringUtil;
+
+import java.util.Optional;
 
 public class AccountCommand extends Command
 {
@@ -38,11 +40,52 @@ public class AccountCommand extends Command
     {
         if ( args.length < 1 )
         {
-            send( "Available Subcommands: create, setpassword, logout" );
+            send( "Available Subcommands: create, testpass, dumpdata" );
         } else
         {
             switch ( args[ 0 ].toLowerCase() )
             {
+                case "dumpdata":
+                {
+                    if ( args.length < 2 )
+                    {
+                        send( "Syntax: account dumpdata [username]" );
+                    } else
+                    {
+                        String username = args[ 1 ];
+                        Optional<Account> account = structure.getAccountManager().getAccount( username );
+                        if ( !account.isPresent() )
+                        {
+                            send( "There is no such account!" );
+                        } else
+                        {
+                            send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                                    .getRawData(), ": ", ", " ) );
+                        }
+                    }
+                }
+                break;
+                case "testpass":
+                {
+                    if ( args.length < 3 )
+                    {
+                        send( "Syntax: account testpass [username] [password]" );
+                    } else
+                    {
+                        String username = args[ 1 ];
+                        String password = args[ 2 ];
+
+                        Optional<Account> accountOptional = structure.getAccountManager().getAccount( username );
+                        if ( !accountOptional.isPresent() )
+                        {
+                            send( "There is no such account!" );
+                        } else
+                        {
+                            send( "Matches: " + accountOptional.get().passwordMatches( password ) );
+                        }
+                    }
+                }
+                break;
                 case "create":
                 {
                     if ( args.length < 3 )
@@ -53,57 +96,18 @@ public class AccountCommand extends Command
                         String username = args[ 1 ];
                         String password = args[ 2 ];
 
-                        if ( structure.getAccountManager().getAccount( new Object[]{ null, username } ) != null )
+                        if ( structure.getAccountManager().getAccount( username ) != null )
                         {
                             send( "There is already an account with that username!" );
                         } else
                         {
                             try
                             {
-                                final byte[] salt = PasswordUtil.getSalt();
-                                final byte[] encryptedPassword = PasswordUtil.encryptPassword( password, salt );
-
-                                Account account = new Account( structure.getAccountManager().getNextId(), username,
-                                        encryptedPassword, salt );
-                                send( "Account created (Username: " + username + ", ID: " + account.getID() + ")" );
-                                structure.getAccountManager().createAccount( account );
+                                send( "Account created (Username: " + username + ")" );
+                                structure.getAccountManager().createAccount( username, password );
                             } catch ( final Exception e )
                             {
                                 e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-                break;
-                case "setpassword":
-                {
-                    if ( args.length < 3 )
-                    {
-                        send( "Syntax: account setpassword [username] [new password]" );
-                    }
-                }
-                break;
-                case "logout":
-                {
-                    if ( args.length < 2 )
-                    {
-                        send( "Syntax: account logout [username]" );
-                    } else
-                    {
-                        Account account = structure.getAccountManager().getAccount( new Object[]{ null, args[ 1 ] } );
-                        if ( account == null )
-                        {
-                            send( "There is no such account" );
-                        } else
-                        {
-                            Session session = structure.getAccountManager().getSession( account );
-                            if ( session == null )
-                            {
-                                send( "There is no such session" );
-                            } else
-                            {
-                                structure.getAccountManager().unbindAccount( session );
-                                send( "Session unbound!" );
                             }
                         }
                     }

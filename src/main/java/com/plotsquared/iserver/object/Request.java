@@ -23,6 +23,7 @@ import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.crush.syntax.VariableProvider;
+import com.plotsquared.iserver.http.HttpMethod;
 import com.plotsquared.iserver.util.*;
 import com.plotsquared.iserver.views.RequestHandler;
 
@@ -202,7 +203,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         Request request = new Request();
         request.headers = new HashMap<>( headers );
         request.socket = socket;
-        request.query = new Query( Method.GET, query );
+        request.query = new Query( HttpMethod.GET, query );
         request.meta = new HashMap<>( meta );
         request.cookies = cookies;
         request.protocolType = protocolType;
@@ -258,10 +259,10 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         final String[] parts = getHeader( "query" ).split( " " );
         if ( parts.length < 3 )
         {
-            this.query = new Query( Method.GET, "/" );
+            this.query = new Query( HttpMethod.GET, "/" );
         } else
         {
-            final Optional<Method> methodOptional = Method.getByName( parts[ 0 ] );
+            final Optional<HttpMethod> methodOptional = HttpMethod.getByName( parts[ 0 ] );
             if ( !methodOptional.isPresent() )
             {
                 throw new RuntimeException( "Unknown request method: " + parts[ 0 ] );
@@ -385,7 +386,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public static class Query
     {
 
-        private final Method method;
+        private final HttpMethod method;
         private final String resource;
         private final Map<String, String> parameters = new HashMap<>();
 
@@ -395,7 +396,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
          * @param method   Request Method
          * @param resource The requested resource
          */
-        Query(Method method, String resource)
+        Query(HttpMethod method, String resource)
         {
             Assert.notNull( method, resource );
 
@@ -414,7 +415,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             this.resource = resource;
         }
 
-        public Method getMethod()
+        public HttpMethod getMethod()
         {
             return this.method;
         }

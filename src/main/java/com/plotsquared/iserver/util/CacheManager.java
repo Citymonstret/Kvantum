@@ -1,23 +1,24 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package com.plotsquared.iserver.util;
 
+import com.plotsquared.iserver.account.Account;
 import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.ResponseBody;
@@ -38,12 +39,15 @@ import java.util.concurrent.TimeUnit;
  * The utility file that
  * handles all runtime caching
  */
+@SuppressWarnings("ALL")
 public class CacheManager
 {
 
     private Cache<String, String> cachedIncludes;
     private Cache<String, String> cachedFiles;
     private Cache<String, CachedResponse> cachedBodies;
+    private Cache<Integer, Account> cachedAccounts;
+    private Cache<String, Integer> cachedAccountIds;
 
     public CacheManager()
     {
@@ -51,22 +55,32 @@ public class CacheManager
                 .withCache( "cachedIncludes", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
                         String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache.cachedIncludesHeapMB,
                                 MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration( Duration.of(
-                                        CoreConfig.Cache.cachedIncludesExpiry, TimeUnit.SECONDS ))
+                        CoreConfig.Cache.cachedIncludesExpiry, TimeUnit.SECONDS ) )
                 ) )
                 .withCache( "cachedBodies", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
                         CachedResponse.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
-                                        .cachedBodiesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
-                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS ))
+                                .cachedBodiesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
+                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS ) )
                 ) )
                 .withCache( "cachedFiles", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
                         String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
-                                        .cachedFilesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
-                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS ))
+                                .cachedFilesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
+                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS ) )
                 ) )
+                .withCache( "cachedAccounts", CacheConfigurationBuilder.newCacheConfigurationBuilder( Integer.class,
+                        Account.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
+                                .cachedAccountsHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration
+                        ( Duration.of( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS ) ) ) )
+                .withCache( "cachedAccountIds", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
+                        Integer.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
+                                .cachedAccountIdsHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration
+                        ( Duration.of( CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS ) ) ) )
                 .build( true );
         this.cachedIncludes = cacheManager.getCache( "cachedIncludes", String.class, String.class );
         this.cachedFiles = cacheManager.getCache( "cachedFiles", String.class, String.class );
         this.cachedBodies = cacheManager.getCache( "cachedBodies", String.class, CachedResponse.class );
+        this.cachedAccounts = cacheManager.getCache( "cachedAccounts", Integer.class, Account.class );
+        this.cachedAccountIds = cacheManager.getCache( "cachedAccountIds", String.class, Integer.class );
     }
 
     /**
@@ -81,6 +95,22 @@ public class CacheManager
 
         return this.cachedIncludes.containsKey( group ) ?
                 cachedIncludes.get( group ) : null;
+    }
+
+    public Optional<Account> getCachedAccount(final int id)
+    {
+        return Optional.ofNullable( cachedAccounts.get( id ) );
+    }
+
+    public Optional<Integer> getCachedId(final String username)
+    {
+        return Optional.ofNullable( cachedAccountIds.get( username ) );
+    }
+
+    public void setCachedAccount(final Account account)
+    {
+        this.cachedAccounts.put( account.getId(), account );
+        this.cachedAccountIds.put( account.getUsername(), account.getId() );
     }
 
     public Optional<String> getCachedFile(final String file)

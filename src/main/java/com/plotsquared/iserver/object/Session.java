@@ -59,9 +59,15 @@ final public class Session implements VariableProvider
 
     public void set(final String s, final Object o)
     {
-        Assert.notNull( s, o );
+        Assert.notNull( s );
 
-        sessionStorage.put( s.toLowerCase(), o );
+        if ( o == null )
+        {
+            sessionStorage.remove( s );
+        } else
+        {
+            sessionStorage.put( s.toLowerCase(), o );
+        }
     }
 
 }

@@ -16,14 +16,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.object;
+package com.plotsquared.iserver.http;
 
+import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.LambdaUtil;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @SuppressWarnings("ALL")
-public enum Method
+public enum HttpMethod
 {
 
     /**
@@ -46,11 +48,19 @@ public enum Method
     /**
      *
      */
+    HEAD,
+
+    /**
+     *
+     */
     DELETE;
 
-    public static Optional<Method> getByName(final String name)
+    public static Optional<HttpMethod> getByName(final String name)
     {
-        return LambdaUtil.getFirst( values(), method -> method.name().equalsIgnoreCase( name ) );
+        Assert.notEmpty( name );
+
+        final String fixed = name.replaceAll( "\\s", "" ).toLowerCase( Locale.ENGLISH );
+        return LambdaUtil.getFirst( values(), method -> method.name().equals( fixed ) );
     }
 
 }

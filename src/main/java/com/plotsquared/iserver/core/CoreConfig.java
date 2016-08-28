@@ -78,6 +78,10 @@ public class CoreConfig
         public static boolean enabled = true;
         public static int cachedIncludesExpiry = 60 * 60; // 1h
         public static int cachedIncludesHeapMB = 32;
+        public static int cachedAccountsExpiry = 60 * 30;
+        public static int cachedAccountsHeapMB = 32;
+        public static int cachedAccountIdsExpiry = 60 * 60 * 24;
+        public static int cachedAccountIdsHeapMB = 32;
         public static int cachedBodiesExpiry = 60 * 60;
         public static int cachedBodiesHeapMB = 32;
         public static int cachedFilesExpiry = 60 * 60 * 24;

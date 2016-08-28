@@ -50,10 +50,10 @@ public final class GenericViewUtil
         Assert.isValid( request );
         Assert.notNull( file, request, extension );
 
-        final boolean isImage = image.contains( extension );
+        final boolean isImage = CollectionUtil.containsIgnoreCase( image, extension );
         if ( isImage )
         {
-            byte[] imageBytes = FileUtils.getBytes( file, buffer );
+            final byte[] imageBytes = FileUtils.getBytes( file, buffer );
             final String imageType = extension.equalsIgnoreCase( "ico" ) ?
                     "x-icon" : ( extension.equalsIgnoreCase( "jpg" ) ? "jpeg" : extension );
             response.getHeader().set( Header.HEADER_CONTENT_TYPE, "image/" + imageType + "; charset=utf-8" );

@@ -20,11 +20,13 @@ package com.plotsquared.iserver.core;
 
 import com.codahale.metrics.Timer;
 import com.plotsquared.iserver.config.Message;
+import com.plotsquared.iserver.http.HttpMethod;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.views.RequestHandler;
+import com.plotsquared.iserver.views.errors.ViewException;
 import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.BASE64Encoder;
 
@@ -249,7 +251,7 @@ class Worker extends AutoCloseable
             }
         } catch ( final Exception e )
         {
-            body = new com.plotsquared.iserver.views.errors.Exception( e ).generate( request );
+            body = new ViewException( e ).generate( request );
             bytes = body.getContent().getBytes();
 
             if ( CoreConfig.verbose )
@@ -352,7 +354,7 @@ class Worker extends AutoCloseable
                 }
                 request = new Request( rRaw.toString(), remote );
                 // Fetch the post request, if it exists
-                if ( request.getQuery().getMethod() == Method.POST )
+                if ( request.getQuery().getMethod() == HttpMethod.POST )
                 {
                     final StringBuilder pR = new StringBuilder();
                     final int cl = Integer.parseInt( request.getHeader( "Content-Length" ).substring( 1 ) );

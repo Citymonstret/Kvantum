@@ -18,8 +18,8 @@
  */
 package com.plotsquared.iserver.extra;
 
+import com.plotsquared.iserver.account.AccountManager;
 import com.plotsquared.iserver.core.Server;
-import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.SQLiteManager;
 
@@ -51,7 +51,7 @@ public class ApplicationStructure
         {
             throw new RuntimeException( e );
         }
-        this.accountManager = new AccountManager( database );
+        this.accountManager = new AccountManager( this );
     }
 
     public AccountManager getAccountManager()

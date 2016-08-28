@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.util;
 
 import java.util.Collection;
+import java.util.Locale;
 
 public final class CollectionUtil
 {
@@ -28,6 +29,26 @@ public final class CollectionUtil
         final int size = collection.size();
         collection.clear();
         return size;
+    }
+
+    public static boolean containsIgnoreCase(final Collection<? extends String> collection, String string)
+    {
+        Assert.notNull( collection );
+        Assert.notNull( string );
+
+        if ( collection.isEmpty() )
+        {
+            return false;
+        }
+        string = string.toLowerCase( Locale.ENGLISH );
+        for ( final String entry : collection )
+        {
+            if ( entry.equals( string ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

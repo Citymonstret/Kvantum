@@ -18,11 +18,11 @@
  */
 package com.plotsquared.iserver.core;
 
+import com.plotsquared.iserver.account.AccountManager;
 import com.plotsquared.iserver.config.ConfigurationFile;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.events.Event;
 import com.plotsquared.iserver.events.EventCaller;
-import com.plotsquared.iserver.extra.accounts.AccountManager;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.object.LogWrapper;

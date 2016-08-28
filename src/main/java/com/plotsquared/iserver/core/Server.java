@@ -19,6 +19,8 @@
 package com.plotsquared.iserver.core;
 
 import com.intellectualsites.configurable.ConfigurationFactory;
+import com.plotsquared.iserver.account.AccountCommand;
+import com.plotsquared.iserver.account.AccountManager;
 import com.plotsquared.iserver.config.ConfigurationFile;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.config.YamlConfiguration;
@@ -29,10 +31,6 @@ import com.plotsquared.iserver.events.defaultEvents.ServerReadyEvent;
 import com.plotsquared.iserver.events.defaultEvents.ShutdownEvent;
 import com.plotsquared.iserver.events.defaultEvents.StartupEvent;
 import com.plotsquared.iserver.extra.ApplicationStructure;
-import com.plotsquared.iserver.extra.accounts.Account;
-import com.plotsquared.iserver.extra.accounts.AccountCommand;
-import com.plotsquared.iserver.extra.accounts.AccountManager;
-import com.plotsquared.iserver.extra.accounts.PasswordUtil;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.logging.LogProvider;
@@ -55,9 +53,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -288,7 +283,7 @@ public final class Server implements IntellectualServer
         this.stopping = false;
 
         this.requestManager = new RequestManager();
-        this.sessionManager = new SessionManager( this );
+        this.sessionManager = new SessionManager();
         this.cacheManager = new CacheManager();
 
         if ( CoreConfig.MySQL.enabled )
@@ -336,7 +331,14 @@ public final class Server implements IntellectualServer
         {
             ApplicationStructure applicationStructure = new ApplicationStructure( "core" );
             this.globalAccountManager = applicationStructure.getAccountManager();
-            this.globalAccountManager.load();
+            try
+            {
+                this.globalAccountManager.setup();
+            } catch ( Exception e )
+            {
+                e.printStackTrace();
+            }
+            // TODO: Remake
             this.inputThread.commands.put( "account", new AccountCommand( applicationStructure ) );
         }
 
@@ -622,48 +624,6 @@ public final class Server implements IntellectualServer
         log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.hostname + ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) +
                 "/'" );
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
-
-        // Pre-Steps
-        if ( standalone )
-        {
-            if ( globalAccountManager.getAccount( new Object[]{ null, "admin", null } ) == null )
-            {
-                log( "There is no admin account as of yet. So, well, let's create one! Please enter a password!" );
-                pause = true;
-                EventManager.getInstance()
-                        .addListener( new com.plotsquared.iserver.events.EventListener<InputThread.TextEvent>()
-                        {
-                            @Override
-                            public void listen(InputThread.TextEvent event)
-                            {
-                                String password = event.getText();
-                                try
-                                {
-                                    try
-                                    {
-                                        final byte[] salt = PasswordUtil.getSalt();
-                                        final byte[] encryptedPassword = PasswordUtil.encryptPassword( password, salt );
-                                        globalAccountManager.createAccount( new Account( globalAccountManager.getNextId()
-                                                , "admin", encryptedPassword, salt ) );
-                                        log( "Great, you've got yourself an admin account. The username is \"admin\"." );
-                                    } catch ( NoSuchAlgorithmException e )
-                                    {
-                                        e.printStackTrace();
-                                    } catch ( InvalidKeySpecException e )
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                    log( "The server has to restart, so I'll shut it down for you!" );
-                                    Server.this.stopServer();
-                                } catch ( SQLException e )
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } );
-                EventManager.getInstance().bake();
-            }
-        }
 
         this.handleEvent( new ServerReadyEvent( this ) );
 

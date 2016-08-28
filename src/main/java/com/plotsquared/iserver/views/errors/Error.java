@@ -64,7 +64,7 @@ public class Error extends View
                 {
                     e.printStackTrace();
                 }
-                File tempFile = new File( Exception.class.getClassLoader().getResource( "template" + File.separator +
+                File tempFile = new File( ViewException.class.getClassLoader().getResource( "template" + File.separator +
                         "error.html" ).toURI() );
                 try ( final FileInputStream in = new FileInputStream( tempFile ) )
                 {

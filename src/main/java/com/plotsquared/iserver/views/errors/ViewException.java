@@ -28,7 +28,7 @@ import com.plotsquared.iserver.views.View;
 import java.io.*;
 import java.net.URISyntaxException;
 
-public class Exception extends View
+public class ViewException extends View
 {
 
     private static String template;
@@ -55,7 +55,7 @@ public class Exception extends View
                 {
                     e.printStackTrace();
                 }
-                File tempFile = new File( Exception.class.getClassLoader().getResource( "template" + File.separator +
+                File tempFile = new File( ViewException.class.getClassLoader().getResource( "template" + File.separator +
                         "exception.html" ).toURI() );
                 try ( final FileInputStream in = new FileInputStream( tempFile ) )
                 {
@@ -81,7 +81,7 @@ public class Exception extends View
 
     private final java.lang.Exception in;
 
-    public Exception(final java.lang.Exception in)
+    public ViewException(final java.lang.Exception in)
     {
         super( "", "exception" );
         this.in = in;
