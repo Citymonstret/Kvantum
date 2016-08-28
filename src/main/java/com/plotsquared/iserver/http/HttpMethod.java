@@ -59,7 +59,7 @@ public enum HttpMethod
     {
         Assert.notEmpty( name );
 
-        final String fixed = name.replaceAll( "\\s", "" ).toLowerCase( Locale.ENGLISH );
+        final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
         return LambdaUtil.getFirst( values(), method -> method.name().equals( fixed ) );
     }
 
