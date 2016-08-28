@@ -20,7 +20,7 @@ package com.plotsquared.iserver.object;
 
 import com.plotsquared.iserver.util.Assert;
 
-final class HeaderOption
+public final class HeaderOption
 {
 
     private final String text;

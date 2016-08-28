@@ -136,6 +136,11 @@ public class Assert
         equals( a, b, new AssertionError( a, "a != b" ) );
     }
 
+    public static void equals(final int a, final int b)
+    {
+        equals ( a == b, true, new AssertionError( a, a + " != " + b ) );
+    }
+
     /**
      * Will only pass if a is equal to b
      *

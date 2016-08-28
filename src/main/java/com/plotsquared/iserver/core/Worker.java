@@ -34,10 +34,7 @@ import java.io.*;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -56,6 +53,9 @@ class Worker extends AutoCloseable
     private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
     private final ReusableGzipOutputStream reusableGzipOutputStream;
+    private final Server server;
+    private Request request;
+    private BufferedOutputStream output;
 
     private Worker()
     {
@@ -86,21 +86,7 @@ class Worker extends AutoCloseable
         }
 
         this.workerProcedureInstance = Server.getInstance().getProcedure().getInstance();
-    }
-
-    @Override
-    protected void handleClose()
-    {
-        if ( CoreConfig.gzip )
-        {
-            try
-            {
-                this.reusableGzipOutputStream.close();
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
+        this.server = (Server) Server.getInstance();
     }
 
     static void setup(final int n)
@@ -129,6 +115,21 @@ class Worker extends AutoCloseable
         return worker;
     }
 
+    @Override
+    protected void handleClose()
+    {
+        if ( CoreConfig.gzip )
+        {
+            try
+            {
+                this.reusableGzipOutputStream.close();
+            } catch ( final Exception e )
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * Compress bytes using gzip
      *
@@ -152,7 +153,7 @@ class Worker extends AutoCloseable
         return compressed;
     }
 
-    private void handle(final Request request, final Server server, final BufferedOutputStream output)
+    private void handle()
     {
         final RequestHandler requestHandler = server.requestManager.match( request );
 
@@ -198,9 +199,9 @@ class Worker extends AutoCloseable
                 final Object redirect = request.getMeta( "internalRedirect" );
                 if ( redirect != null && redirect instanceof Request )
                 {
-                    final Request newRequest = (Request) redirect;
-                    newRequest.removeMeta( "internalRedirect" );
-                    handle( newRequest, server, output );
+                    this.request = (Request) redirect;
+                    this.request.removeMeta( "internalRedirect" );
+                    handle();
                     return;
                 } else
                 {
@@ -317,52 +318,38 @@ class Worker extends AutoCloseable
         request.setValid( false );
     }
 
-    void run(final Socket remote, final Server server)
+    /**
+     * Prepares a request, then calls {@link #handle}
+     * @param remote Client socket
+     */
+    private void handle(final Socket remote)
     {
-        if ( remote == null || remote.isClosed() )
-        {
-            /*
-                I assume this can be caused by the client closing the connecting before
-                it reaches the handler, which is really stupid. Might be worth looking into
-                a better fix for this ::> TODO: Re-Evaluate this
-             */
-            return;
-        }
-
-        final Timer.Context context = Server.getInstance().getMetrics().registerRequestHandling();
-        Assert.notNull( server );
-
+        // Used for metrics
+        final Timer.Context timerContext = Server.getInstance().getMetrics().registerRequestHandling();
         if ( CoreConfig.verbose )
         {         // Do we want to output a load of useless information?
             server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
         }
-
-        final Request request;
-        final BufferedOutputStream output;
         final BufferedReader input;
-
         { // Read the actual request
-            final StringBuilder rRaw = new StringBuilder();
             try
             {
                 input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), CoreConfig.Buffer.in );
                 output = new BufferedOutputStream( remote.getOutputStream(), CoreConfig.Buffer.out );
+
+                final List<String> lines = new ArrayList<>();
                 String str;
-                while ( ( str = input.readLine() ) != null && !str.equals( "" ) )
+                while ( ( str = input.readLine() ) != null && !str.isEmpty() )
                 {
-                    rRaw.append( str ).append( "|" );
+                    lines.add( str );
                 }
-                request = new Request( rRaw.toString(), remote );
-                // Fetch the post request, if it exists
+
+                request = new Request( lines, remote );
+
                 if ( request.getQuery().getMethod() == HttpMethod.POST )
                 {
-                    final StringBuilder pR = new StringBuilder();
                     final int cl = Integer.parseInt( request.getHeader( "Content-Length" ).substring( 1 ) );
-                    for ( int i = 0; i < cl; i++ )
-                    {
-                        pR.append( (char) input.read() );
-                    }
-                    request.setPostRequest( new PostRequest( pR.toString() ) );
+                    request.setPostRequest( PostRequest.construct( cl, input ) );
                 }
             } catch ( final Exception e )
             {
@@ -370,24 +357,36 @@ class Worker extends AutoCloseable
                 return;
             }
         }
-
         if ( !server.silent )
         {
             server.log( request.buildLog() );
         }
+        handle();
+        timerContext.stop();
+    }
 
-        handle( request, server, output );
-
-        try
+    /**
+     * Accepts a remote socket,
+     * makes sure its handled and closed down successfully
+     * @param remote Socket to accept
+     */
+    void run(final Socket remote)
+    {
+        if ( remote != null && !remote.isClosed() )
         {
-            input.close();
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
+            handle( remote );
         }
-
+        if ( remote != null && !remote.isClosed() )
+        {
+            try
+            {
+                remote.close();
+            } catch ( final Exception e ) {
+                e.printStackTrace();
+            }
+        }
+        // MUST BE CALLED LAST
         availableWorkers.add( this );
-        context.stop();
     }
 
     private String md5Checksum(final byte[] input)
@@ -412,14 +411,10 @@ class Worker extends AutoCloseable
                 0x02,                   // maximum compression
                 (byte)0xFF              // unknown creator OS (!!!)
         };
-
+        private final ByteArrayOutputStream bufferStream;
+        private final CRC32 crc32;
         private boolean headerWritten;
         private long writtenSize;
-
-        private final ByteArrayOutputStream bufferStream;
-
-        private final CRC32 crc32;
-
         private boolean written = false;
 
         private ReusableGzipOutputStream()

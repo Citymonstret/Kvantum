@@ -19,7 +19,9 @@
 package com.plotsquared.iserver.object;
 
 import com.plotsquared.iserver.util.Assert;
+import com.plotsquared.iserver.util.StringUtil;
 
+import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,12 +53,7 @@ final public class PostRequest
 
     String buildLog()
     {
-        final StringBuilder b = new StringBuilder();
-        for ( final Map.Entry<String, String> e : vars.entrySet() )
-        {
-            b.append( e.getKey() ).append( "=" ).append( e.getValue() ).append( "&" );
-        }
-        return b.toString();
+        return StringUtil.join( vars, "=", "&" );
     }
 
     public String get(final String k)
@@ -78,4 +75,10 @@ final public class PostRequest
         return vars;
     }
 
+    public static PostRequest construct(final int cl, final BufferedReader input) throws Exception
+    {
+        final char[] chars = new char[ cl ];
+        Assert.equals( input.read( chars ), cl );
+        return new PostRequest( new String( chars ) );
+    }
 }

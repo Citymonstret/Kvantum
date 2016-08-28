@@ -684,7 +684,7 @@ public final class Server implements IntellectualServer
 
     private void acceptSocket(final Socket s)
     {
-        this.executorService.execute( () -> Worker.getAvailableWorker().run( s, Server.this ) );
+        this.executorService.execute( () -> Worker.getAvailableWorker().run( s ) );
     }
 
     @Override

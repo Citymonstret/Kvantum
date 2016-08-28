@@ -29,9 +29,8 @@ import com.plotsquared.iserver.views.RequestHandler;
 
 import javax.net.ssl.SSLSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -52,9 +51,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public static final String ALTERNATE_OUTCOME = "alternateOutcome";
     public static final String INTERNAL_REDIRECT = "internalRedirect";
 
+    public static final String HEADER_AUTHORIZATION = "Authorization";
+
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
-    private ProtocolType protocolType;
     public Map<String, String> postponedCookies = new HashMap<>();
+    private ProtocolType protocolType;
     private Map<String, Object> meta;
     private Map<String, String> headers;
     private Cookie[] cookies;
@@ -63,6 +64,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private Socket socket;
     private Session session;
     private boolean valid = true;
+    private Authorization authorization;
 
     private Request()
     {
@@ -75,7 +77,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * @param socket  The socket which sent the request
      * @throws RuntimeException if the request doesn't contain a query
      */
-    public Request(final String request, final Socket socket)
+    public Request(final Collection<String> request, final Socket socket)
     {
         Assert.notNull( request, socket );
 
@@ -89,8 +91,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         this.socket = socket;
         this.headers = new HashMap<>();
-        final String[] parts = request.split( "\\|" );
-        for ( final String part : parts )
+        for ( final String part : request )
         {
             final String[] subParts = part.split( ":" );
             if ( subParts.length < 2 )
@@ -117,11 +118,20 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         this.getResourceRequest();
         this.cookies = CookieManager.getCookies( this );
         this.meta = new HashMap<>();
+        if ( this.headers.containsKey( HEADER_AUTHORIZATION ) )
+        {
+            this.authorization = new Authorization( this.headers.get( HEADER_AUTHORIZATION ) );
+        }
     }
 
     public void removeMeta(String internalRedirect)
     {
         this.meta.remove( internalRedirect );
+    }
+
+    public Optional<Authorization> getAuthorization()
+    {
+        return Optional.ofNullable( authorization );
     }
 
     @Override
@@ -444,6 +454,38 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         {
             final String parameters = StringUtil.join( getParameters(), "=", "&" );
             return parameters.isEmpty() ? resource : resource + "?" + parameters;
+        }
+
+    }
+
+    public class Authorization
+    {
+
+        private final String mechanism, username, password;
+
+        private Authorization(final String input)
+        {
+            final String[] parts = input.split( "\\s" );
+            this.mechanism = parts[ 1 ];
+            final String[] auth = new String( Base64.getDecoder().decode( parts[ 2 ] ), StandardCharsets.UTF_8 )
+                    .split( ":" );
+            this.username = auth[ 0 ];
+            this.password = auth[ 1 ];
+        }
+
+        public String getMechanism()
+        {
+            return mechanism;
+        }
+
+        public String getUsername()
+        {
+            return username;
+        }
+
+        public String getPassword()
+        {
+            return password;
         }
 
     }

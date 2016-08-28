@@ -43,6 +43,7 @@ final public class Header
 
     public static final String STATUS_TEMPORARY_REDIRECT = "307 Temporary Redirect";
     public static final String STATUS_OK = "200 OK";
+    public static final String STATUS_ACCESS_DENIED = "401 Access Denied";
     public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
     public static final String STATUS_CONTINUE = "100 Continue";
     public static final String STATUS_SWITCHING_PROTOCOLS = "101 Switching Protocols";
