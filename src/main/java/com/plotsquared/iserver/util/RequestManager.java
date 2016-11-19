@@ -20,6 +20,7 @@ package com.plotsquared.iserver.util;
 
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.matching.Router;
 import com.plotsquared.iserver.object.Generator;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.views.RequestHandler;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class RequestManager
+public class RequestManager extends Router
 {
 
     private final List<RequestHandler> views;
@@ -64,6 +65,7 @@ public class RequestManager
      * Register a view to the request manager
      * @param view The view to register
      */
+    @Override
     public void add(final RequestHandler view)
     {
         Assert.notNull( view );
@@ -82,6 +84,7 @@ public class RequestManager
      * @param request Incoming request
      * @return Matching request handler, or {@link #getError404Generator()} if none was found
      */
+    @Override
     public RequestHandler match(final Request request)
     {
         Assert.isValid( request );
@@ -94,6 +97,7 @@ public class RequestManager
         return error404Generator.generate( request );
     }
 
+    @Override
     public void dump(final Server server)
     {
         Assert.notNull( server );
@@ -102,6 +106,7 @@ public class RequestManager
                 .toString() ) ).foreach( views );
     }
 
+    @Override
     public void remove(final RequestHandler view)
     {
         Assert.notNull( view );
@@ -112,6 +117,7 @@ public class RequestManager
         }
     }
 
+    @Override
     public void clear()
     {
         Message.CLEARED_VIEWS.log( CollectionUtil.clear( this.views ) );

@@ -24,6 +24,7 @@ import com.plotsquared.iserver.util.TimeUtil;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings({ "unused" })
 final public class Header
@@ -273,6 +274,17 @@ final public class Header
 
         this.headers.put( key, value );
         return this;
+    }
+
+    public Optional<String> get(final HeaderOption key)
+    {
+        Assert.notNull( key );
+
+        if ( this.headers.containsKey( key ) )
+        {
+            return Optional.of( this.headers.get( key ) );
+        }
+        return Optional.empty();
     }
 
     public byte[] getBytes()

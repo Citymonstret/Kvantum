@@ -18,6 +18,8 @@
  */
 package com.plotsquared.iserver.crush.syntax;
 
+import java.util.Map;
+
 /**
  * The variable provider class - Can get quite confusing.
  * <p>
@@ -50,5 +52,7 @@ public interface VariableProvider
      * @see #contains(String) - Use this to check if it exists
      */
     Object get(final String variable);
+
+    Map<String, Object> getAll();
 
 }

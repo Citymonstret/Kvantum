@@ -211,6 +211,12 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     }
 
     @Override
+    public Map<String, Object> getAll()
+    {
+        return new HashMap<>( this.map );
+    }
+
+    @Override
     public boolean contains(final String key)
     {
         Assert.notNull( key );

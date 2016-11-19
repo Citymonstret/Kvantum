@@ -21,9 +21,11 @@ package com.plotsquared.iserver.core;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.plotsquared.iserver.gui.GuiMain;
+import com.plotsquared.iserver.matching.Router;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.Bootstrap;
+import com.plotsquared.iserver.util.RequestManager;
 import com.plotsquared.iserver.util.TimeUtil;
 
 import java.io.File;
@@ -60,7 +62,7 @@ public class IntellectualServerMain
                 GuiMain.main( args, file );
             } else
             {
-                final Optional<Server> server = create( true, file, new DefaultLogWrapper() );
+                final Optional<Server> server = create( true, file, new DefaultLogWrapper(), new RequestManager() );
                 if ( server.isPresent() )
                 {
                     if ( !options.debug.isEmpty() )
@@ -99,12 +101,13 @@ public class IntellectualServerMain
      * @param wrapper The log wrapper / handler
      * @return The server instance, if sucessfully created, else null
      *
-     * @see #create(boolean, File, LogWrapper) For new method
+     * @see #create(boolean, File, LogWrapper, Router) For new method
      *
      * @deprecated
      */
     @Deprecated
-    public static Server createServer(final boolean standalone, final File coreFolder, final LogWrapper wrapper)
+    public static Server createServer(final boolean standalone, final File coreFolder, final LogWrapper wrapper,
+                                      final Router router)
     {
         Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
                 "Cannot use a folder with '!' path as core folder" );
@@ -112,7 +115,7 @@ public class IntellectualServerMain
         Server server = null;
         try
         {
-            server = new Server( standalone, coreFolder, wrapper );
+            server = new Server( standalone, coreFolder, wrapper, router );
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -128,7 +131,8 @@ public class IntellectualServerMain
      * @param wrapper The log wrapper / handler
      * @return Optional of nullable server
      */
-    public static Optional<Server> create(final boolean standalone, final File coreFolder, final LogWrapper wrapper)
+    public static Optional<Server> create(final boolean standalone, final File coreFolder, final LogWrapper wrapper,
+                                          final Router router)
     {
         Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
                 "Cannot use a folder with '!' path as core folder" );
@@ -136,7 +140,7 @@ public class IntellectualServerMain
         Server server = null;
         try
         {
-            server = new Server( standalone, coreFolder, wrapper );
+            server = new Server( standalone, coreFolder, wrapper, router );
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -150,17 +154,18 @@ public class IntellectualServerMain
      * @param standalone Should it run as a standalone application, or be integrated
      * @return the started server | null
      *
-     * @see #start(boolean, File, LogWrapper)
+     * @see #start(boolean, File, LogWrapper, Router)
      *
      * @deprecated
      */
     @Deprecated
-    public static IntellectualServer startServer(boolean standalone, File coreFolder, LogWrapper wrapper)
+    public static IntellectualServer startServer(boolean standalone, File coreFolder, LogWrapper wrapper, final
+        Router router)
     {
         Server server = null;
         try
         {
-            server = createServer( standalone, coreFolder, wrapper );
+            server = createServer( standalone, coreFolder, wrapper, router );
             server.start();
         } catch ( final Exception e )
         {
@@ -171,7 +176,7 @@ public class IntellectualServerMain
 
     public static Optional<? extends IntellectualServer> start(File coreFolder)
     {
-        return start( false, coreFolder, new DefaultLogWrapper() );
+        return start( false, coreFolder, new DefaultLogWrapper(), new RequestManager() );
     }
 
     public static Optional<? extends IntellectualServer> start()
@@ -187,9 +192,10 @@ public class IntellectualServerMain
      * @param wrapper The log wrapper / handler
      * @return Optional of nullable server
      */
-    public static Optional<? extends IntellectualServer> start(boolean standalone, File coreFolder, LogWrapper wrapper)
+    public static Optional<? extends IntellectualServer> start(boolean standalone, File coreFolder, LogWrapper
+            wrapper, final Router router)
     {
-        Optional<? extends IntellectualServer> server = create( standalone, coreFolder, wrapper );
+        Optional<? extends IntellectualServer> server = create( standalone, coreFolder, wrapper, router );
         try
         {
             if ( server.isPresent() )

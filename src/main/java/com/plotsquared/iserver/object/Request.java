@@ -162,6 +162,12 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return getVariables().get( variable );
     }
 
+    @Override
+    public Map<String, Object> getAll()
+    {
+        return MapUtil.convertMap( getVariables(), ( s ) -> s );
+    }
+
     public void useAlternateOutcome(final String identifier)
     {
         Assert.notEmpty( identifier );
@@ -387,6 +393,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         Assert.notEmpty( key );
 
         return this.meta.containsKey( key );
+    }
+
+    public Map<String,Object> getAllMeta()
+    {
+        return new HashMap<>( this.meta );
     }
 
     /**

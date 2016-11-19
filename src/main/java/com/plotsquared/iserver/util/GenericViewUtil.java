@@ -74,6 +74,7 @@ public final class GenericViewUtil
                 response.setContent( LessView.getLess( file, buffer ) );
             }
         }
+
         return response;
     }
 

@@ -22,6 +22,8 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.crush.syntax.VariableProvider;
 
+import java.util.Map;
+
 /**
  * Created 2015-04-25 for IntellectualServer
  *
@@ -63,5 +65,11 @@ public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProv
     public Object get(String variable)
     {
         return r.getMeta( "doc." + variable );
+    }
+
+    @Override
+    public Map<String, Object> getAll()
+    {
+        return r.getAllMeta();
     }
 }

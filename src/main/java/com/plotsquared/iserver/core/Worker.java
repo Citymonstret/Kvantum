@@ -155,7 +155,7 @@ class Worker extends AutoCloseable
 
     private void handle()
     {
-        final RequestHandler requestHandler = server.requestManager.match( request );
+        final RequestHandler requestHandler = server.router.match( request );
 
         String textContent = "";
         byte[] bytes = empty;
@@ -231,6 +231,18 @@ class Worker extends AutoCloseable
             {
                 body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
             }
+
+            // Start: CTYPE
+            // Desc: To allow worker procedures to filter based on content type
+            final Optional<String> contentType = body.getHeader().get( Header.HEADER_CONTENT_TYPE );
+            if ( contentType.isPresent() )
+            {
+                request.addMeta( "content_type", contentType.get() );
+            } else
+            {
+                request.addMeta( "content_type", null );
+            }
+            // End: CTYPE
 
             if ( body.isText() )
             {

@@ -72,7 +72,7 @@ final public class PostRequest
 
     public Map<String, String> get()
     {
-        return vars;
+        return new HashMap<>( this.vars );
     }
 
     public static PostRequest construct(final int cl, final BufferedReader input) throws Exception

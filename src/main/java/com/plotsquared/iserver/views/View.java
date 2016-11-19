@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.views;
 
 import com.plotsquared.iserver.config.Message;
+import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.matching.ViewPattern;
 import com.plotsquared.iserver.object.Request;
@@ -73,7 +74,7 @@ public class View extends RequestHandler
     private final Map<String, Object> options;
     private final String internalName;
     private final ViewPattern viewPattern;
-    protected String relatedFolderPath, fileName, defaultFile;
+    public String relatedFolderPath, fileName, defaultFile;
     private int buffer = -1;
     private String internalFileName, internalDefaultFile;
     private File folder;
@@ -172,7 +173,7 @@ public class View extends RequestHandler
     @Final
     final public void register()
     {
-        Server.getInstance().getRequestManager().add( this );
+        Server.getInstance().getRouter().add( this );
     }
 
     /**
@@ -232,7 +233,12 @@ public class View extends RequestHandler
     {
         Assert.isValid( request );
 
-        final Map<String, String> variables = (Map<String, String>) request.getMeta( "viewV" );
+        Map<String, String> variables = (Map<String, String>) request.getMeta( "viewV" );
+        if ( variables == null )
+        {
+            variables = (Map<String, String>) request.getMeta( "variables" );
+        }
+
         if ( internalFileName == null )
         {
             if ( containsOption( "filepattern" ) )
@@ -249,7 +255,11 @@ public class View extends RequestHandler
         String n = internalFileName;
         {
             String t = variables.get( VARIABLE_FILE );
-            n = n.replace( PATTERN_VARIABLE_FOLDER, variables.get( VARIABLE_FOLDER ) );
+
+            if ( variables.containsKey( VARIABLE_FOLDER ) )
+            {
+                n = n.replace( PATTERN_VARIABLE_FOLDER, variables.get( VARIABLE_FOLDER ) );
+            }
             if ( t == null || t.equals( "" ) )
             {
                 if ( internalDefaultFile == null )
@@ -267,6 +277,10 @@ public class View extends RequestHandler
                 }
                 t = internalDefaultFile;
             }
+            if ( !variables.containsKey( VARIABLE_FILE ) )
+            {
+                variables.put( VARIABLE_FILE, "index" );
+            }
             n = n.replace( PATTERN_VARIABLE_FILE, variables.get( VARIABLE_FILE ) );
             if ( variables.containsKey( VARIABLE_EXTENSION ) )
             {
@@ -274,6 +288,11 @@ public class View extends RequestHandler
             } else
             {
                 n = n.replace( PATTERN_VARIABLE_EXTENSION, "" );
+            }
+
+            if ( CoreConfig.debug )
+            {
+                Server.getInstance().log( "Translated file name: '%s'", n );
             }
         }
         return new File( getFolder(), n );
@@ -318,6 +337,16 @@ public class View extends RequestHandler
         {
             request.addMeta( CONSTANT_VARIABLES, map );
         }
+
+        if ( CoreConfig.debug )
+        {
+            if ( map == null )
+            {
+                Server.getInstance().log( "Request: '%s' failed to pass '%s'", request.getQuery().getFullRequest(),
+                        viewPattern.toString() );
+            }
+        }
+
         return map != null && passes( request );
     }
 

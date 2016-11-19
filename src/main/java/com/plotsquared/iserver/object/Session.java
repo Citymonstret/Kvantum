@@ -57,6 +57,12 @@ final public class Session implements VariableProvider
         return sessionStorage.get( variable.toLowerCase() );
     }
 
+    @Override
+    public Map<String, Object> getAll()
+    {
+        return new HashMap<>( sessionStorage );
+    }
+
     public void set(final String s, final Object o)
     {
         Assert.notNull( s );

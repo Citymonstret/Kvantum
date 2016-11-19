@@ -34,6 +34,7 @@ import com.plotsquared.iserver.extra.ApplicationStructure;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.logging.LogProvider;
+import com.plotsquared.iserver.matching.Router;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.Request;
@@ -83,7 +84,7 @@ public final class Server implements IntellectualServer
     public ConfigurationFile translations;
     volatile CacheManager cacheManager;
     boolean silent = false;
-    RequestManager requestManager;
+    Router router;
     SessionManager sessionManager;
     // Private
     PrintStream logStream;
@@ -113,12 +114,14 @@ public final class Server implements IntellectualServer
      * @param logWrapper The log implementation
      * @throws IntellectualServerInitializationException If anything was to fail
      */
-    protected Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper)
+    protected Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper, final Router
+                      router)
             throws IntellectualServerInitializationException
     {
         Assert.notNull( coreFolder, logWrapper );
 
-        instance = this; // EW
+        // instance = this; // EW
+        InstanceFactory.setupInstanceAutomagic( this );
 
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
         if ( !coreFolder.exists() )
@@ -282,7 +285,7 @@ public final class Server implements IntellectualServer
         this.started = false;
         this.stopping = false;
 
-        this.requestManager = new RequestManager();
+        this.router = router;
         this.sessionManager = new SessionManager();
         this.cacheManager = new CacheManager();
 
@@ -550,7 +553,7 @@ public final class Server implements IntellectualServer
                     try
                     {
                         final View vv = vc.getDeclaredConstructor( String.class, Map.class ).newInstance( filter, options );
-                        requestManager.add( vv );
+                        router.add( vv );
                     } catch ( final Exception e )
                     {
                         e.printStackTrace();
@@ -567,7 +570,7 @@ public final class Server implements IntellectualServer
             mainApplicationStructure.registerViews( this );
         }
 
-        requestManager.dump( this );
+        router.dump( this );
 
         if ( !CoreConfig.Cache.enabled )
         {
@@ -837,16 +840,16 @@ public final class Server implements IntellectualServer
     }
 
     @Override
-    public RequestManager getRequestManager()
+    public Router getRouter()
     {
-        return requestManager;
+        return router;
     }
 
     @Override
     public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<Request, Response> generator)
     {
         final RequestHandler handler = new SimpleRequestHandler( filter, generator );
-        this.getRequestManager().add( handler );
+        this.getRouter().add( handler );
         return handler;
     }
 }

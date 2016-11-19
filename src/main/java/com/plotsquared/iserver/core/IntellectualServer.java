@@ -25,12 +25,12 @@ import com.plotsquared.iserver.events.Event;
 import com.plotsquared.iserver.events.EventCaller;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.logging.LogProvider;
+import com.plotsquared.iserver.matching.Router;
 import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.CacheManager;
 import com.plotsquared.iserver.util.Metrics;
-import com.plotsquared.iserver.util.RequestManager;
 import com.plotsquared.iserver.util.SessionManager;
 import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.View;
@@ -162,5 +162,5 @@ public interface IntellectualServer
      *
      * @return view manager
      */
-    RequestManager getRequestManager();
+    Router getRouter();
 }

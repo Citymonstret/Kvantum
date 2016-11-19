@@ -22,6 +22,7 @@ import com.plotsquared.iserver.core.DefaultLogWrapper;
 import com.plotsquared.iserver.core.IntellectualServerMain;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.util.Bootstrap;
+import com.plotsquared.iserver.util.RequestManager;
 
 import java.io.File;
 
@@ -54,7 +55,7 @@ public class GuiMain extends Thread
                 super.log( s );
                 Console.getConsole().log( s );
             }
-        } );
+        }, new RequestManager() );
     }
 
     @Override

@@ -109,5 +109,11 @@ public class HTMLView extends View implements CacheApplicable
         {
             return storage.get( variable );
         }
+
+        @Override
+        public Map<String, Object> getAll()
+        {
+            return new HashMap<>( this.storage );
+        }
     }
 }

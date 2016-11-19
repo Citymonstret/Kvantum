@@ -58,6 +58,11 @@ public class Metrics
         this.durationFactor = 1.0 / TimeUnit.MILLISECONDS.toNanos( 1 );
     }
 
+    public MetricRegistry getRegistry()
+    {
+        return registry;
+    }
+
     /**
      * Print statistics to the logger.
      * This is a custom implementation of {@link ConsoleReporter}
@@ -131,22 +136,22 @@ public class Metrics
         }
     }
 
-    private double convertRate(double rate)
+    public double convertRate(double rate)
     {
         return rate * TimeUnit.SECONDS.toSeconds( 1 );
     }
 
-    private String getRateUnit()
+    public String getRateUnit()
     {
         return TimeUnit.SECONDS.name();
     }
 
-    private String getDurationUnit()
+    public String getDurationUnit()
     {
         return TimeUnit.MILLISECONDS.name();
     }
 
-    private double convertDuration(double duration)
+    public double convertDuration(double duration)
     {
         return duration * durationFactor;
     }

@@ -18,6 +18,8 @@
  */
 package com.plotsquared.iserver.views;
 
+import com.plotsquared.iserver.core.CoreConfig;
+import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
@@ -83,6 +85,13 @@ public class LessView extends View implements CacheApplicable
     {
         File file = getFile( request );
         request.addMeta( "less_file", file );
+        if ( CoreConfig.debug )
+        {
+            if ( !file.exists() )
+            {
+                Server.getInstance().log( "Requested file '%s' doesn't exist", file.getAbsoluteFile() );
+            }
+        }
         return file.exists();
     }
 

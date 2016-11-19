@@ -81,4 +81,18 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
         String[] parts = variable.split( "@" );
         return configurations.get( parts[ 0 ] ).get( parts[ 1 ] );
     }
+
+    @Override
+    public Map<String, Object> getAll()
+    {
+        final Map<String, Object> all = new HashMap<>();
+        for ( final Map.Entry<String, ConfigProvider> entry1 : configurations.entrySet() )
+        {
+            for ( Map.Entry<String, Object> entry2 : entry1.getValue().getAll().entrySet() )
+            {
+                all.put( entry1.getKey() + "@" + entry2.getKey(), entry2.getValue() );
+            }
+        }
+        return all;
+    }
 }

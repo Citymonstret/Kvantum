@@ -70,7 +70,7 @@ final public class StaticViewManager
                         view.getMiddlewareQueuePopulator().add( middleware );
                     }
 
-                    Server.getInstance().getRequestManager().add( view );
+                    Server.getInstance().getRouter().add( view );
                 }
             }
         } ).foreach( annotatedMethods );

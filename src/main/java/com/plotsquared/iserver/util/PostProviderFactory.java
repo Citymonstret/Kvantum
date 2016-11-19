@@ -23,6 +23,8 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.crush.syntax.VariableProvider;
 
+import java.util.Map;
+
 /**
  * Created 2015-04-25 for IntellectualServer
  *
@@ -74,5 +76,11 @@ public class PostProviderFactory implements ProviderFactory<PostProviderFactory>
         Assert.notNull( variable );
 
         return p.get( variable );
+    }
+
+    @Override
+    public Map<String, Object> getAll()
+    {
+        return MapUtil.convertMap( this.p.get(), ( s ) -> s );
     }
 }

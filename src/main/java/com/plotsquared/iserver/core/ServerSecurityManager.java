@@ -202,6 +202,15 @@ public class ServerSecurityManager
                     return;
                 }
             }
+
+            if ( CoreConfig.debug )
+            {
+                for ( final StackTraceElement element : stackTraceElements )
+                {
+                    old.println( element );
+                }
+            }
+
             sneakyThrow( new IllegalAccessException( "Non-Logger tried to use System.out!" ) );
         }
 

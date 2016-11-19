@@ -31,6 +31,6 @@ public class Dump extends Command
     @Override
     public void handle(String[] args)
     {
-        Server.getInstance().getRequestManager().dump( (Server) Server.getInstance() );
+        Server.getInstance().getRouter().dump( (Server) Server.getInstance() );
     }
 }

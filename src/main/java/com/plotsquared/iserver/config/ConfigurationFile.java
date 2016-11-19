@@ -18,6 +18,8 @@
  */
 package com.plotsquared.iserver.config;
 
+import java.util.Map;
+
 /**
  * The "official" configuration file
  * interface
@@ -60,6 +62,8 @@ public interface ConfigurationFile
      * @return value|null
      */
     <T> T get(String key);
+
+    Map<String, Object> getAll();
 
     /**
      * Check if the configuration file contains a value

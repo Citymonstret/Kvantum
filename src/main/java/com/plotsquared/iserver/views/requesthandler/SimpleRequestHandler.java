@@ -93,7 +93,7 @@ public class SimpleRequestHandler extends RequestHandler
     @Final
     final public void register()
     {
-        Server.getInstance().getRequestManager().add( this );
+        Server.getInstance().getRouter().add( this );
     }
 
 }
