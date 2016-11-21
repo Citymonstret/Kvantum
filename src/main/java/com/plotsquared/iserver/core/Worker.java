@@ -25,6 +25,8 @@ import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.util.Assert;
+import com.plotsquared.iserver.validation.RequestValidation;
+import com.plotsquared.iserver.validation.ValidationException;
 import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.errors.ViewException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,7 +45,7 @@ import java.util.zip.DeflaterOutputStream;
  * This is the worker that is responsible for nearly everything.
  * Feel no pressure, buddy.
  */
-class Worker extends AutoCloseable
+public class Worker extends AutoCloseable
 {
 
     private static byte[] empty = "NULL".getBytes();
@@ -105,7 +107,7 @@ class Worker extends AutoCloseable
      *
      * @return The next available worker
      */
-    static Worker getAvailableWorker()
+    public static Worker getAvailableWorker()
     {
         Worker worker = availableWorkers.poll();
         while ( worker == null )
@@ -175,6 +177,36 @@ class Worker extends AutoCloseable
 
         try
         {
+            if ( !requestHandler.getValidationManager().isEmpty() )
+            {
+                // Validate post requests
+                if ( request.getQuery().getMethod() == HttpMethod.POST )
+                {
+                    for ( final RequestValidation<PostRequest> validator : requestHandler.getValidationManager()
+                            .getValidators(
+                                    RequestValidation.ValidationStage.POST_PARAMETERS ) )
+                    {
+                        final RequestValidation.ValidationResult result = validator.validate( request
+                                .getPostRequest() );
+                        if ( !result.isSuccess() )
+                        {
+                            throw new ValidationException( result );
+                        }
+                    }
+                } else
+                {
+                    for ( final RequestValidation<Request.Query> validator : requestHandler.getValidationManager()
+                            .getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
+                    {
+                        final RequestValidation.ValidationResult result = validator.validate( request.getQuery() );
+                        if ( !result.isSuccess() )
+                        {
+                            throw new ValidationException( result );
+                        }
+                    }
+                }
+            }
+
             if ( CoreConfig.Cache.enabled && requestHandler instanceof CacheApplicable
                     && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
             {
@@ -361,7 +393,7 @@ class Worker extends AutoCloseable
                 if ( request.getQuery().getMethod() == HttpMethod.POST )
                 {
                     final int cl = Integer.parseInt( request.getHeader( "Content-Length" ).substring( 1 ) );
-                    request.setPostRequest( PostRequest.construct( cl, input ) );
+                    request.setPostRequest( PostRequest.construct( request, cl, input ) );
                 }
             } catch ( final Exception e )
             {
@@ -382,7 +414,7 @@ class Worker extends AutoCloseable
      * makes sure its handled and closed down successfully
      * @param remote Socket to accept
      */
-    void run(final Socket remote)
+    public void run(final Socket remote)
     {
         if ( remote != null && !remote.isClosed() )
         {

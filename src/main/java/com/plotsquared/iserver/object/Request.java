@@ -45,7 +45,7 @@ import java.util.function.Predicate;
  *
  * @author Citymonstret
  */
-final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable
+final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable, RequestChild
 {
 
     public static final String ALTERNATE_OUTCOME = "alternateOutcome";
@@ -124,6 +124,12 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         }
     }
 
+    @Override
+    public Request getParent()
+    {
+        return this;
+    }
+
     public void removeMeta(String internalRedirect)
     {
         this.meta.remove( internalRedirect );
@@ -195,7 +201,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     {
         if ( this.postRequest == null )
         {
-            this.postRequest = new PostRequest( "&" );
+            this.postRequest = new PostRequest( this, "&" );
         }
         return this.postRequest;
     }

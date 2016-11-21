@@ -33,6 +33,10 @@ import com.plotsquared.iserver.events.defaultEvents.StartupEvent;
 import com.plotsquared.iserver.extra.ApplicationStructure;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
+import com.plotsquared.iserver.internal.ErrorOutputStream;
+import com.plotsquared.iserver.internal.ExitSignalHandler;
+import com.plotsquared.iserver.internal.HTTPSThread;
+import com.plotsquared.iserver.internal.SocketHandler;
 import com.plotsquared.iserver.logging.LogProvider;
 import com.plotsquared.iserver.matching.Router;
 import com.plotsquared.iserver.object.AutoCloseable;
@@ -52,12 +56,7 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
@@ -78,7 +77,7 @@ public final class Server implements IntellectualServer
     private final boolean standalone;
     private final Map<String, Class<? extends View>> viewBindings;
     private final WorkerProcedure workerProcedure = new WorkerProcedure();
-    private final ExecutorService executorService;
+    private final SocketHandler socketHandler;
     private final Metrics metrics = new Metrics();
     // Public
     public ConfigurationFile translations;
@@ -120,7 +119,6 @@ public final class Server implements IntellectualServer
     {
         Assert.notNull( coreFolder, logWrapper );
 
-        // instance = this; // EW
         InstanceFactory.setupInstanceAutomagic( this );
 
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
@@ -151,25 +149,7 @@ public final class Server implements IntellectualServer
         {
             this.logStream = new PrintStream( new FileOutputStream( new File( logFolder,
                     TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) );
-            // Extremely hacky solution that enables file logging for exceptions
-            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
-            {
-                @Override
-                public void flush() throws IOException
-                {
-                    String message = new String( toByteArray(), StandardCharsets.UTF_8 );
-                    if ( message.endsWith( System.lineSeparator() ) )
-                    {
-                        message = message.substring( 0, message.length() - System.lineSeparator().length() );
-                    }
-                    if ( !message.isEmpty() )
-                    {
-                        logWrapper.log( new String( toByteArray(), StandardCharsets.UTF_8 ) );
-                    }
-                    super.reset();
-                }
-            };
-            System.setErr( new PrintStream( byteArrayOutputStream, true ) );
+            System.setErr( new PrintStream( new ErrorOutputStream( logWrapper ), true ) );
         } catch ( FileNotFoundException e )
         {
             e.printStackTrace();
@@ -179,29 +159,20 @@ public final class Server implements IntellectualServer
 
         Message.SYNTAX_STATUS.log( CoreConfig.enableSyntax );
 
-        if ( CoreConfig.enableSyntax )
-        {
-            // This adds the default view bindings
-            addViewBinding( "html", HTMLView.class );
-            addViewBinding( "css", CSSView.class );
-            addViewBinding( "javascript", JSView.class );
-            addViewBinding( "less", LessView.class );
-            addViewBinding( "img", ImgView.class );
-            addViewBinding( "download", DownloadView.class );
-            addViewBinding( "redirect", RedirectView.class );
-            addViewBinding( "std", StandardView.class );
-        }
+        // This adds the default view bindings
+        addViewBinding( "html", HTMLView.class );
+        addViewBinding( "css", CSSView.class );
+        addViewBinding( "javascript", JSView.class );
+        addViewBinding( "less", LessView.class );
+        addViewBinding( "img", ImgView.class );
+        addViewBinding( "download", DownloadView.class );
+        addViewBinding( "redirect", RedirectView.class );
+        addViewBinding( "std", StandardView.class );
 
         if ( standalone )
         {
             // Makes the application closable in ze terminal
-            Signal.handle( new Signal( "INT" ), signal ->
-            {
-                if ( signal.toString().equals( "SIGINT" ) )
-                {
-                    stopServer();
-                }
-            } );
+            Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
             // Handles incoming commands
             // TODO: Replace the command system
             // https://github.com/IntellectualSites/CommandAPI
@@ -279,7 +250,7 @@ public final class Server implements IntellectualServer
             log( Message.DEBUG );
         }
 
-        this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
+        this.socketHandler = new SocketHandler();
         Worker.setup( CoreConfig.workers );
 
         this.started = false;
@@ -632,34 +603,7 @@ public final class Server implements IntellectualServer
 
         if ( CoreConfig.SSL.enable && sslSocket != null )
         {
-            Thread thread = new Thread( "SSL-Runner" )
-            {
-
-                @Override
-                public void run()
-                {
-                    for ( ; ; )
-                    {
-                        if ( Server.this.stopping )
-                        {
-                            break;
-                        }
-                        if ( Server.this.pause )
-                        {
-                            continue;
-                        }
-                        try
-                        {
-                            acceptSocket( sslSocket.accept() );
-                        } catch ( final Exception e )
-                        {
-                            Server.this.log( Message.TICK_ERROR );
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            };
-            thread.start();
+            new HTTPSThread( sslSocket, socketHandler ).start();
         }
 
         // Main Loop
@@ -676,18 +620,13 @@ public final class Server implements IntellectualServer
             }
             try
             {
-                acceptSocket( socket.accept() );
+                socketHandler.acceptSocket( socket.accept() );
             } catch ( final Exception e )
             {
                 log( Message.TICK_ERROR );
                 e.printStackTrace();
             }
         }
-    }
-
-    private void acceptSocket(final Socket s)
-    {
-        this.executorService.execute( () -> Worker.getAvailableWorker().run( s ) );
     }
 
     @Override
@@ -808,14 +747,7 @@ public final class Server implements IntellectualServer
             e.printStackTrace();
         }
 
-        try
-        {
-            Message.WAITING_FOR_EXECUTOR_SERVICE.log();
-            this.executorService.awaitTermination( 5, TimeUnit.SECONDS );
-        } catch ( final InterruptedException e )
-        {
-            e.printStackTrace();
-        }
+        socketHandler.handleShutdown();
 
         AutoCloseable.closeAll();
 
@@ -843,6 +775,18 @@ public final class Server implements IntellectualServer
     public Router getRouter()
     {
         return router;
+    }
+
+    @Override
+    public boolean isStopping()
+    {
+        return this.stopping;
+    }
+
+    @Override
+    public boolean isPaused()
+    {
+        return this.pause;
     }
 
     @Override

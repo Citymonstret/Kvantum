@@ -19,22 +19,25 @@
 package com.plotsquared.iserver.object;
 
 import com.plotsquared.iserver.util.Assert;
+import com.plotsquared.iserver.util.RequestChild;
 import com.plotsquared.iserver.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class PostRequest
+final public class PostRequest implements RequestChild
 {
 
     public final String request;
     private final Map<String, String> vars;
+    private final Request parent;
 
-    public PostRequest(final String request)
+    public PostRequest(final Request parent, final String request)
     {
         Assert.notNull( request );
 
+        this.parent = parent;
         this.request = request;
         this.vars = new HashMap<>();
         for ( final String s : request.split( "&" ) )
@@ -49,6 +52,12 @@ final public class PostRequest
                 vars.put( p[ 0 ], p[ 1 ].replace( "+", " " ) );
             }
         }
+    }
+
+    @Override
+    public Request getParent()
+    {
+        return this.parent;
     }
 
     String buildLog()
@@ -75,10 +84,10 @@ final public class PostRequest
         return new HashMap<>( this.vars );
     }
 
-    public static PostRequest construct(final int cl, final BufferedReader input) throws Exception
+    public static PostRequest construct(final Request parent, final int cl, final BufferedReader input) throws Exception
     {
         final char[] chars = new char[ cl ];
         Assert.equals( input.read( chars ), cl );
-        return new PostRequest( new String( chars ) );
+        return new PostRequest( parent, new String( chars ) );
     }
 }

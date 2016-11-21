@@ -24,6 +24,7 @@ import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.Assert;
+import com.plotsquared.iserver.validation.ValidationManager;
 import com.plotsquared.iserver.views.requesthandler.DebugMiddleware;
 import com.plotsquared.iserver.views.requesthandler.MiddlewareQueue;
 import com.plotsquared.iserver.views.requesthandler.MiddlewareQueuePopulator;
@@ -44,6 +45,14 @@ public abstract class RequestHandler
     private static final Class[] REQUIRED_PARAMETERS = new Class[]{ Request.class, Response.class };
 
     protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
+
+    private final ValidationManager validationManager = new ValidationManager( this );
+
+    public ValidationManager getValidationManager()
+    {
+        return validationManager;
+    }
+
     private final Map<String, Method> alternateOutcomes = new HashMap<>();
 
     {

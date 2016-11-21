@@ -163,4 +163,8 @@ public interface IntellectualServer
      * @return view manager
      */
     Router getRouter();
+
+    boolean isStopping();
+
+    boolean isPaused();
 }
