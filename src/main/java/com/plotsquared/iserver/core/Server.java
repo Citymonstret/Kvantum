@@ -134,7 +134,7 @@ public final class Server implements IntellectualServer
         this.logWrapper = logWrapper;
         this.standalone = standalone;
 
-        this.fileSystem = new FileSystem( coreFolder );
+        this.fileSystem = new FileSystem( coreFolder.toPath() );
 
         final File logFolder = new File( coreFolder, "log" );
         if ( !logFolder.exists() )
@@ -287,7 +287,8 @@ public final class Server implements IntellectualServer
                 {
                     path.create();
                 }
-                try ( final OutputStream out = new FileOutputStream( new File( path.getFile(), "index.html" ) ) )
+                try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
+                ) )
                 {
                     FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
                 } catch ( final Exception e )

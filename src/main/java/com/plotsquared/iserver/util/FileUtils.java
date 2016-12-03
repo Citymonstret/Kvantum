@@ -202,8 +202,6 @@ public class FileUtils
 
     public static String getDocument(final File file, int buffer, boolean create)
     {
-        Server.getInstance().log( "Trying to find file : " + file );
-
         final Optional<String> cacheEntry = Server.getInstance().getCacheManager().getCachedFile( file.toString() );
         if ( cacheEntry.isPresent() )
         {

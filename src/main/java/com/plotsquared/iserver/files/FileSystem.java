@@ -20,8 +20,6 @@ package com.plotsquared.iserver.files;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-
 /**
  * A very simple (and restrictive) file system
  */
@@ -29,14 +27,14 @@ import java.io.File;
 public class FileSystem
 {
 
-    final File coreFolder;
+    final java.nio.file.Path coreFolder;
     private final Path corePath;
 
     /**
      * @param coreFolder The core folder (zero point) for this file system,
      *                   you cannot access any paths below it
      */
-    public FileSystem(final File coreFolder)
+    public FileSystem(final java.nio.file.Path coreFolder)
     {
         this.coreFolder = coreFolder;
         this.corePath = new Path( this, "/", true );
@@ -56,6 +54,27 @@ public class FileSystem
             return this.corePath;
         }
         return this.getPath( corePath, rawPath );
+    }
+
+    Path getPathUnsafe(final Path parent, String rawPath)
+    {
+        final String[] parts = rawPath.split( "((?<=/)|(?=/))" );
+        if ( parts.length < 1 )
+        {
+            return corePath;
+        }
+        if ( parts[0].equals( "." ) || parts[0].equals( "/" ) )
+        {
+            if ( parts.length >= 2 && parts[1].equals( "/" ) )
+            {
+                rawPath = rawPath.substring( 2 );
+            } else
+            {
+                rawPath = rawPath.substring( 1 );
+            }
+        }
+        final String lastPart = parts[parts.length - 1];
+        return new Path( this, parent.toString() + rawPath, lastPart.indexOf( '.' ) == -1 );
     }
 
     /**

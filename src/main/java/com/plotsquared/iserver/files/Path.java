@@ -18,16 +18,26 @@
  */
 package com.plotsquared.iserver.files;
 
+import com.plotsquared.iserver.core.Server;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings( "unused" )
 public class Path
 {
 
     private final FileSystem fileSystem;
-    private final String path;
+    private String path;
     private final boolean isFolder;
-    private final File file;
+    // private final File file;
+    private final java.nio.file.Path javaPath;
+
 
     private boolean exists;
     private Path[] subPaths;
@@ -42,18 +52,45 @@ public class Path
         {
             this.path = path;
         }
+        if ( this.path.startsWith( "/" ) )
+        {
+            this.path = this.path.substring( 1 );
+        }
         this.isFolder = isFolder;
-        this.file = new File( fileSystem.coreFolder, path );
-        this.exists = file.exists();
+        this.javaPath = fileSystem.coreFolder.resolve( this.path );
+        this.exists = Files.exists( this.javaPath );
     }
 
-    /**
-     * Get the Java file representation of this path
-     * @return Java file
-     */
-    final public File getFile()
+    final public java.nio.file.Path getJavaPath()
     {
-        return this.file;
+        return this.javaPath;
+    }
+
+    final public String readFile()
+    {
+        final Optional<String> cacheEntry = Server.getInstance().getCacheManager().getCachedFile( toString() );
+        if ( cacheEntry.isPresent() )
+        {
+            return cacheEntry.get();
+        }
+        if ( !exists )
+        {
+            return "";
+        }
+        final StringBuilder document = new StringBuilder();
+        if ( Files.isReadable( javaPath ) )
+        {
+            try
+            {
+                Files.readAllLines( javaPath ).forEach( line -> document.append( line ).append( System.lineSeparator() ) );
+            } catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        final String content = document.toString();
+        Server.getInstance().getCacheManager().setCachedFile( toString(), content );
+        return content;
     }
 
     @Override
@@ -81,6 +118,11 @@ public class Path
         return fileSystem.getPath( this, path );
     }
 
+    Path getPathUnsafe(final String path)
+    {
+        return fileSystem.getPathUnsafe( this, path );
+    }
+
     /**
      * Check if the file exists
      * @return true if the file exists
@@ -105,18 +147,23 @@ public class Path
         {
             return false;
         }
-        if ( isFolder )
-        {
-            return ( exists = getFile().mkdirs() );
-        }
         try
         {
-            exists = getFile().createNewFile();
+            if ( isFolder )
+            {
+                return ( exists = Files.exists( Files.createDirectories( javaPath ) ) );
+            }
+            exists = Files.exists( Files.createFile( javaPath ) );
         } catch ( final Exception e )
         {
             e.printStackTrace();
         }
         return exists;
+    }
+
+    public boolean isCached()
+    {
+        return Server.getInstance().getCacheManager().getCachedFile( toString() ).isPresent();
     }
 
     /**
@@ -133,36 +180,74 @@ public class Path
         return parts[ parts.length - 1 ];
     }
 
+    private void loadSubPaths()
+    {
+        if ( !this.exists )
+        {
+            return;
+        }
+        if ( !this.isFolder )
+        {
+            this.subPaths = new Path[ 0 ];
+            return;
+        }
+        try
+        {
+            final Stream<java.nio.file.Path> stream = Files.list( javaPath );
+            final List<java.nio.file.Path> list = stream.collect( Collectors.toList() );
+            this.subPaths = new Path[ list.size() ];
+            for ( int i = 0; i < list.size(); i++ )
+            {
+                this.subPaths[ i ] = getPathUnsafe( list.get( i ).getFileName().toString() );
+            }
+        } catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Get all sub paths
      * @return Array containing the sub paths, will be empty if this isn't a directory
      * @see #isFolder() to check if this is a directory or not
      */
     public Path[] getSubPaths() {
-        if ( this.subPaths != null )
-        {
-            return this.subPaths;
-        }
-        if ( !this.exists )
-        {
-            return new Path[ 0 ];
-        }
-        if ( !this.isFolder )
-        {
-            this.subPaths = new Path[ 0 ];
-            return this.subPaths;
-        }
-        final File[] files = file.listFiles();
-        if ( files == null )
-        {
-            this.subPaths = new Path[ 0 ];
-            return this.subPaths;
-        }
-        final Path[] paths = new Path[ files.length ];
-        for ( int i = 0; i < files.length; i++ )
-        {
-            paths[ i ] = getPath( files[ i ].getName() );
-        }
-        return paths;
+        return getSubPaths( true );
     }
+
+    public Path[] getSubPaths(boolean includeFolders)
+    {
+        if ( this.subPaths == null )
+        {
+            loadSubPaths();
+        }
+
+        if ( includeFolders )
+        {
+            return this.subPaths;
+        }
+
+        final List<Path> paths = new ArrayList<>();
+        for ( final Path path : subPaths )
+        {
+            if ( !path.isFolder )
+            {
+                paths.add( path );
+            }
+        }
+        return paths.toArray( new Path[ paths.size() ] );
+    }
+
+
+    @SafeVarargs
+    public final Collection<Path> getSubPaths(final Predicate<Path>... filters)
+    {
+        Stream<Path> stream = Arrays.stream( getSubPaths() );
+        for ( final Predicate<Path> filter : filters )
+        {
+            stream = stream.filter( filter );
+        }
+        return stream.collect( Collectors.toList() );
+    }
+
 }
