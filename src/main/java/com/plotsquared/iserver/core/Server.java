@@ -166,7 +166,6 @@ public final class Server implements IntellectualServer
         addViewBinding( "less", LessView.class );
         addViewBinding( "img", ImgView.class );
         addViewBinding( "download", DownloadView.class );
-        addViewBinding( "redirect", RedirectView.class );
         addViewBinding( "std", StandardView.class );
 
         if ( standalone )

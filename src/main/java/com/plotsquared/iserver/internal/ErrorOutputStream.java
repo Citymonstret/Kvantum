@@ -30,7 +30,7 @@ public final class ErrorOutputStream extends ByteArrayOutputStream
         {
             message = message.substring( 0, message.length() - System.lineSeparator().length() );
         }
-        if ( message.isEmpty() )
+        if ( !message.isEmpty() )
         {
             logWrapper.log( new String( toByteArray(), StandardCharsets.UTF_8 ) );
         }

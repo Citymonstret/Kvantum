@@ -21,6 +21,7 @@ package com.plotsquared.iserver.views;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.matching.ViewPattern;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
@@ -30,6 +31,7 @@ import com.plotsquared.iserver.util.Final;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * These are the view management classes.
@@ -76,9 +78,11 @@ public class View extends RequestHandler
     private final ViewPattern viewPattern;
     public String relatedFolderPath, fileName, defaultFile;
     private int buffer = -1;
-    private String internalFileName, internalDefaultFile;
-    private File folder;
+    protected String internalFileName;
+    protected String internalDefaultFile;
+    private Path folder;
     private ViewReturn viewReturn;
+    private final UUID uuid;
 
     /**
      * The constructor (Without prestored options)
@@ -115,6 +119,8 @@ public class View extends RequestHandler
         this.internalName = internalName;
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
+        this.relatedFolderPath = "{file}.{extension}";
+        this.uuid = UUID.randomUUID();
     }
 
     /**
@@ -183,23 +189,23 @@ public class View extends RequestHandler
      *
      * @return File
      */
-    protected File getFolder()
+    protected Path getFolder()
     {
         if ( this.folder == null )
         {
             if ( containsOption( "folder" ) )
             {
-                this.folder = new File( Server.getInstance().getCoreFolder(), getOption( "folder" ).toString() );
+                this.folder = Server.getInstance().getFileSystem().getPath( getOption( "folder" ).toString() );
             } else if ( relatedFolderPath != null )
             {
-                this.folder = new File( Server.getInstance().getCoreFolder(), relatedFolderPath );
+                this.folder = Server.getInstance().getFileSystem().getPath( relatedFolderPath );
             } else
             {
-                this.folder = new File( Server.getInstance().getCoreFolder(), "/" + internalName );
+                this.folder = Server.getInstance().getFileSystem().getPath( "/" + internalName );
             }
             if ( !folder.exists() )
             {
-                if ( !folder.mkdirs() )
+                if ( !folder.create() )
                 {
                     Message.COULD_NOT_CREATE_FOLDER.log( folder );
                 }
@@ -229,7 +235,7 @@ public class View extends RequestHandler
      * @see #VARIABLE_FOLDER
      * @see #getFolder()
      */
-    protected File getFile(final Request request)
+    protected Path getFile(final Request request)
     {
         Assert.isValid( request );
 
@@ -276,6 +282,7 @@ public class View extends RequestHandler
                     }
                 }
                 t = internalDefaultFile;
+                request.getVariables().put( VARIABLE_FILE, internalDefaultFile );
             }
             if ( !variables.containsKey( VARIABLE_FILE ) )
             {
@@ -285,6 +292,10 @@ public class View extends RequestHandler
             if ( variables.containsKey( VARIABLE_EXTENSION ) )
             {
                 n = n.replace( PATTERN_VARIABLE_EXTENSION, variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) );
+            } else if ( containsOption( "defaultExtension" ) )
+            {
+                n = n.replace( PATTERN_VARIABLE_EXTENSION, getOption( "defaultExtension" ).toString().replace( ".", ""
+                        ));
             } else
             {
                 n = n.replace( PATTERN_VARIABLE_EXTENSION, "" );
@@ -295,7 +306,7 @@ public class View extends RequestHandler
                 Server.getInstance().log( "Translated file name: '%s'", n );
             }
         }
-        return new File( getFolder(), n );
+        return getFolder().getPath( n );
     }
 
     /**
@@ -365,7 +376,7 @@ public class View extends RequestHandler
     @Override
     public String toString()
     {
-        return this.viewPattern.toString();
+        return internalName + "@" + uuid.toString();
     }
 
     @Override
@@ -382,4 +393,8 @@ public class View extends RequestHandler
         }
     }
 
+    public void setOption(String key, Object value)
+    {
+        this.options.put( key, value );
+    }
 }

@@ -18,13 +18,11 @@
  */
 package com.plotsquared.iserver.views;
 
-import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.util.FileUtils;
+import com.plotsquared.iserver.util.FileExtension;
 
-import java.io.File;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -32,37 +30,14 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class JSView extends View implements CacheApplicable
+public class JSView extends StaticFileView implements CacheApplicable
 {
 
     public JSView(String filter, Map<String, Object> options)
     {
-        super( filter, "javascript", options );
+        super( filter, options, "javascript", Collections.singletonList( FileExtension.JAVASCRIPT ) );
         super.relatedFolderPath = "/assets/js";
         super.fileName = "{file}.js";
-    }
-
-    @Override
-    public boolean passes(Request request)
-    {
-        Map<String, String> variables = request.getVariables();
-        String file = variables.get( "file" );
-
-        if ( !file.endsWith( ".js" ) )
-            file = file + ".js";
-        request.addMeta( "js_file", file );
-        return ( new File( getFolder(), file ) ).exists();
-    }
-
-
-    @Override
-    public Response generate(final Request r)
-    {
-        File file = new File( getFolder(), r.getMeta( "js_file" ).toString() );
-        Response response = new Response( this );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JAVASCRIPT );
-        response.setContent( FileUtils.getDocument( file, getBuffer() ) );
-        return response;
     }
 
     @Override

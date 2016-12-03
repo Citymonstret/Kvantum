@@ -18,13 +18,11 @@
  */
 package com.plotsquared.iserver.views;
 
-import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.util.FileUtils;
+import com.plotsquared.iserver.util.FileExtension;
 
-import java.io.File;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -32,32 +30,14 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class CSSView extends View implements CacheApplicable
+public class CSSView extends StaticFileView implements CacheApplicable
 {
 
     public CSSView(String filter, Map<String, Object> options)
     {
-        super( filter, "css", options );
+        super( filter, options, "css", Collections.singletonList( FileExtension.CSS ) );
         super.relatedFolderPath = "/assets/css";
         super.fileName = "{file}.css";
-    }
-
-    @Override
-    public boolean passes(Request request)
-    {
-        File file = getFile( request );
-        request.addMeta( "css_file", file );
-        return file.exists();
-    }
-
-    @Override
-    public Response generate(final Request r)
-    {
-        File file = (File) r.getMeta( "css_file" );
-        Response response = new Response( this );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS );
-        response.setContent( FileUtils.getDocument( file, getBuffer() ) );
-        return response;
     }
 
     @Override

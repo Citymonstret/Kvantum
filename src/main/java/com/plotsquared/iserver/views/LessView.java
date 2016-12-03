@@ -18,17 +18,13 @@
  */
 package com.plotsquared.iserver.views;
 
-import com.plotsquared.iserver.core.CoreConfig;
-import com.plotsquared.iserver.core.Server;
-import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
+import com.plotsquared.iserver.util.FileExtension;
 import org.lesscss.LessCompiler;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -36,42 +32,27 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class LessView extends View implements CacheApplicable
+public class LessView extends StaticFileView implements CacheApplicable
 {
 
     public static LessCompiler compiler;
 
     public LessView(String filter, Map<String, Object> options)
     {
-        super( filter, "less", options );
+        super( filter, options, "less", Collections.singletonList( FileExtension.LESS ) );
         super.relatedFolderPath = "./assets/less";
         super.fileName = "{file}.less";
     }
 
-    public static String getLess(File file, int buffer)
+    public static String getLess(String content)
     {
-        StringBuilder document = new StringBuilder();
-        try
-        {
-            BufferedReader reader = new BufferedReader( new FileReader( file ), buffer );
-            String line;
-            while ( ( line = reader.readLine() ) != null )
-            {
-                document.append( line ).append( "\n" );
-            }
-            reader.close();
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-
         if ( compiler == null )
         {
             compiler = new LessCompiler();
         }
         try
         {
-            return compiler.compile( document.toString() );
+            return compiler.compile( content );
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -81,27 +62,10 @@ public class LessView extends View implements CacheApplicable
     }
 
     @Override
-    public boolean passes(Request request)
-    {
-        File file = getFile( request );
-        request.addMeta( "less_file", file );
-        if ( CoreConfig.debug )
-        {
-            if ( !file.exists() )
-            {
-                Server.getInstance().log( "Requested file '%s' doesn't exist", file.getAbsoluteFile() );
-            }
-        }
-        return file.exists();
-    }
-
-    @Override
     public Response generate(final Request r)
     {
-        File file = (File) r.getMeta( "less_file" );
-        Response response = new Response( this );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_CSS );
-        response.setContent( getLess( file, getBuffer() ) );
+        Response response = super.generate( r );
+        response.setContent( getLess( response.getContent() ) );
         return response;
     }
 

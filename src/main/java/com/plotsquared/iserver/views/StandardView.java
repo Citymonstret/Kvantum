@@ -18,74 +18,56 @@
  */
 package com.plotsquared.iserver.views;
 
+import com.plotsquared.iserver.object.Header;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.util.GenericViewUtil;
+import com.plotsquared.iserver.util.FileExtension;
 
-import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 
-public class StandardView extends View implements CacheApplicable
+public class StandardView extends StaticFileView implements CacheApplicable
 {
 
     public StandardView(String filter, Map<String, Object> options)
     {
-        super( filter, "STANDARD", options );
-    }
-
-    @Override
-    public boolean passes(Request request)
-    {
-        String fileName, extension;
-        final Map<String, String> variables = request.getVariables();
-
-        fileName = variables.get( "file" );
-        extension = variables.get( "extension" ).replace( ".", "" );
-
-        if ( fileName.isEmpty() )
-        {
-            if ( containsOption( "defaultFile" ) )
-            {
-                fileName = getOption( "fileName" );
-            } else
-            {
-                fileName = "index";
-            }
-        }
-
-        if ( extension.isEmpty() )
-        {
-            if ( containsOption( "defaultExt" ) )
-            {
-                extension = getOption( "defaultExt" );
-            } else
-            {
-                extension = "html";
-            }
-        }
-        File file = new File( getFolder(), fileName + "." + extension );
-        if ( !file.exists() )
-        {
-            return false;
-        }
-        request.addMeta( "stdfile", file );
-        request.addMeta( "stdext", extension.toLowerCase() );
-        return true;
+        super( filter, options, "STANDARD", Arrays.asList( FileExtension.values() ) );
+        super.fileName = "{file}.{extension}";
+        super.setOption( "defaultExtension", "html" );
+        super.defaultFile = "index";
     }
 
     @Override
     public boolean isApplicable(Request r)
     {
-        return true;
+        // TODO: Try to resolve this
+        // return true;
+        return false;
     }
 
     @Override
     public Response generate(final Request r)
     {
-        final File file = (File) r.getMeta( "stdfile" );
-        final Response response = new Response( this );
-        final String extension = r.getMeta( "stdext" ).toString();
-        return GenericViewUtil.getGenericResponse( file, r, response, extension, getBuffer() );
+        final Response response = super.generate( r );
+        final FileExtension extension = (FileExtension) r.getMeta( "extension" );
+        switch ( extension )
+        {
+            case PDF:
+            case TXT:
+            case ZIP:
+            {
+                response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + extension.getOption
+                    () + "\"" );
+                response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
+                response.getHeader().set( Header.HEADER_CONTENT_LENGTH, r.getMeta( "file_length" ).toString() );
+            } break;
+            case LESS:
+            {
+                response.setContent( LessView.getLess( response.getContent() ) );
+            } break;
+            default: break;
+        }
+        return response;
     }
 }

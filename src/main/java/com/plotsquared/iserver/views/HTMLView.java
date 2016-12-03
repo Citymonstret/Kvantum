@@ -18,15 +18,13 @@
  */
 package com.plotsquared.iserver.views;
 
-import com.plotsquared.iserver.object.Header;
-import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.Response;
-import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.crush.syntax.VariableProvider;
-import com.plotsquared.iserver.util.FileUtils;
+import com.plotsquared.iserver.object.Request;
+import com.plotsquared.iserver.object.cache.CacheApplicable;
+import com.plotsquared.iserver.util.FileExtension;
 
-import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,33 +33,14 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class HTMLView extends View implements CacheApplicable
+public class HTMLView extends StaticFileView implements CacheApplicable
 {
 
     public HTMLView(String filter, Map<String, Object> options)
     {
-        super( filter, "html", options );
+        super( filter, options, "html", Collections.singletonList( FileExtension.HTML ) );
         super.fileName = "{file}.html";
         super.defaultFile = "index";
-    }
-
-    @Override
-    public boolean passes(Request request)
-    {
-        File file = getFile( request );
-        request.addMeta( "html_file", file );
-        return file.exists();
-    }
-
-    @Override
-    public Response generate(final Request r)
-    {
-        File file = (File) r.getMeta( "html_file" );
-
-        Response response = new Response( this );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
-        response.setContent( FileUtils.getDocument( file, getBuffer() ) );
-        return response;
     }
 
     @Override

@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.files;
 
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.util.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,9 +39,8 @@ public class Path
     // private final File file;
     private final java.nio.file.Path javaPath;
 
-
     private boolean exists;
-    private Path[] subPaths;
+    Map<String, Path> subPaths;
 
     Path(final FileSystem fileSystem, final String path, boolean isFolder)
     {
@@ -66,8 +66,42 @@ public class Path
         return this.javaPath;
     }
 
+    public final long length()
+    {
+        try
+        {
+            return Files.size( javaPath );
+        } catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+        return -1L;
+    }
+
+    final public byte[] readBytes()
+    {
+        if ( !exists )
+        {
+            return new byte[ 0 ];
+        }
+        byte[] content = new byte[0];
+        if ( Files.isReadable( javaPath ) )
+        {
+            try
+            {
+                content = Files.readAllBytes( javaPath );
+            } catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        return content;
+    }
+
     final public String readFile()
     {
+        Logger.debug( "Trying to read file: " + toString() );
+
         final Optional<String> cacheEntry = Server.getInstance().getCacheManager().getCachedFile( toString() );
         if ( cacheEntry.isPresent() )
         {
@@ -180,7 +214,7 @@ public class Path
         return parts[ parts.length - 1 ];
     }
 
-    private void loadSubPaths()
+    protected void loadSubPaths()
     {
         if ( !this.exists )
         {
@@ -188,17 +222,18 @@ public class Path
         }
         if ( !this.isFolder )
         {
-            this.subPaths = new Path[ 0 ];
+            this.subPaths = Collections.emptyMap();
             return;
         }
         try
         {
             final Stream<java.nio.file.Path> stream = Files.list( javaPath );
             final List<java.nio.file.Path> list = stream.collect( Collectors.toList() );
-            this.subPaths = new Path[ list.size() ];
-            for ( int i = 0; i < list.size(); i++ )
+            this.subPaths = new HashMap<>();
+            for ( final java.nio.file.Path p : list )
             {
-                this.subPaths[ i ] = getPathUnsafe( list.get( i ).getFileName().toString() );
+                final Path path = getPathUnsafe( p.getFileName().toString() );
+                this.subPaths.put( path.toString(), path );
             }
         } catch ( IOException e )
         {
@@ -211,38 +246,28 @@ public class Path
      * @return Array containing the sub paths, will be empty if this isn't a directory
      * @see #isFolder() to check if this is a directory or not
      */
-    public Path[] getSubPaths() {
+    public Collection<Path> getSubPaths() {
         return getSubPaths( true );
     }
 
-    public Path[] getSubPaths(boolean includeFolders)
+    public Collection<Path> getSubPaths(boolean includeFolders)
     {
         if ( this.subPaths == null )
         {
             loadSubPaths();
         }
-
         if ( includeFolders )
         {
-            return this.subPaths;
+            return this.subPaths.values();
         }
-
-        final List<Path> paths = new ArrayList<>();
-        for ( final Path path : subPaths )
-        {
-            if ( !path.isFolder )
-            {
-                paths.add( path );
-            }
-        }
-        return paths.toArray( new Path[ paths.size() ] );
+        return subPaths.values().stream().filter( path1 -> !path1.isFolder ).collect( Collectors.toList() );
     }
 
 
     @SafeVarargs
     public final Collection<Path> getSubPaths(final Predicate<Path>... filters)
     {
-        Stream<Path> stream = Arrays.stream( getSubPaths() );
+        Stream<Path> stream = getSubPaths().stream();
         for ( final Predicate<Path> filter : filters )
         {
             stream = stream.filter( filter );

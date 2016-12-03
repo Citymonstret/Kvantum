@@ -109,6 +109,14 @@ public class FileSystem
             }
         }
         final String lastPart = parts[parts.length - 1];
+        if ( parent.subPaths == null )
+        {
+            parent.loadSubPaths();
+        }
+        if ( parent.subPaths.containsKey( rawPath ) )
+        {
+            return parent.subPaths.get( rawPath );
+        }
         return new Path( this, parent.toString() + rawPath, lastPart.indexOf( '.' ) == -1 );
     }
 
