@@ -50,8 +50,6 @@ Current Crush Features:
  - If Statements `{#if provider.variable} {/if}`
  - Inverted If Statements `{#if !provider.variable} {/if}`
 
-Put `CrushEngine/CrushEngine-1.2.0.jar` in your `iserver/plugins` folder in order to enable the engine.
-
 ##Views
 IntellectualServer officially supports:
 - CSS
@@ -93,7 +91,7 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>com.github.IntellectualSites</groupId>
     <artifactId>IntellectualServer</artifactId>
-    <version>2.0.2</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
