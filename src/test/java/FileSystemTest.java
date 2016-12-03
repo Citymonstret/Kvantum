@@ -20,7 +20,7 @@ import com.plotsquared.iserver.files.FileSystem;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 public class FileSystemTest
 {
@@ -28,15 +28,15 @@ public class FileSystemTest
     @Test(expected = FileSystem.IllegalPathException.class)
     public void testIllegalPath()
     {
-        final FileSystem system = new FileSystem( new File( "./" ) );
+        final FileSystem system = new FileSystem( Paths.get( "./" ) );
         system.getPath( ".." );
     }
 
     @Test
     public void testListFiles()
     {
-        final FileSystem system = new FileSystem( new File( "./" ) );
-        Assert.assertTrue( system.getPath( "example" ).getSubPaths().length > 0 );
+        final FileSystem system = new FileSystem( Paths.get( "./" ) );
+        Assert.assertTrue( system.getPath( "example" ).getSubPaths().size() > 0 );
     }
 
 }

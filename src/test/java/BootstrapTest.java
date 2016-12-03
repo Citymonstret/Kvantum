@@ -19,6 +19,7 @@
 import com.plotsquared.iserver.core.DefaultLogWrapper;
 import com.plotsquared.iserver.core.IntellectualServerMain;
 import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.util.RequestManager;
 import org.junit.Test;
 
 import java.io.File;
@@ -33,7 +34,7 @@ public class BootstrapTest
     public void serverCreation()
     {
         Optional<Server> serverOptional = IntellectualServerMain.create( true, new File( "." ), new DefaultLogWrapper
-                () );
+                (), new RequestManager() );
 
         assertTrue( "Server is present", serverOptional.isPresent() );
     }
