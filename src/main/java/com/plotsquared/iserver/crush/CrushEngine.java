@@ -1,3 +1,21 @@
+/**
+ * IntellectualServer is a web server, written entirely in the Java language.
+ * Copyright (C) 2015 IntellectualSites
+ *
+ * This program is free software; you can redistribute it andor modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package com.plotsquared.iserver.crush;
 
 import com.plotsquared.iserver.config.ConfigVariableProvider;
@@ -5,7 +23,6 @@ import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.CoreConfig;
 import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.crush.syntax.*;
-import com.plotsquared.iserver.plugin.Plugin;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.MetaProvider;
 import com.plotsquared.iserver.util.PostProviderFactory;
@@ -14,30 +31,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-public class CrushEngine extends Plugin
+public class CrushEngine
 {
 
     private static CrushEngine instance;
 
     public static CrushEngine getInstance()
     {
+        if ( instance == null )
+        {
+            instance = new CrushEngine();
+        }
         return instance;
     }
+
+    private CrushEngine() {}
 
     final Collection<Syntax> syntaxCollection = new LinkedHashSet<>();
     final Collection<ProviderFactory> providers = new ArrayList<>();
 
-    @Override
-    public void onEnable()
+    public void load()
     {
-        Message.SYNTAX_STATUS.log( CoreConfig.enableSyntax );
+        Message.TEMPLATING_ENGINE_STATUS.log( "CrushEngine", CoreConfig.Crush.enable );
 
-        if ( !CoreConfig.enableSyntax )
+        if ( !CoreConfig.Crush.enable )
         {
             return;
         }
-
-        instance = this;
 
         this.syntaxCollection.add( new Include() );
         this.syntaxCollection.add( new Comment() );

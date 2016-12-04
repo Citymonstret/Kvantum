@@ -51,10 +51,15 @@ public class CoreConfig
         CoreConfig.preConfigured = preConfigured;
     }
 
+    @ConfigSection(name = "crush")
+    public static class Crush
+    {
+        public static boolean enable = true;
+    }
+
     @ConfigSection(name = "ssl")
     public static class SSL
     {
-
         public static boolean enable = false;
         public static int port = 443;
         public static String keyStore = "keyStore";

@@ -24,6 +24,7 @@ import com.plotsquared.iserver.account.AccountManager;
 import com.plotsquared.iserver.config.ConfigurationFile;
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.config.YamlConfiguration;
+import com.plotsquared.iserver.crush.CrushEngine;
 import com.plotsquared.iserver.events.Event;
 import com.plotsquared.iserver.events.EventCaller;
 import com.plotsquared.iserver.events.EventManager;
@@ -157,8 +158,6 @@ public final class Server implements IntellectualServer
 
         printLicenseInfo();
 
-        Message.SYNTAX_STATUS.log( CoreConfig.enableSyntax );
-
         // This adds the default view bindings
         addViewBinding( "html", HTMLView.class );
         addViewBinding( "css", CSSView.class );
@@ -286,13 +285,17 @@ public final class Server implements IntellectualServer
                 {
                     path.create();
                 }
-                try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
-                ) )
+                if ( !path.getPath( "index.html" ).exists() )
                 {
-                    FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
-                } catch ( final Exception e )
-                {
-                    e.printStackTrace();
+                    Logger.info( "Creating public/index.html!" );
+                    try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
+                    ) )
+                    {
+                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
+                    } catch ( final Exception e )
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 configViews.saveFile();
             } catch ( final Exception e )
@@ -478,6 +481,8 @@ public final class Server implements IntellectualServer
             e.printStackTrace();
             return;
         }
+
+        CrushEngine.getInstance().load();
 
         // Load Plugins
         this.loadPlugins();

@@ -27,6 +27,7 @@ import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.Final;
+import com.plotsquared.iserver.util.Logger;
 
 import java.io.File;
 import java.util.HashMap;
@@ -291,7 +292,24 @@ public class View extends RequestHandler
             n = n.replace( PATTERN_VARIABLE_FILE, variables.get( VARIABLE_FILE ) );
             if ( variables.containsKey( VARIABLE_EXTENSION ) )
             {
-                n = n.replace( PATTERN_VARIABLE_EXTENSION, variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) );
+                boolean skip = false;
+                if ( containsOption( "extensionRewrite" ) )
+                {
+                    Logger.debug( "Rewrite found for: " + toString() );
+                    final Map<String, Object> rewrite = ( Map<String, Object> ) getOption( "extensionRewrite" );
+                    if ( rewrite.containsKey( variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) ) )
+                    {
+                        final String rewritten = rewrite.get( variables.get( VARIABLE_EXTENSION ).replace( ".", "" )
+                        ).toString();
+                        Logger.debug( "Rewritten to: " + rewritten );
+                        n = n.replace( PATTERN_VARIABLE_EXTENSION, rewritten );
+                        skip = true;
+                    }
+                }
+                if ( !skip )
+                {
+                    n = n.replace( PATTERN_VARIABLE_EXTENSION, variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) );
+                }
             } else if ( containsOption( "defaultExtension" ) )
             {
                 n = n.replace( PATTERN_VARIABLE_EXTENSION, getOption( "defaultExtension" ).toString().replace( ".", ""
