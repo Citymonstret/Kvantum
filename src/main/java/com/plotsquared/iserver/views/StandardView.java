@@ -24,8 +24,11 @@ import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.util.FileExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StandardView extends StaticFileView implements CacheApplicable
 {
@@ -36,6 +39,18 @@ public class StandardView extends StaticFileView implements CacheApplicable
         super.fileName = "{file}.{extension}";
         super.setOption( "defaultExtension", "html" );
         super.defaultFile = "index";
+
+        if ( options.containsKey( "excludeExtensions" ) )
+        {
+            final List<FileExtension> toRemove = new ArrayList<>();
+            final List list = (List) options.get( "excludeExtensions" );
+            for ( Object o : list )
+            {
+                toRemove.addAll( super.extensionList.stream().filter( extension -> extension.matches( o.toString() )
+                 ).collect( Collectors.toList() ) );
+            }
+            super.extensionList.removeAll( toRemove );
+        }
     }
 
     @Override

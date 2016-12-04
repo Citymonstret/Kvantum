@@ -31,14 +31,12 @@ import java.util.Map;
 public abstract class StaticFileView extends View
 {
 
-    private final Collection<FileExtension> extensionList;
+    protected final Collection<FileExtension> extensionList;
 
     public StaticFileView(String filter, Map<String, Object> options, String name, Collection<FileExtension> extensions)
     {
         super( filter, name, options );
         this.extensionList = extensions;
-
-
     }
 
     @Override
