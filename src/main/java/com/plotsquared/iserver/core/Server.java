@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -32,16 +32,18 @@ import com.plotsquared.iserver.events.defaultEvents.ServerReadyEvent;
 import com.plotsquared.iserver.events.defaultEvents.ShutdownEvent;
 import com.plotsquared.iserver.events.defaultEvents.StartupEvent;
 import com.plotsquared.iserver.extra.ApplicationStructure;
+import com.plotsquared.iserver.files.FileCacheManager;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.internal.ErrorOutputStream;
 import com.plotsquared.iserver.internal.ExitSignalHandler;
 import com.plotsquared.iserver.internal.HTTPSThread;
 import com.plotsquared.iserver.internal.SocketHandler;
+import com.plotsquared.iserver.logging.LogModes;
 import com.plotsquared.iserver.logging.LogProvider;
+import com.plotsquared.iserver.logging.LogWrapper;
 import com.plotsquared.iserver.matching.Router;
 import com.plotsquared.iserver.object.AutoCloseable;
-import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.object.error.IntellectualServerInitializationException;
@@ -60,14 +62,6 @@ import java.net.ServerSocket;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-import static com.plotsquared.iserver.logging.LogModes.*;
-
-/**
- * The implementation of {@link IntellectualServer}
- *
- * @author Citymonstret | Sauilitired
- * @see com.plotsquared.iserver.core.IntellectualServer
- */
 public final class Server implements IntellectualServer
 {
 
@@ -94,8 +88,8 @@ public final class Server implements IntellectualServer
     private boolean stopping;
     private InputThread inputThread;
     private boolean started;
-    private ServerSocket socket;
-    private SSLServerSocket sslSocket;
+    private ServerSocket serverSocket;
+    private SSLServerSocket sslServerSocket;
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
@@ -115,12 +109,13 @@ public final class Server implements IntellectualServer
      * @throws IntellectualServerInitializationException If anything was to fail
      */
     protected Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper, final Router
-                      router)
+            router)
             throws IntellectualServerInitializationException
     {
         Assert.notNull( coreFolder, logWrapper );
 
         InstanceFactory.setupInstanceAutomagic( this );
+        ServerImplementation.registerServerImplementation( this );
 
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
         if ( !coreFolder.exists() )
@@ -135,7 +130,20 @@ public final class Server implements IntellectualServer
         this.logWrapper = logWrapper;
         this.standalone = standalone;
 
-        this.fileSystem = new FileSystem( coreFolder.toPath() );
+        this.fileSystem = new FileSystem( coreFolder.toPath(), new FileCacheManager()
+        {
+            @Override
+            public Optional<String> readCachedFile(final String string)
+            {
+                return getCacheManager().getCachedFile( string );
+            }
+
+            @Override
+            public void writeCachedFile(final String file, final String content)
+            {
+                getCacheManager().setCachedFile( file, content );
+            }
+        } );
 
         final File logFolder = new File( coreFolder, "log" );
         if ( !logFolder.exists() )
@@ -202,16 +210,16 @@ public final class Server implements IntellectualServer
                 final String nameSpace;
                 switch ( message.getMode() )
                 {
-                    case MODE_DEBUG:
+                    case LogModes.MODE_DEBUG:
                         nameSpace = "debug";
                         break;
-                    case MODE_INFO:
+                    case LogModes.MODE_INFO:
                         nameSpace = "info";
                         break;
-                    case MODE_ERROR:
+                    case LogModes.MODE_ERROR:
                         nameSpace = "error";
                         break;
-                    case MODE_WARNING:
+                    case LogModes.MODE_WARNING:
                         nameSpace = "warning";
                         break;
                     default:
@@ -560,7 +568,7 @@ public final class Server implements IntellectualServer
         this.started = true;
         try
         {
-            socket = new ServerSocket( CoreConfig.port );
+            serverSocket = new ServerSocket( CoreConfig.port );
             log( Message.SERVER_STARTED );
         } catch ( final Exception e )
         {
@@ -572,7 +580,7 @@ public final class Server implements IntellectualServer
             {
                 try
                 {
-                    socket = new ServerSocket( port++ );
+                    serverSocket = new ServerSocket( port++ );
                     run = false;
                     log( "Specified port was occupied, running on " + port + " instead" );
 
@@ -593,7 +601,7 @@ public final class Server implements IntellectualServer
                 System.setProperty( "javax.net.ssl.keyStorePassword", CoreConfig.SSL.keyStorePassword );
 
                 final SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-                this.sslSocket = (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port );
+                sslServerSocket = (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port );
             } catch ( final Exception e )
             {
                 new RuntimeException( "Failed to start HTTPS server", e ).printStackTrace();
@@ -606,9 +614,9 @@ public final class Server implements IntellectualServer
 
         this.handleEvent( new ServerReadyEvent( this ) );
 
-        if ( CoreConfig.SSL.enable && sslSocket != null )
+        if ( CoreConfig.SSL.enable && sslServerSocket != null )
         {
-            new HTTPSThread( sslSocket, socketHandler ).start();
+            new HTTPSThread( sslServerSocket, socketHandler ).start();
         }
 
         // Main Loop
@@ -625,7 +633,7 @@ public final class Server implements IntellectualServer
             }
             try
             {
-                socketHandler.acceptSocket( socket.accept() );
+                socketHandler.acceptSocket( serverSocket.accept() );
             } catch ( final Exception e )
             {
                 log( Message.TICK_ERROR );
@@ -652,23 +660,23 @@ public final class Server implements IntellectualServer
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
         // to limit to only error messages or such
-        if ( mode < lowestLevel || mode > highestLevel )
+        if ( mode < LogModes.lowestLevel || mode > LogModes.highestLevel )
         {
             return;
         }
         String prefix;
         switch ( mode )
         {
-            case MODE_DEBUG:
+            case LogModes.MODE_DEBUG:
                 prefix = "Debug";
                 break;
-            case MODE_INFO:
+            case LogModes.MODE_INFO:
                 prefix = "Info";
                 break;
-            case MODE_ERROR:
+            case LogModes.MODE_ERROR:
                 prefix = "Error";
                 break;
-            case MODE_WARNING:
+            case LogModes.MODE_WARNING:
                 prefix = "Warning";
                 break;
             default:
@@ -711,9 +719,58 @@ public final class Server implements IntellectualServer
     }
 
     @Override
+    public boolean isStandalone()
+    {
+        return standalone;
+    }
+
+    @Override
+    public Map<String, Class<? extends View>> getViewBindings()
+    {
+        return viewBindings;
+    }
+
+    @Override
+    public WorkerProcedure getWorkerProcedure()
+    {
+        return workerProcedure;
+    }
+
+    @Override
+    public SocketHandler getSocketHandler()
+    {
+        return socketHandler;
+    }
+
+    @Override
+    public boolean isSilent()
+    {
+        return silent;
+    }
+
+    @Override
+    public boolean isPause()
+    {
+        return pause;
+    }
+
+    @Override
+    public boolean isStarted()
+    {
+        return started;
+    }
+
+    @Override
+    public AccountManager getGlobalAccountManager()
+    {
+        return globalAccountManager;
+    }
+
+    @Override
+
     public synchronized void log(String message, final Object... args)
     {
-        this.log( message, MODE_INFO, args );
+        this.log( message, LogModes.MODE_INFO, args );
     }
 
     @Override
@@ -742,10 +799,11 @@ public final class Server implements IntellectualServer
 
         try
         {
-            socket.close();
+            serverSocket.close();
             if ( CoreConfig.SSL.enable )
             {
-                sslSocket.close();
+                sslServerSocket.close();
+                ;
             }
         } catch ( final Exception e )
         {

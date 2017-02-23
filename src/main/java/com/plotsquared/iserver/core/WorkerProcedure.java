@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -25,7 +25,7 @@ import com.plotsquared.iserver.views.RequestHandler;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-@SuppressWarnings( "unused" )
+@SuppressWarnings("unused")
 public final class WorkerProcedure
 {
 
@@ -61,7 +61,7 @@ public final class WorkerProcedure
         Assert.notEmpty( before );
         Assert.notNull( handler );
 
-        final Map<String, Handler> temporaryMap = new HashMap<>( );
+        final Map<String, Handler> temporaryMap = new HashMap<>();
         for ( final Map.Entry<String, Handler> entry : handlers.entrySet() )
         {
             if ( entry.getKey().equalsIgnoreCase( before ) )
@@ -91,7 +91,7 @@ public final class WorkerProcedure
         Assert.notEmpty( after );
         Assert.notNull( handler );
 
-        final Map<String, Handler> temporaryMap = new HashMap<>( );
+        final Map<String, Handler> temporaryMap = new HashMap<>();
         for ( final Map.Entry<String, Handler> entry : handlers.entrySet() )
         {
             temporaryMap.put( entry.getKey(), entry.getValue() );
@@ -117,10 +117,10 @@ public final class WorkerProcedure
         {
             if ( handler instanceof StringHandler )
             {
-                stringHandlers.add( ( StringHandler ) handler );
+                stringHandlers.add( (StringHandler) handler );
             } else
             {
-                byteHandlers.add( ( ByteHandler ) handler );
+                byteHandlers.add( (ByteHandler) handler );
             }
         }
 
@@ -192,10 +192,10 @@ public final class WorkerProcedure
             {
                 if ( handler instanceof StringHandler )
                 {
-                    stringHandlers.add( ( StringHandler ) handler );
+                    stringHandlers.add( (StringHandler) handler );
                 } else
                 {
-                    byteHandlers.add( ( ByteHandler ) handler );
+                    byteHandlers.add( (ByteHandler) handler );
                 }
             }
         }

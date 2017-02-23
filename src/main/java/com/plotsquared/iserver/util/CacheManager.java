@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -20,7 +20,6 @@ package com.plotsquared.iserver.util;
 
 import com.plotsquared.iserver.account.Account;
 import com.plotsquared.iserver.core.CoreConfig;
-import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.ResponseBody;
 import com.plotsquared.iserver.object.cache.CachedResponse;
 import com.plotsquared.iserver.views.RequestHandler;
@@ -40,14 +39,14 @@ import java.util.concurrent.TimeUnit;
  * handles all runtime caching
  */
 @SuppressWarnings("ALL")
-public class CacheManager
+public final class CacheManager
 {
 
-    private Cache<String, String> cachedIncludes;
-    private Cache<String, String> cachedFiles;
-    private Cache<String, CachedResponse> cachedBodies;
-    private Cache<Integer, Account> cachedAccounts;
-    private Cache<String, Integer> cachedAccountIds;
+    private final Cache<String, String> cachedIncludes;
+    private final Cache<String, String> cachedFiles;
+    private final Cache<String, CachedResponse> cachedBodies;
+    private final Cache<Integer, Account> cachedAccounts;
+    private final Cache<String, Integer> cachedAccountIds;
 
     public CacheManager()
     {
@@ -119,7 +118,7 @@ public class CacheManager
 
         if ( CoreConfig.debug )
         {
-            Server.getInstance().log( "Accessing cached file: " + file );
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Accessing cached file: " + file );
         }
 
         if ( !CoreConfig.Cache.enabled )
@@ -195,7 +194,7 @@ public class CacheManager
 
         if ( CoreConfig.debug )
         {
-            Server.getInstance().log( "Accessing cached body: " + view );
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Accessing cached body: " + view );
         }
 
         return this.cachedBodies.get( view.toString() );

@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -19,7 +19,6 @@
 package com.plotsquared.iserver.views;
 
 import com.plotsquared.iserver.core.CoreConfig;
-import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
@@ -47,18 +46,12 @@ public abstract class RequestHandler
     protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
     private final ValidationManager validationManager = new ValidationManager( this );
-
-    public ValidationManager getValidationManager()
-    {
-        return validationManager;
-    }
-
     private final Map<String, Method> alternateOutcomes = new HashMap<>();
 
     {
         if ( CoreConfig.debug )
         {
-            Server.getInstance().log( "Adding DebugMiddleware to SimpleRequestHandler" );
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Adding DebugMiddleware to SimpleRequestHandler" );
             this.middlewareQueuePopulator.add( DebugMiddleware.class );
             try
             {
@@ -68,6 +61,11 @@ public abstract class RequestHandler
                 e.printStackTrace();
             }
         }
+    }
+
+    public ValidationManager getValidationManager()
+    {
+        return validationManager;
     }
 
     public MiddlewareQueuePopulator getMiddlewareQueuePopulator()
@@ -136,7 +134,7 @@ public abstract class RequestHandler
      */
     protected void handleDebug(final Request request, final Response response)
     {
-        Server.getInstance().log( "Using the handleDebug alternate outcome!" );
+        com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Using the handleDebug alternate outcome!" );
         response.copyFrom( generate( request ) );
     }
 
@@ -148,7 +146,7 @@ public abstract class RequestHandler
         middlewareQueue.handle( request );
         if ( !middlewareQueue.finished() )
         {
-            Server.getInstance().log( "Skipping request as a middleware broke the chain!" );
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Skipping request as a middleware broke the chain!" );
             return null;
         }
 

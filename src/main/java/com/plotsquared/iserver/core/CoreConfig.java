@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -22,6 +22,12 @@ import com.intellectualsites.configurable.ConfigurationImplementation;
 import com.intellectualsites.configurable.annotations.ConfigSection;
 import com.intellectualsites.configurable.annotations.Configuration;
 
+/**
+ * This is the configuration implementation that is
+ * meant to control all easily accessible variables
+ * for the web server. This is generated into
+ * ".iserver\config\server.yml" and is loaded on runtime
+ */
 @SuppressWarnings("all")
 @Configuration(implementation = ConfigurationImplementation.YAML, name = "server")
 public class CoreConfig
@@ -39,7 +45,7 @@ public class CoreConfig
     public static boolean enableSyntax = true;
     public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
-    private static boolean preConfigured = false;
+    private transient static boolean preConfigured = false;
 
     public static boolean isPreConfigured()
     {
@@ -54,12 +60,14 @@ public class CoreConfig
     @ConfigSection(name = "crush")
     public static class Crush
     {
+
         public static boolean enable = true;
     }
 
     @ConfigSection(name = "ssl")
     public static class SSL
     {
+
         public static boolean enable = false;
         public static int port = 443;
         public static String keyStore = "keyStore";

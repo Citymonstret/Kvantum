@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -20,7 +20,6 @@ package com.plotsquared.iserver.core;
 
 import com.codahale.metrics.Timer;
 import com.plotsquared.iserver.config.Message;
-import com.plotsquared.iserver.http.HttpMethod;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
@@ -45,6 +44,7 @@ import java.util.zip.DeflaterOutputStream;
  * This is the worker that is responsible for nearly everything.
  * Feel no pressure, buddy.
  */
+@SuppressWarnings("ALL")
 public class Worker extends AutoCloseable
 {
 
@@ -55,7 +55,7 @@ public class Worker extends AutoCloseable
     private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
     private final ReusableGzipOutputStream reusableGzipOutputStream;
-    private final Server server;
+    private final IntellectualServer server;
     private Request request;
     private BufferedOutputStream output;
 
@@ -87,8 +87,9 @@ public class Worker extends AutoCloseable
             this.reusableGzipOutputStream = null;
         }
 
-        this.workerProcedureInstance = Server.getInstance().getProcedure().getInstance();
-        this.server = (Server) Server.getInstance();
+        this.workerProcedureInstance = com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+                .getProcedure().getInstance();
+        this.server = com.plotsquared.iserver.core.ServerImplementation.getImplementation();
     }
 
     static void setup(final int n)
@@ -157,18 +158,18 @@ public class Worker extends AutoCloseable
 
     private void handle()
     {
-        final RequestHandler requestHandler = server.router.match( request );
+        final RequestHandler requestHandler = server.getRouter().match( request );
 
         String textContent = "";
         byte[] bytes = empty;
 
-        final Optional<Session> session = server.sessionManager.getSession( request, output );
+        final Optional<Session> session = server.getSessionManager().getSession( request, output );
         if ( session.isPresent() )
         {
             request.setSession( session.get() );
         } else
         {
-            request.setSession( server.sessionManager.createSession( request, output ) );
+            request.setSession( server.getSessionManager().createSession( request, output ) );
         }
 
         boolean shouldCache = false;
@@ -211,7 +212,7 @@ public class Worker extends AutoCloseable
                     && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
             {
                 cache = true;
-                if ( !server.cacheManager.hasCache( requestHandler ) )
+                if ( !server.getCacheManager().hasCache( requestHandler ) )
                 {
                     shouldCache = true;
                 }
@@ -222,7 +223,7 @@ public class Worker extends AutoCloseable
                 body = requestHandler.handle( request );
             } else
             { // Just read from memory
-                body = server.cacheManager.getCache( requestHandler );
+                body = server.getCacheManager().getCache( requestHandler );
             }
 
             boolean skip = false;
@@ -248,7 +249,7 @@ public class Worker extends AutoCloseable
 
             if ( shouldCache )
             {
-                server.cacheManager.setCache( requestHandler, body );
+                server.getCacheManager().setCache( requestHandler, body );
             }
 
             if ( body.isText() )
@@ -352,7 +353,7 @@ public class Worker extends AutoCloseable
                     .printStackTrace();
         }
 
-        if ( !server.silent )
+        if ( /* !server.silent TODO: Replace */ true )
         {
             server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
                     requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length
@@ -364,12 +365,12 @@ public class Worker extends AutoCloseable
 
     /**
      * Prepares a request, then calls {@link #handle}
-     * @param remote Client socket
+     * @param remote Client com.plotsquared.iserver.internal.IntellectualSocket
      */
-    private void handle(final Socket remote)
+    private void handle(final Socket remote) throws Exception
     {
         // Used for metrics
-        final Timer.Context timerContext = Server.getInstance().getMetrics().registerRequestHandling();
+        final Timer.Context timerContext = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getMetrics().registerRequestHandling();
         if ( CoreConfig.verbose )
         {         // Do we want to output a load of useless information?
             server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
@@ -401,7 +402,7 @@ public class Worker extends AutoCloseable
                 return;
             }
         }
-        if ( !server.silent )
+        if ( /* !server.silent TODO: Replace */ true )
         {
             server.log( request.buildLog() );
         }
@@ -410,22 +411,29 @@ public class Worker extends AutoCloseable
     }
 
     /**
-     * Accepts a remote socket,
+     * Accepts a remote com.plotsquared.iserver.internal.IntellectualSocket,
      * makes sure its handled and closed down successfully
-     * @param remote Socket to accept
+     * @param remote com.plotsquared.iserver.internal.IntellectualSocket to accept
      */
     public void run(final Socket remote)
     {
         if ( remote != null && !remote.isClosed() )
         {
-            handle( remote );
+            try
+            {
+                handle( remote );
+            } catch ( final Exception e )
+            {
+                new RuntimeException( "Failed to handle com.plotsquared.iserver.internal.IntellectualSocket" ).printStackTrace();
+            }
         }
         if ( remote != null && !remote.isClosed() )
         {
             try
             {
                 remote.close();
-            } catch ( final Exception e ) {
+            } catch ( final Exception e )
+            {
                 e.printStackTrace();
             }
         }
@@ -437,8 +445,11 @@ public class Worker extends AutoCloseable
     {
         Assert.notNull( input );
 
+        // Make sure that the buffer is clean
         messageDigestMd5.reset();
+        // Update the digest with the current input
         messageDigestMd5.update( input );
+        // Now encode it, yay
         return encoder.encode( messageDigestMd5.digest() );
     }
 
@@ -447,13 +458,14 @@ public class Worker extends AutoCloseable
      */
     private static class ReusableGzipOutputStream extends DeflaterOutputStream
     {
-        private static final byte[] HEADER = new byte[] {
-                (byte)0x1F, (byte)0x8b, // magic bytes
+
+        private static final byte[] HEADER = new byte[]{
+                (byte) 0x1F, (byte) 0x8b, // magic bytes
                 0x08,                   // compression format == DEFLATE
                 0x00,                   // flags (NOT using CRC16, filename, etc)
                 0x00, 0x00, 0x00, 0x00, // no modification time available (don't leak this!)
                 0x02,                   // maximum compression
-                (byte)0xFF              // unknown creator OS (!!!)
+                (byte) 0xFF              // unknown creator OS (!!!)
         };
         private final ByteArrayOutputStream bufferStream;
         private final CRC32 crc32;
@@ -500,16 +512,16 @@ public class Worker extends AutoCloseable
         private void writeFooter() throws IOException
         {
             final long crcVal = this.crc32.getValue();
-            out.write((int)(crcVal & 0xFF));
-            out.write((int)((crcVal >>> 8) & 0xFF));
-            out.write((int)((crcVal >>> 16) & 0xFF));
-            out.write((int)((crcVal >>> 24) & 0xFF));
+            out.write( (int) ( crcVal & 0xFF ) );
+            out.write( (int) ( ( crcVal >>> 8 ) & 0xFF ) );
+            out.write( (int) ( ( crcVal >>> 16 ) & 0xFF ) );
+            out.write( (int) ( ( crcVal >>> 24 ) & 0xFF ) );
 
             final long sizeVal = this.writtenSize;
-            out.write((int)(sizeVal & 0xFF));
-            out.write((int)((sizeVal >>> 8) & 0xFF));
-            out.write((int)((sizeVal >>> 16) & 0xFF));
-            out.write((int)((sizeVal >>> 24) & 0xFF));
+            out.write( (int) ( sizeVal & 0xFF ) );
+            out.write( (int) ( ( sizeVal >>> 8 ) & 0xFF ) );
+            out.write( (int) ( ( sizeVal >>> 16 ) & 0xFF ) );
+            out.write( (int) ( ( sizeVal >>> 24 ) & 0xFF ) );
             out.flush();
         }
 

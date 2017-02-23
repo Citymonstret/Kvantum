@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -20,10 +20,8 @@ package com.plotsquared.iserver.object;
 
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.CoreConfig;
-import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.crush.syntax.ProviderFactory;
 import com.plotsquared.iserver.crush.syntax.VariableProvider;
-import com.plotsquared.iserver.http.HttpMethod;
 import com.plotsquared.iserver.util.*;
 import com.plotsquared.iserver.views.RequestHandler;
 
@@ -74,7 +72,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * The request constructor
      *
      * @param request Request (from the client)
-     * @param socket  The socket which sent the request
+     * @param socket  The com.plotsquared.iserver.internal.IntellectualSocket which sent the request
      * @throws RuntimeException if the request doesn't contain a query
      */
     public Request(final Collection<String> request, final Socket socket)
@@ -83,7 +81,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         if ( socket instanceof SSLSocket )
         {
-            protocolType  = ProtocolType.HTTPS;
+            protocolType = ProtocolType.HTTPS;
         } else
         {
             protocolType = ProtocolType.HTTP;
@@ -103,7 +101,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
                 }
                 if ( CoreConfig.verbose )
                 {
-                    Server.getInstance().log( "Query: " + subParts[ 0 ] );
+                    com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Query: " + subParts[ 0 ] );
                 }
                 headers.put( "query", subParts[ 0 ] );
             } else
@@ -171,7 +169,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     @Override
     public Map<String, Object> getAll()
     {
-        return MapUtil.convertMap( getVariables(), ( s ) -> s );
+        return MapUtil.convertMap( getVariables(), (s) -> s );
     }
 
     public void useAlternateOutcome(final String identifier)
@@ -224,7 +222,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         Request request = new Request();
         request.headers = new HashMap<>( headers );
-        request.socket = socket;
+        request.socket = this.socket;
         request.query = new Query( HttpMethod.GET, query );
         request.meta = new HashMap<>( meta );
         request.cookies = cookies;
@@ -311,10 +309,14 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      */
     public String buildLog()
     {
-        return "Request >\n\tAddress: " + socket.getRemoteSocketAddress().toString() +
-                "\n\tUser Agent: " + getHeader( "User-Agent" ) + "\n\tRequest String: " +
-                getHeader( "query" ) + "\n\tHost: " + getHeader( "Host" ) + "\n\tQuery: " +
-                this.query.buildLog() + ( postRequest != null ? "\n\tPost: " + postRequest.buildLog() : "" );
+        String msg = Message.REQUEST_LOG.toString();
+        for ( final Object a : new String[]{ socket.getRemoteSocketAddress().toString(), getHeader( "User-Agent" ),
+                getHeader( "query" ), getHeader( "Host" ), this.query.buildLog(), postRequest != null ? postRequest
+                .buildLog() : "" } )
+        {
+            msg = msg.replaceFirst( "%s", a.toString() );
+        }
+        return msg;
     }
 
     /**
@@ -401,7 +403,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return this.meta.containsKey( key );
     }
 
-    public Map<String,Object> getAllMeta()
+    public Map<String, Object> getAllMeta()
     {
         return new HashMap<>( this.meta );
     }
@@ -464,7 +466,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
          */
         String buildLog()
         {
-            return "Query >\n\t\tMethod: " + method.toString() + "\n\t\tResource: " + resource;
+            return "Query: [Method: " + method.toString() + " | Resource: " + resource + "]";
         }
 
         public String getFullRequest()

@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -24,9 +24,10 @@ import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.events.Event;
 import com.plotsquared.iserver.events.EventCaller;
 import com.plotsquared.iserver.files.FileSystem;
+import com.plotsquared.iserver.internal.SocketHandler;
 import com.plotsquared.iserver.logging.LogProvider;
+import com.plotsquared.iserver.logging.LogWrapper;
 import com.plotsquared.iserver.matching.Router;
-import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.object.Response;
 import com.plotsquared.iserver.util.CacheManager;
@@ -36,6 +37,7 @@ import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.View;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -76,13 +78,7 @@ public interface IntellectualServer
 
     FileSystem getFileSystem();
 
-    /**
-     * Create and register a simple request handler
-     * @param filter View filter - {@link com.plotsquared.iserver.matching.ViewPattern}
-     * @param generator The response generator
-     * @return The handler implementation
-     */
-    RequestHandler createSimpleRequestHandler(String filter, BiConsumer<Request, Response> generator);
+    abstract RequestHandler createSimpleRequestHandler(String filter, BiConsumer<Request, Response> generator);
 
     /**
      * Get the metric manager
@@ -130,41 +126,33 @@ public interface IntellectualServer
 
     File getCoreFolder();
 
-    /**
-     * Send a message (Replaces %s with arg#toString)
-     * @param message Message
-     * @param args Arguments
-     */
-    void log(String message, Object... args);
+    boolean isStandalone();
 
-    /**
-     * Send a message (Replaces %s with arg#toString)
-     * @param provider Log Provider
-     * @param message Message
-     * @param args Arguments
-     */
-    void log(LogProvider provider, String message, Object... args);
+    Map<String, Class<? extends View>> getViewBindings();
 
-    /**
-     * Stop the web server
-     */
-    void stopServer();
+    WorkerProcedure getWorkerProcedure();
 
-    /**
-     * Get the session manager
-     *
-     * @return Session Manager;
-     */
-    SessionManager getSessionManager();
+    SocketHandler getSocketHandler();
 
-    /**
-     * Get the view manager
-     *
-     * @return view manager
-     */
-    Router getRouter();
+    boolean isSilent();
 
-    boolean isStopping();
+    boolean isPause();
 
-    boolean isPaused();
+    boolean isStarted();
+
+    AccountManager getGlobalAccountManager();
+
+    abstract void log(String message, Object... args);
+
+    abstract void log(LogProvider provider, String message, Object... args);
+
+    abstract void stopServer();
+
+    abstract SessionManager getSessionManager();
+
+    abstract Router getRouter();
+
+    abstract boolean isStopping();
+
+    abstract boolean isPaused();
 }

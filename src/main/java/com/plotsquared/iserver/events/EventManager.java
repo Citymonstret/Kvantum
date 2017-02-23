@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * The event manager
  */
-@SuppressWarnings( "unused" )
+@SuppressWarnings("unused")
 public class EventManager
 {
 
@@ -52,54 +52,45 @@ public class EventManager
     {
         Assert.notNull( listener );
 
-        synchronized ( listeners )
+        if ( !listeners.containsKey( listener.hashCode() ) )
         {
-            if ( !listeners.containsKey( listener.hashCode() ) )
-                listeners.put( listener.hashCode(),
-                        new ArrayDeque<>() );
-            listeners.get( listener.hashCode() ).add( listener );
+            listeners.put( listener.hashCode(), new ArrayDeque<>() );
         }
+        listeners.get( listener.hashCode() ).add( listener );
     }
 
     public Collection<EventListener> getAll(final Object y)
     {
         Assert.notNull( y );
 
-        synchronized ( listeners )
+        final List<EventListener> l = new ArrayList<>();
+        for ( final Deque<EventListener> listeners : this.listeners.values() )
         {
-            final List<EventListener> l = new ArrayList<>();
-            for ( final Deque<EventListener> listeners : this.listeners.values() )
-            {
-                l.addAll( listeners.stream().filter( listener ->
-                        listener.sddww().equals( y ) ).collect( Collectors.toList() ) );
-            }
-            return l;
+            l.addAll( listeners.stream().filter( listener ->
+                    listener.sddww().equals( y ) ).collect( Collectors.toList() ) );
         }
+        return l;
     }
 
     public void removeAll(final Object y)
     {
         Assert.notNull( y );
 
-        synchronized ( listeners )
+        for ( final Deque<EventListener> listeners : this.listeners.values() )
         {
-            for ( final Deque<EventListener> listeners : this.listeners.values() )
-            {
-                listeners.stream().filter( listener ->
-                        listener.sddww().equals( y ) ).forEachOrdered( listeners::remove );
-            }
-            bake();
+            listeners.stream().filter( listener ->
+                    listener.sddww().equals( y ) ).forEachOrdered( listeners::remove );
         }
+        bake();
     }
 
     public void removeListener(final EventListener listener)
     {
         Assert.notNull( listener );
 
-        synchronized ( listeners )
+        for ( final Deque<EventListener> ll : listeners.values() )
         {
-            for ( final Deque<EventListener> ll : listeners.values() )
-                ll.remove( listener );
+            ll.remove( listener );
         }
     }
 
@@ -107,52 +98,48 @@ public class EventManager
     {
         Assert.notNull( event );
 
-        synchronized ( this )
-        {
-            call( event );
-        }
+        call( event );
     }
 
     public void bake()
     {
-        synchronized ( this )
+
+        bakedListeners = new HashMap<>();
+        List<EventListener> low, med, hig;
+        int index;
+        EventListener[] array;
+        for ( final Map.Entry<Integer, ArrayDeque<EventListener>> entry : listeners
+                .entrySet() )
         {
-            bakedListeners = new HashMap<>();
-            List<EventListener> low, med, hig;
-            int index;
-            EventListener[] array;
-            for ( final Map.Entry<Integer, ArrayDeque<EventListener>> entry : listeners
-                    .entrySet() )
-            {
-                low = new ArrayList<>();
-                med = new ArrayList<>();
-                hig = new ArrayList<>();
-                for ( final EventListener listener : entry.getValue() )
-                    switch ( listener.getPriority() )
-                    {
-                        case LOW:
-                            low.add( listener );
-                            break;
-                        case MEDIUM:
-                            low.add( listener );
-                            break;
-                        case HIGH:
-                            hig.add( listener );
-                            break;
-                        default:
-                            break;
-                    }
-                array = new EventListener[ low.size() + med.size() + hig.size() ];
-                index = 0;
-                for ( final EventListener listener : low )
-                    array[ index++ ] = listener;
-                for ( final EventListener listener : med )
-                    array[ index++ ] = listener;
-                for ( final EventListener listener : hig )
-                    array[ index++ ] = listener;
-                bakedListeners.put( entry.getKey(), array );
-            }
+            low = new ArrayList<>();
+            med = new ArrayList<>();
+            hig = new ArrayList<>();
+            for ( final EventListener listener : entry.getValue() )
+                switch ( listener.getPriority() )
+                {
+                    case LOW:
+                        low.add( listener );
+                        break;
+                    case MEDIUM:
+                        low.add( listener );
+                        break;
+                    case HIGH:
+                        hig.add( listener );
+                        break;
+                    default:
+                        break;
+                }
+            array = new EventListener[ low.size() + med.size() + hig.size() ];
+            index = 0;
+            for ( final EventListener listener : low )
+                array[ index++ ] = listener;
+            for ( final EventListener listener : med )
+                array[ index++ ] = listener;
+            for ( final EventListener listener : hig )
+                array[ index++ ] = listener;
+            bakedListeners.put( entry.getKey(), array );
         }
+
     }
 
     @SuppressWarnings("ALL")
@@ -162,10 +149,14 @@ public class EventManager
 
         if ( bakedListeners == null
                 || !bakedListeners.containsKey( event.hashCode() ) )
+        {
             return;
+        }
         for ( final EventListener listener : bakedListeners
                 .get( event.hashCode() ) )
+        {
             listener.listen( event );
+        }
     }
 
 

@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -37,32 +37,49 @@ import java.util.concurrent.TimeUnit;
 public final class SocketHandler
 {
 
+    public static final SocketFilter Socket_FILTER_IS_ACTIVE = Socket -> !Socket.isClosed() && Socket.isConnected();
     private final ExecutorService executorService;
-    private final List<SocketFilter> socketFilters;
+    private final List<SocketFilter> SocketFilters;
 
     public SocketHandler()
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
-        this.socketFilters = new ArrayList<>();
-        // TODO: Add config option to enable and disable socket filters
+        this.SocketFilters = new ArrayList<>();
+        // TODO: Add config option to enable and disable Socket filters
         // These are just temporary
-        this.socketFilters.add( SOCKET_FILTER_IS_ACTIVE );
+        this.SocketFilters.add( Socket_FILTER_IS_ACTIVE );
+    }
+
+    public static Map<String, SocketFilter> getSocketFilters() throws Exception
+    {
+        final Map<String, SocketFilter> filters = new HashMap<>();
+        for ( final Field field : SocketHandler.class.getDeclaredFields() )
+        {
+            if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( SocketFilter.class ) )
+            {
+                filters.put( field.getName(), (SocketFilter) field.get( null ) );
+            }
+        }
+        return filters;
     }
 
     public void acceptSocket(final Socket s)
     {
-        for ( final SocketFilter filter : socketFilters )
+        for ( final SocketFilter filter : SocketFilters )
         {
             if ( !filter.filter( s ) )
             {
-                Logger.debug( "SocketFilter filtered out socket: " + s ); // TODO: Remove
+                Logger.debug( "SocketFilter filtered out Socket: " + s ); // TODO: Remove
                 breakSocketConnection( s );
                 return;
             }
         }
-        this.executorService.execute( () -> Worker.getAvailableWorker().run( s ) );
+        if ( CoreConfig.debug )
+        {
+            Logger.debug( "Accepting Socket: " + s.toString() );
+        }
+        this.executorService.execute( () -> Worker.getAvailableWorker().run(  s  ) );
     }
-
 
     private void breakSocketConnection(final Socket s)
     {
@@ -87,27 +104,11 @@ public final class SocketHandler
         }
     }
 
-
-    public static final SocketFilter SOCKET_FILTER_IS_ACTIVE = socket -> !socket.isClosed() && socket.isConnected();
-
     public interface SocketFilter
     {
 
-        boolean filter(final Socket socket);
+        boolean filter(final Socket Socket);
 
-    }
-
-    public static Map<String, SocketFilter> getSocketFilters() throws Exception
-    {
-        final Map<String, SocketFilter> filters = new HashMap<>();
-        for ( final Field field : SocketHandler.class.getDeclaredFields() )
-        {
-            if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( SocketFilter.class ) )
-            {
-                filters.put( field.getName(), ( SocketFilter ) field.get( null ) );
-            }
-        }
-        return filters;
     }
 
 }

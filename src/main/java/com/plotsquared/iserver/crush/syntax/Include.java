@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -38,7 +38,6 @@
 package com.plotsquared.iserver.crush.syntax;
 
 import com.plotsquared.iserver.core.CoreConfig;
-import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.object.Request;
 import com.plotsquared.iserver.util.CacheManager;
 
@@ -65,7 +64,7 @@ final public class Include extends Syntax
             boolean setCache = false;
             if ( CoreConfig.Cache.enabled )
             {
-                CacheManager manager = Server.getInstance().getCacheManager();
+                CacheManager manager = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager();
                 String s = manager.getCachedInclude( matcher.group() );
                 if ( s != null )
                 {
@@ -77,7 +76,7 @@ final public class Include extends Syntax
                 }
             }
 
-            File file = new File( Server.getInstance().getCoreFolder(), matcher.group( 1 ) );
+            File file = new File( com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCoreFolder(), matcher.group( 1 ) );
             if ( file.exists() )
             {
                 StringBuilder c = new StringBuilder();
@@ -95,7 +94,7 @@ final public class Include extends Syntax
 
                 if ( setCache )
                 {
-                    Server.getInstance().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
+                    com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
                             ( ".css" ) ?
                             "<style>\n" + c + "<style>" : c.toString() );
                 }
@@ -109,7 +108,7 @@ final public class Include extends Syntax
                 }
             } else
             {
-                Server.getInstance().log( "Couldn't find file for '%s'", matcher.group() );
+                com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Couldn't find file for '%s'", matcher.group() );
             }
         }
         return in;

@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -20,9 +20,8 @@ package com.plotsquared.iserver.core;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.plotsquared.iserver.gui.GuiMain;
+import com.plotsquared.iserver.logging.LogWrapper;
 import com.plotsquared.iserver.matching.Router;
-import com.plotsquared.iserver.object.LogWrapper;
 import com.plotsquared.iserver.util.Assert;
 import com.plotsquared.iserver.util.Bootstrap;
 import com.plotsquared.iserver.util.RequestManager;
@@ -59,7 +58,8 @@ public class IntellectualServerMain
             final File file = new File( options.folder );
             if ( options.gui )
             {
-                GuiMain.main( args, file );
+                new DefaultLogWrapper().log( "The GUI manager was disabled for now!" );
+                // GuiMain.main( args, file );
             } else
             {
                 final Optional<Server> server = create( true, file, new DefaultLogWrapper(), new RequestManager() );
@@ -70,7 +70,7 @@ public class IntellectualServerMain
                         CoreConfig.debug = true;
                         CoreConfig.verbose = true;
                     }
-                    if ( options.port != - 1 )
+                    if ( options.port != -1 )
                     {
                         CoreConfig.port = options.port;
                     }
@@ -83,7 +83,7 @@ public class IntellectualServerMain
                         server.get().start();
                     } catch ( final Exception e )
                     {
-                        throw new RuntimeException( "Failed to start the server instance" );
+                        throw new RuntimeException( "Failed to start the server instance", e );
                     }
                 } else
                 {
@@ -160,7 +160,7 @@ public class IntellectualServerMain
      */
     @Deprecated
     public static IntellectualServer startServer(boolean standalone, File coreFolder, LogWrapper wrapper, final
-        Router router)
+    Router router)
     {
         Server server = null;
         try

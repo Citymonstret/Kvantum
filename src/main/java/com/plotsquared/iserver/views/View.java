@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -20,7 +20,6 @@ package com.plotsquared.iserver.views;
 
 import com.plotsquared.iserver.config.Message;
 import com.plotsquared.iserver.core.CoreConfig;
-import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.files.Path;
 import com.plotsquared.iserver.matching.ViewPattern;
 import com.plotsquared.iserver.object.Request;
@@ -77,13 +76,13 @@ public class View extends RequestHandler
     private final Map<String, Object> options;
     private final String internalName;
     private final ViewPattern viewPattern;
+    private final UUID uuid;
     public String relatedFolderPath, fileName, defaultFile;
-    private int buffer = -1;
     protected String internalFileName;
     protected String internalDefaultFile;
+    private int buffer = -1;
     private Path folder;
     private ViewReturn viewReturn;
-    private final UUID uuid;
 
     /**
      * The constructor (Without prestored options)
@@ -180,7 +179,7 @@ public class View extends RequestHandler
     @Final
     final public void register()
     {
-        Server.getInstance().getRouter().add( this );
+        com.plotsquared.iserver.core.ServerImplementation.getImplementation().getRouter().add( this );
     }
 
     /**
@@ -196,13 +195,13 @@ public class View extends RequestHandler
         {
             if ( containsOption( "folder" ) )
             {
-                this.folder = Server.getInstance().getFileSystem().getPath( getOption( "folder" ).toString() );
+                this.folder = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getFileSystem().getPath( getOption( "folder" ).toString() );
             } else if ( relatedFolderPath != null )
             {
-                this.folder = Server.getInstance().getFileSystem().getPath( relatedFolderPath );
+                this.folder = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getFileSystem().getPath( relatedFolderPath );
             } else
             {
-                this.folder = Server.getInstance().getFileSystem().getPath( "/" + internalName );
+                this.folder = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getFileSystem().getPath( "/" + internalName );
             }
             if ( !folder.exists() )
             {
@@ -296,7 +295,7 @@ public class View extends RequestHandler
                 if ( containsOption( "extensionRewrite" ) )
                 {
                     Logger.debug( "Rewrite found for: " + toString() );
-                    final Map<String, Object> rewrite = ( Map<String, Object> ) getOption( "extensionRewrite" );
+                    final Map<String, Object> rewrite = (Map<String, Object>) getOption( "extensionRewrite" );
                     if ( rewrite.containsKey( variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) ) )
                     {
                         final String rewritten = rewrite.get( variables.get( VARIABLE_EXTENSION ).replace( ".", "" )
@@ -313,7 +312,7 @@ public class View extends RequestHandler
             } else if ( containsOption( "defaultExtension" ) )
             {
                 n = n.replace( PATTERN_VARIABLE_EXTENSION, getOption( "defaultExtension" ).toString().replace( ".", ""
-                        ));
+                ) );
             } else
             {
                 n = n.replace( PATTERN_VARIABLE_EXTENSION, "" );
@@ -321,7 +320,7 @@ public class View extends RequestHandler
 
             if ( CoreConfig.debug )
             {
-                Server.getInstance().log( "Translated file name: '%s'", n );
+                com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Translated file name: '%s'", n );
             }
         }
         return getFolder().getPath( n );
@@ -371,7 +370,8 @@ public class View extends RequestHandler
         {
             if ( map == null )
             {
-                Server.getInstance().log( "Request: '%s' failed to pass '%s'", request.getQuery().getFullRequest(),
+                com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Request: '%s' failed to " +
+                                "pass '%s'", request.getQuery().getFullRequest(),
                         viewPattern.toString() );
             }
         }
@@ -386,7 +386,7 @@ public class View extends RequestHandler
      * @param request The request from which the URL is fetches
      * @return True if the request matches, false if not
      */
-    protected boolean passes(Request request)
+    protected boolean passes(final Request request)
     {
         return true;
     }
@@ -405,14 +405,17 @@ public class View extends RequestHandler
             return viewReturn.get( r );
         } else
         {
-            Response response = new Response( this );
+            final Response response = new Response( this );
             response.setContent( "<h1>Content!</h1>" );
             return response;
         }
     }
 
-    public void setOption(String key, Object value)
+    public void setOption(final String key, final Object value)
     {
+        Assert.notNull( key );
+        Assert.notNull( value );
+
         this.options.put( key, value );
     }
 }

@@ -1,17 +1,17 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -24,14 +24,19 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-public class ServerSecurityManager
+final class ServerSecurityManager
 {
 
     static class SecurePrintStream extends PrintStream
     {
-        
+
         private PrintStream old;
-        
+
+        private SecurePrintStream(final OutputStream outputStream)
+        {
+            super( outputStream );
+        }
+
         static SecurePrintStream construct(final PrintStream old) throws Exception
         {
             final Field field = FilterOutputStream.class.getDeclaredField( "out" );
@@ -41,10 +46,11 @@ public class ServerSecurityManager
             stream.old = old;
             return stream;
         }
-        
-        private SecurePrintStream(final OutputStream outputStream)
+
+        @SuppressWarnings("unchecked")
+        static <T extends Throwable> void sneakyThrow(final Throwable t) throws T
         {
-            super( outputStream );
+            throw (T) t;
         }
 
         @Override
@@ -194,15 +200,16 @@ public class ServerSecurityManager
             return old.printf( l, format, args );
         }
 
-        void checkPermission() {
+        void checkPermission()
+        {
             final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
             for ( final StackTraceElement element : stackTraceElements )
             {
-                if ( element.getClassName().contains( "LogWrapper" ) ) {
+                if ( element.getClassName().contains( "LogWrapper" ) )
+                {
                     return;
                 }
             }
-
             if ( CoreConfig.debug )
             {
                 for ( final StackTraceElement element : stackTraceElements )
@@ -210,13 +217,7 @@ public class ServerSecurityManager
                     old.println( element );
                 }
             }
-
             sneakyThrow( new IllegalAccessException( "Non-Logger tried to use System.out!" ) );
-        }
-
-        @SuppressWarnings("unchecked")
-        static <T extends Throwable> void sneakyThrow(Throwable t) throws T {
-            throw (T) t;
         }
     }
 }

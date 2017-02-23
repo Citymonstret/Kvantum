@@ -1,24 +1,23 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package com.plotsquared.iserver.account;
 
-import com.plotsquared.iserver.core.Server;
 import com.plotsquared.iserver.extra.ApplicationStructure;
 import com.plotsquared.iserver.object.Session;
 import com.plotsquared.iserver.util.Assert;
@@ -28,7 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
 
-@SuppressWarnings( "unused" )
+@SuppressWarnings("ALL")
 public class AccountManager
 {
 
@@ -76,10 +75,10 @@ public class AccountManager
             Optional<Account> adminAccount = createAccount( "admin", "admin" );
             if ( !adminAccount.isPresent() )
             {
-                Server.getInstance().log( "Failed to create admin account :(" );
+                com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Failed to create admin account :(" );
             } else
             {
-                Server.getInstance().log( "Created admin account with password \"admin\"" );
+                com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Created admin account with password \"admin\"" );
                 adminAccount.get().setData( "administrator", "true" );
             }
         }
@@ -117,11 +116,11 @@ public class AccountManager
     {
         Assert.notEmpty( username );
 
-        Optional<Integer> accountId = Server.getInstance().getCacheManager().getCachedId( username );
+        Optional<Integer> accountId = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager().getCachedId( username );
         Optional<Account> ret = EMPTY_OPTIONAL;
         if ( accountId.isPresent() )
         {
-            ret = Server.getInstance().getCacheManager().getCachedAccount( accountId.get() );
+            ret = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId.get() );
         }
         if ( ret.isPresent() )
         {
@@ -144,14 +143,14 @@ public class AccountManager
         }
         if ( ret.isPresent() )
         {
-            Server.getInstance().getCacheManager().setCachedAccount( ret.get() );
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager().setCachedAccount( ret.get() );
         }
         return ret;
     }
 
     public Optional<Account> getAccount(final int accountId)
     {
-        Optional<Account> ret = Server.getInstance().getCacheManager().getCachedAccount( accountId );
+        Optional<Account> ret = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId );
         if ( ret.isPresent() )
         {
             return ret;
@@ -174,7 +173,7 @@ public class AccountManager
         }
         if ( ret.isPresent() )
         {
-            Server.getInstance().getCacheManager().setCachedAccount( ret.get() );
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation().getCacheManager().setCachedAccount( ret.get() );
         }
         return ret;
     }
@@ -210,7 +209,7 @@ public class AccountManager
     void loadData(final Account account)
     {
         try ( final PreparedStatement statement = applicationStructure.getDatabaseManager().prepareStatement(
-                "SELECT * FROM account_data WHERE account_id = ?" ))
+                "SELECT * FROM account_data WHERE account_id = ?" ) )
         {
             statement.setInt( 1, account.getId() );
             final ResultSet set = statement.executeQuery();

@@ -1,24 +1,24 @@
 /**
  * IntellectualServer is a web server, written entirely in the Java language.
  * Copyright (C) 2015 IntellectualSites
- *
+ * <p>
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package com.plotsquared.iserver.config;
 
-import com.plotsquared.iserver.core.Server;
+import com.plotsquared.iserver.core.ServerImplementation;
 
 import static com.plotsquared.iserver.logging.LogModes.*;
 
@@ -48,6 +48,7 @@ public enum Message
     STARTING_SSL_ON_PORT( "Starting the HTTPS server on port %s", MODE_INFO ),
     SERVER_STARTED( "The server is started", MODE_INFO ),
     TICK_ERROR( "Error in server ticking...", MODE_ERROR ),
+    REQUEST_LOG( "Request: [Address: %s | User Agent: %s | Request String: %s | Host: %s | Query: %s, Post: %s]" ),
     CONNECTION_ACCEPTED( "Connection accepted from '%s' - Handling the data!", MODE_DEBUG ),
     DEBUG( ">> Debug - Ignore <<", MODE_DEBUG ),
     CANNOT_LOAD_TRANSLATIONS( "Cannot load the translation file", MODE_ERROR ),
@@ -88,7 +89,8 @@ public enum Message
     @Override
     public String toString()
     {
-        if ( Server.getInstance() != null && ( (Server) Server.getInstance() ).translations != null )
+        if ( com.plotsquared.iserver.core.ServerImplementation.getImplementation() != null && ( ServerImplementation
+                .getImplementation().getTranslations() != null ) )
         {
             String nameSpace;
             switch ( this.getMode() )
@@ -109,9 +111,11 @@ public enum Message
                     nameSpace = "info";
                     break;
             }
-            if ( ( (Server) Server.getInstance() ).translations.contains( nameSpace + "." + this.name().toLowerCase() ) )
+            if ( ServerImplementation.getImplementation().getTranslations().contains( nameSpace + "." + this.name().toLowerCase()
+            ) )
             {
-                return ( (Server) Server.getInstance() ).translations.get( nameSpace + "." + this.name().toLowerCase() );
+                return ( ServerImplementation.getImplementation().getTranslations().get( nameSpace + "." + this.name
+                        ().toLowerCase() ) );
             }
         }
         return this.message;
@@ -119,6 +123,6 @@ public enum Message
 
     public void log(Object... args)
     {
-        Server.getInstance().log( this, args );
+        com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( this, args );
     }
 }
