@@ -18,34 +18,46 @@
  */
 package com.plotsquared.iserver.core;
 
-import com.plotsquared.iserver.commands.*;
+import com.intellectualsites.commands.CommandHandlingOutput;
+import com.intellectualsites.commands.CommandResult;
+import com.plotsquared.iserver.commands.Dump;
+import com.plotsquared.iserver.commands.Metrics;
+import com.plotsquared.iserver.commands.Show;
+import com.plotsquared.iserver.commands.Stop;
 import com.plotsquared.iserver.events.Event;
+import com.plotsquared.iserver.object.AutoCloseable;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The thread which handles command inputs, when ran as a standalone
  * applications.
  *
+ * The actual command handler is accessed by {@link IntellectualServer#getCacheManager()}
  * @author Citymonstret
  */
 @SuppressWarnings("all")
 public final class InputThread extends Thread
 {
-
-    public final Map<String, Command> commands;
     public String currentString = "";
 
     InputThread()
     {
-        this.commands = new HashMap<>();
-        this.commands.put( "stop", new Stop() );
-        this.commands.put( "show", new Show() );
-        this.commands.put( "dump", new Dump() );
-        this.commands.put( "metrics", new Metrics() );
+        ServerImplementation.getImplementation().getCommandManager().createCommand( new Stop() );
+        ServerImplementation.getImplementation().getCommandManager().createCommand( new Dump() );
+        ServerImplementation.getImplementation().getCommandManager().createCommand( new Metrics() );
+        ServerImplementation.getImplementation().getCommandManager().createCommand( new Show() );
+
+        new AutoCloseable() {
+
+            @Override
+            @SuppressWarnings( "deprecated" )
+            public void handleClose()
+            {
+                InputThread.this.stop();
+            }
+        };
     }
 
     @Override
@@ -54,8 +66,14 @@ public final class InputThread extends Thread
         try ( BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) ) )
         {
             String line;
+
             for ( ; ; )
             {
+                if ( ServerImplementation.getImplementation().isStopping() )
+                {
+                    break;
+                }
+
                 line = in.readLine();
                 if ( line == null || line.isEmpty() )
                 {
@@ -64,23 +82,37 @@ public final class InputThread extends Thread
                 if ( line.startsWith( "/" ) )
                 {
                     line = line.replace( "/", "" ).toLowerCase();
-                    final String[] strings = line.split( " " );
-                    final String[] args;
-                    if ( strings.length > 1 )
+                    final CommandResult result = ServerImplementation.getImplementation().getCommandManager().handle(
+                            ServerImplementation.getImplementation(), line );
+
+                    switch ( result.getCommandResult() )
                     {
-                        args = new String[ strings.length - 1 ];
-                        System.arraycopy( strings, 1, args, 0, strings.length - 1 );
-                    } else
-                    {
-                        args = new String[ 0 ];
-                    }
-                    final String command = strings[ 0 ];
-                    if ( commands.containsKey( command ) )
-                    {
-                        commands.get( command ).handle( args );
-                    } else
-                    {
-                        ServerImplementation.getImplementation().log( "Unknown command '%s'", line );
+                        case CommandHandlingOutput.NOT_PERMITTED:
+                            ServerImplementation.getImplementation().log( "Command Error: You are not allowed to execute that command!" );
+                            break;
+                        case CommandHandlingOutput.ERROR:
+                            ServerImplementation.getImplementation().log( "Something went wrong when executing the command!" );
+                            result.getStacktrace().printStackTrace();
+                            break;
+                        case CommandHandlingOutput.NOT_FOUND:
+                            if ( result.getClosestMatch() != null )
+                            {
+                                ServerImplementation.getImplementation().log( "Did you mean: /%s", result
+                                        .getClosestMatch().getCommand() );
+                            } else
+                            {
+                                ServerImplementation.getImplementation().log( "There is no such command!" );
+                            }
+                            break;
+                        case CommandHandlingOutput.WRONG_USAGE:
+                            ServerImplementation.getImplementation().log( "Command Usage: " + result.getCommand().getUsage() );
+                            break;
+                        case CommandHandlingOutput.SUCCESS:
+                            break;
+                        default:
+                            ServerImplementation.getImplementation().log( "Unknown command result: " + CommandHandlingOutput.nameField(
+                                    result.getCommandResult() ) );
+                            break;
                     }
                 } else
                 {

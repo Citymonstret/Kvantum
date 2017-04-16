@@ -18,13 +18,24 @@
  */
 package com.plotsquared.iserver.commands;
 
+
+import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandDeclaration;
+import com.intellectualsites.commands.CommandInstance;
+
+@CommandDeclaration(
+
+        command = "stop",
+        description = "Stop the server"
+)
 public class Stop extends Command
 {
 
     @Override
-    public void handle(String[] args)
+    public boolean onCommand(CommandInstance instance)
     {
         com.plotsquared.iserver.core.ServerImplementation.getImplementation().stopServer();
+        return true;
     }
 
 }

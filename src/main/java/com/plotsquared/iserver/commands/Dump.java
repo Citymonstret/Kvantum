@@ -18,17 +18,27 @@
  */
 package com.plotsquared.iserver.commands;
 
+import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandDeclaration;
+import com.intellectualsites.commands.CommandInstance;
+
 /**
  * Created 12/24/2015 for IntellectualServer
  *
  * @author Citymonstret
  */
+@CommandDeclaration(
+        command = "dump",
+        description = "Dump information from the router"
+)
 public class Dump extends Command
 {
 
     @Override
-    public void handle(String[] args)
+    public boolean onCommand(CommandInstance instance)
     {
         com.plotsquared.iserver.core.ServerImplementation.getImplementation().getRouter().dump( com.plotsquared.iserver.core.ServerImplementation.getImplementation() );
+        return true;
     }
+
 }

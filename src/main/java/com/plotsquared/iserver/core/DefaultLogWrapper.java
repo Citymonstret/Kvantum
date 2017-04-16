@@ -27,6 +27,9 @@ import print.color.ColoredPrinterWIN;
 
 import java.text.SimpleDateFormat;
 
+/**
+ * The default log handler. Uses Ansi for colored output
+ */
 public class DefaultLogWrapper implements LogWrapper
 {
 

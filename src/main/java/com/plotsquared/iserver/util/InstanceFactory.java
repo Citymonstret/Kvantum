@@ -21,6 +21,7 @@ package com.plotsquared.iserver.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+@SuppressWarnings( "ALL" )
 public class InstanceFactory
 {
 
@@ -47,7 +48,7 @@ public class InstanceFactory
         setupInstance( t, "instance" );
     }
 
-    public static <T> void setupInstanceAutomagic(T t)
+    public static <T> void setupInstanceAutomagic(final T t)
     {
         for ( final Field field : t.getClass().getDeclaredFields() )
         {

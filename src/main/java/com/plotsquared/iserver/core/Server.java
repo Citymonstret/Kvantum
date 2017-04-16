@@ -18,6 +18,7 @@
  */
 package com.plotsquared.iserver.core;
 
+import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
 import com.plotsquared.iserver.account.AccountCommand;
 import com.plotsquared.iserver.account.AccountManager;
@@ -75,7 +76,6 @@ public final class Server implements IntellectualServer
     private final SocketHandler socketHandler;
     private final Metrics metrics = new Metrics();
     // Public
-    public ConfigurationFile translations;
     volatile CacheManager cacheManager;
     boolean silent = false;
     Router router;
@@ -83,10 +83,10 @@ public final class Server implements IntellectualServer
     // Private
     PrintStream logStream;
     // Package-Protected
+    private ConfigurationFile translations;
     private File coreFolder;
     private boolean pause = false;
     private boolean stopping;
-    private InputThread inputThread;
     private boolean started;
     private ServerSocket serverSocket;
     private SSLServerSocket sslServerSocket;
@@ -96,6 +96,7 @@ public final class Server implements IntellectualServer
     private ApplicationStructure mainApplicationStructure;
     private AccountManager globalAccountManager;
     private FileSystem fileSystem;
+    private CommandManager commandManager;
 
     {
         viewBindings = new HashMap<>();
@@ -182,7 +183,10 @@ public final class Server implements IntellectualServer
             // Handles incoming commands
             // TODO: Replace the command system
             // https://github.com/IntellectualSites/CommandAPI
-            ( inputThread = new InputThread() ).start();
+            this.commandManager = new CommandManager( '/' );
+            this.commandManager.getManagerOptions().getFindCloseMatches( false );
+            this.commandManager.getManagerOptions().setRequirePrefix( false );
+            new InputThread().start();
         }
 
         try
@@ -324,7 +328,7 @@ public final class Server implements IntellectualServer
                 e.printStackTrace();
             }
             // TODO: Remake
-            this.inputThread.commands.put( "account", new AccountCommand( applicationStructure ) );
+            getCommandManager().createCommand( new AccountCommand( applicationStructure ) );
         }
 
         if ( !CoreConfig.Application.main.isEmpty() )
@@ -473,6 +477,12 @@ public final class Server implements IntellectualServer
         {
             log( Message.STANDALONE_NOT_LOADING_PLUGINS );
         }
+    }
+
+    @Override
+    public CommandManager getCommandManager()
+    {
+        return this.commandManager;
     }
 
     @SuppressWarnings("ALL")

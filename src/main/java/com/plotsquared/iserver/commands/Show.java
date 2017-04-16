@@ -18,14 +18,21 @@
  */
 package com.plotsquared.iserver.commands;
 
+import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandDeclaration;
+import com.intellectualsites.commands.CommandInstance;
 import com.plotsquared.iserver.logging.LogWrapper;
 
+
+@CommandDeclaration(
+        command = "show"
+)
 public class Show extends Command
 {
 
-    @Override
-    public void handle(String[] args)
+    public boolean onCommand(CommandInstance instance)
     {
+        final String[] args = instance.getArguments();
         if ( args.length < 1 )
         {
             com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "> Required Parameter Missing (`c`|`w`)" );
@@ -274,5 +281,6 @@ public class Show extends Command
                 wrapper.log( "  " + line );
             }
         }
+        return true;
     }
 }

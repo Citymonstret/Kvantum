@@ -18,6 +18,10 @@
  */
 package com.plotsquared.iserver.core;
 
+import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandManager;
+import com.intellectualsites.commands.callers.CommandCaller;
+import com.intellectualsites.commands.parser.Parserable;
 import com.plotsquared.iserver.account.AccountManager;
 import com.plotsquared.iserver.config.ConfigurationFile;
 import com.plotsquared.iserver.config.Message;
@@ -37,6 +41,7 @@ import com.plotsquared.iserver.views.RequestHandler;
 import com.plotsquared.iserver.views.View;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -47,8 +52,32 @@ import java.util.function.BiConsumer;
  * for the server to work
  */
 @SuppressWarnings("unused")
-public interface IntellectualServer
+public interface IntellectualServer extends CommandCaller<IntellectualServer>
 {
+
+    @Override
+    default void message(String s)
+    {
+        log( s );
+    }
+
+    @Override
+    default IntellectualServer getSuperCaller()
+    {
+        return this;
+    }
+
+    @Override
+    default boolean hasAttachment(String s)
+    {
+        return true;
+    }
+
+    @Override
+    default void sendRequiredArgumentsList(CommandManager commandManager, Command command, Collection<Parserable> collection, String s)
+    {
+        message( "Argument List Not Implemented!" );
+    }
 
     boolean isMysqlEnabled();
 
@@ -97,6 +126,8 @@ public interface IntellectualServer
      * Load all plugins
      */
     void loadPlugins();
+
+    CommandManager getCommandManager();
 
     @SuppressWarnings("ALL")
     void start();

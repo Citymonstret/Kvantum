@@ -18,16 +18,26 @@
  */
 package com.plotsquared.iserver.commands;
 
+import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandDeclaration;
+import com.intellectualsites.commands.CommandInstance;
+import com.plotsquared.iserver.core.ServerImplementation;
+
 /**
  * Prints {@link com.plotsquared.iserver.util.Metrics} information to
  * the logger
  */
+@CommandDeclaration(
+        command = "metrics"
+)
 public class Metrics extends Command
 {
 
     @Override
-    public void handle(String[] args)
+    public boolean onCommand(CommandInstance instance)
     {
-        com.plotsquared.iserver.core.ServerImplementation.getImplementation().getMetrics().logReport();
+        ServerImplementation.getImplementation().getMetrics().logReport();
+        return true;
     }
+
 }

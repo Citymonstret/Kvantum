@@ -24,6 +24,11 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
+/**
+ * This is primarily used to check if the system output stream is used
+ * inside of the logger, but might be extended to handle more in the
+ * future
+ */
 final class ServerSecurityManager
 {
 

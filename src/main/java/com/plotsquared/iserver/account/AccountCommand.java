@@ -18,7 +18,9 @@
  */
 package com.plotsquared.iserver.account;
 
-import com.plotsquared.iserver.commands.Command;
+import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandDeclaration;
+import com.intellectualsites.commands.CommandInstance;
 import com.plotsquared.iserver.core.ServerImplementation;
 import com.plotsquared.iserver.extra.ApplicationStructure;
 import com.plotsquared.iserver.util.Assert;
@@ -26,6 +28,12 @@ import com.plotsquared.iserver.util.StringUtil;
 
 import java.util.Optional;
 
+/**
+ * TODO: Remake this!
+ */
+@CommandDeclaration(
+        command = "account"
+)
 public class AccountCommand extends Command
 {
 
@@ -38,24 +46,24 @@ public class AccountCommand extends Command
         this.structure = applicationStructure;
     }
 
-    @Override
-    public void handle(String[] args)
+
+    public boolean onCommand(CommandInstance instance )
     {
-        if ( args.length < 1 )
+        if ( instance.getArguments().length < 1 )
         {
             send( "Available Subcommands: create, testpass, dumpdata" );
         } else
         {
-            switch ( args[ 0 ].toLowerCase() )
+            switch ( instance.getArguments()[ 0 ].toLowerCase() )
             {
                 case "dumpdata":
                 {
-                    if ( args.length < 2 )
+                    if ( instance.getArguments().length < 2 )
                     {
                         send( "Syntax: account dumpdata [username]" );
                     } else
                     {
-                        String username = args[ 1 ];
+                        String username = instance.getArguments()[ 1 ];
                         Optional<Account> account = structure.getAccountManager().getAccount( username );
                         if ( !account.isPresent() )
                         {
@@ -70,13 +78,13 @@ public class AccountCommand extends Command
                 break;
                 case "testpass":
                 {
-                    if ( args.length < 3 )
+                    if ( instance.getArguments().length < 3 )
                     {
                         send( "Syntax: account testpass [username] [password]" );
                     } else
                     {
-                        String username = args[ 1 ];
-                        String password = args[ 2 ];
+                        String username = instance.getArguments()[ 1 ];
+                        String password = instance.getArguments()[ 2 ];
 
                         Optional<Account> accountOptional = structure.getAccountManager().getAccount( username );
                         if ( !accountOptional.isPresent() )
@@ -91,13 +99,13 @@ public class AccountCommand extends Command
                 break;
                 case "create":
                 {
-                    if ( args.length < 3 )
+                    if ( instance.getArguments().length < 3 )
                     {
                         send( "Syntax: account create [username] [password]" );
                     } else
                     {
-                        String username = args[ 1 ];
-                        String password = args[ 2 ];
+                        String username = instance.getArguments()[ 1 ];
+                        String password = instance.getArguments()[ 2 ];
 
                         if ( structure.getAccountManager().getAccount( username ) != null )
                         {
@@ -117,10 +125,11 @@ public class AccountCommand extends Command
                 }
                 break;
                 default:
-                    send( "Unknown subcommand: " + args[ 0 ].toLowerCase() );
+                    send( "Unknown subcommand: " + instance.getArguments()[ 0 ].toLowerCase() );
                     break;
             }
         }
+        return true;
     }
 
     private void send(final String s)

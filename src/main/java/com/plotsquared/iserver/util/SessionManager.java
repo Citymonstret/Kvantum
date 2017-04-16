@@ -51,7 +51,8 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
         final String sessionID = UUID.randomUUID().toString();
 
         r.postponedCookies.put( name, sessionID );
-        com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Set session (%s=%s)", name, sessionID ); // TODO: Fix
+        com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+                .log( "Set session (%s=%s)", name, sessionID ); // TODO: Fix
 
         final Session session = new Session();
         this.sessions.put( sessionID, session );
@@ -85,7 +86,8 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
                 session = sessions.get( sessionID );
                 if ( CoreConfig.debug )
                 {
-                    com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Found session (%s=%s) for request %s", session, sessionID, r ); // TODO: Fix
+                    com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+                            .log( "Found session (%s=%s) for request %s", session, sessionID, r ); // TODO: Fix
                 }
             } else
             {
@@ -94,9 +96,9 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
                     r.postponedCookies.put( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
                     if ( CoreConfig.debug )
                     {
-                        com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "Deleting invalid session cookie (%s) for request %s", cookie.get()
-                                        .getValue(),
-                                r );
+                        com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+                                .log( "Deleting invalid session cookie (%s) for request %s", cookie.get()
+                                        .getValue(), r );
                     }
                 }
             }

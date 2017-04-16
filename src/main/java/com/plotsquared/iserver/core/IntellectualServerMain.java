@@ -34,6 +34,7 @@ import java.util.Optional;
  * The main bootstrap class
  */
 @Bootstrap
+@SuppressWarnings( "ALL" ) // It's perfect.
 public class IntellectualServerMain
 {
 

@@ -69,7 +69,7 @@ public final class SocketHandler
         {
             if ( !filter.filter( s ) )
             {
-                Logger.debug( "SocketFilter filtered out Socket: " + s ); // TODO: Remove
+                Logger.debug( "SocketFilter filtered out Socket: " + s );
                 breakSocketConnection( s );
                 return;
             }

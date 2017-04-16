@@ -45,6 +45,8 @@ public class CoreConfig
     public static boolean enableSyntax = true;
     public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
+
+    // Transient makes sure that this is ignored by the config factory
     private transient static boolean preConfigured = false;
 
     public static boolean isPreConfigured()
@@ -52,7 +54,7 @@ public class CoreConfig
         return preConfigured;
     }
 
-    public static void setPreConfigured(boolean preConfigured)
+    public static void setPreConfigured(final boolean preConfigured)
     {
         CoreConfig.preConfigured = preConfigured;
     }
