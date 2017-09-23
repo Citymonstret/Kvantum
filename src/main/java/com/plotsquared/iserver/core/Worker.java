@@ -285,23 +285,26 @@ public class Worker extends AutoCloseable
             }
             // End: CTYPE
 
-            if ( body.isText() )
+            if ( request.getQuery().getMethod().hasBody() )
             {
-                for ( final WorkerProcedure.Handler<String> handler : workerProcedureInstance.getStringHandlers() )
+                if ( body.isText() )
                 {
-                    textContent = handler.act( requestHandler, request, textContent );
+                    for ( final WorkerProcedure.Handler<String> handler : workerProcedureInstance.getStringHandlers() )
+                    {
+                        textContent = handler.act( requestHandler, request, textContent );
+                    }
+                    bytes = textContent.getBytes();
                 }
-                bytes = textContent.getBytes();
-            }
 
-            if ( !workerProcedureInstance.getByteHandlers().isEmpty() )
-            {
-                Byte[] wrapper = ArrayUtils.toObject( bytes );
-                for ( final WorkerProcedure.Handler<Byte[]> handler : workerProcedureInstance.getByteHandlers() )
+                if ( !workerProcedureInstance.getByteHandlers().isEmpty() )
                 {
-                    wrapper = handler.act( requestHandler, request, wrapper );
+                    Byte[] wrapper = ArrayUtils.toObject( bytes );
+                    for ( final WorkerProcedure.Handler<Byte[]> handler : workerProcedureInstance.getByteHandlers() )
+                    {
+                        wrapper = handler.act( requestHandler, request, wrapper );
+                    }
+                    bytes = ArrayUtils.toPrimitive( wrapper );
                 }
-                bytes = ArrayUtils.toPrimitive( wrapper );
             }
         } catch ( final Exception e )
         {

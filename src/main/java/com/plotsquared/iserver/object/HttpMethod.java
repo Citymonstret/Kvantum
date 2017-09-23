@@ -48,12 +48,24 @@ public enum HttpMethod
     /**
      *
      */
-    HEAD,
+    HEAD( false ),
 
     /**
      *
      */
     DELETE;
+
+    private final boolean hasBody;
+
+    HttpMethod(final boolean hasBody)
+    {
+        this.hasBody = hasBody;
+    }
+
+    HttpMethod()
+    {
+        this( true );
+    }
 
     public static Optional<HttpMethod> getByName(final String name)
     {
@@ -63,4 +75,8 @@ public enum HttpMethod
         return LambdaUtil.getFirst( values(), method -> method.name().equals( fixed ) );
     }
 
+    public boolean hasBody()
+    {
+        return this.hasBody;
+    }
 }
