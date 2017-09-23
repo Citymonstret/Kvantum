@@ -27,7 +27,7 @@ public abstract class Router
 
     public abstract RequestHandler match(final Request request);
 
-    public abstract void add(final RequestHandler handler);
+    public abstract RequestHandler add(final RequestHandler handler);
 
     public abstract void remove(final RequestHandler handler);
 

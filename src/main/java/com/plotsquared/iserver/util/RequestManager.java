@@ -66,7 +66,7 @@ public class RequestManager extends Router
      * @param view The view to register
      */
     @Override
-    public void add(final RequestHandler view)
+    public RequestHandler add(final RequestHandler view)
     {
         Assert.notNull( view );
 
@@ -77,6 +77,7 @@ public class RequestManager extends Router
             throw new IllegalArgumentException( "Duplicate view pattern!" );
         }
         views.add( view );
+        return view;
     }
 
     /**

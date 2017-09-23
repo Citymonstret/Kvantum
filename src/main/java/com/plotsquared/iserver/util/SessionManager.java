@@ -51,8 +51,12 @@ final public class SessionManager implements ProviderFactory<VariableProvider>
         final String sessionID = UUID.randomUUID().toString();
 
         r.postponedCookies.put( name, sessionID );
-        com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+
+        if ( CoreConfig.debug )
+        {
+            com.plotsquared.iserver.core.ServerImplementation.getImplementation()
                 .log( "Set session (%s=%s)", name, sessionID ); // TODO: Fix
+        }
 
         final Session session = new Session();
         this.sessions.put( sessionID, session );

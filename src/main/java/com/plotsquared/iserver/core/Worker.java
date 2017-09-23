@@ -20,6 +20,7 @@ package com.plotsquared.iserver.core;
 
 import com.codahale.metrics.Timer;
 import com.plotsquared.iserver.config.Message;
+import com.plotsquared.iserver.logging.LogModes;
 import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
@@ -297,6 +298,8 @@ public class Worker extends AutoCloseable
             }
         } catch ( final Exception e )
         {
+            server.log( "Error When Handling Request: %s", e.getMessage(), LogModes.MODE_ERROR );
+
             body = new ViewException( e ).generate( request );
             bytes = body.getContent().getBytes();
 
@@ -353,10 +356,10 @@ public class Worker extends AutoCloseable
                     .printStackTrace();
         }
 
-        if ( /* !server.silent TODO: Replace */ true )
+        if ( CoreConfig.debug )
         {
-            server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%s'",
-                    requestHandler.getName(), body.isText() ? "text" : "bytes", bytes.length
+            server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%skB'",
+                    requestHandler.getName(), body.isText() ? "text" : "bytes", (bytes.length / 1000)
             );
         }
 

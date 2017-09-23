@@ -67,6 +67,7 @@ public final class Server implements IntellectualServer
 {
 
     // Private Static
+    @SuppressWarnings( "ALL" )
     private static Server instance;
     // Private Final
     private final LogWrapper logWrapper;
@@ -76,10 +77,10 @@ public final class Server implements IntellectualServer
     private final SocketHandler socketHandler;
     private final Metrics metrics = new Metrics();
     // Public
-    volatile CacheManager cacheManager;
-    boolean silent = false;
-    Router router;
-    SessionManager sessionManager;
+    private volatile CacheManager cacheManager;
+    private boolean silent = false;
+    private Router router;
+    private SessionManager sessionManager;
     // Private
     PrintStream logStream;
     // Package-Protected
@@ -109,15 +110,17 @@ public final class Server implements IntellectualServer
      * @param logWrapper The log implementation
      * @throws IntellectualServerInitializationException If anything was to fail
      */
-    protected Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper, final Router
+    Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper, final Router
             router)
             throws IntellectualServerInitializationException
     {
         Assert.notNull( coreFolder, logWrapper );
 
+        // This setups the "instance" instance
         InstanceFactory.setupInstanceAutomagic( this );
         ServerImplementation.registerServerImplementation( this );
 
+        // Make sure that the main folder is created
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
         if ( !coreFolder.exists() )
         {
@@ -131,6 +134,8 @@ public final class Server implements IntellectualServer
         this.logWrapper = logWrapper;
         this.standalone = standalone;
 
+        // Setup the proprietary file system
+        // TODO: Move to separate class
         this.fileSystem = new FileSystem( coreFolder.toPath(), new FileCacheManager()
         {
             @Override
@@ -155,6 +160,7 @@ public final class Server implements IntellectualServer
             }
         }
 
+        // Setup log-to-file
         try
         {
             this.logStream = new PrintStream( new FileOutputStream( new File( logFolder,
@@ -168,6 +174,7 @@ public final class Server implements IntellectualServer
         printLicenseInfo();
 
         // This adds the default view bindings
+        // TODO: Make configurable
         addViewBinding( "html", HTMLView.class );
         addViewBinding( "css", CSSView.class );
         addViewBinding( "javascript", JSView.class );
@@ -180,9 +187,7 @@ public final class Server implements IntellectualServer
         {
             // Makes the application closable in ze terminal
             Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
-            // Handles incoming commands
-            // TODO: Replace the command system
-            // https://github.com/IntellectualSites/CommandAPI
+
             this.commandManager = new CommandManager( '/' );
             this.commandManager.getManagerOptions().getFindCloseMatches( false );
             this.commandManager.getManagerOptions().setRequirePrefix( false );
@@ -670,7 +675,8 @@ public final class Server implements IntellectualServer
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
         // to limit to only error messages or such
-        if ( mode < LogModes.lowestLevel || mode > LogModes.highestLevel )
+        if ( (mode == LogModes.MODE_DEBUG && !CoreConfig.debug) || mode < LogModes.lowestLevel || mode > LogModes
+            .highestLevel )
         {
             return;
         }
@@ -697,9 +703,8 @@ public final class Server implements IntellectualServer
         {
             message = message.replaceFirst( "%s", a.toString() );
         }
-        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), message, Thread.currentThread().getName() );
-        // logWrapper.log(String.format("[%s][%s][%s] %s", PREFIX, prefix, TimeUtil.getTimeStamp(), message));
-        // System.out.printf("[%s][%s][%s] %s%s", PREFIX, prefix, TimeUtil.getTimeStamp(), message, System.lineSeparator());
+        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), message,
+                Thread.currentThread().getName() );
     }
 
     @Override
@@ -793,9 +798,6 @@ public final class Server implements IntellectualServer
 
         logWrapper.log( CoreConfig.logPrefix, provider.getLogIdentifier(), TimeUtil.getTimeStamp(),
                 message, Thread.currentThread().getName() );
-        // void log(String prefix, String prefix1, String timeStamp, String message);
-        // logWrapper.log(String.format("[%s][%s] %s", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message));
-        // System.out.printf("[%s][%s] %s\n", provider.getLogIdentifier(), TimeUtil.getTimeStamp(), message);
     }
 
     @Override
@@ -804,16 +806,12 @@ public final class Server implements IntellectualServer
         Message.SHUTTING_DOWN.log();
         EventManager.getInstance().handle( new ShutdownEvent( this ) );
 
-        // Handled by AutoCloseable
-        // SQLiteManager.sessions.forEach( SQLiteManager::close );
-
         try
         {
             serverSocket.close();
             if ( CoreConfig.SSL.enable )
             {
                 sslServerSocket.close();
-                ;
             }
         } catch ( final Exception e )
         {
@@ -865,8 +863,6 @@ public final class Server implements IntellectualServer
     @Override
     public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<Request, Response> generator)
     {
-        final RequestHandler handler = new SimpleRequestHandler( filter, generator );
-        this.getRouter().add( handler );
-        return handler;
+        return this.getRouter().add( new SimpleRequestHandler( filter, generator ) );
     }
 }

@@ -42,8 +42,6 @@ public abstract class StaticFileView extends View
     @Override
     final public boolean passes(final Request request)
     {
-        Logger.info( "StaticFileView: Incoming request!" );
-
         final Map<String, String> variables = request.getVariables();
         FileExtension fileExtension;
         if ( !variables.containsKey( "extension" ) || variables.get( "extension" ).isEmpty() )
