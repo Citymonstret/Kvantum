@@ -25,6 +25,7 @@ import com.plotsquared.iserver.object.AutoCloseable;
 import com.plotsquared.iserver.object.*;
 import com.plotsquared.iserver.object.cache.CacheApplicable;
 import com.plotsquared.iserver.util.Assert;
+import com.plotsquared.iserver.util.For;
 import com.plotsquared.iserver.validation.RequestValidation;
 import com.plotsquared.iserver.validation.ValidationException;
 import com.plotsquared.iserver.views.RequestHandler;
@@ -93,25 +94,32 @@ public class Worker extends AutoCloseable
         this.server = com.plotsquared.iserver.core.ServerImplementation.getImplementation();
     }
 
+    /**
+     * Setup the handler with a specified number of worker instances
+     * @param n Number of worker instances (must be positive)
+     */
     static void setup(final int n)
     {
-        Assert.isPositive( n );
+        availableWorkers = new ArrayDeque<>( Assert.isPositive( n ).intValue() );
 
-        availableWorkers = new ArrayDeque<>( n );
-        for ( int i = 0; i < n; i++ )
-        {
-            availableWorkers.add( new Worker() );
-        }
+        For.upTo( n ).perform( i ->
+                {
+                    ServerImplementation.getImplementation().log( "Added Worker [%s]", i );
+                    availableWorkers.add( new Worker() );
+                }
+        );
+
+        ServerImplementation.getImplementation().log( "Availabe workers: " + availableWorkers.size() );
     }
 
     /**
-     * Poll the worker queue until a worker is available
-     *
+     * Poll the worker queue until a worker is available.
+     * Warning: The thread will be locked until a new worker is available
      * @return The next available worker
      */
     public static Worker getAvailableWorker()
     {
-        Worker worker = availableWorkers.poll();
+        Worker worker = Assert.notNull( availableWorkers ).poll();
         while ( worker == null )
         {
             worker = availableWorkers.poll();
@@ -181,7 +189,6 @@ public class Worker extends AutoCloseable
         {
             if ( !requestHandler.getValidationManager().isEmpty() )
             {
-                // Validate post requests
                 if ( request.getQuery().getMethod() == HttpMethod.POST )
                 {
                     for ( final RequestValidation<PostRequest> validator : requestHandler.getValidationManager()
@@ -299,6 +306,7 @@ public class Worker extends AutoCloseable
         } catch ( final Exception e )
         {
             server.log( "Error When Handling Request: %s", e.getMessage(), LogModes.MODE_ERROR );
+            e.printStackTrace();
 
             body = new ViewException( e ).generate( request );
             bytes = body.getContent().getBytes();
@@ -373,9 +381,10 @@ public class Worker extends AutoCloseable
     private void handle(final Socket remote) throws Exception
     {
         // Used for metrics
-        final Timer.Context timerContext = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getMetrics().registerRequestHandling();
+        final Timer.Context timerContext = com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+                .getMetrics().registerRequestHandling();
         if ( CoreConfig.verbose )
-        {         // Do we want to output a load of useless information?
+        { // Do we want to output a load of useless information?
             server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
         }
         final BufferedReader input;
@@ -414,9 +423,9 @@ public class Worker extends AutoCloseable
     }
 
     /**
-     * Accepts a remote com.plotsquared.iserver.internal.IntellectualSocket,
-     * makes sure its handled and closed down successfully
-     * @param remote com.plotsquared.iserver.internal.IntellectualSocket to accept
+     * Accepts a remote socket and handles the incoming request,
+     * also makes sure its handled and closed down successfully
+     * @param remote socket to accept
      */
     public void run(final Socket remote)
     {
@@ -427,7 +436,7 @@ public class Worker extends AutoCloseable
                 handle( remote );
             } catch ( final Exception e )
             {
-                new RuntimeException( "Failed to handle com.plotsquared.iserver.internal.IntellectualSocket" ).printStackTrace();
+                new RuntimeException( "Failed to handle incoming socket" ).printStackTrace();
             }
         }
         if ( remote != null && !remote.isClosed() )
@@ -440,10 +449,16 @@ public class Worker extends AutoCloseable
                 e.printStackTrace();
             }
         }
-        // MUST BE CALLED LAST
+
+        // Add the worker back to the poll
         availableWorkers.add( this );
     }
 
+    /**
+     * MD5-ify the input
+     * @param input Input text to be digested
+     * @return md5-ified digested text
+     */
     private String md5Checksum(final byte[] input)
     {
         Assert.notNull( input );

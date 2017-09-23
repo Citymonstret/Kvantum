@@ -68,9 +68,10 @@ public class Assert
         equals( array != null && array.length > 0, true );
     }
 
-    public static void isPositive(final Number number)
+    public static Number isPositive(final Number number)
     {
         equals( number.intValue() >= 0, true );
+        return number;
     }
 
     /**

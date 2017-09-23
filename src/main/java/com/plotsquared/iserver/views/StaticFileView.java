@@ -91,7 +91,8 @@ public abstract class StaticFileView extends View
             response.setBytes( path.readBytes() );
         } else
         {
-            response.setContent( path.readFile() );
+            response.setContent( extension.getComment( "Served to you by IntellectualServer" ) + System.lineSeparator()
+                    + path.readFile() );
         }
         return response;
     }
