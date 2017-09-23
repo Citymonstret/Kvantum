@@ -482,14 +482,26 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         private final String mechanism, username, password;
 
+        public boolean isValid()
+        {
+            return this.mechanism != null && this.username != null && this.password != null;
+        }
+
         private Authorization(final String input)
         {
             final String[] parts = input.split( "\\s" );
             this.mechanism = parts[ 1 ];
             final String[] auth = new String( Base64.getDecoder().decode( parts[ 2 ] ), StandardCharsets.UTF_8 )
                     .split( ":" );
-            this.username = auth[ 0 ];
-            this.password = auth[ 1 ];
+            if ( auth.length < 2 )
+            {
+                this.username = null;
+                this.password = null;
+            } else
+            {
+                this.username = auth[ 0 ];
+                this.password = auth[ 1 ];
+            }
         }
 
         public String getMechanism()

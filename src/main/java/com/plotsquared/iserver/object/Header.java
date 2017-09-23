@@ -45,6 +45,7 @@ final public class Header
     public static final String STATUS_TEMPORARY_REDIRECT = "307 Temporary Redirect";
     public static final String STATUS_OK = "200 OK";
     public static final String STATUS_ACCESS_DENIED = "401 Access Denied";
+    public static final String STATUS_UNAUTHORIZED = "401 Unauthorized status";
     public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
     public static final String STATUS_CONTINUE = "100 Continue";
     public static final String STATUS_SWITCHING_PROTOCOLS = "101 Switching Protocols";
@@ -205,6 +206,9 @@ final public class Header
      * response chain
      */
     public static final HeaderOption HEADER_PRAGMA = HeaderOption.create( "Pragma" );
+
+    public static final HeaderOption HEADER_WWW_AUTHENTICATE = HeaderOption.create( "WWW-Authenticate" );
+
     /**
      * Request authentication to
      * access the proxy
