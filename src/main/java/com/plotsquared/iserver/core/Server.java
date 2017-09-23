@@ -302,6 +302,19 @@ public final class Server implements IntellectualServer
                 {
                     path.create();
                 }
+                if ( !path.getPath( "favicon.ico" ).exists() )
+                {
+                    Logger.info( "Creating public/favicon.ico" );
+                    try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
+                            "favicon.ico" )
+                    ) )
+                    {
+                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/favicon.ico" ), out, 1024 * 16 );
+                    } catch ( final Exception e )
+                    {
+                        e.printStackTrace();
+                    }
+                }
                 if ( !path.getPath( "index.html" ).exists() )
                 {
                     Logger.info( "Creating public/index.html!" );
