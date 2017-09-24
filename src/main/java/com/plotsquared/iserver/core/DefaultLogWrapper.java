@@ -18,7 +18,8 @@
  */
 package com.plotsquared.iserver.core;
 
-import com.plotsquared.iserver.logging.LogWrapper;
+import com.plotsquared.iserver.api.core.ServerImplementation;
+import com.plotsquared.iserver.api.logging.LogWrapper;
 import com.sun.media.jfxmedia.logging.Logger;
 import print.color.Ansi;
 import print.color.ColoredPrinter;
@@ -86,7 +87,7 @@ public class DefaultLogWrapper implements LogWrapper
         coloredPrinter.print( System.lineSeparator() );
         coloredPrinter.clear();
 
-        ( (Server) com.plotsquared.iserver.core.ServerImplementation.getImplementation() ).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
+        ( (Server) ServerImplementation.getImplementation() ).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
                 message, System.lineSeparator() );
         // System.out.printf("[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator());
         // coloredPrinter.println("Hello", Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.YELLOW)
@@ -96,7 +97,7 @@ public class DefaultLogWrapper implements LogWrapper
     public void log(String s)
     {
         System.out.println( s );
-        ( (Server) com.plotsquared.iserver.core.ServerImplementation.getImplementation() ).logStream.println( s );
+        ( (Server) ServerImplementation.getImplementation() ).logStream.println( s );
     }
 
 }

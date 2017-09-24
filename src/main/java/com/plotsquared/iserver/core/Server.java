@@ -20,40 +20,43 @@ package com.plotsquared.iserver.core;
 
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
-import com.plotsquared.iserver.account.AccountCommand;
-import com.plotsquared.iserver.account.AccountManager;
-import com.plotsquared.iserver.config.ConfigurationFile;
-import com.plotsquared.iserver.config.Message;
-import com.plotsquared.iserver.config.YamlConfiguration;
+import com.plotsquared.iserver.*;
+import com.plotsquared.iserver.api.account.AccountManager;
+import com.plotsquared.iserver.api.cache.CacheManager;
+import com.plotsquared.iserver.api.config.ConfigurationFile;
+import com.plotsquared.iserver.api.config.CoreConfig;
+import com.plotsquared.iserver.api.config.Message;
+import com.plotsquared.iserver.api.config.YamlConfiguration;
+import com.plotsquared.iserver.api.core.IntellectualServer;
+import com.plotsquared.iserver.api.core.ServerImplementation;
+import com.plotsquared.iserver.api.core.WorkerProcedure;
+import com.plotsquared.iserver.api.events.Event;
+import com.plotsquared.iserver.api.events.EventCaller;
+import com.plotsquared.iserver.api.events.EventManager;
+import com.plotsquared.iserver.api.events.defaultEvents.ServerReadyEvent;
+import com.plotsquared.iserver.api.events.defaultEvents.ShutdownEvent;
+import com.plotsquared.iserver.api.events.defaultEvents.StartupEvent;
+import com.plotsquared.iserver.api.logging.LogModes;
+import com.plotsquared.iserver.api.logging.LogProvider;
+import com.plotsquared.iserver.api.logging.LogWrapper;
+import com.plotsquared.iserver.api.logging.Logger;
+import com.plotsquared.iserver.api.matching.Router;
+import com.plotsquared.iserver.api.plugin.PluginLoader;
+import com.plotsquared.iserver.api.plugin.PluginManager;
+import com.plotsquared.iserver.api.request.Request;
+import com.plotsquared.iserver.api.response.Response;
+import com.plotsquared.iserver.api.session.SessionManager;
+import com.plotsquared.iserver.api.util.*;
+import com.plotsquared.iserver.api.util.AutoCloseable;
+import com.plotsquared.iserver.api.views.*;
+import com.plotsquared.iserver.api.views.requesthandler.SimpleRequestHandler;
+import com.plotsquared.iserver.commands.AccountCommand;
 import com.plotsquared.iserver.crush.CrushEngine;
-import com.plotsquared.iserver.events.Event;
-import com.plotsquared.iserver.events.EventCaller;
-import com.plotsquared.iserver.events.EventManager;
-import com.plotsquared.iserver.events.defaultEvents.ServerReadyEvent;
-import com.plotsquared.iserver.events.defaultEvents.ShutdownEvent;
-import com.plotsquared.iserver.events.defaultEvents.StartupEvent;
-import com.plotsquared.iserver.extra.ApplicationStructure;
+import com.plotsquared.iserver.error.IntellectualServerInitializationException;
+import com.plotsquared.iserver.error.IntellectualServerStartException;
 import com.plotsquared.iserver.files.FileCacheManager;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
-import com.plotsquared.iserver.internal.ErrorOutputStream;
-import com.plotsquared.iserver.internal.ExitSignalHandler;
-import com.plotsquared.iserver.internal.HTTPSThread;
-import com.plotsquared.iserver.internal.SocketHandler;
-import com.plotsquared.iserver.logging.LogModes;
-import com.plotsquared.iserver.logging.LogProvider;
-import com.plotsquared.iserver.logging.LogWrapper;
-import com.plotsquared.iserver.matching.Router;
-import com.plotsquared.iserver.object.AutoCloseable;
-import com.plotsquared.iserver.object.Request;
-import com.plotsquared.iserver.object.Response;
-import com.plotsquared.iserver.object.error.IntellectualServerInitializationException;
-import com.plotsquared.iserver.object.error.IntellectualServerStartException;
-import com.plotsquared.iserver.plugin.PluginLoader;
-import com.plotsquared.iserver.plugin.PluginManager;
-import com.plotsquared.iserver.util.*;
-import com.plotsquared.iserver.views.*;
-import com.plotsquared.iserver.views.requesthandler.SimpleRequestHandler;
 import sun.misc.Signal;
 
 import javax.net.ssl.SSLServerSocket;
@@ -74,15 +77,15 @@ public final class Server implements IntellectualServer
     private final boolean standalone;
     private final Map<String, Class<? extends View>> viewBindings;
     private final WorkerProcedure workerProcedure = new WorkerProcedure();
-    private final SocketHandler socketHandler;
+    private final SimpleSocketHandler socketHandler;
     private final Metrics metrics = new Metrics();
+    // Private
+    PrintStream logStream;
     // Public
     private volatile CacheManager cacheManager;
     private boolean silent = false;
     private Router router;
     private SessionManager sessionManager;
-    // Private
-    PrintStream logStream;
     // Package-Protected
     private ConfigurationFile translations;
     private File coreFolder;
@@ -265,14 +268,14 @@ public final class Server implements IntellectualServer
             log( Message.DEBUG );
         }
 
-        this.socketHandler = new SocketHandler();
+        this.socketHandler = new SimpleSocketHandler();
         Worker.setup( CoreConfig.workers );
 
         this.started = false;
         this.stopping = false;
 
         this.router = router;
-        this.sessionManager = new SessionManager();
+        this.sessionManager = new SimpleSessionManager();
         this.cacheManager = new CacheManager();
 
         if ( CoreConfig.MySQL.enabled )
@@ -336,7 +339,14 @@ public final class Server implements IntellectualServer
 
         if ( standalone )
         {
-            ApplicationStructure applicationStructure = new ApplicationStructure( "core" );
+            ApplicationStructure applicationStructure = new ApplicationStructure( "core" )
+            {
+                @Override
+                public AccountManager createNewAccountManager()
+                {
+                    return new SimpleAccountManager( this );
+                }
+            };
             this.globalAccountManager = applicationStructure.getAccountManager();
             try
             {
@@ -765,7 +775,7 @@ public final class Server implements IntellectualServer
     }
 
     @Override
-    public SocketHandler getSocketHandler()
+    public SimpleSocketHandler getSocketHandler()
     {
         return socketHandler;
     }

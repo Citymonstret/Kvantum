@@ -22,6 +22,7 @@ package com.plotsquared.iserver.commands;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
+import com.plotsquared.iserver.api.core.ServerImplementation;
 
 @CommandDeclaration(
 
@@ -34,7 +35,7 @@ public class Stop extends Command
     @Override
     public boolean onCommand(CommandInstance instance)
     {
-        com.plotsquared.iserver.core.ServerImplementation.getImplementation().stopServer();
+        ServerImplementation.getImplementation().stopServer();
         return true;
     }
 

@@ -21,7 +21,8 @@ package com.plotsquared.iserver.commands;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
-import com.plotsquared.iserver.logging.LogWrapper;
+import com.plotsquared.iserver.api.core.ServerImplementation;
+import com.plotsquared.iserver.api.logging.LogWrapper;
 
 
 @CommandDeclaration(
@@ -35,7 +36,7 @@ public class Show extends Command
         final String[] args = instance.getArguments();
         if ( args.length < 1 )
         {
-            com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "> Required Parameter Missing (`c`|`w`)" );
+            ServerImplementation.getImplementation().log( "> Required Parameter Missing (`c`|`w`)" );
         } else
         {
             String[] lines = new String[ 0 ];
@@ -272,10 +273,10 @@ public class Show extends Command
                     };
                     break;
                 default:
-                    com.plotsquared.iserver.core.ServerImplementation.getImplementation().log( "> Unknown Parameter `%s`", args[ 0 ].toLowerCase() );
+                    ServerImplementation.getImplementation().log( "> Unknown Parameter `%s`", args[ 0 ].toLowerCase() );
                     break;
             }
-            LogWrapper wrapper = com.plotsquared.iserver.core.ServerImplementation.getImplementation().getLogWrapper();
+            LogWrapper wrapper = ServerImplementation.getImplementation().getLogWrapper();
             for ( String line : lines )
             {
                 wrapper.log( "  " + line );

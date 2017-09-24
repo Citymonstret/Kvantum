@@ -21,10 +21,10 @@ package com.plotsquared.iserver.commands;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
-import com.plotsquared.iserver.core.ServerImplementation;
+import com.plotsquared.iserver.api.core.ServerImplementation;
 
 /**
- * Prints {@link com.plotsquared.iserver.util.Metrics} information to
+ * Prints {@link com.plotsquared.iserver.api.util.Metrics} information to
  * the logger
  */
 @CommandDeclaration(

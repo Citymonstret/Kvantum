@@ -18,6 +18,8 @@
  */
 package com.plotsquared.iserver.core;
 
+import com.plotsquared.iserver.api.config.CoreConfig;
+
 import java.io.FilterOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;

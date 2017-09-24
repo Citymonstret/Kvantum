@@ -21,6 +21,7 @@ package com.plotsquared.iserver.commands;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
+import com.plotsquared.iserver.api.core.ServerImplementation;
 
 /**
  * Created 12/24/2015 for IntellectualServer
@@ -37,7 +38,7 @@ public class Dump extends Command
     @Override
     public boolean onCommand(CommandInstance instance)
     {
-        com.plotsquared.iserver.core.ServerImplementation.getImplementation().getRouter().dump( com.plotsquared.iserver.core.ServerImplementation.getImplementation() );
+        ServerImplementation.getImplementation().getRouter().dump( ServerImplementation.getImplementation() );
         return true;
     }
 

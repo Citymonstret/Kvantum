@@ -154,7 +154,7 @@ Middleware is a class responsible for filtering out, and acting on requests, bef
 Middleware is lined up in a sort of chain, by using a special queue. If a middleware breaks the que, the request is not served by the view ( Middleware can redirect requests to other views without continuing the chain ).
 
 #### Creation
-You just have to extend `com.plotsquared.iserver.views.requesthandler.Middleware`
+You just have to extend `com.plotsquared.iserver.api.views.requesthandler.Middleware`
 Your class must have a public no-args constructor.
 
 ```java

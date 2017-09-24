@@ -19,17 +19,26 @@
 package com.plotsquared.iserver.core;
 
 import com.codahale.metrics.Timer;
-import com.plotsquared.iserver.config.Message;
-import com.plotsquared.iserver.logging.LogModes;
-import com.plotsquared.iserver.object.AutoCloseable;
-import com.plotsquared.iserver.object.*;
-import com.plotsquared.iserver.object.cache.CacheApplicable;
-import com.plotsquared.iserver.util.Assert;
-import com.plotsquared.iserver.util.For;
-import com.plotsquared.iserver.validation.RequestValidation;
-import com.plotsquared.iserver.validation.ValidationException;
-import com.plotsquared.iserver.views.RequestHandler;
-import com.plotsquared.iserver.views.errors.ViewException;
+import com.plotsquared.iserver.api.cache.CacheApplicable;
+import com.plotsquared.iserver.api.config.CoreConfig;
+import com.plotsquared.iserver.api.config.Message;
+import com.plotsquared.iserver.api.core.IntellectualServer;
+import com.plotsquared.iserver.api.core.ServerImplementation;
+import com.plotsquared.iserver.api.core.WorkerProcedure;
+import com.plotsquared.iserver.api.logging.LogModes;
+import com.plotsquared.iserver.api.request.HttpMethod;
+import com.plotsquared.iserver.api.request.PostRequest;
+import com.plotsquared.iserver.api.request.Request;
+import com.plotsquared.iserver.api.response.Header;
+import com.plotsquared.iserver.api.response.ResponseBody;
+import com.plotsquared.iserver.api.session.Session;
+import com.plotsquared.iserver.api.util.Assert;
+import com.plotsquared.iserver.api.util.AutoCloseable;
+import com.plotsquared.iserver.api.util.For;
+import com.plotsquared.iserver.api.validation.RequestValidation;
+import com.plotsquared.iserver.api.validation.ValidationException;
+import com.plotsquared.iserver.api.views.RequestHandler;
+import com.plotsquared.iserver.api.views.errors.ViewException;
 import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.BASE64Encoder;
 
@@ -89,9 +98,9 @@ public class Worker extends AutoCloseable
             this.reusableGzipOutputStream = null;
         }
 
-        this.workerProcedureInstance = com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+        this.workerProcedureInstance = ServerImplementation.getImplementation()
                 .getProcedure().getInstance();
-        this.server = com.plotsquared.iserver.core.ServerImplementation.getImplementation();
+        this.server = ServerImplementation.getImplementation();
     }
 
     /**
@@ -384,7 +393,7 @@ public class Worker extends AutoCloseable
     private void handle(final Socket remote) throws Exception
     {
         // Used for metrics
-        final Timer.Context timerContext = com.plotsquared.iserver.core.ServerImplementation.getImplementation()
+        final Timer.Context timerContext = ServerImplementation.getImplementation()
                 .getMetrics().registerRequestHandling();
         if ( CoreConfig.verbose )
         { // Do we want to output a load of useless information?

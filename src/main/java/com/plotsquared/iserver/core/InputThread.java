@@ -20,12 +20,13 @@ package com.plotsquared.iserver.core;
 
 import com.intellectualsites.commands.CommandHandlingOutput;
 import com.intellectualsites.commands.CommandResult;
+import com.plotsquared.iserver.api.core.ServerImplementation;
+import com.plotsquared.iserver.api.events.Event;
+import com.plotsquared.iserver.api.util.AutoCloseable;
 import com.plotsquared.iserver.commands.Dump;
 import com.plotsquared.iserver.commands.Metrics;
 import com.plotsquared.iserver.commands.Show;
 import com.plotsquared.iserver.commands.Stop;
-import com.plotsquared.iserver.events.Event;
-import com.plotsquared.iserver.object.AutoCloseable;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -117,7 +118,7 @@ public final class InputThread extends Thread
                 } else
                 {
                     currentString = line;
-                    com.plotsquared.iserver.core.ServerImplementation.getImplementation().handleEvent( new TextEvent( line ) );
+                    ServerImplementation.getImplementation().handleEvent( new TextEvent( line ) );
                 }
             }
         } catch ( final Exception ignored )
