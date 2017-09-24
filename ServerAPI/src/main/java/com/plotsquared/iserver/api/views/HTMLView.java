@@ -27,6 +27,7 @@ import com.plotsquared.iserver.api.util.VariableProvider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created 2015-04-19 for IntellectualServer
@@ -66,9 +67,9 @@ public class HTMLView extends StaticFileView implements CacheApplicable
         }
 
         @Override
-        public HTMLProvider get(Request r)
+        public Optional<HTMLProvider> get(Request r)
         {
-            return this;
+            return Optional.of( this );
         }
 
         @Override

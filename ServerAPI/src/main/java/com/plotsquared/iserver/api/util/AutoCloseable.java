@@ -39,6 +39,7 @@ public abstract class AutoCloseable implements java.lang.AutoCloseable
         //noinspection ConstantConditions
         reference.get().close();
     };
+
     private boolean closed = false;
 
     protected AutoCloseable()

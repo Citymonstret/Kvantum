@@ -34,7 +34,7 @@ import java.sql.SQLException;
  * @author peelsh
  * @author Citymonstret
  */
-public class MySQLConnManager
+final public class MySQLConnManager
 {
 
     private String host;
@@ -45,7 +45,7 @@ public class MySQLConnManager
 
     private Connection conn;
 
-    public MySQLConnManager()
+    MySQLConnManager()
     {
         try
         {
@@ -71,7 +71,7 @@ public class MySQLConnManager
         return conn;
     }
 
-    public void init()
+    void init()
     {
         String connUrl = "jdbc:mysql://" + host + ":" + port + "/" + db;
         try
@@ -97,7 +97,7 @@ public class MySQLConnManager
     private class MySQLInitiationException extends RuntimeException
     {
 
-        public MySQLInitiationException(final String issue, final Exception cause)
+        MySQLInitiationException(final String issue, final Exception cause)
         {
             super( issue, cause );
         }

@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.core;
+package com.plotsquared.iserver;
 
 import com.plotsquared.iserver.api.core.ServerImplementation;
 import com.plotsquared.iserver.api.logging.LogWrapper;
@@ -36,7 +36,7 @@ public class DefaultLogWrapper implements LogWrapper
 
     private final ColoredPrinterI coloredPrinter;
 
-    public DefaultLogWrapper()
+    DefaultLogWrapper()
     {
         if ( System.getProperty( "os.name" ).startsWith( "win" ) )
         {

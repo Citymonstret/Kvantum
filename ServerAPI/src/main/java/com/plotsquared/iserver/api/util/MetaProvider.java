@@ -21,6 +21,7 @@ package com.plotsquared.iserver.api.util;
 import com.plotsquared.iserver.api.request.Request;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created 2015-04-25 for IntellectualServer
@@ -42,9 +43,9 @@ public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProv
     }
 
     @Override
-    public MetaProvider get(Request r)
+    public Optional<MetaProvider> get(Request r)
     {
-        return new MetaProvider( r );
+        return Optional.of( new MetaProvider( r ) );
     }
 
     @Override

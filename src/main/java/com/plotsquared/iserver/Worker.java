@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.core;
+package com.plotsquared.iserver;
 
 import com.codahale.metrics.Timer;
 import com.plotsquared.iserver.api.cache.CacheApplicable;
@@ -34,7 +34,7 @@ import com.plotsquared.iserver.api.response.ResponseBody;
 import com.plotsquared.iserver.api.session.Session;
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.AutoCloseable;
-import com.plotsquared.iserver.api.util.For;
+import com.plotsquared.iserver.api.util.LambdaUtil;
 import com.plotsquared.iserver.api.validation.RequestValidation;
 import com.plotsquared.iserver.api.validation.ValidationException;
 import com.plotsquared.iserver.api.views.RequestHandler;
@@ -55,8 +55,7 @@ import java.util.zip.DeflaterOutputStream;
  * This is the worker that is responsible for nearly everything.
  * Feel no pressure, buddy.
  */
-@SuppressWarnings("ALL")
-public class Worker extends AutoCloseable
+final class Worker extends AutoCloseable
 {
 
     private static byte[] empty = "NULL".getBytes();
@@ -110,14 +109,7 @@ public class Worker extends AutoCloseable
     static void setup(final int n)
     {
         availableWorkers = new ArrayDeque<>( Assert.isPositive( n ).intValue() );
-
-        For.upTo( n ).perform( i ->
-                {
-                    ServerImplementation.getImplementation().log( "Added Worker [%s]", i );
-                    availableWorkers.add( new Worker() );
-                }
-        );
-
+        LambdaUtil.collectionAssign( () -> availableWorkers, Worker::new, n );
         ServerImplementation.getImplementation().log( "Availabe workers: " + availableWorkers.size() );
     }
 
@@ -126,7 +118,7 @@ public class Worker extends AutoCloseable
      * Warning: The thread will be locked until a new worker is available
      * @return The next available worker
      */
-    public static Worker getAvailableWorker()
+    static Worker getAvailableWorker()
     {
         Worker worker = Assert.notNull( availableWorkers ).poll();
         while ( worker == null )

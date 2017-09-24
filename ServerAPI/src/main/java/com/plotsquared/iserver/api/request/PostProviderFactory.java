@@ -24,6 +24,7 @@ import com.plotsquared.iserver.api.util.ProviderFactory;
 import com.plotsquared.iserver.api.util.VariableProvider;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created 2015-04-25 for IntellectualServer
@@ -45,15 +46,15 @@ public class PostProviderFactory implements ProviderFactory<PostProviderFactory>
     }
 
     @Override
-    public PostProviderFactory get(final Request r)
+    public Optional<PostProviderFactory> get(final Request r)
     {
         Assert.notNull( r );
 
         if ( r.getPostRequest() == null )
         {
-            return null;
+            return Optional.empty();
         }
-        return new PostProviderFactory( r.getPostRequest() );
+        return Optional.of( new PostProviderFactory( r.getPostRequest() ) );
     }
 
     @Override

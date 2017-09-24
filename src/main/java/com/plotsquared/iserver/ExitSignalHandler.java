@@ -18,11 +18,10 @@
  */
 package com.plotsquared.iserver;
 
-import com.plotsquared.iserver.core.Server;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
-public final class ExitSignalHandler implements SignalHandler
+final class ExitSignalHandler implements SignalHandler
 {
 
     @Override

@@ -16,10 +16,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.core;
+package com.plotsquared.iserver;
 
 import com.intellectualsites.commands.CommandHandlingOutput;
 import com.intellectualsites.commands.CommandResult;
+import com.plotsquared.iserver.api.core.IntellectualServer;
 import com.plotsquared.iserver.api.core.ServerImplementation;
 import com.plotsquared.iserver.api.events.Event;
 import com.plotsquared.iserver.api.util.AutoCloseable;
@@ -38,9 +39,10 @@ import java.io.InputStreamReader;
  * The actual command handler is accessed by {@link IntellectualServer#getCacheManager()}
  * @author Citymonstret
  */
-@SuppressWarnings("all")
 public final class InputThread extends Thread
 {
+
+    @SuppressWarnings("ALL")
     public String currentString = "";
 
     InputThread()
@@ -135,9 +137,9 @@ public final class InputThread extends Thread
          * The name which will be used
          * to identity this event
          *
-         * @param name Event Name
+         * @param text Event Name
          */
-        protected TextEvent(String text)
+        TextEvent(String text)
         {
             super( "inputtextevent" );
             this.text = text;

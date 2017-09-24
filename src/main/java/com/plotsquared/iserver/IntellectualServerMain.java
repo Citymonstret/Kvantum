@@ -16,11 +16,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.core;
+package com.plotsquared.iserver;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.plotsquared.iserver.RequestManager;
 import com.plotsquared.iserver.api.config.CoreConfig;
 import com.plotsquared.iserver.api.core.IntellectualServer;
 import com.plotsquared.iserver.api.logging.LogWrapper;
@@ -36,8 +35,8 @@ import java.util.Optional;
  * The main bootstrap class
  */
 @Bootstrap
-@SuppressWarnings( "ALL" ) // It's perfect.
-public class IntellectualServerMain
+@SuppressWarnings("ALL")
+final public class IntellectualServerMain
 {
 
     /**

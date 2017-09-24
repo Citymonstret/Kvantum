@@ -35,13 +35,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-final public class SimpleSessionManager implements SessionManager
+final class SimpleSessionManager implements SessionManager
 {
 
     private final Map<String, Session> sessions = new HashMap<>();
     private final SessionIdentifierProvider sessionIdentifierProvider;
 
-    public SimpleSessionManager()
+    SimpleSessionManager()
     {
         final String i = "" + System.nanoTime();
         this.sessionIdentifierProvider = r -> i;
@@ -118,9 +118,15 @@ final public class SimpleSessionManager implements SessionManager
         return Optional.ofNullable( session );
     }
 
-    public VariableProvider get(final Request r)
+    @Override
+    public Optional<VariableProvider> get(final Request r)
     {
-        return OptionalUtil.getOrNull( getSession( r, null ) );
+        final Session session = OptionalUtil.getOrNull( getSession( r, null ) );
+        if ( session == null )
+        {
+            return Optional.empty();
+        }
+        return Optional.of( session );
     }
 
     public String providerName()

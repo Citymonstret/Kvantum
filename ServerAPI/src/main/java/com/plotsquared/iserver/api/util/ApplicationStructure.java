@@ -39,9 +39,7 @@ public abstract class ApplicationStructure
 
     public ApplicationStructure(final String applicationName)
     {
-        Assert.notNull( applicationName );
-
-        this.applicationName = applicationName;
+        this.applicationName = Assert.notEmpty( applicationName );
         try
         {
             this.database = new SQLiteManager( this.applicationName );

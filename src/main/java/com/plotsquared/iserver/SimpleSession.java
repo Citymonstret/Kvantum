@@ -25,14 +25,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-final public class SimpleSession implements Session
+final class SimpleSession implements Session
 {
 
     private static long id = 0L;
     private final Map<String, Object> sessionStorage;
     private long sessionId = 0;
 
-    public SimpleSession()
+    SimpleSession()
     {
         sessionStorage = new HashMap<>();
         sessionId = id++;

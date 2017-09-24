@@ -42,6 +42,7 @@ import com.plotsquared.iserver.api.util.ProviderFactory;
 import com.plotsquared.iserver.api.util.VariableProvider;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,9 +62,10 @@ final public class IfStatement extends Syntax
             String neg = matcher.group( 2 ), namespace = matcher.group( 3 ), variable = matcher.group( 4 );
             if ( factories.containsKey( namespace.toLowerCase() ) )
             {
-                VariableProvider p = factories.get( namespace.toLowerCase() ).get( r );
-                if ( p != null )
+                Optional<VariableProvider> pOptional = factories.get( namespace.toLowerCase() ).get( r );
+                if ( pOptional.isPresent() )
                 {
+                    final VariableProvider p = pOptional.get();
                     if ( p.contains( variable ) )
                     {
                         Object o = p.get( variable );

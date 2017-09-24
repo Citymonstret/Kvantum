@@ -16,11 +16,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver.core;
+package com.plotsquared.iserver;
 
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
-import com.plotsquared.iserver.*;
 import com.plotsquared.iserver.api.account.AccountManager;
 import com.plotsquared.iserver.api.cache.CacheManager;
 import com.plotsquared.iserver.api.config.ConfigurationFile;
@@ -388,7 +387,7 @@ public final class Server implements IntellectualServer
      *
      * @return this, literally... this!
      */
-    public static IntellectualServer getInstance()
+    static IntellectualServer getInstance()
     {
         return instance;
     }

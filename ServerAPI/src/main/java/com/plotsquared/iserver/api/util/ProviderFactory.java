@@ -20,10 +20,12 @@ package com.plotsquared.iserver.api.util;
 
 import com.plotsquared.iserver.api.request.Request;
 
+import java.util.Optional;
+
 public interface ProviderFactory<T extends VariableProvider>
 {
 
-    T get(final Request r);
+    Optional<T> get(final Request r);
 
     String providerName();
 

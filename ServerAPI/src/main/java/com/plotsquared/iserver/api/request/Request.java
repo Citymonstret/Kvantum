@@ -74,23 +74,19 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * The request constructor
      *
      * @param request Request (from the client)
-     * @param socket  The com.plotsquared.iserver.internal.IntellectualSocket which sent the request
+     * @param socket  The socket that sent the request
      * @throws RuntimeException if the request doesn't contain a query
      */
     public Request(final Collection<String> request, final Socket socket)
     {
         Assert.notNull( request, socket );
 
-        if ( socket instanceof SSLSocket )
-        {
-            protocolType = ProtocolType.HTTPS;
-        } else
-        {
-            protocolType = ProtocolType.HTTP;
-        }
+        protocolType = ( socket instanceof SSLSocket ) ? ProtocolType.HTTPS : ProtocolType.HTTP;
 
         this.socket = socket;
         this.headers = new HashMap<>();
+
+        // Read the request line per line
         for ( final String part : request )
         {
             final String[] subParts = part.split( ":" );
@@ -130,9 +126,9 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return this;
     }
 
-    public void removeMeta(String internalRedirect)
+    public void removeMeta(String metaKey)
     {
-        this.meta.remove( internalRedirect );
+        this.meta.remove( Assert.notEmpty( metaKey ) );
     }
 
     public Optional<Authorization> getAuthorization()
@@ -141,9 +137,9 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Override
-    public Request get(Request r)
+    public Optional<Request> get(Request r)
     {
-        return this;
+        return Optional.of( this );
     }
 
     @Override

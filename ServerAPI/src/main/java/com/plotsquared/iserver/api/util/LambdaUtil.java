@@ -41,6 +41,20 @@ public final class LambdaUtil
         return Arrays.stream( collection ).filter( predicate ).findFirst();
     }
 
+    public static <T> Collection<T> collectionAssign(final Provider<Collection<T>> listProvider, final Provider<T>
+            valueProvider, final int number)
+    {
+        Assert.notNull( listProvider, valueProvider );
+        Assert.isPositive( number );
+
+        final Collection<T> list = listProvider.provide();
+        for ( int i = 0; i < number; i++ )
+        {
+            list.add( valueProvider.provide() );
+        }
+        return list;
+    }
+
     public static <T> T[] arrayAssign(final T[] array, final Provider<T> provider)
     {
         Assert.notNull( array, provider );

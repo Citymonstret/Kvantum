@@ -31,19 +31,19 @@ import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class RequestManager extends Router
+final public class RequestManager extends Router
 {
 
     private final List<RequestHandler> views;
     private Generator<Request, RequestHandler> error404Generator = (request) -> View404.construct( request.getQuery()
             .getFullRequest() );
 
-    public RequestManager()
+    RequestManager()
     {
         this.views = new ArrayList<>();
     }
 
-    public Generator<Request, RequestHandler> getError404Generator()
+    private Generator<Request, RequestHandler> getError404Generator()
     {
         return error404Generator;
     }

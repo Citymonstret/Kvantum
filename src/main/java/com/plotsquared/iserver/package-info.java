@@ -26,4 +26,4 @@
  * package are making sure that the server
  * runs.
  */
-package com.plotsquared.iserver.core;
+package com.plotsquared.iserver;

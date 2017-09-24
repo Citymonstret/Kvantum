@@ -20,17 +20,16 @@ package com.plotsquared.iserver;
 
 import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.util.Assert;
-import com.plotsquared.iserver.core.Server;
 
 import javax.net.ssl.SSLServerSocket;
 
-public final class HTTPSThread extends Thread
+final class HTTPSThread extends Thread
 {
 
     private final SimpleSocketHandler SocketHandler;
     private final SSLServerSocket sslSocket;
 
-    public HTTPSThread(final SSLServerSocket sslSocket, final SimpleSocketHandler SocketHandler)
+    HTTPSThread(final SSLServerSocket sslSocket, final SimpleSocketHandler SocketHandler)
     {
         super( "SSL-Runner" );
         this.SocketHandler = Assert.notNull( SocketHandler );

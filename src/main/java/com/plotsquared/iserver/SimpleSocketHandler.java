@@ -21,9 +21,8 @@ package com.plotsquared.iserver;
 import com.plotsquared.iserver.api.config.CoreConfig;
 import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.logging.Logger;
+import com.plotsquared.iserver.api.socket.SocketFilter;
 import com.plotsquared.iserver.api.socket.SocketHandler;
-import com.plotsquared.iserver.api.util.SocketFilter;
-import com.plotsquared.iserver.core.Worker;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -36,14 +35,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public final class SimpleSocketHandler implements SocketHandler
+final class SimpleSocketHandler implements SocketHandler
 {
 
+    @SuppressWarnings("ALL")
     public static final SocketFilter Socket_FILTER_IS_ACTIVE = Socket -> !Socket.isClosed() && Socket.isConnected();
     private final ExecutorService executorService;
     private final List<SocketFilter> SocketFilters;
 
-    public SimpleSocketHandler()
+    SimpleSocketHandler()
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
         this.SocketFilters = new ArrayList<>();

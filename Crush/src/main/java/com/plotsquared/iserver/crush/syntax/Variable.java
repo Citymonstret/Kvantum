@@ -45,10 +45,7 @@ import com.plotsquared.iserver.crush.syntax.filter.List;
 import com.plotsquared.iserver.crush.syntax.filter.Lowercase;
 import com.plotsquared.iserver.crush.syntax.filter.Uppercase;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,9 +86,10 @@ final public class Variable extends Syntax
             {
                 try
                 {
-                    VariableProvider p = factories.get( provider.toLowerCase() ).get( r );
-                    if ( p != null )
+                    Optional pOptional = factories.get( provider.toLowerCase() ).get( r );
+                    if ( pOptional.isPresent() )
                     {
+                        final VariableProvider p = (VariableProvider) pOptional.get();
                         if ( p.contains( variable ) )
                         {
                             Object o = p.get( variable );

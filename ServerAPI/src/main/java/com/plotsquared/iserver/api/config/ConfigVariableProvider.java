@@ -24,6 +24,7 @@ import com.plotsquared.iserver.api.util.VariableProvider;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This allows you to access configuration
@@ -57,9 +58,9 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
     }
 
     @Override
-    public ConfigVariableProvider get(Request r)
+    public Optional<ConfigVariableProvider> get(Request r)
     {
-        return this;
+        return Optional.of( this );
     }
 
     @Override

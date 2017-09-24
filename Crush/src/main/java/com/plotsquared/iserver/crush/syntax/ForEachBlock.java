@@ -44,6 +44,7 @@ import com.plotsquared.iserver.api.util.VariableProvider;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,9 +69,10 @@ final public class ForEachBlock extends Syntax
             {
                 if ( factories.containsKey( provider.toLowerCase() ) )
                 {
-                    VariableProvider p = factories.get( provider.toLowerCase() ).get( r );
-                    if ( p != null )
+                    Optional<VariableProvider> pOptional = factories.get( provider.toLowerCase() ).get( r );
+                    if ( pOptional.isPresent() )
                     {
+                        final VariableProvider p = pOptional.get();
                         if ( !variable.equalsIgnoreCase( "ALL" ) && !p.contains( variable ) )
                         {
                             content = content.replace( matcher.group(), "" );

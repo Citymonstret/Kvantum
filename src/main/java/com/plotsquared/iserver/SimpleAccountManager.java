@@ -30,8 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
 
-@SuppressWarnings("ALL")
-public class SimpleAccountManager implements AccountManager
+final class SimpleAccountManager implements AccountManager
 {
 
     private static final String SESSION_ACCOUNT_CONSTANT = "__user_id__";
@@ -41,7 +40,7 @@ public class SimpleAccountManager implements AccountManager
 
     private final ApplicationStructure applicationStructure;
 
-    public SimpleAccountManager(final ApplicationStructure applicationStructure)
+    SimpleAccountManager(final ApplicationStructure applicationStructure)
     {
         this.applicationStructure = applicationStructure;
     }
