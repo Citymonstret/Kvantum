@@ -44,6 +44,7 @@ import java.util.function.Predicate;
  *
  * @author Citymonstret
  */
+@SuppressWarnings("unused")
 final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable, RequestChild
 {
 
@@ -478,6 +479,10 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
     }
 
+    /**
+     * Used to handle HTTP authentication
+     */
+    @SuppressWarnings("unused")
     public class Authorization
     {
 

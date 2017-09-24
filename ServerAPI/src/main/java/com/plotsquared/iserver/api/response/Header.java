@@ -326,7 +326,7 @@ final public class Header
 
     public String[] dump()
     {
-        String[] dump = new String[ this.headers.size() + 1 ];
+        final String[] dump = new String[ this.headers.size() + 1 ];
         dump[ 0 ] = "HTTP/1.1 " + this.status;
         int index = 1;
         for ( final Map.Entry<HeaderOption, String> entry : this.headers.entrySet() )
@@ -357,16 +357,12 @@ final public class Header
         {
             v = cookie + "=" + value;
         }
-        set( HEADER_SET_COOKIE, v );
-        return this;
+        return set( HEADER_SET_COOKIE, v );
     }
 
     public Header removeCookie(final String cookie)
     {
-        Assert.notNull( cookie );
-
-        setCookie( cookie, Header.COOKIE_DELETED );
-        return this;
+        return setCookie( Assert.notNull( cookie ), Header.COOKIE_DELETED );
     }
 
 }

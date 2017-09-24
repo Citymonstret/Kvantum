@@ -18,11 +18,21 @@
  */
 package com.plotsquared.iserver.api.core;
 
+/**
+ * Use this class to manage the {@link IntellectualServer} instances
+ */
 public final class ServerImplementation
 {
 
     private static IntellectualServer intellectualServer;
 
+    /**
+     * Register the server implementation used in the application instance
+     * Cannot be used if the instance is already registered, use {@link #getImplementation()} to check for null.
+     *
+     * @param intellectualServer Server instance
+     * @throws RuntimeException if the instance is already set
+     */
     public static void registerServerImplementation(final IntellectualServer intellectualServer)
     {
         if ( ServerImplementation.intellectualServer != null )
@@ -32,10 +42,13 @@ public final class ServerImplementation
         ServerImplementation.intellectualServer = intellectualServer;
     }
 
+    /**
+     * Get the registered implementation
+     * @return Implementation or mull
+     */
     public static IntellectualServer getImplementation()
     {
         return intellectualServer;
     }
-
 
 }

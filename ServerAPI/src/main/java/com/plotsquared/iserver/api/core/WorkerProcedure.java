@@ -32,11 +32,6 @@ public final class WorkerProcedure
     private final List<WeakReference<WorkerProcedureInstance>> instances = new ArrayList<>();
     private volatile Map<String, Handler> handlers = new LinkedHashMap<>();
 
-    public WorkerProcedure()
-    {
-
-    }
-
     /**
      * Add a procedure, and allow the Worker to use it
      * @param name Procedure name

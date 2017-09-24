@@ -61,7 +61,7 @@ public class Response implements ResponseBody
         this( null );
     }
 
-    public void copyFrom(Response handle)
+    public void copyFrom(final Response handle)
     {
         this.header = handle.header;
         this.content = handle.content;
@@ -89,9 +89,7 @@ public class Response implements ResponseBody
      */
     public void setBytes(final byte[] bytes)
     {
-        Assert.notNull( bytes );
-
-        this.bytes = bytes;
+        this.bytes = Assert.notNull( bytes );
         this.isText = false;
     }
 
@@ -114,9 +112,7 @@ public class Response implements ResponseBody
      */
     public Response setHeader(final Header header)
     {
-        Assert.notNull( header );
-
-        this.header = header;
+        this.header = Assert.notNull( header );
         return this;
     }
 
@@ -140,9 +136,7 @@ public class Response implements ResponseBody
      */
     public Response setContent(final String content)
     {
-        Assert.notNull( content );
-
-        this.content = content;
+        this.content = Assert.notNull( content );
         this.isText = true;
         return this;
     }
@@ -162,9 +156,7 @@ public class Response implements ResponseBody
 
     public Response setParent(final RequestHandler parent)
     {
-        Assert.notNull( parent );
-
-        this.parent = parent;
+        this.parent = Assert.notNull( parent );
         return this;
     }
 

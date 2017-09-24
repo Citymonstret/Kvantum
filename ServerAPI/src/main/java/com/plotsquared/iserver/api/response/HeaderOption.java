@@ -28,19 +28,17 @@ public final class HeaderOption
 
     private HeaderOption(final String text)
     {
-        Assert.notNull( text );
-
-        this.text = text;
+        this.text = Assert.notNull( text );
     }
 
     public static HeaderOption create(final String text)
     {
-        return new HeaderOption( text );
+        return new HeaderOption( Assert.notNull( text ) );
     }
 
     public static HeaderOption create(final String text, boolean cacheApplicable)
     {
-        return new HeaderOption( text ).cacheApplicable( cacheApplicable );
+        return new HeaderOption( Assert.notNull( text ) ).cacheApplicable( cacheApplicable );
     }
 
     public String getText()

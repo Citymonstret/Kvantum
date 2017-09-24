@@ -36,6 +36,7 @@ import com.plotsquared.iserver.api.request.Request;
 import com.plotsquared.iserver.api.response.Response;
 import com.plotsquared.iserver.api.session.SessionManager;
 import com.plotsquared.iserver.api.socket.SocketHandler;
+import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.Metrics;
 import com.plotsquared.iserver.api.views.RequestHandler;
 import com.plotsquared.iserver.api.views.View;
@@ -59,7 +60,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
     @Override
     default void message(String s)
     {
-        log( s );
+        log( Assert.notNull( s ) );
     }
 
     @Override
@@ -77,6 +78,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
     @Override
     default void sendRequiredArgumentsList(CommandManager commandManager, Command command, Collection<Parserable> collection, String s)
     {
+        // TODO: implement
         message( "Argument List Not Implemented!" );
     }
 
@@ -106,9 +108,21 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
      */
     void handleEvent(Event event);
 
+    /**
+     * Get the file system used in the server implementation
+     *
+     * @return File system (defaults to .iserver)
+     */
     FileSystem getFileSystem();
 
-    abstract RequestHandler createSimpleRequestHandler(String filter, BiConsumer<Request, Response> generator);
+    /**
+     * Create a simple request handler
+     *
+     * @param filter    Filter to use for the handler
+     * @param generator Response generator
+     * @return The created request handler
+     */
+    RequestHandler createSimpleRequestHandler(String filter, BiConsumer<Request, Response> generator);
 
     /**
      * Get the metric manager
@@ -131,6 +145,9 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
 
     CommandManager getCommandManager();
 
+    /**
+     * Start the server instance
+     */
     @SuppressWarnings("ALL")
     void start();
 
@@ -175,19 +192,55 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
 
     boolean isStarted();
 
+    /**
+     * Get the account manager instance
+     * @return The account manager instance
+     */
     AccountManager getGlobalAccountManager();
 
+    /**
+     * Log a message
+     * @param message Message
+     * @param args Arguments, will replace "%s" in the order provided, uses
+     *             #toString
+     */
     void log(String message, Object... args);
 
+    /**
+     * Log a message
+     * @param provider Message provider
+     * @param message Message
+     * @param args Arguments, will replace "%s" in the order provided, uses
+     *             #toString
+     */
     void log(LogProvider provider, String message, Object... args);
 
+    /**
+     * Shut down the server
+     */
     void stopServer();
 
+    /**
+     * Get the session manager instance
+     * @return Session manager
+     */
     SessionManager getSessionManager();
 
+    /**
+     * Get the current router instance
+     * @return Current router
+     */
     Router getRouter();
 
+    /**
+     * Is the server currently shutting down?
+     * @return true if the server is shutting down
+     */
     boolean isStopping();
 
+    /**
+     * Is the server currently paused? This could be when the server is waiting for required input, etc.
+     * @return true if the server is paused
+     */
     boolean isPaused();
 }

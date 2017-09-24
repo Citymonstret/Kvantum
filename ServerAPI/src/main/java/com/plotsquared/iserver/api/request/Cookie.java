@@ -29,6 +29,12 @@ public final class Cookie
     private final String name;
     private final String value;
 
+    /**
+     * Create a new cookie (Essentially name=value)
+     *
+     * @param name  Cookie name
+     * @param value Cookie value
+     */
     public Cookie(final String name, final String value)
     {
         Assert.notNull( name, value );
@@ -37,11 +43,19 @@ public final class Cookie
         this.value = value;
     }
 
+    /**
+     * Get the cookie name
+     * @return Cookie name
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Get the cookie value
+     * @return Cookie value
+     */
     public String getValue()
     {
         return value;
