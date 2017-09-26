@@ -36,7 +36,7 @@ public class DefaultLogWrapper implements LogWrapper
 
     private final ColoredPrinterI coloredPrinter;
 
-    DefaultLogWrapper()
+    public DefaultLogWrapper()
     {
         if ( System.getProperty( "os.name" ).startsWith( "win" ) )
         {

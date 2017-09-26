@@ -26,6 +26,7 @@ import com.plotsquared.iserver.api.logging.LogWrapper;
 import com.plotsquared.iserver.api.matching.Router;
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.Bootstrap;
+import com.plotsquared.iserver.api.util.RequestManager;
 import com.plotsquared.iserver.api.util.TimeUtil;
 
 import java.io.File;
@@ -64,7 +65,8 @@ final public class IntellectualServerMain
                 // GuiMain.main( args, file );
             } else
             {
-                final Optional<Server> server = create( true, file, new DefaultLogWrapper(), new RequestManager() );
+                final Optional<IntellectualServer> server = create( true, file, new DefaultLogWrapper(), new
+                        RequestManager() );
                 if ( server.isPresent() )
                 {
                     if ( !options.debug.isEmpty() )
@@ -133,8 +135,8 @@ final public class IntellectualServerMain
      * @param wrapper The log wrapper / handler
      * @return Optional of nullable server
      */
-    public static Optional<Server> create(final boolean standalone, final File coreFolder, final LogWrapper wrapper,
-                                          final Router router)
+    public static Optional<IntellectualServer> create(final boolean standalone, final File coreFolder, final LogWrapper wrapper,
+                                                      final Router router)
     {
         Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
                 "Cannot use a folder with '!' path as core folder" );

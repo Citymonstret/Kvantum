@@ -16,13 +16,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.plotsquared.iserver;
+package com.plotsquared.iserver.api.util;
 
 import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.core.IntellectualServer;
 import com.plotsquared.iserver.api.matching.Router;
 import com.plotsquared.iserver.api.request.Request;
-import com.plotsquared.iserver.api.util.*;
 import com.plotsquared.iserver.api.views.RequestHandler;
 import com.plotsquared.iserver.api.views.errors.View404;
 
@@ -38,7 +37,7 @@ final public class RequestManager extends Router
     private Generator<Request, RequestHandler> error404Generator = (request) -> View404.construct( request.getQuery()
             .getFullRequest() );
 
-    RequestManager()
+    public RequestManager()
     {
         this.views = new ArrayList<>();
     }
@@ -63,6 +62,7 @@ final public class RequestManager extends Router
 
     /**
      * Register a view to the request manager
+     *
      * @param view The view to register
      */
     @Override
@@ -82,6 +82,7 @@ final public class RequestManager extends Router
 
     /**
      * Try to find the request handler that matches the request
+     *
      * @param request Incoming request
      * @return Matching request handler, or {@link #getError404Generator()} if none was found
      */
