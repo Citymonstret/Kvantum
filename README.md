@@ -1,4 +1,4 @@
-#IntellectualServer
+# IntellectualServer
 
 ## Table Of Content
 * [Description](#description)
@@ -14,16 +14,16 @@
 * [Middleware](#middleware)
 * [Filters](#filters)
 
-##Description
+## Description
 IntellectualServer is a lightweight, innovative, portable and embeddable web server - Written entirely in java.
 It is the perfect choice, if you need a an embedded web server to ship with your application; as it can be
 run as both an integrated and standalone application. It supports both programmed views, and configuration of 
 pre-made ones - To use it just like you'd use any other web server. It's almost magic.
 
-##Wiki/Information
+## Wiki/Information
 ( **OUTDATED** ) More information can be found in our [wiki](https://github.com/IntellectualSites/IntellectualServer/wiki)
 
-##Features
+## Features
 Major:
 - Supports both HTTP and HTTPS
 - Easy to use API (including Middlewares, Annotation based view declaration, Functional View Declaration, Object 
@@ -37,7 +37,7 @@ Minor:
 - GZIP Compression
 - MD5 Checksum
 
-##Templates
+## Templates
 CrushTemplate is a templating engine that is shipped with the core of the server. It allows for things that you just cannot do with normal webservers.
 
 Current Crush Features:
@@ -50,7 +50,7 @@ Current Crush Features:
  - If Statements `{#if provider.variable} {/if}`
  - Inverted If Statements `{#if !provider.variable} {/if}`
 
-##Views
+## Views
 IntellectualServer officially supports:
 - CSS
 - LESS
@@ -63,7 +63,7 @@ IntellectualServer officially supports:
 
 You can also expand upon this yourself, with the easy to use API!
 
-##SSL
+## SSL
 The server supports SSL. You just have to enable it in `.iserver/config/server.yml`
 ```yml
 ssl:
@@ -73,9 +73,9 @@ ssl:
   keyStore: './path/to/your/keystore.jks' # Full path to the keystore
 ```
 
-##Development
+## Development
 
-###Maven
+### Maven
 [![](https://jitpack.io/v/IntellectualSites/IntellectualServer.svg)](https://jitpack.io/#IntellectualSites/IntellectualServer)
 
 
@@ -91,19 +91,19 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>com.github.IntellectualSites</groupId>
     <artifactId>IntellectualServer</artifactId>
-    <version>2.2.0</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 
-###Building
+### Building
 You build IntellectualServer using gradle. Use `gradlew build` to download all dependencies and build the compiled 
 output. To build a jar containing all dependencies, use `gradlew shadowJar`. And finally, to run the tests, use 
 `gradlew test`
 
-###Example
+### Example
 More examples can be found in the "example" folder
 
-####Initialization
+#### Initialization
 ```java
 public static void main(final String[] args)
 {
@@ -121,7 +121,7 @@ public static void main(final String[] args)
 }
 ```
 
-####@Annotation Views
+#### @Annotation Views
 ```java
 // Scan the file for views
 try
@@ -148,7 +148,7 @@ public void randomUUID(final Request request, final Response response)
 }
 ```
 
-###Middleware
+### Middleware
 Middleware is a class responsible for filtering out, and acting on requests, before they are handled by the appropriate views. They can be used to redirect non-authenticated users, or make sure that a requested user exists in a database.
 
 Middleware is lined up in a sort of chain, by using a special queue. If a middleware breaks the que, the request is not served by the view ( Middleware can redirect requests to other views without continuing the chain ).
@@ -193,7 +193,7 @@ Or add it to your `@ViewMatcher` like this:
 
 [**Example of request filtering**](https://github.com/IntellectualSites/IntellectualServer/blob/master/example/Embedded/src/main/java/com/plotsquared/iserver/example/APITest.java#L58)
 
-###Filters
+### Filters
 Filters are used to determine which view gets to serve the incoming requests. Each filter is made up of different parts, there are four types of parts:
 * Separator - `/` - Used like a path separator
 * Static - Example: `user` - A static string

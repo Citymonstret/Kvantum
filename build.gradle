@@ -12,7 +12,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2'
+    gradleVersion = '3.5'
 }
 
 apply plugin: 'java'
@@ -22,7 +22,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "com.github.hierynomus.license"
 
 group = 'com.intellectualsites'
-version = '2.2.0'
+version = '3.0.0'
 
 description = """"""
 
