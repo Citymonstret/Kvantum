@@ -619,7 +619,7 @@ public final class Server implements IntellectualServer
                 {
                     serverSocket = new ServerSocket( port++ );
                     run = false;
-                    log( "Specified port was occupied, running on " + port + " instead" );
+                    log( "Specified port was occupied, running on " + ( port - 1 ) + " instead" );
 
                     CoreConfig.port = port;
                 } catch ( final Exception ex )
