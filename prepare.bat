@@ -8,6 +8,7 @@ call gradlew :shadowJar
 set /p oldVersion=< old-version.txt
 set /p newVersion=< version.txt
 
+echo.
 echo Replacing README.md version
 echo Don't forget to publish the github release
 echo.
@@ -15,6 +16,8 @@ echo Old version: %oldVersion%
 echo New version: %newVersion%
 
 call:DoReplace "%oldVersion%" "%newVersion%" README.md README.md
+call:DoReplace "%oldVersion%" "%newVersion%" start.bat start.bat
+call:DoReplace "%oldVersion%" "%newVersion%" start.sh start.sh
 
 copy /Y .\build\libs\IntellectualServer-%newVersion%-all.jar .\
 

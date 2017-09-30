@@ -91,7 +91,7 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>com.github.IntellectualSites</groupId>
     <artifactId>IntellectualServer</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 </dependency>
 ```
 
