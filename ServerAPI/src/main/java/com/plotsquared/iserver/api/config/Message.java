@@ -65,6 +65,8 @@ public enum Message
     APPLICATION_DOES_NOT_EXTEND( "Application '%s' does not extend ApplicationStructure.class", MODE_WARNING ),
     INITIALIZING_LOCATION_SERVICES( "Initializing location services", MODE_INFO ),
     CLEARED_VIEWS( "Cleared views ( %s )", MODE_INFO ),
+    SESSION_SET( "Set session (%s=%s)", MODE_DEBUG ),
+    SESSION_FOUND( "Found session (%s=%s) for request %s", MODE_DEBUG ),
     REQUEST_HANDLER_DUMP( "> RequestHandler - Class '%s', Pattern: '%s'" );
 
     private final String message;

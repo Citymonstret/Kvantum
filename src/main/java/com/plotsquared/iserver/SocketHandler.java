@@ -18,12 +18,16 @@
  */
 package com.plotsquared.iserver;
 
+import com.plotsquared.iserver.api.config.ConfigurationFile;
 import com.plotsquared.iserver.api.config.CoreConfig;
 import com.plotsquared.iserver.api.config.Message;
+import com.plotsquared.iserver.api.config.YamlConfiguration;
+import com.plotsquared.iserver.api.core.ServerImplementation;
 import com.plotsquared.iserver.api.logging.Logger;
 import com.plotsquared.iserver.api.socket.ISocketHandler;
 import com.plotsquared.iserver.api.socket.SocketFilter;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.Socket;
@@ -39,17 +43,41 @@ final class SocketHandler implements ISocketHandler
 {
 
     @SuppressWarnings("ALL")
-    public static final SocketFilter Socket_FILTER_IS_ACTIVE = Socket -> !Socket.isClosed() && Socket.isConnected();
+    public static final SocketFilter SOCKET_FILTER_IS_ACTIVE = Socket -> !Socket.isClosed() && Socket.isConnected();
+    public static final SocketFilter SOCKET_FILTER_ENABLE_SOCKET = Socket -> false;
+
+    private static final Map<String, SocketFilter> availableSocketFilters = new HashMap<>();
+
+    static
+    {
+        availableSocketFilters.put( "1isActive", SOCKET_FILTER_IS_ACTIVE );
+        availableSocketFilters.put( "0all", SOCKET_FILTER_ENABLE_SOCKET );
+    }
+
     private final ExecutorService executorService;
-    private final List<SocketFilter> SocketFilters;
+    private final List<SocketFilter> socketFilters;
 
     SocketHandler()
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
-        this.SocketFilters = new ArrayList<>();
-        // TODO: Add config option to enable and disable Socket filters
-        // These are just temporary
-        this.SocketFilters.add( Socket_FILTER_IS_ACTIVE );
+        this.socketFilters = new ArrayList<>();
+
+        try
+        {
+            ConfigurationFile configurationFile = new YamlConfiguration( "socketFilters", new File( new File(
+                    ServerImplementation
+                            .getImplementation().getCoreFolder(), "config" ), "socketFilters.yml" ) );
+            configurationFile.loadFile();
+            availableSocketFilters.forEach( (key, value) -> configurationFile.setIfNotExists( key.substring( 1 ),
+                    key.charAt( 0 ) == '1' ) );
+            configurationFile.saveFile();
+            availableSocketFilters.entrySet().stream().filter( entry -> configurationFile.get( entry.getKey()
+                    .substring( 1 ) ) )
+                    .forEach( entry -> socketFilters.add( entry.getValue() ) );
+        } catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
     }
 
     static Map<String, SocketFilter> getSocketFilters() throws Exception
@@ -68,7 +96,7 @@ final class SocketHandler implements ISocketHandler
     @Override
     public void acceptSocket(final Socket s)
     {
-        for ( final SocketFilter filter : SocketFilters )
+        for ( final SocketFilter filter : socketFilters )
         {
             if ( !filter.filter( s ) )
             {

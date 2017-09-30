@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.api.util;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 
 public final class CollectionUtil
@@ -29,6 +30,27 @@ public final class CollectionUtil
         final int size = collection.size();
         collection.clear();
         return size;
+    }
+
+    public static <T> String smartJoin(final Collection<T> collection, final Generator<T, String> stringGenerator,
+                                       final String joiner)
+    {
+        final StringBuilder stringBuilder = new StringBuilder();
+        final Iterator<T> iterator = collection.iterator();
+        while ( iterator.hasNext() )
+        {
+            stringBuilder.append( stringGenerator.generate( iterator.next() ) );
+            if ( iterator.hasNext() )
+            {
+                stringBuilder.append( joiner );
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    public static <T> String join(final Collection<T> collection, String joiner)
+    {
+        return smartJoin( collection, Object::toString, joiner );
     }
 
     public static boolean containsIgnoreCase(final Collection<? extends String> collection, String string)

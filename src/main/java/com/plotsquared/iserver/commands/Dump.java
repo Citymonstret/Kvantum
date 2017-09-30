@@ -23,11 +23,6 @@ import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import com.plotsquared.iserver.api.core.ServerImplementation;
 
-/**
- * Created 12/24/2015 for IntellectualServer
- *
- * @author Citymonstret
- */
 @CommandDeclaration(
         command = "dump",
         description = "Dump information from the router"

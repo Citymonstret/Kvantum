@@ -104,7 +104,8 @@ public final class InputThread extends Thread
                                         .getClosestMatch().getCommand() );
                             } else
                             {
-                                ServerImplementation.getImplementation().log( "There is no such command!" );
+                                ServerImplementation.getImplementation().log( "There is no such command: " + result
+                                        .getInput() );
                             }
                             break;
                         case CommandHandlingOutput.WRONG_USAGE:

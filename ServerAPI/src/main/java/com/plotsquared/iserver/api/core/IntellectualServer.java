@@ -37,6 +37,8 @@ import com.plotsquared.iserver.api.response.Response;
 import com.plotsquared.iserver.api.session.SessionManager;
 import com.plotsquared.iserver.api.socket.ISocketHandler;
 import com.plotsquared.iserver.api.util.Assert;
+import com.plotsquared.iserver.api.util.CollectionUtil;
+import com.plotsquared.iserver.api.util.Generator;
 import com.plotsquared.iserver.api.util.Metrics;
 import com.plotsquared.iserver.api.views.RequestHandler;
 import com.plotsquared.iserver.api.views.View;
@@ -78,8 +80,12 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
     @Override
     default void sendRequiredArgumentsList(CommandManager commandManager, Command command, Collection<Parserable> collection, String s)
     {
-        // TODO: implement
-        message( "Argument List Not Implemented!" );
+        final Generator<Parserable, String> parserableStringGenerator = input -> "[name: " + input.getName() + ", " +
+                "desc: " +
+                input.getDesc() + ", parser: " + input.getParser().getName() + ", example: " + input.getParser()
+                .getExample() + "]";
+        message( "Command '" + s + "' requires following arguments: " + CollectionUtil.smartJoin( collection,
+                parserableStringGenerator, ", " ) );
     }
 
     boolean isMysqlEnabled();

@@ -57,6 +57,7 @@ public class StandardView extends StaticFileView implements CacheApplicable
     public boolean isApplicable(Request r)
     {
         // TODO: Try to resolve this
+        // An idea would be to add an option to map cache applicable requests through views.yml?
         // return true;
         return false;
     }

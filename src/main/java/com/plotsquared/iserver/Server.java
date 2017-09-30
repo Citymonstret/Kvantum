@@ -157,7 +157,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         printLicenseInfo();
 
         // This adds the default view bindings
-        // TODO: Make configurable
         addViewBinding( "html", HTMLView.class );
         addViewBinding( "css", CSSView.class );
         addViewBinding( "javascript", JSView.class );
@@ -337,7 +336,6 @@ public final class Server implements IntellectualServer, ISessionCreator
             {
                 e.printStackTrace();
             }
-            // TODO: Remake
             getCommandManager().createCommand( new AccountCommand( applicationStructure ) );
         }
 
@@ -870,7 +868,6 @@ public final class Server implements IntellectualServer, ISessionCreator
     @Override
     public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<Request, Response> generator)
     {
-
         return SimpleRequestHandler.builder().setPattern( filter ).setGenerator( generator )
                 .build().addToRouter( router );
     }

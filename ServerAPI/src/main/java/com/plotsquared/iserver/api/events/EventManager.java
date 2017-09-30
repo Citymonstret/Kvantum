@@ -57,6 +57,11 @@ public class EventManager
             listeners.put( listener.hashCode(), new ArrayDeque<>() );
         }
         listeners.get( listener.hashCode() ).add( listener );
+
+        if ( !bakedListeners.isEmpty() )
+        {
+            bake(); // re-bake!
+        }
     }
 
     public Collection<EventListener> getAll(final Object y)

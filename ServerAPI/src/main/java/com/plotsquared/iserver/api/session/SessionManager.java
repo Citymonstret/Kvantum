@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.api.session;
 
 import com.plotsquared.iserver.api.config.CoreConfig;
+import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.core.ServerImplementation;
 import com.plotsquared.iserver.api.request.Cookie;
 import com.plotsquared.iserver.api.request.Request;
@@ -58,8 +59,7 @@ public final class SessionManager implements ProviderFactory<ISession>
 
         if ( CoreConfig.debug )
         {
-            ServerImplementation.getImplementation()
-                .log( "Set session (%s=%s)", name, sessionID ); // TODO: Fix
+            Message.SESSION_SET.log( name, sessionID );
         }
 
         final ISession session = sessionCreator.createSession();
@@ -94,8 +94,7 @@ public final class SessionManager implements ProviderFactory<ISession>
                 session = sessions.get( sessionID );
                 if ( CoreConfig.debug )
                 {
-                    ServerImplementation.getImplementation()
-                            .log( "Found session (%s=%s) for request %s", session, sessionID, r ); // TODO: Fix
+                    Message.SESSION_FOUND.log( session, sessionID, r );
                 }
             } else
             {

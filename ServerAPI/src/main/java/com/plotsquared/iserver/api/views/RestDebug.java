@@ -31,6 +31,9 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+/**
+ * Just an example class of how to use the rest system
+ */
 public final class RestDebug extends RestHandler
 {
 
@@ -78,7 +81,6 @@ public final class RestDebug extends RestHandler
             {
                 JSONObject t = new JSONObject();
                 t.put( "count", timer.getValue().getCount() );
-                // TODO: Add More
                 timers.put( timer.getKey(), t );
             }
             object.put( "timers", timers );

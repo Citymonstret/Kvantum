@@ -21,6 +21,7 @@ package com.plotsquared.iserver.commands;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
+import com.intellectualsites.commands.parser.impl.StringParser;
 import com.plotsquared.iserver.api.account.Account;
 import com.plotsquared.iserver.api.core.ServerImplementation;
 import com.plotsquared.iserver.api.util.ApplicationStructure;
@@ -29,9 +30,6 @@ import com.plotsquared.iserver.api.util.StringUtil;
 
 import java.util.Optional;
 
-/**
- * TODO: Remake this!
- */
 @CommandDeclaration(
         command = "account"
 )
@@ -44,9 +42,12 @@ public class AccountCommand extends Command
     {
         Assert.notNull( applicationStructure );
 
+        this.createCommand( new DumpData() );
+        this.createCommand( new TestPass() );
+        this.createCommand( new CreateAccount() );
+
         this.structure = applicationStructure;
     }
-
 
     public boolean onCommand(CommandInstance instance )
     {
@@ -55,82 +56,108 @@ public class AccountCommand extends Command
             send( "Available Subcommands: create, testpass, dumpdata" );
         } else
         {
-            switch ( instance.getArguments()[ 0 ].toLowerCase() )
-            {
-                case "dumpdata":
-                {
-                    if ( instance.getArguments().length < 2 )
-                    {
-                        send( "Syntax: account dumpdata [username]" );
-                    } else
-                    {
-                        String username = instance.getArguments()[ 1 ];
-                        Optional<Account> account = structure.getAccountManager().getAccount( username );
-                        if ( !account.isPresent() )
-                        {
-                            send( "There is no such account!" );
-                        } else
-                        {
-                            send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
-                                    .getRawData(), ": ", ", " ) );
-                        }
-                    }
-                }
-                break;
-                case "testpass":
-                {
-                    if ( instance.getArguments().length < 3 )
-                    {
-                        send( "Syntax: account testpass [username] [password]" );
-                    } else
-                    {
-                        String username = instance.getArguments()[ 1 ];
-                        String password = instance.getArguments()[ 2 ];
-
-                        Optional<Account> accountOptional = structure.getAccountManager().getAccount( username );
-                        if ( !accountOptional.isPresent() )
-                        {
-                            send( "There is no such account!" );
-                        } else
-                        {
-                            send( "Matches: " + accountOptional.get().passwordMatches( password ) );
-                        }
-                    }
-                }
-                break;
-                case "create":
-                {
-                    if ( instance.getArguments().length < 3 )
-                    {
-                        send( "Syntax: account create [username] [password]" );
-                    } else
-                    {
-                        String username = instance.getArguments()[ 1 ];
-                        String password = instance.getArguments()[ 2 ];
-
-                        if ( structure.getAccountManager().getAccount( username ) != null )
-                        {
-                            send( "There is already an account with that username!" );
-                        } else
-                        {
-                            try
-                            {
-                                send( "Account created (Username: " + username + ")" );
-                                structure.getAccountManager().createAccount( username, password );
-                            } catch ( final Exception e )
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-                break;
-                default:
-                    send( "Unknown subcommand: " + instance.getArguments()[ 0 ].toLowerCase() );
-                    break;
-            }
+            super.handle( instance.getCaller(), instance.getArguments() );
         }
         return true;
+    }
+
+    @CommandDeclaration(
+            command = "dumpdata"
+    )
+    public class DumpData extends Command
+    {
+
+        DumpData()
+        {
+            this.withArgument( "username", new StringParser(), "Username!" );
+        }
+
+        @Override
+        public boolean onCommand(CommandInstance instance)
+        {
+            if ( instance.getArguments().length < 1 )
+            {
+                send( "Syntax: account dumpdata [username]" );
+            } else
+            {
+                String username = instance.getValue( "username", String.class );
+                Optional<Account> account = structure.getAccountManager().getAccount( username );
+                if ( !account.isPresent() )
+                {
+                    send( "There is no such account!" );
+                } else
+                {
+                    send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                            .getRawData(), ": ", ", " ) );
+                }
+            }
+            return true;
+        }
+    }
+
+    @CommandDeclaration(
+            command = "create"
+    )
+    public class CreateAccount extends Command
+    {
+
+        CreateAccount()
+        {
+            this.withArgument( "username", new StringParser(), "Username!" );
+            this.withArgument( "password", new StringParser(), "Password!" );
+        }
+
+        @Override
+        public boolean onCommand(CommandInstance instance)
+        {
+            String username = instance.getValue( "username", String.class );
+            String password = instance.getValue( "password", String.class );
+            if ( structure.getAccountManager().getAccount( username ).isPresent() )
+            {
+                send( "There is already an account with that username!" );
+            } else
+            {
+                try
+                {
+                    send( "Account created (Username: " + username + ")" );
+                    structure.getAccountManager().createAccount( username, password );
+                } catch ( final Exception e )
+                {
+                    e.printStackTrace();
+                }
+            }
+            return true;
+        }
+    }
+
+    @CommandDeclaration(
+            command = "testpass"
+    )
+    public class TestPass extends Command
+    {
+
+        TestPass()
+        {
+            this.withArgument( "username", new StringParser(), "Username!" );
+            this.withArgument( "password", new StringParser(), "Password!" );
+        }
+
+        @Override
+        public boolean onCommand(CommandInstance instance)
+        {
+            String username = instance.getValue( "username", String.class );
+            String password = instance.getValue( "password", String.class );
+
+            Optional<Account> accountOptional = structure.getAccountManager().getAccount( username );
+            if ( !accountOptional.isPresent() )
+            {
+                send( "There is no such account!" );
+            } else
+            {
+                send( "Matches: " + accountOptional.get().passwordMatches( password ) );
+            }
+            return true;
+        }
     }
 
     private void send(final String s)
