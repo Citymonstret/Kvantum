@@ -35,6 +35,7 @@ import com.plotsquared.iserver.api.events.EventManager;
 import com.plotsquared.iserver.api.events.defaultEvents.ServerReadyEvent;
 import com.plotsquared.iserver.api.events.defaultEvents.ShutdownEvent;
 import com.plotsquared.iserver.api.events.defaultEvents.StartupEvent;
+import com.plotsquared.iserver.api.events.defaultEvents.ViewsInitializedEvent;
 import com.plotsquared.iserver.api.logging.LogModes;
 import com.plotsquared.iserver.api.logging.LogProvider;
 import com.plotsquared.iserver.api.logging.LogWrapper;
@@ -572,6 +573,8 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             mainApplicationStructure.registerViews( this );
         }
+
+        this.handleEvent( new ViewsInitializedEvent( this ) );
 
         router.dump( this );
 

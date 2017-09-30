@@ -1,0 +1,4 @@
+name: ExamplePlugin
+main: example.ExamplePlugin
+author: Sauilitired
+version: 0.1
