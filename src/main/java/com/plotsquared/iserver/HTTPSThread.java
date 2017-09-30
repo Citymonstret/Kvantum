@@ -26,10 +26,10 @@ import javax.net.ssl.SSLServerSocket;
 final class HTTPSThread extends Thread
 {
 
-    private final SimpleSocketHandler SocketHandler;
+    private final com.plotsquared.iserver.SocketHandler SocketHandler;
     private final SSLServerSocket sslSocket;
 
-    HTTPSThread(final SSLServerSocket sslSocket, final SimpleSocketHandler SocketHandler)
+    HTTPSThread(final SSLServerSocket sslSocket, final com.plotsquared.iserver.SocketHandler SocketHandler)
     {
         super( "SSL-Runner" );
         this.SocketHandler = Assert.notNull( SocketHandler );

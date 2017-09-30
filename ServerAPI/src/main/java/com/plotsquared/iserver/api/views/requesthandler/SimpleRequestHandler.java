@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.api.views.requesthandler;
 
 import com.plotsquared.iserver.api.core.ServerImplementation;
+import com.plotsquared.iserver.api.matching.Router;
 import com.plotsquared.iserver.api.matching.ViewPattern;
 import com.plotsquared.iserver.api.request.Request;
 import com.plotsquared.iserver.api.response.Response;
@@ -32,6 +33,17 @@ import java.util.function.BiConsumer;
 public class SimpleRequestHandler extends RequestHandler
 {
 
+    protected SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator)
+    {
+        this.pattern = pattern;
+        this.generator = generator;
+    }
+
+    public static Builder builder()
+    {
+        return new Builder();
+    }
+
     private static AtomicInteger identifier = new AtomicInteger( 0 );
 
     private final String pattern;
@@ -39,10 +51,37 @@ public class SimpleRequestHandler extends RequestHandler
     private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
     private ViewPattern compiledPattern;
 
-    public SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator)
+    public SimpleRequestHandler addToRouter(final Router router)
     {
-        this.pattern = pattern;
-        this.generator = generator;
+        return (SimpleRequestHandler) router.add( this );
+    }
+
+    public static final class Builder
+    {
+
+        private String pattern;
+        private BiConsumer<Request, Response> generator;
+
+        private Builder()
+        {
+        }
+
+        public Builder setPattern(final String pattern)
+        {
+            this.pattern = pattern;
+            return this;
+        }
+
+        public Builder setGenerator(final BiConsumer<Request, Response> generator)
+        {
+            this.generator = generator;
+            return this;
+        }
+
+        public SimpleRequestHandler build()
+        {
+            return new SimpleRequestHandler( pattern, generator );
+        }
     }
 
     public void setInternalName(String internalName)

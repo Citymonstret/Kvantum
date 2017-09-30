@@ -2,7 +2,7 @@ package com.plotsquared.iserver.api.socket;
 
 import java.net.Socket;
 
-public interface SocketHandler
+public interface ISocketHandler
 {
 
     void acceptSocket(Socket s);

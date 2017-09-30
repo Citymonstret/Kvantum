@@ -19,9 +19,9 @@
 package com.plotsquared.iserver;
 
 import com.plotsquared.iserver.api.account.Account;
-import com.plotsquared.iserver.api.account.AccountManager;
+import com.plotsquared.iserver.api.account.IAccountManager;
 import com.plotsquared.iserver.api.core.ServerImplementation;
-import com.plotsquared.iserver.api.session.Session;
+import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.ApplicationStructure;
 import com.plotsquared.iserver.api.util.Assert;
 import org.mindrot.jbcrypt.BCrypt;
@@ -30,7 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
 
-final public class SimpleAccountManager implements AccountManager
+final public class AccountManager implements IAccountManager
 {
 
     private static final String SESSION_ACCOUNT_CONSTANT = "__user_id__";
@@ -40,7 +40,7 @@ final public class SimpleAccountManager implements AccountManager
 
     private final ApplicationStructure applicationStructure;
 
-    public SimpleAccountManager(final ApplicationStructure applicationStructure)
+    public AccountManager(final ApplicationStructure applicationStructure)
     {
         this.applicationStructure = applicationStructure;
     }
@@ -188,7 +188,7 @@ final public class SimpleAccountManager implements AccountManager
     }
 
     @Override
-    public Optional<Account> getAccount(final Session session)
+    public Optional<Account> getAccount(final ISession session)
     {
         if ( !session.contains( SESSION_ACCOUNT_CONSTANT ) )
         {
@@ -198,13 +198,13 @@ final public class SimpleAccountManager implements AccountManager
     }
 
     @Override
-    public void bindAccount(final Account account, final Session session)
+    public void bindAccount(final Account account, final ISession session)
     {
         session.set( SESSION_ACCOUNT_CONSTANT, account.getId() );
     }
 
     @Override
-    public void unbindAccount(final Session session)
+    public void unbindAccount(final ISession session)
     {
         session.set( SESSION_ACCOUNT_CONSTANT, null );
     }

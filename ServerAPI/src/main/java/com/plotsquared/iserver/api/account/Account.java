@@ -33,9 +33,9 @@ public class Account
     private final String password;
     private final String salt;
     private final Map<String, String> data;
-    private final AccountManager manager;
+    private final IAccountManager manager;
 
-    public Account(final int id, final String username, final String password, final String salt, final AccountManager
+    public Account(final int id, final String username, final String password, final String salt, final IAccountManager
             manager)
     {
         Assert.isPositive( id );

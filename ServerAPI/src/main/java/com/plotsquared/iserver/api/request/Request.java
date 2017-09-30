@@ -21,7 +21,7 @@ package com.plotsquared.iserver.api.request;
 import com.plotsquared.iserver.api.config.CoreConfig;
 import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.core.ServerImplementation;
-import com.plotsquared.iserver.api.session.Session;
+import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.*;
 import com.plotsquared.iserver.api.views.CookieManager;
 import com.plotsquared.iserver.api.views.RequestHandler;
@@ -62,7 +62,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private Query query;
     private PostRequest postRequest;
     private Socket socket;
-    private Session session;
+    private ISession session;
     private boolean valid = true;
     private Authorization authorization;
 
@@ -371,7 +371,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @return true|null
      */
-    public Session getSession()
+    public ISession getSession()
     {
         return this.session;
     }
@@ -381,7 +381,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @param session Session
      */
-    public void setSession(final Session session)
+    public void setSession(final ISession session)
     {
         Assert.notNull( session );
 

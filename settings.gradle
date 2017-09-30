@@ -4,4 +4,5 @@ include 'ServerImplementation'
 include 'ServerAPI'
 include 'Crush'
 include 'Assert'
+include 'WindowsLauncher'
 

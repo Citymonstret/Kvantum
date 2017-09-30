@@ -18,14 +18,14 @@
  */
 package com.plotsquared.iserver.api.account;
 
-import com.plotsquared.iserver.api.session.Session;
+import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.ApplicationStructure;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
 
 @SuppressWarnings("ALL")
-public interface AccountManager
+public interface IAccountManager
 {
 
     default boolean checkPassword(final String candidate, final String password)
@@ -44,11 +44,11 @@ public interface AccountManager
 
     Optional<Account> getAccount(int accountId);
 
-    Optional<Account> getAccount(Session session);
+    Optional<Account> getAccount(ISession session);
 
-    void bindAccount(Account account, Session session);
+    void bindAccount(Account account, ISession session);
 
-    void unbindAccount(Session session);
+    void unbindAccount(ISession session);
 
     void setData(Account account, String key, String value);
 

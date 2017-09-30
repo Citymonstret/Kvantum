@@ -21,8 +21,8 @@ package com.plotsquared.iserver;
 import com.plotsquared.iserver.api.config.CoreConfig;
 import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.logging.Logger;
+import com.plotsquared.iserver.api.socket.ISocketHandler;
 import com.plotsquared.iserver.api.socket.SocketFilter;
-import com.plotsquared.iserver.api.socket.SocketHandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-final class SimpleSocketHandler implements SocketHandler
+final class SocketHandler implements ISocketHandler
 {
 
     @SuppressWarnings("ALL")
@@ -43,7 +43,7 @@ final class SimpleSocketHandler implements SocketHandler
     private final ExecutorService executorService;
     private final List<SocketFilter> SocketFilters;
 
-    SimpleSocketHandler()
+    SocketHandler()
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
         this.SocketFilters = new ArrayList<>();
@@ -55,7 +55,7 @@ final class SimpleSocketHandler implements SocketHandler
     static Map<String, SocketFilter> getSocketFilters() throws Exception
     {
         final Map<String, SocketFilter> filters = new HashMap<>();
-        for ( final Field field : SimpleSocketHandler.class.getDeclaredFields() )
+        for ( final Field field : SocketHandler.class.getDeclaredFields() )
         {
             if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( SocketFilter.class ) )
             {

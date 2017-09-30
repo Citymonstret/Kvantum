@@ -20,7 +20,7 @@ package com.plotsquared.iserver;
 
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
-import com.plotsquared.iserver.api.account.AccountManager;
+import com.plotsquared.iserver.api.account.IAccountManager;
 import com.plotsquared.iserver.api.cache.CacheManager;
 import com.plotsquared.iserver.api.config.ConfigurationFile;
 import com.plotsquared.iserver.api.config.CoreConfig;
@@ -44,6 +44,8 @@ import com.plotsquared.iserver.api.plugin.PluginLoader;
 import com.plotsquared.iserver.api.plugin.PluginManager;
 import com.plotsquared.iserver.api.request.Request;
 import com.plotsquared.iserver.api.response.Response;
+import com.plotsquared.iserver.api.session.ISession;
+import com.plotsquared.iserver.api.session.ISessionCreator;
 import com.plotsquared.iserver.api.session.SessionManager;
 import com.plotsquared.iserver.api.util.*;
 import com.plotsquared.iserver.api.util.AutoCloseable;
@@ -53,7 +55,6 @@ import com.plotsquared.iserver.commands.AccountCommand;
 import com.plotsquared.iserver.crush.CrushEngine;
 import com.plotsquared.iserver.error.IntellectualServerInitializationException;
 import com.plotsquared.iserver.error.IntellectualServerStartException;
-import com.plotsquared.iserver.files.FileCacheManager;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
 import sun.misc.Signal;
@@ -65,7 +66,7 @@ import java.net.ServerSocket;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public final class Server implements IntellectualServer
+public final class Server implements IntellectualServer, ISessionCreator
 {
 
     // Private Static
@@ -76,7 +77,7 @@ public final class Server implements IntellectualServer
     private final boolean standalone;
     private final Map<String, Class<? extends View>> viewBindings;
     private final WorkerProcedure workerProcedure = new WorkerProcedure();
-    private final SimpleSocketHandler socketHandler;
+    private final SocketHandler socketHandler;
     private final Metrics metrics = new Metrics();
     // Private
     PrintStream logStream;
@@ -97,7 +98,7 @@ public final class Server implements IntellectualServer
     private MySQLConnManager mysqlConnManager;
     private EventCaller eventCaller;
     private ApplicationStructure mainApplicationStructure;
-    private AccountManager globalAccountManager;
+    private IAccountManager globalAccountManager;
     private FileSystem fileSystem;
     private CommandManager commandManager;
 
@@ -137,30 +138,9 @@ public final class Server implements IntellectualServer
         this.standalone = standalone;
 
         // Setup the proprietary file system
-        // TODO: Move to separate class
-        this.fileSystem = new FileSystem( coreFolder.toPath(), new FileCacheManager()
-        {
-            @Override
-            public Optional<String> readCachedFile(final String string)
-            {
-                return getCacheManager().getCachedFile( string );
-            }
+        this.fileSystem = new IntellectualFileSystem( coreFolder.toPath() );
 
-            @Override
-            public void writeCachedFile(final String file, final String content)
-            {
-                getCacheManager().setCachedFile( file, content );
-            }
-        } );
-
-        final File logFolder = new File( coreFolder, "log" );
-        if ( !logFolder.exists() )
-        {
-            if ( !logFolder.mkdirs() )
-            {
-                log( Message.COULD_NOT_CREATE_FOLDER, "log" );
-            }
-        }
+        final File logFolder = FileUtils.attemptFolderCreation( new File( coreFolder, "log" ) );
 
         // Setup log-to-file
         try
@@ -267,15 +247,16 @@ public final class Server implements IntellectualServer
             log( Message.DEBUG );
         }
 
-        this.socketHandler = new SimpleSocketHandler();
+        this.socketHandler = new SocketHandler();
         Worker.setup( CoreConfig.workers );
 
         this.started = false;
         this.stopping = false;
 
         this.router = router;
-        this.sessionManager = new SimpleSessionManager();
+
         this.cacheManager = new CacheManager();
+        this.sessionManager = new SessionManager( this );
 
         if ( CoreConfig.MySQL.enabled )
         {
@@ -317,6 +298,7 @@ public final class Server implements IntellectualServer
                         e.printStackTrace();
                     }
                 }
+
                 if ( !path.getPath( "index.html" ).exists() )
                 {
                     Logger.info( "Creating public/index.html!" );
@@ -341,9 +323,9 @@ public final class Server implements IntellectualServer
             ApplicationStructure applicationStructure = new ApplicationStructure( "core" )
             {
                 @Override
-                public AccountManager createNewAccountManager()
+                public IAccountManager createNewAccountManager()
                 {
-                    return new SimpleAccountManager( this );
+                    return new AccountManager( this );
                 }
             };
             this.globalAccountManager = applicationStructure.getAccountManager();
@@ -431,7 +413,7 @@ public final class Server implements IntellectualServer
     }
 
     @Override
-    public Optional<AccountManager> getAccountManager()
+    public Optional<IAccountManager> getAccountManager()
     {
         return Optional.ofNullable( this.globalAccountManager );
     }
@@ -774,7 +756,7 @@ public final class Server implements IntellectualServer
     }
 
     @Override
-    public SimpleSocketHandler getSocketHandler()
+    public SocketHandler getSocketHandler()
     {
         return socketHandler;
     }
@@ -798,7 +780,7 @@ public final class Server implements IntellectualServer
     }
 
     @Override
-    public AccountManager getGlobalAccountManager()
+    public IAccountManager getGlobalAccountManager()
     {
         return globalAccountManager;
     }
@@ -885,6 +867,15 @@ public final class Server implements IntellectualServer
     @Override
     public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<Request, Response> generator)
     {
-        return this.getRouter().add( new SimpleRequestHandler( filter, generator ) );
+
+        return SimpleRequestHandler.builder().setPattern( filter ).setGenerator( generator )
+                .build().addToRouter( router );
     }
+
+    @Override
+    public ISession createSession()
+    {
+        return new Session();
+    }
+
 }

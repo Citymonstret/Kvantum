@@ -2,7 +2,7 @@ package com.plotsquared.iserver.api.session;
 
 import com.plotsquared.iserver.api.util.VariableProvider;
 
-public interface Session extends VariableProvider
+public interface ISession extends VariableProvider
 {
 
     long getSessionId();

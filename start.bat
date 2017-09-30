@@ -1,7 +1,7 @@
 @ECHO OFF
 
 :: Configuration
-SET version=2.0.2
+SET version=3.0.0
 SET minRam=256
 SET maxRam=1024
 :: End of configuration

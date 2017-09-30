@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+
 public interface IConsumer<T> extends Consumer<T>
 {
 

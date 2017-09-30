@@ -23,7 +23,7 @@ import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.callers.CommandCaller;
 import com.intellectualsites.commands.parser.Parserable;
-import com.plotsquared.iserver.api.account.AccountManager;
+import com.plotsquared.iserver.api.account.IAccountManager;
 import com.plotsquared.iserver.api.cache.CacheManager;
 import com.plotsquared.iserver.api.config.ConfigurationFile;
 import com.plotsquared.iserver.api.config.Message;
@@ -35,7 +35,7 @@ import com.plotsquared.iserver.api.matching.Router;
 import com.plotsquared.iserver.api.request.Request;
 import com.plotsquared.iserver.api.response.Response;
 import com.plotsquared.iserver.api.session.SessionManager;
-import com.plotsquared.iserver.api.socket.SocketHandler;
+import com.plotsquared.iserver.api.socket.ISocketHandler;
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.Metrics;
 import com.plotsquared.iserver.api.views.RequestHandler;
@@ -93,7 +93,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
      */
     void addViewBinding(String key, Class<? extends View> c);
 
-    Optional<AccountManager> getAccountManager();
+    Optional<IAccountManager> getAccountManager();
 
     /**
      * Validate the views, and make sure they
@@ -184,7 +184,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
 
     WorkerProcedure getWorkerProcedure();
 
-    SocketHandler getSocketHandler();
+    ISocketHandler getSocketHandler();
 
     boolean isSilent();
 
@@ -196,7 +196,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
      * Get the account manager instance
      * @return The account manager instance
      */
-    AccountManager getGlobalAccountManager();
+    IAccountManager getGlobalAccountManager();
 
     /**
      * Log a message

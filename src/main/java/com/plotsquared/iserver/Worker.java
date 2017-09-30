@@ -31,7 +31,7 @@ import com.plotsquared.iserver.api.request.PostRequest;
 import com.plotsquared.iserver.api.request.Request;
 import com.plotsquared.iserver.api.response.Header;
 import com.plotsquared.iserver.api.response.ResponseBody;
-import com.plotsquared.iserver.api.session.Session;
+import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.AutoCloseable;
 import com.plotsquared.iserver.api.util.LambdaUtil;
@@ -173,7 +173,7 @@ final class Worker extends AutoCloseable
         String textContent = "";
         byte[] bytes = empty;
 
-        final Optional<Session> session = server.getSessionManager().getSession( request, output );
+        final Optional<ISession> session = server.getSessionManager().getSession( request, output );
         if ( session.isPresent() )
         {
             request.setSession( session.get() );

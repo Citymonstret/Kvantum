@@ -18,7 +18,7 @@
  */
 package com.plotsquared.iserver.api.util;
 
-import com.plotsquared.iserver.api.account.AccountManager;
+import com.plotsquared.iserver.api.account.IAccountManager;
 import com.plotsquared.iserver.api.core.IntellectualServer;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.sql.SQLException;
 public abstract class ApplicationStructure
 {
 
-    private final AccountManager accountManager;
+    private final IAccountManager accountManager;
     private final String applicationName;
     private SQLiteManager database;
 
@@ -50,9 +50,9 @@ public abstract class ApplicationStructure
         this.accountManager = createNewAccountManager();
     }
 
-    public abstract AccountManager createNewAccountManager();
+    public abstract IAccountManager createNewAccountManager();
 
-    public AccountManager getAccountManager()
+    public IAccountManager getAccountManager()
     {
         return this.accountManager;
     }

@@ -18,6 +18,7 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.core.ServerImplementation;
 import org.apache.commons.io.IOUtils;
 
@@ -120,6 +121,18 @@ public class FileUtils
                 f.delete();
             }
         }
+    }
+
+    public static File attemptFolderCreation(final File folder)
+    {
+        if ( !folder.exists() )
+        {
+            if ( !folder.mkdirs() )
+            {
+                Message.COULD_NOT_CREATE_FOLDER.log( folder );
+            }
+        }
+        return folder;
     }
 
     public static void copyFile(final File in, final File out)

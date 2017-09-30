@@ -18,7 +18,7 @@
  */
 package com.plotsquared.iserver.api.views.requesthandler;
 
-import com.plotsquared.iserver.api.account.AccountManager;
+import com.plotsquared.iserver.api.account.IAccountManager;
 import com.plotsquared.iserver.api.core.ServerImplementation;
 import com.plotsquared.iserver.api.request.Request;
 
@@ -30,7 +30,7 @@ public class AuthenticationRequiredMiddleware extends Middleware
     @Override
     public void handle(Request request, MiddlewareQueue queue)
     {
-        final Optional<AccountManager> accountManager = ServerImplementation.getImplementation().getAccountManager();
+        final Optional<IAccountManager> accountManager = ServerImplementation.getImplementation().getAccountManager();
         if ( accountManager.isPresent() && accountManager.get().getAccount( request.getSession() ).isPresent() )
         {
             queue.handle( request );

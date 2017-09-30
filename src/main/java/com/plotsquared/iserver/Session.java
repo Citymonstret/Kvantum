@@ -18,21 +18,21 @@
  */
 package com.plotsquared.iserver;
 
-import com.plotsquared.iserver.api.session.Session;
+import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-final class SimpleSession implements Session
+final class Session implements ISession
 {
 
     private static long id = 0L;
     private final Map<String, Object> sessionStorage;
     private long sessionId = 0;
 
-    SimpleSession()
+    Session()
     {
         sessionStorage = new HashMap<>();
         sessionId = id++;

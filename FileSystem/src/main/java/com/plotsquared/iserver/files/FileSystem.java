@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  * A very simple (and restrictive) file system
  */
 @SuppressWarnings("unused")
-public final class FileSystem
+public class FileSystem
 {
 
     final java.nio.file.Path coreFolder;
