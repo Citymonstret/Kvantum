@@ -24,14 +24,17 @@ import com.plotsquared.iserver.api.response.Header;
 import com.plotsquared.iserver.api.response.Response;
 import com.plotsquared.iserver.api.util.FileExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StandardView extends StaticFileView implements CacheApplicable
 {
+
+    private static final String CONSTANT_EXCLUDE_EXTENSIONS = "excludeExtensions";
+    private static final String CONSTANT_CACHE_APPLICABLE = "cacheApplicable";
+
+    private final List cacheApplicable;
+    private final boolean cacheApplicableAll;
 
     public StandardView(String filter, Map<String, Object> options)
     {
@@ -40,10 +43,10 @@ public class StandardView extends StaticFileView implements CacheApplicable
         super.setOption( "defaultExtension", "html" );
         super.defaultFile = "index";
 
-        if ( options.containsKey( "excludeExtensions" ) )
+        if ( options.containsKey( CONSTANT_EXCLUDE_EXTENSIONS ) )
         {
             final List<FileExtension> toRemove = new ArrayList<>();
-            final List list = (List) options.get( "excludeExtensions" );
+            final List list = (List) options.get( CONSTANT_EXCLUDE_EXTENSIONS );
             for ( Object o : list )
             {
                 toRemove.addAll( super.extensionList.stream().filter( extension -> extension.matches( o.toString() )
@@ -51,15 +54,16 @@ public class StandardView extends StaticFileView implements CacheApplicable
             }
             super.extensionList.removeAll( toRemove );
         }
+
+        final Optional<List> cacheApplicable = getOptionSafe( CONSTANT_CACHE_APPLICABLE );
+        this.cacheApplicable = cacheApplicable.orElseGet( ArrayList::new );
+        this.cacheApplicableAll = this.cacheApplicable.contains( "all" );
     }
 
     @Override
     public boolean isApplicable(Request r)
     {
-        // TODO: Try to resolve this
-        // An idea would be to add an option to map cache applicable requests through views.yml?
-        // return true;
-        return false;
+        return cacheApplicableAll || this.cacheApplicable.contains( r.getQuery().getResource() );
     }
 
     @Override

@@ -32,6 +32,7 @@ import com.plotsquared.iserver.files.Path;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -141,6 +142,18 @@ public class View extends RequestHandler
         Assert.notNull( s );
 
         return ( (T) options.get( s ) );
+    }
+
+    final public <T> Optional<T> getOptionSafe(final String s)
+    {
+        Assert.notNull( s );
+
+        if ( options.containsKey( s ) )
+        {
+            return Optional.of( (T) options.get( s ) );
+        }
+
+        return Optional.empty();
     }
 
     /**

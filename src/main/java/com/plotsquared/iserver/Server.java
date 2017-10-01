@@ -301,6 +301,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 view.put( "type", "std" );
                 Map<String, Object> opts = new HashMap<>();
                 opts.put( "folder", "./public" );
+                opts.put( "cacheApplicable", Collections.singletonList( "all" ) );
                 view.put( "options", opts );
                 views.put( "std", view );
                 configViews.setIfNotExists( "views", views );
