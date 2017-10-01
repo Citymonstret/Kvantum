@@ -17,8 +17,8 @@ plugins {
     id 'idea'
 }
 
-group 'com.intellectualsites'
-version '2.1.1'
+group 'com.github.intellectualsites'
+version 'BETA-1.0.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

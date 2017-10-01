@@ -11,8 +11,8 @@ buildscript {
     }
 }
 
-group 'com.intellectualsites'
-version '2.1.1'
+group 'com.github.intellectualsites'
+version 'RELEASE-1.0.0'
 
 apply plugin: 'java'
 apply plugin: 'maven'

@@ -21,8 +21,8 @@ apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "com.github.hierynomus.license"
 
-group = 'com.intellectualsites'
-version = '3.0.1'
+group = 'com.github.intellectualsites'
+version = 'BETA-1.0.0'
 
 description = """"""
 
@@ -45,14 +45,14 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'IntellectualServer',
                 'Implementation-Version': version,
-                'Main-Class': 'com.plotsquared.iserver.IntellectualServerMain'
+                'Main-Class': 'com.github.intellectualsites.iserver.IntellectualServerMain'
     }
 }
 
 task writeVersionToFile << {
-    File file = new File(projectDir, "version.txt");
-    new File(projectDir, "old-version.txt").text = file.text;
-    file.text = version;
+    File file = new File(projectDir, "version.txt")
+    new File(projectDir, "old-version.txt").text = file.text
+    file.text = version
 }
 
 dependencies {

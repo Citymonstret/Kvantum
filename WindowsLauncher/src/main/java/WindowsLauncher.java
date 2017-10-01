@@ -1,5 +1,5 @@
-import com.plotsquared.iserver.IntellectualServerMain;
-import com.plotsquared.iserver.api.util.AutoCloseable;
+import com.github.intellectualsites.iserver.IntellectualServerMain;
+import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import dorkbox.systemTray.SystemTray;
 
 public class WindowsLauncher

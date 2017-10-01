@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-import com.plotsquared.iserver.api.matching.ViewPattern;
+import com.github.intellectualsites.iserver.api.matching.ViewPattern;
 import org.junit.Assert;
 import org.junit.Test;
 

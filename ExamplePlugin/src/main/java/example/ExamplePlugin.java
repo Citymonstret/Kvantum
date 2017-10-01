@@ -1,11 +1,11 @@
 package example;
 
-import com.plotsquared.iserver.api.core.ServerImplementation;
-import com.plotsquared.iserver.api.plugin.Plugin;
-import com.plotsquared.iserver.api.request.Request;
-import com.plotsquared.iserver.api.response.Response;
-import com.plotsquared.iserver.api.views.staticviews.StaticViewManager;
-import com.plotsquared.iserver.api.views.staticviews.ViewMatcher;
+import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.plugin.Plugin;
+import com.github.intellectualsites.iserver.api.request.Request;
+import com.github.intellectualsites.iserver.api.response.Response;
+import com.github.intellectualsites.iserver.api.views.staticviews.StaticViewManager;
+import com.github.intellectualsites.iserver.api.views.staticviews.ViewMatcher;
 
 public class ExamplePlugin extends Plugin
 {
