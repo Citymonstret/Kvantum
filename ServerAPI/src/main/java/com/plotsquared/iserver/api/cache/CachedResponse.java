@@ -23,6 +23,9 @@ import com.plotsquared.iserver.api.response.ResponseBody;
 import com.plotsquared.iserver.api.util.Assert;
 import lombok.Getter;
 
+/**
+ * A saved response generated from a previous response, and saved in the {@link CacheManager}
+ */
 public class CachedResponse implements ResponseBody
 {
 
@@ -31,6 +34,11 @@ public class CachedResponse implements ResponseBody
     @Getter
     private final byte[] bytes;
 
+    /**
+     * The parent response body
+     *
+     * @param parent parent body
+     */
     public CachedResponse(final ResponseBody parent)
     {
         Assert.notNull( parent );

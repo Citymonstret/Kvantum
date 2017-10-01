@@ -59,18 +59,30 @@ import java.util.function.BiConsumer;
 public interface IntellectualServer extends CommandCaller<IntellectualServer>
 {
 
+    /**
+     * The same as {@link #log(String, Object...)}
+     *
+     * @param s Message to be logged
+     */
     @Override
     default void message(String s)
     {
         log( Assert.notNull( s ) );
     }
 
+    /**
+     * Returns itself
+     * @return this.
+     */
     @Override
     default IntellectualServer getSuperCaller()
     {
         return this;
     }
 
+    /**
+     * Ignore this.
+     */
     @Override
     default boolean hasAttachment(String s)
     {

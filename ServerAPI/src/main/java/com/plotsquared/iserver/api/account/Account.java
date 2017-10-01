@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A data structure representing an account, managed by {@link IAccountManager}
+ */
 public class Account
 {
 
@@ -38,6 +41,13 @@ public class Account
     private final Map<String, String> data;
     private final IAccountManager manager;
 
+    /**
+     * @param id       (Unique) account ID
+     * @param username Account username
+     * @param password Account password
+     * @param salt     Salt used when generating password
+     * @param manager  Account manager implementation
+     */
     public Account(final int id, final String username, final String password, final String salt, final IAccountManager
             manager)
     {
