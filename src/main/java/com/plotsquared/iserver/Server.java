@@ -58,6 +58,9 @@ import com.plotsquared.iserver.error.IntellectualServerInitializationException;
 import com.plotsquared.iserver.error.IntellectualServerStartException;
 import com.plotsquared.iserver.files.FileSystem;
 import com.plotsquared.iserver.files.Path;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import sun.misc.Signal;
 
 import javax.net.ssl.SSLServerSocket;
@@ -72,35 +75,56 @@ public final class Server implements IntellectualServer, ISessionCreator
 
     // Private Static
     @SuppressWarnings( "ALL" )
+    @Getter(AccessLevel.PACKAGE)
     private static Server instance;
     // Private Final
+    @Getter
     private final LogWrapper logWrapper;
+    @Getter
     private final boolean standalone;
+    @Getter
     private final Map<String, Class<? extends View>> viewBindings;
-    private final WorkerProcedure workerProcedure = new WorkerProcedure();
+    @Getter
+    private final WorkerProcedure procedure = new WorkerProcedure();
+    @Getter
     private final SocketHandler socketHandler;
+    @Getter
     private final Metrics metrics = new Metrics();
     // Private
     PrintStream logStream;
     // Public
+    @Getter
     private volatile CacheManager cacheManager;
+    @Getter
     private boolean silent = false;
+    @Getter
     private Router router;
+    @Getter
     private SessionManager sessionManager;
     // Package-Protected
+    @Getter
     private ConfigurationFile translations;
+    @Getter
     private File coreFolder;
-    private boolean pause = false;
+    @Getter
+    private boolean paused = false;
+    @Getter
     private boolean stopping;
+    @Getter
     private boolean started;
     private ServerSocket serverSocket;
     private SSLServerSocket sslServerSocket;
     private ConfigurationFile configViews;
     private MySQLConnManager mysqlConnManager;
+    @Setter
+    @Getter
     private EventCaller eventCaller;
     private ApplicationStructure mainApplicationStructure;
+    @Getter
     private IAccountManager globalAccountManager;
+    @Getter
     private FileSystem fileSystem;
+    @Getter
     private CommandManager commandManager;
 
     {
@@ -363,22 +387,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         }
     }
 
-    /**
-     * Get THE instance of the server
-     *
-     * @return this, literally... this!
-     */
-    static IntellectualServer getInstance()
-    {
-        return instance;
-    }
-
-    @Override
-    public Metrics getMetrics()
-    {
-        return metrics;
-    }
-
     private void printLicenseInfo()
     {
         final LogWrapper.LogEntryFormatter prefix = msg -> "> " + msg;
@@ -451,20 +459,6 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public FileSystem getFileSystem()
-    {
-        return fileSystem;
-    }
-
-    @Override
-    public void setEventCaller(final EventCaller caller)
-    {
-        Assert.notNull( caller );
-
-        this.eventCaller = caller;
-    }
-
-    @Override
     public void loadPlugins()
     {
         if ( standalone )
@@ -485,12 +479,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             log( Message.STANDALONE_NOT_LOADING_PLUGINS );
         }
-    }
-
-    @Override
-    public CommandManager getCommandManager()
-    {
-        return this.commandManager;
     }
 
     @SuppressWarnings("ALL")
@@ -647,7 +635,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 log( Message.SHUTTING_DOWN );
                 break;
             }
-            if ( pause )
+            if ( paused )
             {
                 continue;
             }
@@ -660,12 +648,6 @@ public final class Server implements IntellectualServer, ISessionCreator
                 e.printStackTrace();
             }
         }
-    }
-
-    @Override
-    public WorkerProcedure getProcedure()
-    {
-        return this.workerProcedure;
     }
 
     @Override
@@ -713,81 +695,6 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public CacheManager getCacheManager()
-    {
-        return cacheManager;
-    }
-
-    @Override
-    public LogWrapper getLogWrapper()
-    {
-
-        return logWrapper;
-    }
-
-    @Override
-    public ConfigurationFile getTranslations()
-    {
-
-        return translations;
-    }
-
-    @Override
-    public File getCoreFolder()
-    {
-        return coreFolder;
-    }
-
-    @Override
-    public boolean isStandalone()
-    {
-        return standalone;
-    }
-
-    @Override
-    public Map<String, Class<? extends View>> getViewBindings()
-    {
-        return viewBindings;
-    }
-
-    @Override
-    public WorkerProcedure getWorkerProcedure()
-    {
-        return workerProcedure;
-    }
-
-    @Override
-    public SocketHandler getSocketHandler()
-    {
-        return socketHandler;
-    }
-
-    @Override
-    public boolean isSilent()
-    {
-        return silent;
-    }
-
-    @Override
-    public boolean isPause()
-    {
-        return pause;
-    }
-
-    @Override
-    public boolean isStarted()
-    {
-        return started;
-    }
-
-    @Override
-    public IAccountManager getGlobalAccountManager()
-    {
-        return globalAccountManager;
-    }
-
-    @Override
-
     public synchronized void log(String message, final Object... args)
     {
         this.log( message, LogModes.MODE_INFO, args );
@@ -839,30 +746,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             System.exit( 0 );
         }
-    }
-
-    @Override
-    public SessionManager getSessionManager()
-    {
-        return this.sessionManager;
-    }
-
-    @Override
-    public Router getRouter()
-    {
-        return router;
-    }
-
-    @Override
-    public boolean isStopping()
-    {
-        return this.stopping;
-    }
-
-    @Override
-    public boolean isPaused()
-    {
-        return this.pause;
     }
 
     @Override

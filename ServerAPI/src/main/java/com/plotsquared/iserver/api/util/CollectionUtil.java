@@ -18,10 +18,13 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
 
+@UtilityClass
 public final class CollectionUtil
 {
 

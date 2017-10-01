@@ -25,6 +25,9 @@ import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.*;
 import com.plotsquared.iserver.api.views.CookieManager;
 import com.plotsquared.iserver.api.views.RequestHandler;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 import javax.net.ssl.SSLSocket;
 import java.net.Socket;
@@ -48,21 +51,32 @@ import java.util.function.Predicate;
 final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable, RequestChild
 {
 
-    public static final String ALTERNATE_OUTCOME = "alternateOutcome";
+    @SuppressWarnings("ALL")
     public static final String INTERNAL_REDIRECT = "internalRedirect";
+    public static final String ALTERNATE_OUTCOME = "alternateOutcome";
 
-    public static final String HEADER_AUTHORIZATION = "Authorization";
+    private static final String HEADER_AUTHORIZATION = "Authorization";
 
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
     public Map<String, String> postponedCookies = new HashMap<>();
+    @Getter
     private ProtocolType protocolType;
     private Map<String, Object> meta;
+    @Getter
     private Map<String, String> headers;
+    @Getter
     private Cookie[] cookies;
+    @Getter
     private Query query;
+    @Setter
     private PostRequest postRequest;
     private Socket socket;
+    @NonNull
+    @Setter
+    @Getter
     private ISession session;
+    @Setter
+    @Getter
     private boolean valid = true;
     private Authorization authorization;
 
@@ -126,7 +140,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return this;
     }
 
-    public void removeMeta(String metaKey)
+    public void removeMeta(final String metaKey)
     {
         this.meta.remove( Assert.notEmpty( metaKey ) );
     }
@@ -149,19 +163,15 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Override
-    public boolean contains(String variable)
+    public boolean contains(final String variable)
     {
-        Assert.notNull( variable );
-
-        return getVariables().containsKey( variable );
+        return getVariables().containsKey( Assert.notNull( variable ) );
     }
 
     @Override
     public Object get(String variable)
     {
-        Assert.notNull( variable );
-
-        return getVariables().get( variable );
+        return getVariables().get( Assert.notNull( variable ) );
     }
 
     @Override
@@ -172,20 +182,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
     public void useAlternateOutcome(final String identifier)
     {
-        Assert.notEmpty( identifier );
-
-        this.addMeta( ALTERNATE_OUTCOME, identifier );
-    }
-
-    @Override
-    public boolean isValid()
-    {
-        return this.valid;
-    }
-
-    public void setValid(boolean valid)
-    {
-        this.valid = valid;
+        this.addMeta( ALTERNATE_OUTCOME, Assert.notNull( identifier ) );
     }
 
     /**
@@ -202,19 +199,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return this.postRequest;
     }
 
-    /**
-     * The post request is basically... a POST request.
-     *
-     * @param postRequest The post request
-     */
-    public void setPostRequest(final PostRequest postRequest)
-    {
-        Assert.notNull( postRequest );
-
-        this.postRequest = postRequest;
-    }
-
-    private Request newRequest(String query)
+    private Request newRequest(final String query)
     {
         Assert.notEmpty( query );
 
@@ -225,27 +210,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         request.meta = new HashMap<>( meta );
         request.cookies = cookies;
         request.protocolType = protocolType;
+
         return request;
-    }
-
-    public Map<String, String> getHeaders()
-    {
-        return headers;
-    }
-
-    /**
-     * Get all request cookies
-     *
-     * @return Request cookies
-     */
-    public Cookie[] getCookies()
-    {
-        return this.cookies;
-    }
-
-    public ProtocolType getProtocolType()
-    {
-        return this.protocolType;
     }
 
     /**
@@ -265,6 +231,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         {
             return this.headers.get( name );
         }
+
         return "";
     }
 
@@ -287,16 +254,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             }
             this.query = new Query( methodOptional.get(), parts[ 1 ] );
         }
-        return this.query;
-    }
-
-    /**
-     * Get the built query
-     *
-     * @return Compiled query
-     */
-    public Query getQuery()
-    {
         return this.query;
     }
 
@@ -366,28 +323,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return (Map<String, String>) getMeta( "variables" );
     }
 
-    /**
-     * Get the internal session
-     *
-     * @return true|null
-     */
-    public ISession getSession()
-    {
-        return this.session;
-    }
-
-    /**
-     * Set the internal session
-     *
-     * @param session Session
-     */
-    public void setSession(final ISession session)
-    {
-        Assert.notNull( session );
-
-        this.session = session;
-    }
-
     @Override
     public String toString()
     {
@@ -396,9 +331,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
     public boolean hasMeta(final String key)
     {
-        Assert.notEmpty( key );
-
-        return this.meta.containsKey( key );
+        return this.meta.containsKey( Assert.notNull( key ) );
     }
 
     public Map<String, Object> getAllMeta()
@@ -410,11 +343,14 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * The query, for example:
      * "http://localhost/query?example=this"
      */
-    public static class Query
+    final public static class Query
     {
 
+        @Getter
         private final HttpMethod method;
+        @Getter
         private final String resource;
+        @Getter
         private final Map<String, String> parameters = new HashMap<>();
 
         /**
@@ -442,21 +378,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             this.resource = resource;
         }
 
-        public HttpMethod getMethod()
-        {
-            return this.method;
-        }
-
-        public String getResource()
-        {
-            return this.resource;
-        }
-
-        public Map<String, String> getParameters()
-        {
-            return this.parameters;
-        }
-
         /**
          * Build a logging string... for logging?
          *
@@ -479,10 +400,15 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * Used to handle HTTP authentication
      */
     @SuppressWarnings("unused")
-    public class Authorization
+    final public class Authorization
     {
 
-        private final String mechanism, username, password;
+        @Getter
+        private final String mechanism;
+        @Getter
+        private final String username;
+        @Getter
+        private final String password;
 
         private Authorization(final String input)
         {
@@ -504,21 +430,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         public boolean isValid()
         {
             return this.mechanism != null && this.username != null && this.password != null;
-        }
-
-        public String getMechanism()
-        {
-            return mechanism;
-        }
-
-        public String getUsername()
-        {
-            return username;
-        }
-
-        public String getPassword()
-        {
-            return password;
         }
 
     }

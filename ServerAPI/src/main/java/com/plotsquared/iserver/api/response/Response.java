@@ -21,6 +21,7 @@ package com.plotsquared.iserver.api.response;
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.TimeUtil;
 import com.plotsquared.iserver.api.views.RequestHandler;
+import lombok.Getter;
 
 /**
  * The HTTP response,
@@ -32,10 +33,14 @@ import com.plotsquared.iserver.api.views.RequestHandler;
 public class Response implements ResponseBody
 {
 
+    @Getter
     private Header header;
+    @Getter
     private String content;
     private RequestHandler parent;
-    private boolean isText;
+    @Getter
+    private boolean text;
+    @Getter
     private byte[] bytes;
 
     /**
@@ -66,20 +71,8 @@ public class Response implements ResponseBody
         this.header = handle.header;
         this.content = handle.content;
         this.parent = handle.parent;
-        this.isText = handle.isText;
+        this.text = handle.text;
         this.bytes = handle.bytes;
-    }
-
-    /**
-     * Get the bytes
-     *
-     * @return bytes, if exists
-     * @see #isText() Should be false for this to work
-     */
-    @Override
-    public byte[] getBytes()
-    {
-        return this.bytes;
     }
 
     /**
@@ -90,19 +83,7 @@ public class Response implements ResponseBody
     public void setBytes(final byte[] bytes)
     {
         this.bytes = Assert.notNull( bytes );
-        this.isText = false;
-    }
-
-    /**
-     * Get the response header
-     *
-     * @return the set response header
-     * @see #setHeader(Header) - To set the header
-     */
-    @Override
-    public Header getHeader()
-    {
-        return this.header;
+        this.text = false;
     }
 
     /**
@@ -117,18 +98,6 @@ public class Response implements ResponseBody
     }
 
     /**
-     * Get the content as a string
-     *
-     * @return The string content
-     * @see #isText() Should be true for this to work
-     */
-    @Override
-    public String getContent()
-    {
-        return this.content;
-    }
-
-    /**
      * Set the text content
      *
      * @param content The string content
@@ -137,21 +106,8 @@ public class Response implements ResponseBody
     public Response setContent(final String content)
     {
         this.content = Assert.notNull( content );
-        this.isText = true;
+        this.text = true;
         return this;
-    }
-
-    /**
-     * Check if using raw bytes, or a string
-     *
-     * @return True if using String, false if using bytes
-     * @see #setContent(String) To set the string content
-     * @see #setBytes(byte[]) To set the byte content
-     */
-    @Override
-    public boolean isText()
-    {
-        return isText;
     }
 
     public Response setParent(final RequestHandler parent)

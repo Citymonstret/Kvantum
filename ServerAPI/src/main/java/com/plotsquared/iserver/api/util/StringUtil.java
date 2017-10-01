@@ -18,9 +18,12 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Iterator;
 import java.util.Map;
 
+@UtilityClass
 public final class StringUtil
 {
 

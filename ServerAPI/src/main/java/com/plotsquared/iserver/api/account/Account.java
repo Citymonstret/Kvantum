@@ -19,6 +19,7 @@
 package com.plotsquared.iserver.api.account;
 
 import com.plotsquared.iserver.api.util.Assert;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Account
 {
 
+    @Getter
     private final int id;
+    @Getter
     private final String username;
     private final String password;
     private final String salt;
@@ -52,11 +55,6 @@ public class Account
         this.manager = manager;
 
         this.manager.loadData( this );
-    }
-
-    public String getUsername()
-    {
-        return username;
     }
 
     public Map<String, String> getRawData()
@@ -106,8 +104,4 @@ public class Account
         this.manager.removeData( this, key );
     }
 
-    public int getId()
-    {
-        return id;
-    }
 }

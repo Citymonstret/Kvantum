@@ -20,6 +20,7 @@ package com.plotsquared.iserver.api.response;
 
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.TimeUtil;
+import lombok.Getter;
 
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -240,7 +241,9 @@ final public class Header
     public static final HeaderOption HEADER_RETRY_AFTER = HeaderOption.create( "Retry-After" );
 
     private final Map<HeaderOption, String> headers = new HashMap<>();
+    @Getter
     private String status;
+    @Getter
     private String format;
 
     public Header(final String status, final String format)
@@ -254,22 +257,12 @@ final public class Header
         this( status, "HTTP/1.1" );
     }
 
-    public String getStatus()
-    {
-        return status;
-    }
-
     public Header setStatus(final String status)
     {
         Assert.notNull( status );
 
         this.status = status;
         return this;
-    }
-
-    public String getFormat()
-    {
-        return format;
     }
 
     public Header set(final HeaderOption key, final String value)

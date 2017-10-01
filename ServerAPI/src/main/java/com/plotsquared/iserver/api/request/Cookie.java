@@ -18,48 +18,20 @@
  */
 package com.plotsquared.iserver.api.request;
 
-import com.plotsquared.iserver.api.util.Assert;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * A very simple representation of a cookie
  */
+@AllArgsConstructor
 public final class Cookie
 {
 
+    @Getter
     private final String name;
+    @Getter
     private final String value;
-
-    /**
-     * Create a new cookie (Essentially name=value)
-     *
-     * @param name  Cookie name
-     * @param value Cookie value
-     */
-    public Cookie(final String name, final String value)
-    {
-        Assert.notNull( name, value );
-
-        this.name = name;
-        this.value = value;
-    }
-
-    /**
-     * Get the cookie name
-     * @return Cookie name
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Get the cookie value
-     * @return Cookie value
-     */
-    public String getValue()
-    {
-        return value;
-    }
 
     /**
      * Get the full cookie, as per the HTTP protocol format

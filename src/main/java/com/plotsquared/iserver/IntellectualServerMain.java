@@ -25,17 +25,12 @@ import com.plotsquared.iserver.api.core.IntellectualServer;
 import com.plotsquared.iserver.api.logging.LogWrapper;
 import com.plotsquared.iserver.api.matching.Router;
 import com.plotsquared.iserver.api.util.Assert;
-import com.plotsquared.iserver.api.util.Bootstrap;
 import com.plotsquared.iserver.api.util.RequestManager;
 import com.plotsquared.iserver.api.util.TimeUtil;
 
 import java.io.File;
 import java.util.Optional;
 
-/**
- * The main bootstrap class
- */
-@Bootstrap
 @SuppressWarnings("ALL")
 final public class IntellectualServerMain
 {

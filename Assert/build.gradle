@@ -27,7 +27,6 @@ license {
     header rootProject.file('HEADER')
 }
 
-
 repositories {
     maven { url "https://jitpack.io" }
     maven { url "http://repo.maven.apache.org/maven2" }

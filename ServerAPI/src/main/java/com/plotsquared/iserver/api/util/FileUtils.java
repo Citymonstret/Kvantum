@@ -20,6 +20,7 @@ package com.plotsquared.iserver.api.util;
 
 import com.plotsquared.iserver.api.config.Message;
 import com.plotsquared.iserver.api.core.ServerImplementation;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -28,11 +29,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-/**
- * File Utilitiy Methods
- *
- * @author Citymonstret
- */
+@UtilityClass
 public class FileUtils
 {
 

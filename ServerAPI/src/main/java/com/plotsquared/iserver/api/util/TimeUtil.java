@@ -18,10 +18,13 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+@UtilityClass
 public class TimeUtil
 {
 

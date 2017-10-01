@@ -431,7 +431,7 @@ final class Worker extends AutoCloseable
      * also makes sure its handled and closed down successfully
      * @param remote socket to accept
      */
-    public void run(final Socket remote)
+    void run(final Socket remote)
     {
         if ( remote != null && !remote.isClosed() )
         {

@@ -20,6 +20,7 @@ package com.plotsquared.iserver.api.request;
 
 import com.plotsquared.iserver.api.util.Assert;
 import com.plotsquared.iserver.api.util.StringUtil;
+import lombok.Getter;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ final public class PostRequest implements RequestChild
 
     public final String request;
     private final Map<String, String> vars;
+    @Getter
     private final Request parent;
 
     public PostRequest(final Request parent, final String request)
@@ -58,12 +60,6 @@ final public class PostRequest implements RequestChild
         final char[] chars = new char[ cl ];
         Assert.equals( input.read( chars ), cl );
         return new PostRequest( parent, new String( chars ) );
-    }
-
-    @Override
-    public Request getParent()
-    {
-        return this.parent;
     }
 
     String buildLog()

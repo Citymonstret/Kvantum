@@ -11,15 +11,14 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java'
+    id 'maven'
+    id 'idea'
+}
+
 group 'com.intellectualsites'
 version '2.1.1'
-
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'idea'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: "com.github.hierynomus.license"
-
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -27,7 +26,6 @@ targetCompatibility = 1.8
 license {
     header rootProject.file('HEADER')
 }
-
 
 repositories {
     maven { url "https://jitpack.io" }
@@ -38,10 +36,11 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok:1.16.18'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     compile group: 'org.mindrot', name: 'jbcrypt', version: '0.3m'
-    compile 'com.github.Sauilitired:Configurable:0.0.3'
+    compile 'com.github.Sauilitired:Configurable:1.0.0'
     compile 'org.ehcache:ehcache:3.1.1'
     compile project(":FileSystem")
     compile 'io.dropwizard.metrics:metrics-core:3.1.0'

@@ -18,18 +18,17 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Optional;
 
+@UtilityClass
 public class OptionalUtil
 {
 
     public static <T> T getOrNull(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") final Optional<T> optional)
     {
-        if ( optional.isPresent() )
-        {
-            return optional.get();
-        }
-        return null;
+        return optional.orElse( null );
     }
 
 }

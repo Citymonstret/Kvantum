@@ -20,6 +20,7 @@ package com.plotsquared.iserver;
 
 import com.plotsquared.iserver.api.session.ISession;
 import com.plotsquared.iserver.api.util.Assert;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,18 +31,13 @@ final class Session implements ISession
 
     private static long id = 0L;
     private final Map<String, Object> sessionStorage;
+    @Getter
     private long sessionId = 0;
 
     Session()
     {
         sessionStorage = new HashMap<>();
         sessionId = id++;
-    }
-
-    @Override
-    public long getSessionId()
-    {
-        return sessionId;
     }
 
     @Override

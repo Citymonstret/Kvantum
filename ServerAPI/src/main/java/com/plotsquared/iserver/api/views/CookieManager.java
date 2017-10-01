@@ -29,8 +29,10 @@ import com.plotsquared.iserver.api.util.Assert;
  *
  * @author Citymonstret
  */
-public class CookieManager
+final public class CookieManager
 {
+
+    private static final Cookie[] EMPTY_COOKIES = new Cookie[ 0 ];
 
     /**
      * Get all cookies from a HTTP Request
@@ -43,25 +45,30 @@ public class CookieManager
         Assert.isValid( r );
 
         String raw = r.getHeader( "Cookie" );
-        if ( raw.equals( "" ) )
+
+        if ( raw.isEmpty() )
         {
-            return new Cookie[ 0 ];
+            return EMPTY_COOKIES;
         }
+
         raw = raw.replaceFirst( " ", "" );
+
         final String[] pieces = raw.split( "; " );
         final Cookie[] cookies = new Cookie[ pieces.length ];
+
         for ( int i = 0; i < pieces.length; i++ )
         {
             final String piece = pieces[ i ];
-            final String[] piecePieces = piece.split( "=" );
-            if ( piecePieces.length == 1 )
+            final String[] subPieces = piece.split( "=" );
+            if ( subPieces.length == 1 )
             {
-                cookies[ i ] = new Cookie( piecePieces[ 0 ], "" );
+                cookies[ i ] = new Cookie( subPieces[ 0 ], "" );
             } else
             {
-                cookies[ i ] = new Cookie( piecePieces[ 0 ], piecePieces[ 1 ] );
+                cookies[ i ] = new Cookie( subPieces[ 0 ], subPieces[ 1 ] );
             }
         }
+
         return cookies;
     }
 

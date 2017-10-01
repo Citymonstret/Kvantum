@@ -19,7 +19,9 @@
 package com.plotsquared.iserver.api.thread;
 
 import com.plotsquared.iserver.api.util.Assert;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public final class ThreadManager
 {
 

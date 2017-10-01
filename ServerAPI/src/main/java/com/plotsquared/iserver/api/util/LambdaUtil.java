@@ -18,12 +18,15 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+@UtilityClass
 public final class LambdaUtil
 {
 

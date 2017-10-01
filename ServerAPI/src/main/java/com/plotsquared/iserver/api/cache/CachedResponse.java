@@ -21,11 +21,14 @@ package com.plotsquared.iserver.api.cache;
 import com.plotsquared.iserver.api.response.Header;
 import com.plotsquared.iserver.api.response.ResponseBody;
 import com.plotsquared.iserver.api.util.Assert;
+import lombok.Getter;
 
 public class CachedResponse implements ResponseBody
 {
 
+    @Getter
     public final Header header;
+    @Getter
     private final byte[] bytes;
 
     public CachedResponse(final ResponseBody parent)
@@ -40,18 +43,6 @@ public class CachedResponse implements ResponseBody
         {
             this.bytes = parent.getBytes();
         }
-    }
-
-    @Override
-    public byte[] getBytes()
-    {
-        return bytes;
-    }
-
-    @Override
-    public Header getHeader()
-    {
-        return header;
     }
 
     @Override

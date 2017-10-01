@@ -18,10 +18,13 @@
  */
 package com.plotsquared.iserver.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 @SuppressWarnings( "ALL" )
+@UtilityClass
 public class InstanceFactory
 {
 
@@ -71,8 +74,6 @@ public class InstanceFactory
                 }
             }
         }
-
-
     }
 
 }
