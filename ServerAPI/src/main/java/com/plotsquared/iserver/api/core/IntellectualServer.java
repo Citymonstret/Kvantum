@@ -188,13 +188,9 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
 
     Map<String, Class<? extends View>> getViewBindings();
 
-    WorkerProcedure getProcedure();
-
     ISocketHandler getSocketHandler();
 
     boolean isSilent();
-
-    boolean isPaused();
 
     boolean isStarted();
 
