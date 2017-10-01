@@ -418,7 +418,7 @@ final class Worker extends AutoCloseable
                 return;
             }
         }
-        if ( /* !server.silent TODO: Replace */ true )
+        if ( !server.isSilent() )
         {
             server.log( request.buildLog() );
         }
