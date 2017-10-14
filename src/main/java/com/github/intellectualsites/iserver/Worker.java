@@ -26,6 +26,7 @@ import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.logging.LogModes;
+import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.request.HttpMethod;
 import com.github.intellectualsites.iserver.api.request.PostRequest;
 import com.github.intellectualsites.iserver.api.request.Request;
@@ -168,19 +169,19 @@ final class Worker extends AutoCloseable
 
     private void handle()
     {
-        final RequestHandler requestHandler = server.getRouter().match( request );
-
-        String textContent = "";
-        byte[] bytes = empty;
-
-        final Optional<ISession> session = server.getSessionManager().getSession( request, output );
+        Optional<ISession> session = server.getSessionManager().getSession( request, output );
         if ( session.isPresent() )
         {
             request.setSession( session.get() );
         } else
         {
-            request.setSession( server.getSessionManager().createSession( request, output ) );
+            Logger.warn( "Could not initialize session!" );
         }
+
+        final RequestHandler requestHandler = server.getRouter().match( request );
+
+        String textContent = "";
+        byte[] bytes = empty;
 
         boolean shouldCache = false;
         boolean cache = false;
@@ -440,7 +441,7 @@ final class Worker extends AutoCloseable
                 handle( remote );
             } catch ( final Exception e )
             {
-                new RuntimeException( "Failed to handle incoming socket" ).printStackTrace();
+                new RuntimeException( "Failed to handle incoming socket", e ).printStackTrace();
             }
         }
         if ( remote != null && !remote.isClosed() )

@@ -22,6 +22,9 @@ import com.github.intellectualsites.iserver.api.request.Cookie;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.util.Assert;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This is an utility class
  * created to handle all
@@ -32,7 +35,7 @@ import com.github.intellectualsites.iserver.api.util.Assert;
 final public class CookieManager
 {
 
-    private static final Cookie[] EMPTY_COOKIES = new Cookie[ 0 ];
+    private static final Map<String, Cookie> EMPTY_COOKIES = new HashMap<>( 0 );
 
     /**
      * Get all cookies from a HTTP Request
@@ -40,7 +43,7 @@ final public class CookieManager
      * @param r HTTP Request
      * @return an array containing the cookies
      */
-    public static Cookie[] getCookies(final Request r)
+    public static Map<String, Cookie> getCookies(final Request r)
     {
         Assert.isValid( r );
 
@@ -54,18 +57,17 @@ final public class CookieManager
         raw = raw.replaceFirst( " ", "" );
 
         final String[] pieces = raw.split( "; " );
-        final Cookie[] cookies = new Cookie[ pieces.length ];
+        final Map<String, Cookie> cookies = new HashMap<>( pieces.length );
 
-        for ( int i = 0; i < pieces.length; i++ )
+        for ( final String piece : pieces )
         {
-            final String piece = pieces[ i ];
             final String[] subPieces = piece.split( "=" );
             if ( subPieces.length == 1 )
             {
-                cookies[ i ] = new Cookie( subPieces[ 0 ], "" );
+                cookies.put( subPieces[ 0 ], new Cookie( subPieces[ 0 ], "" ) );
             } else
             {
-                cookies[ i ] = new Cookie( subPieces[ 0 ], subPieces[ 1 ] );
+                cookies.put( subPieces[ 0 ], new Cookie( subPieces[ 0 ], subPieces[ 1 ] ) );
             }
         }
 

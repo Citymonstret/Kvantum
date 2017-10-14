@@ -189,17 +189,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         addViewBinding( "download", DownloadView.class );
         addViewBinding( "std", StandardView.class );
 
-        if ( standalone )
-        {
-            // Makes the application closable in ze terminal
-            Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
-
-            this.commandManager = new CommandManager( '/' );
-            this.commandManager.getManagerOptions().getFindCloseMatches( false );
-            this.commandManager.getManagerOptions().setRequirePrefix( false );
-            new InputThread().start();
-        }
-
         try
         {
             FileUtils.addToZip( new File( logFolder, "old.zip" ),
@@ -347,6 +336,13 @@ public final class Server implements IntellectualServer, ISessionCreator
 
         if ( standalone )
         {
+            // Makes the application closable in ze terminal
+            Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
+
+            this.commandManager = new CommandManager( '/' );
+            this.commandManager.getManagerOptions().getFindCloseMatches( false );
+            this.commandManager.getManagerOptions().setRequirePrefix( false );
+
             ApplicationStructure applicationStructure = new ApplicationStructure( "core" )
             {
                 @Override
@@ -576,6 +572,12 @@ public final class Server implements IntellectualServer, ISessionCreator
         }
 
         log( Message.STARTING_ON_PORT, CoreConfig.port );
+
+        if ( standalone )
+        {
+            new InputThread().start();
+        }
+
         this.started = true;
         try
         {

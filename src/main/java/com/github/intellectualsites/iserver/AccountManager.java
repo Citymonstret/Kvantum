@@ -159,8 +159,7 @@ final public class AccountManager implements IAccountManager
                 "SELECT * FROM `account` WHERE `id` = ?" ) )
         {
             statement.setInt( 1, accountId );
-            statement.executeQuery();
-            try ( final ResultSet resultSet = statement.getResultSet() )
+            try ( final ResultSet resultSet = statement.executeQuery() )
             {
                 if ( resultSet.next() )
                 {

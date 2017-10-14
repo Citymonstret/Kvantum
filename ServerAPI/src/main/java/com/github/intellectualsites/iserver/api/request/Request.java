@@ -65,7 +65,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     @Getter
     private Map<String, String> headers;
     @Getter
-    private Cookie[] cookies;
+    private Map<String, Cookie> cookies;
     @Getter
     private Query query;
     @Setter
