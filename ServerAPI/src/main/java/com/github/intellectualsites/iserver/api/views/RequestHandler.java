@@ -166,12 +166,12 @@ public abstract class RequestHandler
                     m.invoke( this, request, response );
                 } catch ( IllegalAccessException | InvocationTargetException e )
                 {
-                    throw new RuntimeException( "Failed to handle alternate outcome method", e );
+                    throw new IntellectualServerException( "Failed to handle alternate outcome method", e );
                 }
                 return response;
             } else
             {
-                throw new RuntimeException( "Trying to access an internal redirect which isn't registered for type "
+                throw new IntellectualServerException( "Trying to access an internal redirect which isn't registered for type "
                         + this.getName() + ", identified by " + request.getMeta( Request.ALTERNATE_OUTCOME ) );
             }
         }

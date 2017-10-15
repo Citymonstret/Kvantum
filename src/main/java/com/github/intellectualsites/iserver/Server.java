@@ -52,6 +52,7 @@ import com.github.intellectualsites.iserver.api.views.*;
 import com.github.intellectualsites.iserver.api.views.requesthandler.SimpleRequestHandler;
 import com.github.intellectualsites.iserver.commands.AccountCommand;
 import com.github.intellectualsites.iserver.crush.CrushEngine;
+import com.github.intellectualsites.iserver.error.IntellectualServerException;
 import com.github.intellectualsites.iserver.error.IntellectualServerInitializationException;
 import com.github.intellectualsites.iserver.error.IntellectualServerStartException;
 import com.github.intellectualsites.iserver.files.FileSystem;
@@ -330,7 +331,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 configViews.saveFile();
             } catch ( final Exception e )
             {
-                throw new RuntimeException( "Couldn't load in views", e );
+                throw new IntellectualServerInitializationException( "Couldn't load in views", e );
             }
         }
 
@@ -485,7 +486,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             Assert.equals( this.started, false,
                     new IntellectualServerStartException( "Cannot start the server, it is already started",
-                            new RuntimeException( "Cannot restart server singleton" ) ) );
+                            new IntellectualServerException( "Cannot restart server singleton" ) ) );
         } catch ( IntellectualServerStartException e )
         {
             e.printStackTrace();
@@ -583,7 +584,6 @@ public final class Server implements IntellectualServer, ISessionCreator
             log( Message.SERVER_STARTED );
         } catch ( final Exception e )
         {
-            // throw new RuntimeException("Couldn't start the server...", e);
             boolean run = true;
 
             int port = CoreConfig.port + 1;
@@ -615,7 +615,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 sslServerSocket = (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port );
             } catch ( final Exception e )
             {
-                new RuntimeException( "Failed to start HTTPS server", e ).printStackTrace();
+                new IntellectualServerException( "Failed to start HTTPS server", e ).printStackTrace();
             }
         }
 

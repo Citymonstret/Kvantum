@@ -1,3 +1,5 @@
+package windows;
+
 import com.github.intellectualsites.iserver.IntellectualServerMain;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import dorkbox.systemTray.SystemTray;
