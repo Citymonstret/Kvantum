@@ -63,9 +63,9 @@ public class Error extends View
                 }
                 File tempFile = new File( ViewException.class.getClassLoader().getResource( "template" + File.separator +
                         "error.html" ).toURI() );
-                try ( final FileInputStream in = new FileInputStream( tempFile ) )
+                try ( FileInputStream in = new FileInputStream( tempFile ) )
                 {
-                    try ( final FileOutputStream out = new FileOutputStream( file ) )
+                    try ( FileOutputStream out = new FileOutputStream( file ) )
                     {
                         FileUtils.copyFile( in, out, 1024 * 1024 * 16 );
                     } catch ( final java.lang.Exception e )

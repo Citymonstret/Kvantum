@@ -34,6 +34,7 @@ public class SimpleRequestHandler extends RequestHandler
 {
 
     private static AtomicInteger identifier = new AtomicInteger( 0 );
+
     private final String pattern;
     private final BiConsumer<Request, Response> generator;
     private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();

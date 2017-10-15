@@ -129,7 +129,7 @@ public abstract class RequestHandler
      * @return True if the request can be served by this handler
      * False if not
      */
-    abstract public boolean matches(final Request request);
+    abstract public boolean matches(Request request);
 
     /**
      * Simple alternate outcome for the {@link DebugMiddleware} middleware

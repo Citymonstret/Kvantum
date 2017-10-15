@@ -305,7 +305,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 if ( !path.getPath( "favicon.ico" ).exists() )
                 {
                     Logger.info( "Creating public/favicon.ico" );
-                    try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
+                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
                             "favicon.ico" )
                     ) )
                     {
@@ -319,7 +319,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 if ( !path.getPath( "index.html" ).exists() )
                 {
                     Logger.info( "Creating public/index.html!" );
-                    try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
+                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
                     ) )
                     {
                         FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
@@ -660,13 +660,13 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public void log(Message message, final Object... args)
+    public void log(final Message message, final Object... args)
     {
         this.log( message.toString(), message.getMode(), args );
     }
 
     @Override
-    public synchronized void log(String message, int mode, final Object... args)
+    public synchronized void log(final String message, final int mode, final Object... args)
     {
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
@@ -695,16 +695,17 @@ public final class Server implements IntellectualServer, ISessionCreator
                 prefix = "Info";
                 break;
         }
+        String msg = message;
         for ( final Object a : args )
         {
-            message = message.replaceFirst( "%s", a.toString() );
+            msg = msg.replaceFirst( "%s", a.toString() );
         }
-        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), message,
+        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), msg,
                 Thread.currentThread().getName() );
     }
 
     @Override
-    public synchronized void log(String message, final Object... args)
+    public synchronized void log(final String message, final Object... args)
     {
         this.log( message, LogModes.MODE_INFO, args );
     }

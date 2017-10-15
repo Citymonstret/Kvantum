@@ -62,6 +62,8 @@ final class Worker extends AutoCloseable
     private static byte[] empty = "NULL".getBytes();
     private static Queue<Worker> availableWorkers;
 
+    private static final String CONTENT_TYPE = "content_type";
+
     private final MessageDigest messageDigestMd5;
     private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
@@ -111,7 +113,7 @@ final class Worker extends AutoCloseable
     {
         availableWorkers = new ArrayDeque<>( Assert.isPositive( n ).intValue() );
         LambdaUtil.collectionAssign( () -> availableWorkers, Worker::new, n );
-        ServerImplementation.getImplementation().log( "Availabe workers: " + availableWorkers.size() );
+        ServerImplementation.getImplementation().log( "Available workers: " + availableWorkers.size() );
     }
 
     /**
@@ -280,10 +282,10 @@ final class Worker extends AutoCloseable
             final Optional<String> contentType = body.getHeader().get( Header.HEADER_CONTENT_TYPE );
             if ( contentType.isPresent() )
             {
-                request.addMeta( "content_type", contentType.get() );
+                request.addMeta( CONTENT_TYPE, contentType.get() );
             } else
             {
-                request.addMeta( "content_type", null );
+                request.addMeta( CONTENT_TYPE, null );
             }
             // End: CTYPE
 
@@ -564,7 +566,7 @@ final class Worker extends AutoCloseable
         }
 
         @Override
-        public void write(int b) throws IOException
+        public void write(final int b) throws IOException
         {
             this.written = true;
             this.ensureWritten();
@@ -574,13 +576,13 @@ final class Worker extends AutoCloseable
         }
 
         @Override
-        public void write(byte[] b) throws IOException
+        public void write(final byte[] b) throws IOException
         {
             write( b, 0, b.length );
         }
 
         @Override
-        public void write(byte[] buf, int off, int len) throws IOException
+        public void write(final byte[] buf, final int off, final int len) throws IOException
         {
             this.written = true;
             this.ensureWritten();

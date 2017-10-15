@@ -219,6 +219,12 @@ public class Plugin implements LogProvider
         return this.toString();
     }
 
+    /**
+     * Log a message
+     *
+     * @param message Message to be logged
+     * @see com.github.intellectualsites.iserver.api.core.IntellectualServer#log(String, Object...)
+     */
     public void log(String message)
     {
         ServerImplementation.getImplementation().log( this, message );

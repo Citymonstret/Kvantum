@@ -53,14 +53,14 @@ public class SQLiteManager extends com.github.intellectualsites.iserver.api.util
         this.connection = DriverManager.getConnection( "jdbc:sqlite:" + file.getAbsolutePath() );
     }
 
-    public void executeUpdate(String sql) throws SQLException
+    public void executeUpdate(final String sql) throws SQLException
     {
         Statement statement = this.connection.createStatement();
         statement.executeUpdate( sql );
         statement.close();
     }
 
-    public PreparedStatement prepareStatement(String statement) throws SQLException
+    public PreparedStatement prepareStatement(final String statement) throws SQLException
     {
         return connection.prepareStatement( statement );
     }

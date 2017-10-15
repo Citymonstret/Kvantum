@@ -23,11 +23,6 @@ import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 public class ServerReadyEvent extends ServerEvent
 {
 
-    /**
-     * Constructor
-     *
-     * @param server The server instance
-     */
     public ServerReadyEvent(IntellectualServer server)
     {
         super( server, "Server-Ready" );
