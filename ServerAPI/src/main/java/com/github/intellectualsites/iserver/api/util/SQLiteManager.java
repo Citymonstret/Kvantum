@@ -32,23 +32,18 @@ public class SQLiteManager extends com.github.intellectualsites.iserver.api.util
 
     public static Set<SQLiteManager> sessions = new HashSet<>();
 
-    private final String name;
     private final Connection connection;
-    private final File file;
 
     public SQLiteManager(final String name) throws IOException, SQLException
     {
         sessions.add( this );
 
-        this.name = name + ".db";
-        this.file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "storage" ), this
-                .name );
-        if ( !file.exists() )
+        String name1 = name + ".db";
+        File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "storage" ), name1 );
+        if ( !file.exists() && ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file
+                .createNewFile() ) )
         {
-            if ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file.createNewFile() )
-            {
-                throw new IntellectualServerException( "Couldn't create: " + name );
-            }
+            throw new IntellectualServerException( "Couldn't create: " + name );
         }
         this.connection = DriverManager.getConnection( "jdbc:sqlite:" + file.getAbsolutePath() );
     }

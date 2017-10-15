@@ -93,7 +93,7 @@ final public class Variable extends Syntax
                         if ( p.contains( variable ) )
                         {
                             Object o = p.get( variable );
-                            if ( !filter.equals( "" ) )
+                            if ( !"".equals( filter ) )
                             {
                                 o = filters.get( filter.toUpperCase() ).handle( variable, o );
                             }

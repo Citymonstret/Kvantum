@@ -151,12 +151,9 @@ public final class Server implements IntellectualServer, ISessionCreator
 
         // Make sure that the main folder is created
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
-        if ( !coreFolder.exists() )
+        if ( !coreFolder.exists() && !coreFolder.mkdirs() )
         {
-            if ( !coreFolder.mkdirs() )
-            {
-                throw new IntellectualServerInitializationException( "Failed to create the core folder: " + coreFolder );
-            }
+            throw new IntellectualServerInitializationException( "Failed to create the core folder: " + coreFolder );
         }
 
         this.coreFolder = coreFolder;

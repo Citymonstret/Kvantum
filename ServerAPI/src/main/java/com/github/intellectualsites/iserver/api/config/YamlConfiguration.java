@@ -46,19 +46,13 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         Assert.notNull( file );
 
         this.file = file;
-        if ( !file.getParentFile().exists() )
+        if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
         {
-            if ( !file.getParentFile().mkdirs() )
-            {
-                throw new RuntimeException( "Couldn't create parents for " + file.getAbsolutePath() );
-            }
+            throw new RuntimeException( "Couldn't create parents for " + file.getAbsolutePath() );
         }
-        if ( !file.exists() )
+        if ( !file.exists() && !file.createNewFile() )
         {
-            if ( !file.createNewFile() )
-            {
-                throw new RuntimeException( "Couldn't create " + file.getAbsolutePath() );
-            }
+            throw new RuntimeException( "Couldn't create " + file.getAbsolutePath() );
         }
         this.map = new HashMap<>();
     }

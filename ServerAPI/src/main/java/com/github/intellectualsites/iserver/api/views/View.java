@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.views;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.matching.ViewPattern;
@@ -275,7 +276,7 @@ public class View extends RequestHandler
                 this.internalFileName = fileName;
             } else
             {
-                throw new RuntimeException( "getFile called without a filename set!" );
+                throw new IntellectualServerException( "getFile called without a filename set!" );
             }
         }
         String n = internalFileName;
@@ -386,14 +387,11 @@ public class View extends RequestHandler
             request.addMeta( CONSTANT_VARIABLES, map );
         }
 
-        if ( CoreConfig.debug )
+        if ( CoreConfig.debug && map == null )
         {
-            if ( map == null )
-            {
-                ServerImplementation.getImplementation().log( "Request: '%s' failed to " +
-                                "pass '%s'", request.getQuery().getFullRequest(),
-                        viewPattern.toString() );
-            }
+            ServerImplementation.getImplementation().log( "Request: '%s' failed to " +
+                            "pass '%s'", request.getQuery().getFullRequest(),
+                    viewPattern.toString() );
         }
 
         return map != null && passes( request );

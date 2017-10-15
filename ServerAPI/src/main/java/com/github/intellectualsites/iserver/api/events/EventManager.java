@@ -110,7 +110,9 @@ public class EventManager
     {
 
         bakedListeners = new HashMap<>();
-        List<com.github.intellectualsites.iserver.api.events.EventListener> low, med, hig;
+        List<EventListener> low;
+        List<EventListener> med;
+        List<EventListener> hig;
         int index;
         com.github.intellectualsites.iserver.api.events.EventListener[] array;
         for ( final Map.Entry<Integer, ArrayDeque<com.github.intellectualsites.iserver.api.events.EventListener>> entry : listeners

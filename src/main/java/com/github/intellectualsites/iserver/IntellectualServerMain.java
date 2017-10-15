@@ -27,6 +27,7 @@ import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.RequestManager;
 import com.github.intellectualsites.iserver.api.util.TimeUtil;
+import com.github.intellectualsites.iserver.error.IntellectualServerInitializationException;
 
 import java.io.File;
 import java.util.Optional;
@@ -40,7 +41,7 @@ final public class IntellectualServerMain
      *
      * @param args Command line arguments
      */
-    public static void main(final String[] args)
+    public static void main(final String[] args) throws Throwable
     {
         final Options options = new Options();
         final JCommander jCommander = new JCommander( options, args );
@@ -82,11 +83,11 @@ final public class IntellectualServerMain
                         server.get().start();
                     } catch ( final Exception e )
                     {
-                        throw new RuntimeException( "Failed to start the server instance", e );
+                        throw new IntellectualServerInitializationException( "Failed to start the server instance", e );
                     }
                 } else
                 {
-                    throw new RuntimeException( "Failed to create a server instance" );
+                    throw new IntellectualServerInitializationException( "Failed to create a server instance" );
                 }
             }
         }

@@ -39,12 +39,9 @@ public class ViewException extends View
         try
         {
             file = new File( ServerImplementation.getImplementation().getCoreFolder(), "templates" );
-            if ( !file.exists() )
+            if ( !file.exists() && !file.mkdir() )
             {
-                if ( !file.mkdir() )
-                {
-                    Message.COULD_NOT_CREATE_FOLDER.log( file );
-                }
+                Message.COULD_NOT_CREATE_FOLDER.log( file );
             }
             file = new File( file, "exception.html" );
             if ( !file.exists() )

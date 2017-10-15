@@ -309,13 +309,14 @@ public class PluginLoader extends AutoCloseable
             } else
             {
                 final File lib = new File( destination, "lib" );
-                if ( !lib.exists() )
-                    if ( !lib.mkdir() )
-                    {
-                        continue;
-                    }
-                if ( new File( lib, e.getName() ).exists() )
+                if ( !lib.exists() && lib.mkdir() )
+                {
                     continue;
+                }
+                if ( new File( lib, e.getName() ).exists() )
+                {
+                    continue;
+                }
                 try
                 {
                     FileUtils.copyFile( jar.getInputStream( e ),

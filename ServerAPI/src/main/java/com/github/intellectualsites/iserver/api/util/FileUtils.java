@@ -46,12 +46,9 @@ public class FileUtils
     {
         Assert.notNull( zipFile, files );
 
-        if ( !zipFile.exists() )
+        if ( !zipFile.exists() && !zipFile.createNewFile() )
         {
-            if ( !zipFile.createNewFile() )
-            {
-                throw new IntellectualServerException( "Couldn't create " + zipFile );
-            }
+            throw new IntellectualServerException( "Couldn't create " + zipFile );
         }
 
         final File temporary = File.createTempFile( zipFile.getName(), "" );
@@ -123,12 +120,9 @@ public class FileUtils
 
     public static File attemptFolderCreation(final File folder)
     {
-        if ( !folder.exists() )
+        if ( !folder.exists() && !folder.mkdirs() )
         {
-            if ( !folder.mkdirs() )
-            {
-                Message.COULD_NOT_CREATE_FOLDER.log( folder );
-            }
+            Message.COULD_NOT_CREATE_FOLDER.log( folder );
         }
         return folder;
     }

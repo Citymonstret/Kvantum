@@ -37,7 +37,6 @@ public class Account
     @Getter
     private final String username;
     private final String password;
-    private final String salt;
     private final Map<String, String> data;
     private final IAccountManager manager;
 
@@ -59,7 +58,6 @@ public class Account
 
         this.username = username;
         this.password = password;
-        this.salt = salt;
         this.id = id;
         this.data = new ConcurrentHashMap<>();
         this.manager = manager;

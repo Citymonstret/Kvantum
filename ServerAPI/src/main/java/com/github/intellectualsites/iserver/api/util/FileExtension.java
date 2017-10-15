@@ -112,15 +112,16 @@ public enum FileExtension
         return IMAGE.contains( this );
     }
 
-    public boolean matches(String string)
+    public boolean matches(final String string)
     {
-        if ( string.startsWith( "." ) )
+        String workingString = string;
+        if ( workingString.startsWith( "." ) )
         {
-            string = string.substring( 1 );
+            workingString = workingString.substring( 1 );
         }
         for ( final String e : extensions )
         {
-            if ( e.equalsIgnoreCase( string ) )
+            if ( e.equalsIgnoreCase( workingString ) )
             {
                 return true;
             }

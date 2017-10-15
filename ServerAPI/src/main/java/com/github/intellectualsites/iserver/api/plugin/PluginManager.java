@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.iserver.api.plugin;
 
+import com.github.intellectualsites.iserver.api.exceptions.PluginException;
 import com.github.intellectualsites.iserver.api.util.Assert;
 
 import java.util.ArrayList;
@@ -79,14 +80,14 @@ public class PluginManager
      * Enable a plugin
      *
      * @param plugin Plugin to enable
-     * @throws java.lang.RuntimeException if the plugin is not added to the plugin list {@see
+     * @throws PluginException if the plugin is not added to the plugin list {@see
      *                                    #addPlugin(com.marine.Plugin)}
      */
     protected void enablePlugin(final Plugin plugin)
     {
         Assert.notNull( plugin );
         if ( !plugins.containsKey( plugin.toString() ) )
-            throw new RuntimeException( "Plugin: " + plugin.getName()
+            throw new PluginException( "Plugin: " + plugin.getName()
                     + " is not added to the plugin list, can't enable" );
         plugin.enable();
     }
@@ -95,14 +96,14 @@ public class PluginManager
      * Disable a plugin
      *
      * @param plugin Plugin to disable
-     * @throws java.lang.RuntimeException if the plugin is not added to the plugin list {@see
+     * @throws PluginException if the plugin is not added to the plugin list {@see
      *                                    #addPlugin(com.marine.Plugin)}
      */
     protected void disablePlugin(final Plugin plugin)
     {
         Assert.notNull( plugin );
         if ( !plugins.containsKey( plugin.toString() ) )
-            throw new RuntimeException( "Plugin: " + plugin.getName()
+            throw new PluginException( "Plugin: " + plugin.getName()
                     + " is not added to the plugin list, can't disable" );
         plugin.disable();
     }
