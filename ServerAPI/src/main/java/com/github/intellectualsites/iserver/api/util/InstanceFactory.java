@@ -28,7 +28,7 @@ import java.lang.reflect.Modifier;
 public class InstanceFactory
 {
 
-    public static <T> void setupInstance(T t, String fieldName)
+    public static <T> void setupInstance(final T t, final String fieldName)
     {
         try
         {
@@ -46,7 +46,7 @@ public class InstanceFactory
         }
     }
 
-    public static <T> void setupInstance(T t)
+    public static <T> void setupInstance(final T t)
     {
         setupInstance( t, "instance" );
     }

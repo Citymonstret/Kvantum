@@ -86,13 +86,14 @@ final public class MySQLConnManager
         }
     }
 
-    private void log(String message, final Object... args)
+    private void log(final String message, final Object... args)
     {
+        String msg = message;
         for ( final Object a : args )
         {
-            message = message.replaceFirst( "%s", a.toString() );
+            msg = msg.replaceFirst( "%s", a.toString() );
         }
-        System.out.printf( "[%s][%s] %s\n", CoreConfig.logPrefix + "-MySQL", TimeUtil.getTimeStamp(), message );
+        System.out.printf( "[%s][%s] %s\n", CoreConfig.logPrefix + "-MySQL", TimeUtil.getTimeStamp(), msg );
     }
 
     private class MySQLInitiationException extends IntellectualServerException

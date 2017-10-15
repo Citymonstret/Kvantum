@@ -152,7 +152,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Override
-    public Optional<Request> get(Request r)
+    public Optional<Request> get(final Request r)
     {
         return Optional.of( this );
     }
@@ -170,7 +170,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Override
-    public Object get(String variable)
+    public Object get(final String variable)
     {
         return getVariables().get( Assert.notNull( variable ) );
     }
@@ -292,7 +292,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         meta.put( name, var );
     }
 
-    final public void internalRedirect(final String url)
+    public void internalRedirect(final String url)
     {
         Assert.notNull( url );
 
@@ -319,7 +319,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Final
-    final public Map<String, String> getVariables()
+    public Map<String, String> getVariables()
     {
         return (Map<String, String>) getMeta( "variables" );
     }

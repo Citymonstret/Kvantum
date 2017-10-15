@@ -69,7 +69,7 @@ public abstract class ApplicationStructure
         return this.applicationName;
     }
 
-    public void registerViews(IntellectualServer server)
+    public void registerViews(final IntellectualServer server)
     {
         // Override me!
     }

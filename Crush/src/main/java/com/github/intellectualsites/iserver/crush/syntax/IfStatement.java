@@ -55,8 +55,10 @@ final public class IfStatement extends Syntax
     }
 
     @Override
-    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    public String process(final String in, final Matcher matcher, final Request r, final Map<String, ProviderFactory>
+            factories)
     {
+        String workingString = in;
         while ( matcher.find() )
         {
             String neg = matcher.group( 2 );
@@ -87,15 +89,15 @@ final public class IfStatement extends Syntax
 
                         if ( b )
                         {
-                            in = in.replace( matcher.group(), matcher.group( 5 ) );
+                            workingString = workingString.replace( matcher.group(), matcher.group( 5 ) );
                         } else
                         {
-                            in = in.replace( matcher.group(), "" );
+                            workingString = workingString.replace( matcher.group(), "" );
                         }
                     }
                 }
             }
         }
-        return in;
+        return workingString;
     }
 }

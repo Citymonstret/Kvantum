@@ -83,7 +83,9 @@ public class View extends RequestHandler
     private final String internalName;
     private final ViewPattern viewPattern;
     private final UUID uuid;
-    public String relatedFolderPath, fileName, defaultFile;
+    public String relatedFolderPath;
+    public String fileName;
+    public String defaultFile;
     protected String internalFileName;
     protected String internalDefaultFile;
     private int buffer = -1;

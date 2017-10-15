@@ -376,7 +376,7 @@ public class PluginLoader extends AutoCloseable
         return f;
     }
 
-    public boolean isTaken(String provider)
+    public boolean isTaken(final String provider)
     {
         for ( Plugin plugin : getManager().getPlugins() )
         {
