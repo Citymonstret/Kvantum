@@ -18,6 +18,8 @@
  */
 package com.github.intellectualsites.iserver.api.core;
 
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
+
 /**
  * Use this class to manage the {@link IntellectualServer} instances
  */
@@ -31,13 +33,13 @@ public final class ServerImplementation
      * Cannot be used if the instance is already registered, use {@link #getImplementation()} to check for null.
      *
      * @param intellectualServer Server instance
-     * @throws RuntimeException if the instance is already set
+     * @throws IntellectualServerException if the instance is already set
      */
     public static void registerServerImplementation(final IntellectualServer intellectualServer)
     {
         if ( ServerImplementation.intellectualServer != null )
         {
-            throw new RuntimeException( "Trying to replace server implementation" );
+            throw new IntellectualServerException( "Trying to replace server implementation" );
         }
         ServerImplementation.intellectualServer = intellectualServer;
     }

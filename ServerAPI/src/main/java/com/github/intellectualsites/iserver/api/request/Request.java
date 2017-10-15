@@ -90,7 +90,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @param request Request (from the client)
      * @param socket  The socket that sent the request
-     * @throws RuntimeException if the request doesn't contain a query
+     * @throws RequestException if the request doesn't contain a query
      */
     public Request(final Collection<String> request, final Socket socket)
     {

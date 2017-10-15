@@ -360,7 +360,7 @@ final class Worker extends AutoCloseable
             output.write( bytes );
         } catch ( final Exception e )
         {
-            new RuntimeException( "Failed to write to the client", e )
+            new IntellectualServerException( "Failed to write to the client", e )
                     .printStackTrace();
         }
         try
@@ -368,7 +368,7 @@ final class Worker extends AutoCloseable
             output.flush();
         } catch ( final Exception e )
         {
-            new RuntimeException( "Failed to flush to the client", e )
+            new IntellectualServerException( "Failed to flush to the client", e )
                     .printStackTrace();
         }
 
@@ -444,7 +444,7 @@ final class Worker extends AutoCloseable
                 handle( remote );
             } catch ( final Exception e )
             {
-                new RuntimeException( "Failed to handle incoming socket", e ).printStackTrace();
+                new IntellectualServerException( "Failed to handle incoming socket", e ).printStackTrace();
             }
         }
         if ( remote != null && !remote.isClosed() )

@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.YamlConfiguration;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.util.TimeUtil;
 
 import java.io.File;
@@ -94,7 +95,7 @@ final public class MySQLConnManager
         System.out.printf( "[%s][%s] %s\n", CoreConfig.logPrefix + "-MySQL", TimeUtil.getTimeStamp(), message );
     }
 
-    private class MySQLInitiationException extends RuntimeException
+    private class MySQLInitiationException extends IntellectualServerException
     {
 
         MySQLInitiationException(final String issue, final Exception cause)
