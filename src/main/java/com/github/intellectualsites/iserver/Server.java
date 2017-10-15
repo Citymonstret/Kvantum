@@ -30,10 +30,10 @@ import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.events.Event;
 import com.github.intellectualsites.iserver.api.events.EventCaller;
 import com.github.intellectualsites.iserver.api.events.EventManager;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.ServerReadyEvent;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.ShutdownEvent;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.StartupEvent;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.ViewsInitializedEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.ServerReadyEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.ShutdownEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.StartupEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.ViewsInitializedEvent;
 import com.github.intellectualsites.iserver.api.logging.LogModes;
 import com.github.intellectualsites.iserver.api.logging.LogProvider;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
@@ -463,13 +463,10 @@ public final class Server implements IntellectualServer, ISessionCreator
         if ( standalone )
         {
             final File file = new File( coreFolder, "plugins" );
-            if ( !file.exists() )
+            if ( !file.exists() && !file.mkdirs() )
             {
-                if ( !file.mkdirs() )
-                {
-                    log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
-                    return;
-                }
+                log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
+                return;
             }
             PluginLoader pluginLoader = new PluginLoader( new PluginManager() );
             pluginLoader.loadAllPlugins( file );
@@ -522,7 +519,8 @@ public final class Server implements IntellectualServer, ISessionCreator
             views.entrySet().forEach( entry ->
             {
                 final Map<String, Object> view = entry.getValue();
-                String type = "html", filter = view.get( "filter" ).toString();
+                String type = "html";
+                String filter = view.get( "filter" ).toString();
                 if ( view.containsKey( "type" ) )
                 {
                     type = view.get( "type" ).toString();

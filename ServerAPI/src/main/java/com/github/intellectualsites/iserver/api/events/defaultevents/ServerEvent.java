@@ -16,20 +16,40 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.iserver.api.events.defaultEvents;
+package com.github.intellectualsites.iserver.api.events.defaultevents;
 
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
+import com.github.intellectualsites.iserver.api.events.Event;
 
 /**
- * Called when the server shuts down
+ * An event wrapper for events that involved the server
  *
  * @author Citymonstret
  */
-public class ShutdownEvent extends ServerEvent
+public abstract class ServerEvent extends Event
 {
 
-    public ShutdownEvent(IntellectualServer server)
+    private final IntellectualServer server;
+
+    /**
+     * Constructor
+     *
+     * @param server The server instance
+     * @param name   The event identifier
+     */
+    ServerEvent(final IntellectualServer server, final String name)
     {
-        super( server, "shutdown" );
+        super( "is::server::" + name );
+        this.server = server;
+    }
+
+    /**
+     * Get the server instance
+     *
+     * @return server instance
+     */
+    public final IntellectualServer getServer()
+    {
+        return this.server;
     }
 }

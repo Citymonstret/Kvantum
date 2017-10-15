@@ -16,21 +16,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.iserver.api.events.defaultEvents;
+package com.github.intellectualsites.iserver.api.events.defaultevents;
 
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 
-public class ServerReadyEvent extends ServerEvent
+/**
+ * Called when the server shuts down
+ *
+ * @author Citymonstret
+ */
+public class ShutdownEvent extends ServerEvent
 {
 
-    /**
-     * Constructor
-     *
-     * @param server The server instance
-     */
-    public ServerReadyEvent(IntellectualServer server)
+    public ShutdownEvent(IntellectualServer server)
     {
-        super( server, "Server-Ready" );
+        super( server, "shutdown" );
     }
-
 }

@@ -1,4 +1,4 @@
-package com.github.intellectualsites.iserver.api.events.defaultEvents;
+package com.github.intellectualsites.iserver.api.events.defaultevents;
 
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 

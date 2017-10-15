@@ -35,7 +35,6 @@ public class ViewMatcherTest
         final String in3 = "/public/foo/bar";
         final String in4 = "/public/foo/bar.html";
         final String in5 = "test";
-        final String in6 = "";
 
         Assert.assertNotNull( pattern1 + ": " + in1, pattern1.matches( in1 ) );
         Assert.assertNotNull( pattern2 + ": " + in2, pattern2.matches( in2 ) );
