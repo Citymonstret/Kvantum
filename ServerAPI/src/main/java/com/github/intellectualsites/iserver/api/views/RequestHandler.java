@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.api.views;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
@@ -46,7 +47,7 @@ public abstract class RequestHandler
 
     protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
-    private final ValidationManager validationManager = new ValidationManager( this );
+    private final ValidationManager validationManager = new ValidationManager();
     private final Map<String, Method> alternateOutcomes = new HashMap<>();
 
     {
@@ -105,7 +106,7 @@ public abstract class RequestHandler
         }
         if ( method == null )
         {
-            throw new RuntimeException( "Could not find #" + methodName + "( Request, Response )" );
+            throw new IntellectualServerException( "Could not find #" + methodName + "( Request, Response )" );
         }
         method.setAccessible( true );
         this.alternateOutcomes.put( identifier, method );
@@ -128,7 +129,7 @@ public abstract class RequestHandler
      * @return True if the request can be served by this handler
      * False if not
      */
-    abstract public boolean matches(final Request request);
+    abstract public boolean matches(Request request);
 
     /**
      * Simple alternate outcome for the {@link DebugMiddleware} middleware
@@ -165,12 +166,12 @@ public abstract class RequestHandler
                     m.invoke( this, request, response );
                 } catch ( IllegalAccessException | InvocationTargetException e )
                 {
-                    throw new RuntimeException( "Failed to handle alternate outcome method", e );
+                    throw new IntellectualServerException( "Failed to handle alternate outcome method", e );
                 }
                 return response;
             } else
             {
-                throw new RuntimeException( "Trying to access an internal redirect which isn't registered for type "
+                throw new IntellectualServerException( "Trying to access an internal redirect which isn't registered for type "
                         + this.getName() + ", identified by " + request.getMeta( Request.ALTERNATE_OUTCOME ) );
             }
         }

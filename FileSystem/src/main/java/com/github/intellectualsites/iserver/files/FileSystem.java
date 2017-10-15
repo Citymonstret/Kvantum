@@ -63,25 +63,26 @@ public class FileSystem
         return this.getPath( corePath, rawPath );
     }
 
-    Path getPathUnsafe(final Path parent, String rawPath)
+    Path getPathUnsafe(final Path parent, final String rawPath)
     {
         final String[] parts = rawPath.split( "((?<=/)|(?=/))" );
         if ( parts.length < 1 )
         {
             return corePath;
         }
+        String finalPath = rawPath;
         if ( parts[ 0 ].equals( "." ) || parts[ 0 ].equals( "/" ) )
         {
             if ( parts.length >= 2 && parts[ 1 ].equals( "/" ) )
             {
-                rawPath = rawPath.substring( 2 );
+                finalPath = rawPath.substring( 2 );
             } else
             {
-                rawPath = rawPath.substring( 1 );
+                finalPath = rawPath.substring( 1 );
             }
         }
         final String lastPart = parts[ parts.length - 1 ];
-        return new Path( this, parent.toString() + rawPath, lastPart.indexOf( '.' ) == -1 );
+        return new Path( this, parent.toString() + finalPath, lastPart.indexOf( '.' ) == -1 );
     }
 
     /**

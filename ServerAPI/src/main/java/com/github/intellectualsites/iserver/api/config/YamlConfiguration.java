@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.iserver.api.config;
 
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -46,19 +47,13 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         Assert.notNull( file );
 
         this.file = file;
-        if ( !file.getParentFile().exists() )
+        if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
         {
-            if ( !file.getParentFile().mkdirs() )
-            {
-                throw new RuntimeException( "Couldn't create parents for " + file.getAbsolutePath() );
-            }
+            throw new IntellectualServerException( "Couldn't create parents for " + file.getAbsolutePath() );
         }
-        if ( !file.exists() )
+        if ( !file.exists() && !file.createNewFile() )
         {
-            if ( !file.createNewFile() )
-            {
-                throw new RuntimeException( "Couldn't create " + file.getAbsolutePath() );
-            }
+            throw new IntellectualServerException( "Couldn't create " + file.getAbsolutePath() );
         }
         this.map = new HashMap<>();
     }
@@ -87,7 +82,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     @Override
     public void saveFile()
     {
-        try ( final BufferedWriter writer = new BufferedWriter( new FileWriter( file ) ) )
+        try ( BufferedWriter writer = new BufferedWriter( new FileWriter( file ) ) )
         {
             this.getYaml().dump( map, writer );
         } catch ( IOException e )
@@ -100,7 +95,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     @Override
     public void loadFile()
     {
-        try ( final BufferedInputStream stream = new BufferedInputStream( new FileInputStream( file ) ) )
+        try ( BufferedInputStream stream = new BufferedInputStream( new FileInputStream( file ) ) )
         {
             final Object o = this.getYaml().load( stream );
             if ( o != null )

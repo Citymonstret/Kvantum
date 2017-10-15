@@ -19,6 +19,7 @@
 package com.github.intellectualsites.iserver.api.plugin;
 
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.PluginException;
 import com.github.intellectualsites.iserver.api.logging.LogProvider;
 import com.github.intellectualsites.iserver.api.util.Assert;
 
@@ -57,7 +58,7 @@ public class Plugin implements LogProvider
                              final PluginClassLoader classLoader)
     {
         if ( this.desc != null )
-            throw new RuntimeException( "Plugin already created: " + desc.name );
+            throw new PluginException( "Plugin already created: " + desc.name );
         Assert.notNull( desc, data, classLoader );
         this.desc = desc;
         this.classLoader = classLoader;
@@ -80,7 +81,7 @@ public class Plugin implements LogProvider
     /**
      * Used to enable the plugin
      *
-     * @throws RuntimeException If the plugin is already enabled, or if couldn't be enabled
+     * @throws PluginException If the plugin is already enabled, or if couldn't be enabled
      */
     final public void enable()
     {
@@ -92,7 +93,7 @@ public class Plugin implements LogProvider
         } catch ( final Exception e )
         {
             enabled = false;
-            throw new RuntimeException( "Could not enable plugin", e );
+            throw new PluginException( "Could not enable plugin", e );
         }
     }
 
@@ -218,6 +219,12 @@ public class Plugin implements LogProvider
         return this.toString();
     }
 
+    /**
+     * Log a message
+     *
+     * @param message Message to be logged
+     * @see com.github.intellectualsites.iserver.api.core.IntellectualServer#log(String, Object...)
+     */
     public void log(String message)
     {
         ServerImplementation.getImplementation().log( this, message );

@@ -19,7 +19,6 @@
 package com.github.intellectualsites.iserver.crush;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.request.Request;
@@ -34,18 +33,18 @@ import java.util.Map;
 public class SyntaxHandler extends WorkerProcedure.StringHandler
 {
 
-    private final IntellectualServer server;
     private final CrushEngine crushEngine;
 
-    SyntaxHandler(final IntellectualServer server, final CrushEngine crushEngine)
+    SyntaxHandler(final CrushEngine crushEngine)
     {
-        this.server = server;
         this.crushEngine = crushEngine;
     }
 
     @Override
-    public String act(RequestHandler requestHandler, Request request, String in)
+    public String act(final RequestHandler requestHandler, final Request request, final String in)
     {
+        String out = in;
+
         if ( CoreConfig.debug )
         {
             ServerImplementation.getImplementation().log( "CrushEngine is reacting to %s", request );
@@ -67,12 +66,12 @@ public class SyntaxHandler extends WorkerProcedure.StringHandler
             // Quite simple, yet powerful!
             for ( final Syntax syntax : crushEngine.syntaxCollection )
             {
-                if ( syntax.matches( in ) )
+                if ( syntax.matches( out ) )
                 {
-                    in = syntax.handle( in, request, factories );
+                    out = syntax.handle( out, request, factories );
                 }
             }
         }
-        return in;
+        return out;
     }
 }

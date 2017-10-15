@@ -33,6 +33,13 @@ import java.util.function.BiConsumer;
 public class SimpleRequestHandler extends RequestHandler
 {
 
+    private static AtomicInteger identifier = new AtomicInteger( 0 );
+
+    private final String pattern;
+    private final BiConsumer<Request, Response> generator;
+    private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
+    private ViewPattern compiledPattern;
+
     protected SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator)
     {
         this.pattern = pattern;
@@ -44,44 +51,9 @@ public class SimpleRequestHandler extends RequestHandler
         return new Builder();
     }
 
-    private static AtomicInteger identifier = new AtomicInteger( 0 );
-
-    private final String pattern;
-    private final BiConsumer<Request, Response> generator;
-    private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
-    private ViewPattern compiledPattern;
-
     public SimpleRequestHandler addToRouter(final Router router)
     {
         return (SimpleRequestHandler) router.add( this );
-    }
-
-    public static final class Builder
-    {
-
-        private String pattern;
-        private BiConsumer<Request, Response> generator;
-
-        private Builder()
-        {
-        }
-
-        public Builder setPattern(final String pattern)
-        {
-            this.pattern = pattern;
-            return this;
-        }
-
-        public Builder setGenerator(final BiConsumer<Request, Response> generator)
-        {
-            this.generator = generator;
-            return this;
-        }
-
-        public SimpleRequestHandler build()
-        {
-            return new SimpleRequestHandler( pattern, generator );
-        }
     }
 
     public void setInternalName(String internalName)
@@ -133,6 +105,34 @@ public class SimpleRequestHandler extends RequestHandler
     final public void register()
     {
         ServerImplementation.getImplementation().getRouter().add( this );
+    }
+
+    public static final class Builder
+    {
+
+        private String pattern;
+        private BiConsumer<Request, Response> generator;
+
+        private Builder()
+        {
+        }
+
+        public Builder setPattern(final String pattern)
+        {
+            this.pattern = pattern;
+            return this;
+        }
+
+        public Builder setGenerator(final BiConsumer<Request, Response> generator)
+        {
+            this.generator = generator;
+            return this;
+        }
+
+        public SimpleRequestHandler build()
+        {
+            return new SimpleRequestHandler( pattern, generator );
+        }
     }
 
 }

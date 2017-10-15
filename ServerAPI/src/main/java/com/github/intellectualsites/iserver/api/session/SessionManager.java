@@ -24,10 +24,10 @@ import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.request.Cookie;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.HeaderProvider;
-import com.github.intellectualsites.iserver.api.util.*;
+import com.github.intellectualsites.iserver.api.util.Assert;
+import com.github.intellectualsites.iserver.api.util.ProviderFactory;
 
 import java.io.BufferedOutputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,32 +38,30 @@ public final class SessionManager implements ProviderFactory<ISession>
 {
 
     private final Map<String, ISession> sessions = new HashMap<>();
-    private final SessionIdentifierProvider sessionIdentifierProvider;
     private final ISessionCreator sessionCreator;
 
     public SessionManager(final ISessionCreator sessionCreator)
     {
         this.sessionCreator = sessionCreator;
-        final String i = "" + System.nanoTime();
-        this.sessionIdentifierProvider = r -> i;
     }
 
-    public ISession createSession(final Request r, final BufferedOutputStream out)
+    private ISession createSession(final Request r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
 
-        final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
         final String sessionID = UUID.randomUUID().toString();
 
-        r.postponedCookies.put( name, sessionID );
+        r.postponedCookies.put( "session", sessionID );
 
         if ( CoreConfig.debug )
         {
-            Message.SESSION_SET.log( name, sessionID );
+            Message.SESSION_SET.log( "session", sessionID );
         }
 
         final ISession session = sessionCreator.createSession();
+        session.set( "id", sessionID );
         this.sessions.put( sessionID, session );
+        r.getCookies().put( "session", new Cookie( "session", sessionID ) );
 
         return session;
     }
@@ -72,57 +70,69 @@ public final class SessionManager implements ProviderFactory<ISession>
     {
         Assert.notNull( r, re );
 
-        final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
-        re.getHeader().setCookie( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
+        re.getHeader().setCookie( "session", "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
     }
 
-    public Optional<ISession> getSession(final Request r, final OutputStream out)
+    public Optional<ISession> getSession(final Request r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
 
         ISession session = null;
 
-        final Cookie[] cookies = r.getCookies();
-        final String name = sessionIdentifierProvider.getIdentifier( r ) + "session";
-
-        final Optional<Cookie> cookie = LambdaUtil.getFirst( cookies, c -> c.getName().equalsIgnoreCase( name ) );
-        if ( cookie.isPresent() )
+        // Check cookies to see if present
+        for ( Cookie cookie : r.getCookies().values() )
         {
-            final String sessionID = cookie.get().getValue();
-            if ( sessions.containsKey( sessionID ) )
+            // If a cookie is registered
+            if ( cookie.getName().equalsIgnoreCase( "session" ) )
             {
-                session = sessions.get( sessionID );
-                if ( CoreConfig.debug )
+                // Cookie was found
+                final String sessionID = cookie.getValue();
+                // Check if session is valid
+                if ( sessions.containsKey( sessionID ) )
                 {
-                    Message.SESSION_FOUND.log( session, sessionID, r );
-                }
-            } else
-            {
-                if ( out != null )
-                {
-                    r.postponedCookies.put( name, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
+                    session = sessions.get( sessionID );
                     if ( CoreConfig.debug )
                     {
+                        Message.SESSION_FOUND.log( session, sessionID, r );
+                    }
+                } else
+                {
+                    // Session isn't valid, remove old cookie
+                    if ( out != null )
+                    {
                         ServerImplementation.getImplementation()
-                                .log( "Deleting invalid session cookie (%s) for request %s", cookie.get()
-                                        .getValue(), r );
+                                .log( "Deleting invalid session cookie (%s) for request %s", cookie.getValue(), r );
+                        session = createSession( r, out );
+                        r.postponedCookies.put( "session", session.get( "id" ).toString() );
+                        r.getCookies().put( "session", new Cookie( "session", session.get( "id" ).toString() ) );
                     }
                 }
+                break;
             }
+        }
+
+        // No session found
+        if ( session == null )
+        {
+            session = createSession( r, out );
         }
 
         return Optional.ofNullable( session );
     }
 
+    public Optional<ISession> getSession(final String sessionID)
+    {
+        if ( sessions.containsKey( sessionID ) )
+        {
+            return Optional.of( sessions.get( sessionID ) );
+        }
+        return Optional.empty();
+    }
+
     @Override
     public Optional<ISession> get(final Request r)
     {
-        final ISession session = OptionalUtil.getOrNull( getSession( r, null ) );
-        if ( session == null )
-        {
-            return Optional.empty();
-        }
-        return Optional.of( session );
+        return getSession( r, null );
     }
 
     public String providerName()

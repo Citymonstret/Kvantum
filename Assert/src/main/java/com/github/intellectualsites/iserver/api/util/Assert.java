@@ -74,9 +74,9 @@ public class Assert
         return t;
     }
 
-    public static <T extends Validatable> T isValid(T t)
+    public static <T extends Validatable> T isValid(final T t)
     {
-        t = notNull( t );
+        notNull( t );
         try
         {
             equals( t.isValid(), true );
@@ -135,8 +135,8 @@ public class Assert
         equals( a, b, new com.github.intellectualsites.iserver.api.util.AssertionError( a, message ) );
     }
 
-    public static void notEmpty(byte[] password)
+    public static void notEmpty(final byte[] array)
     {
-        equals( password != null && password.length > 0, true );
+        equals( array != null && array.length > 0, true );
     }
 }

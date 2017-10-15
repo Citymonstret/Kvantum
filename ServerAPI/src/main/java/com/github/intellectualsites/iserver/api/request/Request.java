@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.request;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.RequestException;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.views.CookieManager;
@@ -65,7 +66,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     @Getter
     private Map<String, String> headers;
     @Getter
-    private Cookie[] cookies;
+    private Map<String, Cookie> cookies;
     @Getter
     private Query query;
     @Setter
@@ -89,7 +90,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      *
      * @param request Request (from the client)
      * @param socket  The socket that sent the request
-     * @throws RuntimeException if the request doesn't contain a query
+     * @throws RequestException if the request doesn't contain a query
      */
     public Request(final Collection<String> request, final Socket socket)
     {
@@ -123,7 +124,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         }
         if ( !this.headers.containsKey( "query" ) )
         {
-            throw new RuntimeException( "Couldn't find query header..." );
+            throw new RequestException( "Couldn't find query header..." );
         }
         this.getResourceRequest();
         this.cookies = CookieManager.getCookies( this );
@@ -151,7 +152,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Override
-    public Optional<Request> get(Request r)
+    public Optional<Request> get(final Request r)
     {
         return Optional.of( this );
     }
@@ -169,7 +170,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Override
-    public Object get(String variable)
+    public Object get(final String variable)
     {
         return getVariables().get( Assert.notNull( variable ) );
     }
@@ -250,7 +251,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             final Optional<HttpMethod> methodOptional = HttpMethod.getByName( parts[ 0 ] );
             if ( !methodOptional.isPresent() )
             {
-                throw new RuntimeException( "Unknown request method: " + parts[ 0 ] );
+                throw new RequestException( "Unknown request method: " + parts[ 0 ] );
             }
             this.query = new Query( methodOptional.get(), parts[ 1 ] );
         }
@@ -291,7 +292,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         meta.put( name, var );
     }
 
-    final public void internalRedirect(final String url)
+    public void internalRedirect(final String url)
     {
         Assert.notNull( url );
 
@@ -318,7 +319,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     }
 
     @Final
-    final public Map<String, String> getVariables()
+    public Map<String, String> getVariables()
     {
         return (Map<String, String>) getMeta( "variables" );
     }
@@ -359,23 +360,25 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
          * @param method   Request Method
          * @param resource The requested resource
          */
-        Query(HttpMethod method, String resource)
+        Query(final HttpMethod method, final String resource)
         {
             Assert.notNull( method, resource );
 
+            String resourceName = resource;
+
             this.method = method;
-            if ( resource.contains( "?" ) )
+            if ( resourceName.contains( "?" ) )
             {
                 final String[] parts = resource.split( "\\?" );
                 final String[] subParts = parts[ 1 ].split( "&" );
-                resource = parts[ 0 ];
+                resourceName = parts[ 0 ];
                 for ( final String part : subParts )
                 {
                     final String[] subSubParts = part.split( "=" );
                     this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
                 }
             }
-            this.resource = resource;
+            this.resource = resourceName;
         }
 
         /**

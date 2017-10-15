@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.views;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.matching.ViewPattern;
@@ -82,7 +83,9 @@ public class View extends RequestHandler
     private final String internalName;
     private final ViewPattern viewPattern;
     private final UUID uuid;
-    public String relatedFolderPath, fileName, defaultFile;
+    public String relatedFolderPath;
+    public String fileName;
+    public String defaultFile;
     protected String internalFileName;
     protected String internalDefaultFile;
     private int buffer = -1;
@@ -223,12 +226,9 @@ public class View extends RequestHandler
             {
                 this.folder = ServerImplementation.getImplementation().getFileSystem().getPath( "/" + internalName );
             }
-            if ( !folder.exists() )
+            if ( !folder.exists() && !folder.create() )
             {
-                if ( !folder.create() )
-                {
-                    Message.COULD_NOT_CREATE_FOLDER.log( folder );
-                }
+                Message.COULD_NOT_CREATE_FOLDER.log( folder );
             }
         }
         return this.folder;
@@ -275,7 +275,7 @@ public class View extends RequestHandler
                 this.internalFileName = fileName;
             } else
             {
-                throw new RuntimeException( "getFile called without a filename set!" );
+                throw new IntellectualServerException( "getFile called without a filename set!" );
             }
         }
         String n = internalFileName;
@@ -298,7 +298,7 @@ public class View extends RequestHandler
                         this.internalDefaultFile = defaultFile;
                     } else
                     {
-                        throw new RuntimeException( "getFile called with empty file path, and no default file set!" );
+                        throw new IntellectualServerException( "getFile called with empty file path, and no default file set!" );
                     }
                 }
                 t = internalDefaultFile;
@@ -386,14 +386,11 @@ public class View extends RequestHandler
             request.addMeta( CONSTANT_VARIABLES, map );
         }
 
-        if ( CoreConfig.debug )
+        if ( CoreConfig.debug && map == null )
         {
-            if ( map == null )
-            {
-                ServerImplementation.getImplementation().log( "Request: '%s' failed to " +
-                                "pass '%s'", request.getQuery().getFullRequest(),
-                        viewPattern.toString() );
-            }
+            ServerImplementation.getImplementation().log( "Request: '%s' failed to " +
+                            "pass '%s'", request.getQuery().getFullRequest(),
+                    viewPattern.toString() );
         }
 
         return map != null && passes( request );

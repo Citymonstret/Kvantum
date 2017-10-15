@@ -28,7 +28,7 @@ import java.lang.reflect.Modifier;
 public class InstanceFactory
 {
 
-    public static <T> void setupInstance(T t, String fieldName)
+    public static <T> void setupInstance(final T t, final String fieldName)
     {
         try
         {
@@ -46,7 +46,7 @@ public class InstanceFactory
         }
     }
 
-    public static <T> void setupInstance(T t)
+    public static <T> void setupInstance(final T t)
     {
         setupInstance( t, "instance" );
     }
@@ -55,22 +55,19 @@ public class InstanceFactory
     {
         for ( final Field field : t.getClass().getDeclaredFields() )
         {
-            if ( Modifier.isStatic( field.getModifiers() ) )
+            if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( t.getClass() ) )
             {
-                if ( field.getType().equals( t.getClass() ) )
+                try
                 {
-                    try
+                    field.setAccessible( true );
+                    if ( field.get( null ) != null )
                     {
-                        field.setAccessible( true );
-                        if ( field.get( null ) != null )
-                        {
-                            continue;
-                        }
-                        field.set( null, t );
-                    } catch ( IllegalAccessException e )
-                    {
-                        e.printStackTrace();
+                        continue;
                     }
+                    field.set( null, t );
+                } catch ( IllegalAccessException e )
+                {
+                    e.printStackTrace();
                 }
             }
         }

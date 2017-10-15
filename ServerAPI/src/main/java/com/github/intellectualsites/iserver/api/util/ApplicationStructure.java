@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -45,7 +46,7 @@ public abstract class ApplicationStructure
             this.database = new SQLiteManager( this.applicationName );
         } catch ( final IOException | SQLException e )
         {
-            throw new RuntimeException( e );
+            throw new IntellectualServerException( e );
         }
         this.accountManager = createNewAccountManager();
     }
@@ -68,7 +69,7 @@ public abstract class ApplicationStructure
         return this.applicationName;
     }
 
-    public void registerViews(IntellectualServer server)
+    public void registerViews(final IntellectualServer server)
     {
         // Override me!
     }

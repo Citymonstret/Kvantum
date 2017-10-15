@@ -30,10 +30,10 @@ import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.events.Event;
 import com.github.intellectualsites.iserver.api.events.EventCaller;
 import com.github.intellectualsites.iserver.api.events.EventManager;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.ServerReadyEvent;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.ShutdownEvent;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.StartupEvent;
-import com.github.intellectualsites.iserver.api.events.defaultEvents.ViewsInitializedEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.ServerReadyEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.ShutdownEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.StartupEvent;
+import com.github.intellectualsites.iserver.api.events.defaultevents.ViewsInitializedEvent;
 import com.github.intellectualsites.iserver.api.logging.LogModes;
 import com.github.intellectualsites.iserver.api.logging.LogProvider;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
@@ -52,6 +52,7 @@ import com.github.intellectualsites.iserver.api.views.*;
 import com.github.intellectualsites.iserver.api.views.requesthandler.SimpleRequestHandler;
 import com.github.intellectualsites.iserver.commands.AccountCommand;
 import com.github.intellectualsites.iserver.crush.CrushEngine;
+import com.github.intellectualsites.iserver.error.IntellectualServerException;
 import com.github.intellectualsites.iserver.error.IntellectualServerInitializationException;
 import com.github.intellectualsites.iserver.error.IntellectualServerStartException;
 import com.github.intellectualsites.iserver.files.FileSystem;
@@ -150,12 +151,9 @@ public final class Server implements IntellectualServer, ISessionCreator
 
         // Make sure that the main folder is created
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
-        if ( !coreFolder.exists() )
+        if ( !coreFolder.exists() && !coreFolder.mkdirs() )
         {
-            if ( !coreFolder.mkdirs() )
-            {
-                throw new IntellectualServerInitializationException( "Failed to create the core folder: " + coreFolder );
-            }
+            throw new IntellectualServerInitializationException( "Failed to create the core folder: " + coreFolder );
         }
 
         this.coreFolder = coreFolder;
@@ -188,17 +186,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         addViewBinding( "img", ImgView.class );
         addViewBinding( "download", DownloadView.class );
         addViewBinding( "std", StandardView.class );
-
-        if ( standalone )
-        {
-            // Makes the application closable in ze terminal
-            Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
-
-            this.commandManager = new CommandManager( '/' );
-            this.commandManager.getManagerOptions().getFindCloseMatches( false );
-            this.commandManager.getManagerOptions().setRequirePrefix( false );
-            new InputThread().start();
-        }
 
         try
         {
@@ -315,7 +302,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 if ( !path.getPath( "favicon.ico" ).exists() )
                 {
                     Logger.info( "Creating public/favicon.ico" );
-                    try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
+                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
                             "favicon.ico" )
                     ) )
                     {
@@ -329,7 +316,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 if ( !path.getPath( "index.html" ).exists() )
                 {
                     Logger.info( "Creating public/index.html!" );
-                    try ( final OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
+                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
                     ) )
                     {
                         FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
@@ -341,12 +328,19 @@ public final class Server implements IntellectualServer, ISessionCreator
                 configViews.saveFile();
             } catch ( final Exception e )
             {
-                throw new RuntimeException( "Couldn't load in views", e );
+                throw new IntellectualServerInitializationException( "Couldn't load in views", e );
             }
         }
 
         if ( standalone )
         {
+            // Makes the application closable in ze terminal
+            Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
+
+            this.commandManager = new CommandManager( '/' );
+            this.commandManager.getManagerOptions().getFindCloseMatches( false );
+            this.commandManager.getManagerOptions().setRequirePrefix( false );
+
             ApplicationStructure applicationStructure = new ApplicationStructure( "core" )
             {
                 @Override
@@ -467,13 +461,10 @@ public final class Server implements IntellectualServer, ISessionCreator
         if ( standalone )
         {
             final File file = new File( coreFolder, "plugins" );
-            if ( !file.exists() )
+            if ( !file.exists() && !file.mkdirs() )
             {
-                if ( !file.mkdirs() )
-                {
-                    log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
-                    return;
-                }
+                log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
+                return;
             }
             PluginLoader pluginLoader = new PluginLoader( new PluginManager() );
             pluginLoader.loadAllPlugins( file );
@@ -492,7 +483,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             Assert.equals( this.started, false,
                     new IntellectualServerStartException( "Cannot start the server, it is already started",
-                            new RuntimeException( "Cannot restart server singleton" ) ) );
+                            new IntellectualServerException( "Cannot restart server singleton" ) ) );
         } catch ( IntellectualServerStartException e )
         {
             e.printStackTrace();
@@ -526,7 +517,8 @@ public final class Server implements IntellectualServer, ISessionCreator
             views.entrySet().forEach( entry ->
             {
                 final Map<String, Object> view = entry.getValue();
-                String type = "html", filter = view.get( "filter" ).toString();
+                String type = "html";
+                String filter = view.get( "filter" ).toString();
                 if ( view.containsKey( "type" ) )
                 {
                     type = view.get( "type" ).toString();
@@ -576,6 +568,12 @@ public final class Server implements IntellectualServer, ISessionCreator
         }
 
         log( Message.STARTING_ON_PORT, CoreConfig.port );
+
+        if ( standalone )
+        {
+            new InputThread().start();
+        }
+
         this.started = true;
         try
         {
@@ -583,7 +581,6 @@ public final class Server implements IntellectualServer, ISessionCreator
             log( Message.SERVER_STARTED );
         } catch ( final Exception e )
         {
-            // throw new RuntimeException("Couldn't start the server...", e);
             boolean run = true;
 
             int port = CoreConfig.port + 1;
@@ -615,7 +612,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 sslServerSocket = (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port );
             } catch ( final Exception e )
             {
-                new RuntimeException( "Failed to start HTTPS server", e ).printStackTrace();
+                new IntellectualServerException( "Failed to start HTTPS server", e ).printStackTrace();
             }
         }
 
@@ -660,13 +657,13 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public void log(Message message, final Object... args)
+    public void log(final Message message, final Object... args)
     {
         this.log( message.toString(), message.getMode(), args );
     }
 
     @Override
-    public synchronized void log(String message, int mode, final Object... args)
+    public synchronized void log(final String message, final int mode, final Object... args)
     {
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
@@ -695,30 +692,32 @@ public final class Server implements IntellectualServer, ISessionCreator
                 prefix = "Info";
                 break;
         }
+        String msg = message;
         for ( final Object a : args )
         {
-            message = message.replaceFirst( "%s", a.toString() );
+            msg = msg.replaceFirst( "%s", a.toString() );
         }
-        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), message,
+        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), msg,
                 Thread.currentThread().getName() );
     }
 
     @Override
-    public synchronized void log(String message, final Object... args)
+    public synchronized void log(final String message, final Object... args)
     {
         this.log( message, LogModes.MODE_INFO, args );
     }
 
     @Override
-    public void log(final LogProvider provider, String message, final Object... args)
+    public void log(final LogProvider provider, final String message, final Object... args)
     {
+        String workingMessage = message;
         for ( final Object a : args )
         {
-            message = message.replaceFirst( "%s", a.toString() );
+            workingMessage = message.replaceFirst( "%s", a.toString() );
         }
 
         logWrapper.log( CoreConfig.logPrefix, provider.getLogIdentifier(), TimeUtil.getTimeStamp(),
-                message, Thread.currentThread().getName() );
+                workingMessage, Thread.currentThread().getName() );
     }
 
     @Override

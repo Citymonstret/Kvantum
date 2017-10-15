@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.api.views.staticviews;
 
 import com.github.intellectualsites.iserver.api.views.requesthandler.SimpleRequestHandler;
 
+
 class StaticView extends SimpleRequestHandler
 {
 
@@ -30,5 +31,6 @@ class StaticView extends SimpleRequestHandler
         super( matcher.filter(), method );
         this.method = method;
     }
+
 
 }

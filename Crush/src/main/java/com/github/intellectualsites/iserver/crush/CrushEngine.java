@@ -73,8 +73,7 @@ public class CrushEngine
         this.providers.add( new PostProviderFactory() );
         this.providers.add( new MetaProvider() );
 
-        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( ServerImplementation.getImplementation
-                (), this ) );
+        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
     }
 
     public void addProviderFactory(final ProviderFactory factory)

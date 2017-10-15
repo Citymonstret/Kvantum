@@ -20,9 +20,7 @@ package com.github.intellectualsites.iserver.api.util;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.*;
 
 @UtilityClass
 public final class CollectionUtil
@@ -33,6 +31,13 @@ public final class CollectionUtil
         final int size = collection.size();
         collection.clear();
         return size;
+    }
+
+    public static <T> List<String> toStringList(final Collection<T> collection)
+    {
+        final List<String> returnList = new ArrayList<>( collection.size() );
+        collection.forEach( o -> returnList.add( o.toString() ) );
+        return returnList;
     }
 
     public static <T> String smartJoin(final Collection<T> collection, final Generator<T, String> stringGenerator,

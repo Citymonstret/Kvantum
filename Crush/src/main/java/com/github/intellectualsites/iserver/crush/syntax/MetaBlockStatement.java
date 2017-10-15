@@ -58,7 +58,7 @@ final public class MetaBlockStatement extends Syntax
         while ( matcher.find() )
         {
             // Document meta :D
-            r.addMeta( "doc." + matcher.group( 1 ), matcher.group( 2 ) );
+            r.addMeta( matcher.group( 1 ), matcher.group( 2 ) );
         }
         return in;
     }

@@ -25,16 +25,17 @@ import com.github.intellectualsites.iserver.api.views.RequestHandler;
 public abstract class Router
 {
 
-    public abstract RequestHandler match(final Request request);
+    public abstract RequestHandler match(Request request);
 
-    public abstract RequestHandler add(final RequestHandler handler);
+    public abstract RequestHandler add(RequestHandler handler);
 
-    public abstract void remove(final RequestHandler handler);
+    public abstract void remove(RequestHandler handler);
 
     public abstract void clear();
 
     public void dump(final IntellectualServer server)
     {
+        // Override me
     }
 
 }

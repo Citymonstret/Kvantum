@@ -47,13 +47,9 @@ public class Error extends View
         try
         {
             file = new File( ServerImplementation.getImplementation().getCoreFolder(), "templates" );
-            if ( !file.exists() )
+            if ( !file.exists() && !file.mkdir() )
             {
-                if ( !file.mkdir() )
-                {
-
-                    Message.COULD_NOT_CREATE_FOLDER.log( file );
-                }
+                Message.COULD_NOT_CREATE_FOLDER.log( file );
             }
             file = new File( file, "error.html" );
             if ( !file.exists() )
@@ -67,9 +63,9 @@ public class Error extends View
                 }
                 File tempFile = new File( ViewException.class.getClassLoader().getResource( "template" + File.separator +
                         "error.html" ).toURI() );
-                try ( final FileInputStream in = new FileInputStream( tempFile ) )
+                try ( FileInputStream in = new FileInputStream( tempFile ) )
                 {
-                    try ( final FileOutputStream out = new FileOutputStream( file ) )
+                    try ( FileOutputStream out = new FileOutputStream( file ) )
                     {
                         FileUtils.copyFile( in, out, 1024 * 1024 * 16 );
                     } catch ( final java.lang.Exception e )

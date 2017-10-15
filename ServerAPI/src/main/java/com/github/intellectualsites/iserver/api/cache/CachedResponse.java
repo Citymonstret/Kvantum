@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.iserver.api.cache;
 
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
 import com.github.intellectualsites.iserver.api.util.Assert;
@@ -56,7 +57,7 @@ public class CachedResponse implements ResponseBody
     @Override
     public String getContent()
     {
-        throw new RuntimeException( "Cannot access text content in cached response" );
+        throw new IntellectualServerException( "Cannot access text content in cached response" );
     }
 
     @Override

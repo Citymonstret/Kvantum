@@ -57,13 +57,13 @@ public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProv
     @Override
     public boolean contains(String variable)
     {
-        return r.getMeta( "doc." + variable ) != null;
+        return r.getMeta( variable ) != null;
     }
 
     @Override
     public Object get(String variable)
     {
-        return r.getMeta( "doc." + variable );
+        return r.getMeta( variable );
     }
 
     @Override

@@ -15,17 +15,22 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- * <p>
- * These are the default events, these are
- * shipped natively with IntellectualServer and
- * are called from within the core application
- *
- * @author Citymonstret
- *//**
- * These are the default events, these are
- * shipped natively with IntellectualServer and
- * are called from within the core application
+ */
+package com.github.intellectualsites.iserver.api.events.defaultevents;
+
+import com.github.intellectualsites.iserver.api.core.IntellectualServer;
+
+/**
+ * Called when the servers starts up
  *
  * @author Citymonstret
  */
-package com.github.intellectualsites.iserver.api.events.defaultEvents;
+public class StartupEvent extends ServerEvent
+{
+
+    public StartupEvent(final IntellectualServer server)
+    {
+        super( server, "startup" );
+    }
+
+}

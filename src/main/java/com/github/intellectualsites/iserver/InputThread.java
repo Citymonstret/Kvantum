@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.events.Event;
+import com.github.intellectualsites.iserver.api.logging.InternalJlineManager;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import com.github.intellectualsites.iserver.commands.Dump;
 import com.github.intellectualsites.iserver.commands.Metrics;
@@ -28,9 +29,8 @@ import com.github.intellectualsites.iserver.commands.Show;
 import com.github.intellectualsites.iserver.commands.Stop;
 import com.intellectualsites.commands.CommandHandlingOutput;
 import com.intellectualsites.commands.CommandResult;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.UserInterruptException;
 
 /**
  * The thread which handles command inputs, when ran as a standalone
@@ -68,7 +68,71 @@ public final class InputThread extends Thread
     @Override
     public void run()
     {
-        try ( BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) ) )
+        String line;
+        for ( ; ; )
+        {
+            try
+            {
+                line = InternalJlineManager.getInstance().getLineReader().readLine( "> " );
+                if ( shouldStop || ServerImplementation.getImplementation().isStopping() )
+                {
+                    break;
+                }
+                if ( line == null || line.isEmpty() )
+                {
+                    continue;
+                }
+                if ( line.startsWith( "/" ) )
+                {
+                    line = line.replace( "/", "" ).toLowerCase();
+                    final CommandResult result = ServerImplementation.getImplementation().getCommandManager().handle(
+                            ServerImplementation.getImplementation(), line );
+
+                    switch ( result.getCommandResult() )
+                    {
+                        case CommandHandlingOutput.NOT_PERMITTED:
+                            ServerImplementation.getImplementation().log( "Command Error: You are not allowed to execute that command!" );
+                            break;
+                        case CommandHandlingOutput.ERROR:
+                            ServerImplementation.getImplementation().log( "Something went wrong when executing the command!" );
+                            result.getStacktrace().printStackTrace();
+                            break;
+                        case CommandHandlingOutput.NOT_FOUND:
+                            if ( result.getClosestMatch() != null )
+                            {
+                                ServerImplementation.getImplementation().log( "Did you mean: /%s", result
+                                        .getClosestMatch().getCommand() );
+                            } else
+                            {
+                                ServerImplementation.getImplementation().log( "There is no such command: " + result
+                                        .getInput() );
+                            }
+                            break;
+                        case CommandHandlingOutput.WRONG_USAGE:
+                            ServerImplementation.getImplementation().log( "Command Usage: " + result.getCommand().getUsage() );
+                            break;
+                        case CommandHandlingOutput.SUCCESS:
+                            break;
+                        default:
+                            ServerImplementation.getImplementation().log( "Unknown command result: " + CommandHandlingOutput.nameField(
+                                    result.getCommandResult() ) );
+                            break;
+                    }
+                } else
+                {
+                    currentString = line;
+                    ServerImplementation.getImplementation().handleEvent( new TextEvent( line ) );
+                }
+            } catch ( UserInterruptException e )
+            {
+                e.printStackTrace();
+            } catch ( EndOfFileException e )
+            {
+                return;
+            }
+        }
+
+        /* try ( BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) ) )
         {
             String line;
 
@@ -129,6 +193,7 @@ public final class InputThread extends Thread
         } catch ( final Exception ignored )
         {
         }
+        */
     }
 
     public static class TextEvent extends Event

@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 
@@ -45,12 +46,9 @@ public class FileUtils
     {
         Assert.notNull( zipFile, files );
 
-        if ( !zipFile.exists() )
+        if ( !zipFile.exists() && !zipFile.createNewFile() )
         {
-            if ( !zipFile.createNewFile() )
-            {
-                throw new RuntimeException( "Couldn't create " + zipFile );
-            }
+            throw new IntellectualServerException( "Couldn't create " + zipFile );
         }
 
         final File temporary = File.createTempFile( zipFile.getName(), "" );
@@ -59,7 +57,7 @@ public class FileUtils
 
         if ( !zipFile.renameTo( temporary ) )
         {
-            throw new RuntimeException( "Couldn't rename " + zipFile + " to " + temporary );
+            throw new IntellectualServerException( "Couldn't rename " + zipFile + " to " + temporary );
         }
 
         final byte[] buffer = new byte[ 1024 * 16 ]; // 16mb
@@ -122,12 +120,9 @@ public class FileUtils
 
     public static File attemptFolderCreation(final File folder)
     {
-        if ( !folder.exists() )
+        if ( !folder.exists() && !folder.mkdirs() )
         {
-            if ( !folder.mkdirs() )
-            {
-                Message.COULD_NOT_CREATE_FOLDER.log( folder );
-            }
+            Message.COULD_NOT_CREATE_FOLDER.log( folder );
         }
         return folder;
     }

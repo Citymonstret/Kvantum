@@ -15,41 +15,17 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-package com.github.intellectualsites.iserver.api.events.defaultEvents;
-
-import com.github.intellectualsites.iserver.api.core.IntellectualServer;
-import com.github.intellectualsites.iserver.api.events.Event;
-
-/**
- * An event wrapper for events that involved the server
+ * <p>
+ * These are the default events, these are
+ * shipped natively with IntellectualServer and
+ * are called from within the core application
+ *
+ * @author Citymonstret
+ *//**
+ * These are the default events, these are
+ * shipped natively with IntellectualServer and
+ * are called from within the core application
  *
  * @author Citymonstret
  */
-public abstract class ServerEvent extends Event
-{
-
-    private final IntellectualServer server;
-
-    /**
-     * Constructor
-     *
-     * @param server The server instance
-     * @param name   The event identifier
-     */
-    ServerEvent(final IntellectualServer server, final String name)
-    {
-        super( "is::server::" + name );
-        this.server = server;
-    }
-
-    /**
-     * Get the server instance
-     *
-     * @return server instance
-     */
-    public final IntellectualServer getServer()
-    {
-        return this.server;
-    }
-}
+package com.github.intellectualsites.iserver.api.events.defaultevents;

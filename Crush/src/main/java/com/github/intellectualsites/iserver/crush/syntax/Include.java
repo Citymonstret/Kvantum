@@ -59,8 +59,10 @@ final public class Include extends Syntax
     }
 
     @Override
-    public String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    public String process(final String in, final Matcher matcher, final Request r, final Map<String, ProviderFactory>
+            factories)
     {
+        String out = in;
         while ( matcher.find() )
         {
             boolean setCache = false;
@@ -70,7 +72,7 @@ final public class Include extends Syntax
                 String s = manager.getCachedInclude( matcher.group() );
                 if ( s != null )
                 {
-                    in = in.replace( matcher.group(), s );
+                    out = out.replace( matcher.group(), s );
                     continue;
                 } else
                 {
@@ -103,16 +105,16 @@ final public class Include extends Syntax
 
                 if ( file.getName().endsWith( ".css" ) )
                 {
-                    in = in.replace( matcher.group(), "<style>\n" + c + "</style>" );
+                    out = out.replace( matcher.group(), "<style>\n" + c + "</style>" );
                 } else
                 {
-                    in = in.replace( matcher.group(), c.toString() );
+                    out = out.replace( matcher.group(), c.toString() );
                 }
             } else
             {
                 ServerImplementation.getImplementation().log( "Couldn't find file for '%s'", matcher.group() );
             }
         }
-        return in;
+        return out;
     }
 }

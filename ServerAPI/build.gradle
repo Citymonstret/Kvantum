@@ -37,6 +37,7 @@ repositories {
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.18'
+    compile group: 'org.jline', name: 'jline', version: '3.3.0'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     compile group: 'org.mindrot', name: 'jbcrypt', version: '0.3m'
