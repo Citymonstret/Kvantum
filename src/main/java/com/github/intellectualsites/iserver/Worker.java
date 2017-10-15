@@ -40,6 +40,7 @@ import com.github.intellectualsites.iserver.api.validation.RequestValidation;
 import com.github.intellectualsites.iserver.api.validation.ValidationException;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.github.intellectualsites.iserver.api.views.errors.ViewException;
+import com.github.intellectualsites.iserver.error.IntellectualServerException;
 import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.BASE64Encoder;
 
@@ -353,7 +354,7 @@ final class Worker extends AutoCloseable
                     bytes = compress( bytes );
                 } catch ( final IOException e )
                 {
-                    new RuntimeException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
+                    new IntellectualServerException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
                 }
             }
             output.write( bytes );
