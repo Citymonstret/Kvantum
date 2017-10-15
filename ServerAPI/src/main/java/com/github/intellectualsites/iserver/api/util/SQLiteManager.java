@@ -19,6 +19,7 @@
 package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class SQLiteManager extends com.github.intellectualsites.iserver.api.util
         {
             if ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file.createNewFile() )
             {
-                throw new RuntimeException( "Couldn't create: " + name );
+                throw new IntellectualServerException( "Couldn't create: " + name );
             }
         }
         this.connection = DriverManager.getConnection( "jdbc:sqlite:" + file.getAbsolutePath() );

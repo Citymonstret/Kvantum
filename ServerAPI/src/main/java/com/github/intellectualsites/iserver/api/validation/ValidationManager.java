@@ -18,20 +18,16 @@
  */
 package com.github.intellectualsites.iserver.api.validation;
 
-import com.github.intellectualsites.iserver.api.views.RequestHandler;
-
 import java.util.*;
 
 public class ValidationManager
 {
 
-    private final RequestHandler parent;
     private final Map<RequestValidation.ValidationStage, List<RequestValidation>> validators;
     private boolean empty = true;
 
-    public ValidationManager(final RequestHandler parent)
+    public ValidationManager()
     {
-        this.parent = parent;
         this.validators = new HashMap<>();
         for ( final RequestValidation.ValidationStage stage : RequestValidation.ValidationStage.values() )
         {

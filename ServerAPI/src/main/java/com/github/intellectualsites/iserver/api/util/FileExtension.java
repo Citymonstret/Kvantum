@@ -67,17 +67,18 @@ public enum FileExtension
         this.comment = comment;
     }
 
-    public static Optional<FileExtension> getExtension(String string)
+    public static Optional<FileExtension> getExtension(final String string)
     {
+        String workingString = string;
         if ( string.startsWith( "." ) )
         {
-            string = string.substring( 1 );
+            workingString = string.substring( 1 );
         }
         for ( final FileExtension extension : values() )
         {
             for ( final String e : extension.extensions )
             {
-                if ( e.equalsIgnoreCase( string ) )
+                if ( e.equalsIgnoreCase( workingString ) )
                 {
                     return Optional.of( extension );
                 }

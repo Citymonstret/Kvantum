@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 
@@ -49,7 +50,7 @@ public class FileUtils
         {
             if ( !zipFile.createNewFile() )
             {
-                throw new RuntimeException( "Couldn't create " + zipFile );
+                throw new IntellectualServerException( "Couldn't create " + zipFile );
             }
         }
 
@@ -59,7 +60,7 @@ public class FileUtils
 
         if ( !zipFile.renameTo( temporary ) )
         {
-            throw new RuntimeException( "Couldn't rename " + zipFile + " to " + temporary );
+            throw new IntellectualServerException( "Couldn't rename " + zipFile + " to " + temporary );
         }
 
         final byte[] buffer = new byte[ 1024 * 16 ]; // 16mb

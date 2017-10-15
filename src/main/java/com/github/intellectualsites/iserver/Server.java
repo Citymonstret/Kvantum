@@ -710,15 +710,16 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public void log(final LogProvider provider, String message, final Object... args)
+    public void log(final LogProvider provider, final String message, final Object... args)
     {
+        String workingMessage = message;
         for ( final Object a : args )
         {
-            message = message.replaceFirst( "%s", a.toString() );
+            workingMessage = message.replaceFirst( "%s", a.toString() );
         }
 
         logWrapper.log( CoreConfig.logPrefix, provider.getLogIdentifier(), TimeUtil.getTimeStamp(),
-                message, Thread.currentThread().getName() );
+                workingMessage, Thread.currentThread().getName() );
     }
 
     @Override

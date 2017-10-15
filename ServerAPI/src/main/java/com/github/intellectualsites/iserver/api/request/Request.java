@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.request;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.RequestException;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.views.CookieManager;
@@ -123,7 +124,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         }
         if ( !this.headers.containsKey( "query" ) )
         {
-            throw new RuntimeException( "Couldn't find query header..." );
+            throw new RequestException( "Couldn't find query header..." );
         }
         this.getResourceRequest();
         this.cookies = CookieManager.getCookies( this );
@@ -250,7 +251,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             final Optional<HttpMethod> methodOptional = HttpMethod.getByName( parts[ 0 ] );
             if ( !methodOptional.isPresent() )
             {
-                throw new RuntimeException( "Unknown request method: " + parts[ 0 ] );
+                throw new RequestException( "Unknown request method: " + parts[ 0 ] );
             }
             this.query = new Query( methodOptional.get(), parts[ 1 ] );
         }
@@ -359,23 +360,25 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
          * @param method   Request Method
          * @param resource The requested resource
          */
-        Query(HttpMethod method, String resource)
+        Query(final HttpMethod method, final String resource)
         {
             Assert.notNull( method, resource );
 
+            String resourceName = resource;
+
             this.method = method;
-            if ( resource.contains( "?" ) )
+            if ( resourceName.contains( "?" ) )
             {
                 final String[] parts = resource.split( "\\?" );
                 final String[] subParts = parts[ 1 ].split( "&" );
-                resource = parts[ 0 ];
+                resourceName = parts[ 0 ];
                 for ( final String part : subParts )
                 {
                     final String[] subSubParts = part.split( "=" );
                     this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
                 }
             }
-            this.resource = resource;
+            this.resource = resourceName;
         }
 
         /**

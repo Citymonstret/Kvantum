@@ -18,6 +18,8 @@
  */
 package com.github.intellectualsites.iserver.api.plugin;
 
+import com.github.intellectualsites.iserver.api.exceptions.PluginException;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -65,14 +67,15 @@ public class PluginClassLoader extends URLClassLoader
             jar = Class.forName( desc.mainClass, true, this );
         } catch ( final ClassNotFoundException e )
         {
-            throw new RuntimeException( "Could not find main class for plugin " + desc.name + ", main class: " + desc.mainClass );
+            throw new PluginException( "Could not find main class for plugin " + desc.name + ", main class: " + desc
+                    .mainClass );
         }
         try
         {
             plg = jar.asSubclass( Plugin.class );
         } catch ( final ClassCastException e )
         {
-            throw new RuntimeException( "Plugin main class for " + desc.name + " is not instanceof Plugin" );
+            throw new PluginException( "Plugin main class for " + desc.name + " is not instanceof Plugin" );
         }
         try
         {
@@ -137,7 +140,7 @@ public class PluginClassLoader extends URLClassLoader
     synchronized void create(final Plugin plugin)
     {
         if ( init != null )
-            throw new RuntimeException( plugin.getName() + " is already created" );
+            throw new PluginException( plugin.getName() + " is already created" );
         init = plugin;
         plugin.create( desc, data, this );
     }

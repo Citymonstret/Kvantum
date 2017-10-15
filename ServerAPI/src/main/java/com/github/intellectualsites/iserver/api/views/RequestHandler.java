@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.api.views;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
@@ -46,7 +47,7 @@ public abstract class RequestHandler
 
     protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
-    private final ValidationManager validationManager = new ValidationManager( this );
+    private final ValidationManager validationManager = new ValidationManager();
     private final Map<String, Method> alternateOutcomes = new HashMap<>();
 
     {
@@ -105,7 +106,7 @@ public abstract class RequestHandler
         }
         if ( method == null )
         {
-            throw new RuntimeException( "Could not find #" + methodName + "( Request, Response )" );
+            throw new IntellectualServerException( "Could not find #" + methodName + "( Request, Response )" );
         }
         method.setAccessible( true );
         this.alternateOutcomes.put( identifier, method );
