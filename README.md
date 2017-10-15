@@ -1,6 +1,6 @@
 # IntellectualServer
 [![](https://jitpack.io/v/IntellectualSites/IntellectualServer.svg)](https://jitpack.io/#IntellectualSites/IntellectualServer)
-![Codacy Badge](https://api.codacy.com/project/badge/Grade/73620f1387604ab3b719045696b76cee)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/73620f1387604ab3b719045696b76cee)](https://www.codacy.com/app/citymonstret/IntellectualServer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=IntellectualSites/IntellectualServer&amp;utm_campaign=Badge_Grade)
 ## Description
 IntellectualServer is a lightweight, innovative, portable and embeddable web server - Written entirely in java.
 It is the perfect choice, if you need a an embedded web server to ship with your application; as it can be
