@@ -75,7 +75,7 @@ final public class IfStatement extends Syntax
                             b = (Boolean) o;
                         } else if ( o instanceof String )
                         {
-                            b = o.toString().toLowerCase().equals( "true" );
+                            b = o.toString().equalsIgnoreCase( "true" );
                         } else
                             b = o instanceof Number && ( (Number) o ).intValue() == 1;
                         if ( neg.contains( "!" ) )
