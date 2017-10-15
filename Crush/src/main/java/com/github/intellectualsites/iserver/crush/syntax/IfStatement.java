@@ -59,7 +59,9 @@ final public class IfStatement extends Syntax
     {
         while ( matcher.find() )
         {
-            String neg = matcher.group( 2 ), namespace = matcher.group( 3 ), variable = matcher.group( 4 );
+            String neg = matcher.group( 2 );
+            String namespace = matcher.group( 3 );
+            String variable = matcher.group( 4 );
             if ( factories.containsKey( namespace.toLowerCase() ) )
             {
                 Optional<VariableProvider> pOptional = factories.get( namespace.toLowerCase() ).get( r );

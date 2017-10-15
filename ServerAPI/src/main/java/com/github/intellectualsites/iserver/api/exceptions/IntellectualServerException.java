@@ -13,4 +13,9 @@ public class IntellectualServerException extends RuntimeException
         super( "IntellectualServer threw an exception: " + message, cause );
     }
 
+    public IntellectualServerException(final Throwable cause)
+    {
+        super( cause );
+    }
+
 }

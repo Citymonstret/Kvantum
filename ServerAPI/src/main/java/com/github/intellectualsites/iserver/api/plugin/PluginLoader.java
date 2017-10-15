@@ -19,6 +19,7 @@
 package com.github.intellectualsites.iserver.api.plugin;
 
 import com.github.intellectualsites.iserver.api.config.Message;
+import com.github.intellectualsites.iserver.api.exceptions.PluginException;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import com.github.intellectualsites.iserver.api.util.FileUtils;
@@ -78,14 +79,18 @@ public class PluginLoader extends AutoCloseable
      * BY THE WAY, DON'T USE OUR FREAKING DOMAIN NAME...
      *
      * @param desc File to be checked
-     * @throws RuntimeException If the file uses a bad name
+     * @throws PluginException If the file uses a bad name
      */
     public void checkIllegal(final PluginFile desc)
     {
         final String main = desc.mainClass;
         for ( final String blocked : BLOCKED_NAMES )
+        {
             if ( main.toLowerCase().contains( blocked ) )
-                throw new RuntimeException( "Plugin " + desc.name + " contains illegal main path" );
+            {
+                throw new PluginException( "Plugin " + desc.name + " contains illegal main path" );
+            }
+        }
     }
 
     /**
@@ -161,17 +166,18 @@ public class PluginLoader extends AutoCloseable
     public PluginClassLoader loadPlugin(final File file) throws Exception
     {
         if ( !file.exists() )
+        {
             throw new FileNotFoundException( file.getPath()
                     + " does not exist" );
+        }
         final PluginFile desc = getPluginFile( file );
         Assert.equals( isTaken( desc.name ), false );
-        final File parent = file.getParentFile(), data = new File( parent,
-                desc.name );
-        if ( !data.exists() )
-            if ( !data.mkdir() )
-            {
-                throw new RuntimeException( "Couldn't create the data folder for " + desc.name );
-            }
+        final File parent = file.getParentFile();
+        final File data = new File( parent, desc.name );
+        if ( !data.exists() && !data.mkdir() )
+        {
+            throw new PluginException( "Couldn't create the data folder for " + desc.name );
+        }
         copyConfigIfExists( file, data );
         PluginClassLoader loader;
         loader = new PluginClassLoader( this, desc, file );
@@ -353,7 +359,9 @@ public class PluginLoader extends AutoCloseable
         jar = new JarFile( file );
         final JarEntry desc = jar.getJarEntry( "desc.yml" );
         if ( desc == null )
-            throw new RuntimeException( "Couldn't find desc for " + file );
+        {
+            throw new PluginException( "Couldn't find desc for " + file );
+        }
         InputStream stream;
         stream = jar.getInputStream( desc );
         PluginFile f;

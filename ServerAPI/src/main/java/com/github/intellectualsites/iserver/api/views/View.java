@@ -224,12 +224,9 @@ public class View extends RequestHandler
             {
                 this.folder = ServerImplementation.getImplementation().getFileSystem().getPath( "/" + internalName );
             }
-            if ( !folder.exists() )
+            if ( !folder.exists() && !folder.create() )
             {
-                if ( !folder.create() )
-                {
-                    Message.COULD_NOT_CREATE_FOLDER.log( folder );
-                }
+                Message.COULD_NOT_CREATE_FOLDER.log( folder );
             }
         }
         return this.folder;
@@ -299,7 +296,7 @@ public class View extends RequestHandler
                         this.internalDefaultFile = defaultFile;
                     } else
                     {
-                        throw new RuntimeException( "getFile called with empty file path, and no default file set!" );
+                        throw new IntellectualServerException( "getFile called with empty file path, and no default file set!" );
                     }
                 }
                 t = internalDefaultFile;
