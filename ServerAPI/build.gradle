@@ -10,25 +10,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'java'
-    id 'maven'
-    id 'idea'
-}
-
-group 'com.github.intellectualsites'
-version 'BETA-1.0.0'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    maven { url "https://jitpack.io" }
-    maven { url "http://repo.maven.apache.org/maven2" }
-    flatDir {
-        dirs '../libs'
-    }
-}
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.18'

@@ -10,28 +10,12 @@ buildscript {
     }
 }
 
-group 'com.github.intellectualsites'
-version = 'BETA-1.0.2'
-
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'idea'
-apply plugin: 'com.github.johnrengelman.shadow'
-
-repositories {
-    flatDir {
-        dirs '../libs'
-    }
-}
-
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.18'
-    testCompile 'junit:junit:4.12'
+    compile group: 'com.diogonunes', name: 'JCDP', version: '2.0.3.1'
     compile group: 'com.cedarsoftware', name: 'json-io', version: '2.9.3'
-    // compile group: 'org.yaml', name: 'snakeyaml', version: '1.14'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.8.7'
     compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.13'
-    compile name: 'JCDP-1.25-win'
     compile group: 'com.beust', name: 'jcommander', version: '1.48'
     compile project(":ServerAPI")
     compile project(":Crush")
