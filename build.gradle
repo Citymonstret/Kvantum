@@ -61,14 +61,6 @@ repositories {
     }
 }
 
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'IntellectualServer',
-                'Implementation-Version': version,
-                'Main-Class': 'com.github.intellectualsites.iserver.IntellectualServerMain'
-    }
-}
-
 task writeVersionToFile << {
     File file = new File(projectDir, "version.txt")
     new File(projectDir, "old-version.txt").text = file.text
