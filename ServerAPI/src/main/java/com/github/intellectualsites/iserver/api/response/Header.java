@@ -48,6 +48,7 @@ final public class Header
     public static final String STATUS_ACCESS_DENIED = "401 Access Denied";
     public static final String STATUS_UNAUTHORIZED = "401 Unauthorized status";
     public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
+    public static final String STATUS_NOT_ACCEPTABLE = "406 Not Acceptable";
     public static final String STATUS_CONTINUE = "100 Continue";
     public static final String STATUS_SWITCHING_PROTOCOLS = "101 Switching Protocols";
     public static final String STATUS_PROCESSING = "102 Processing";
@@ -60,6 +61,10 @@ final public class Header
 
     public static final String ALLOW_ALL = "*";
     public static final String COOKIE_DELETED = "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    public static final HeaderOption X_CONTENT_TYPE_OPTIONS = HeaderOption.create( "X-Content-Type-Options" );
+    public static final HeaderOption X_FRAME_OPTIONS = HeaderOption.create( "X-Frame-Options" );
+    public static final HeaderOption CONTENT_SECURITY_POLICY = HeaderOption.create( "Content-Security-Policy" );
 
     /**
      * Specifying which web sites can

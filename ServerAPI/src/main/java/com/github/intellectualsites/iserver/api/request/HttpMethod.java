@@ -45,6 +45,8 @@ public enum HttpMethod
      */
     PUT,
 
+    PATCH,
+
     /**
      * Retrieve the headers for a request
      * Uses {@link #GET} but ignores any content

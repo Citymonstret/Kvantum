@@ -16,13 +16,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.iserver.api.views;
+package com.github.intellectualsites.iserver.api.views.rest;
 
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.IgnoreSyntax;
+import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +32,11 @@ import java.util.List;
 
 public class RestHandler extends RequestHandler implements IgnoreSyntax
 {
+
+    private static final Response RESPONSE_METHOD_NOT_ALLOWED = new Response()
+            .setHeader( new Header( Header.STATUS_NOT_ALLOWED ) );
+    private static final Response RESPONSE_NOT_ACCEPTABLE = new Response()
+            .setHeader( new Header( Header.STATUS_NOT_ACCEPTABLE ) );
 
     private final List<RestResponse> responseHandlers;
 
@@ -68,6 +74,17 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
         {
             return null;
         }
+
+        if ( !restResponse.methodMatches( request ) )
+        {
+            return RESPONSE_METHOD_NOT_ALLOWED;
+        }
+
+        if ( !restResponse.contentTypeMatches( request ) )
+        {
+            return RESPONSE_NOT_ACCEPTABLE;
+        }
+
         JSONObject jsonObject = null;
         try
         {
@@ -89,6 +106,9 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
 
         final Response response = new Response( this );
         response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
+        response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
+        response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
+        response.getHeader().set( Header.CONTENT_SECURITY_POLICY, "default-src 'none'" );
         response.setContent( jsonObject.toString() );
         return response;
     }
