@@ -21,11 +21,13 @@ package com.github.intellectualsites.iserver.api.session;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.request.Cookie;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.HeaderProvider;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.ProviderFactory;
+import lombok.AllArgsConstructor;
 
 import java.io.BufferedOutputStream;
 import java.util.HashMap;
@@ -34,35 +36,35 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
+@AllArgsConstructor
 public final class SessionManager implements ProviderFactory<ISession>
 {
 
     private final Map<String, ISession> sessions = new HashMap<>();
     private final ISessionCreator sessionCreator;
-
-    public SessionManager(final ISessionCreator sessionCreator)
-    {
-        this.sessionCreator = sessionCreator;
-    }
+    private final ISessionDatabase sessionDatabase;
 
     private ISession createSession(final Request r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
 
         final String sessionID = UUID.randomUUID().toString();
-
         r.postponedCookies.put( "session", sessionID );
-
         if ( CoreConfig.debug )
         {
             Message.SESSION_SET.log( "session", sessionID );
         }
+        final ISession session = createSession( sessionID );
+        r.getCookies().put( "session", new Cookie( "session", sessionID ) );
+        return session;
+    }
 
+    private ISession createSession(final String sessionID)
+    {
         final ISession session = sessionCreator.createSession();
         session.set( "id", sessionID );
         this.sessions.put( sessionID, session );
-        r.getCookies().put( "session", new Cookie( "session", sessionID ) );
-
+        this.sessionDatabase.storeSession( sessionID );
         return session;
     }
 
@@ -95,8 +97,24 @@ public final class SessionManager implements ProviderFactory<ISession>
                     {
                         Message.SESSION_FOUND.log( session, sessionID, r );
                     }
+                    long difference = ( System.currentTimeMillis() - (long) session.get( "last_active" ) ) / 1000;
+                    if ( difference >= CoreConfig.Sessions.sessionTimeout )
+                    {
+                        if ( CoreConfig.debug )
+                        {
+                            Logger.debug( "Deleted outdated session: %s", session );
+                        }
+                        this.sessions.remove( sessionID );
+                        this.sessionDatabase.deleteSession( sessionID );
+                        return Optional.empty();
+                    }
                 } else
                 {
+                    if ( sessionDatabase.isValid( sessionID ) )
+                    {
+                        session = createSession( sessionID );
+                        break;
+                    }
                     // Session isn't valid, remove old cookie
                     if ( out != null )
                     {
@@ -127,6 +145,16 @@ public final class SessionManager implements ProviderFactory<ISession>
             return Optional.of( sessions.get( sessionID ) );
         }
         return Optional.empty();
+    }
+
+    public void setSessionLastActive(final String sessionID)
+    {
+        final Optional<ISession> session = getSession( sessionID );
+        if ( session.isPresent() )
+        {
+            session.get().set( "last_active", System.currentTimeMillis() );
+            this.sessionDatabase.updateSession( sessionID );
+        }
     }
 
     @Override

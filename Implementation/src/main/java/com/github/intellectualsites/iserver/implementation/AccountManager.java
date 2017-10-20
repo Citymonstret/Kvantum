@@ -94,8 +94,8 @@ final public class AccountManager implements IAccountManager
         {
             return ret;
         }
-        try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager().prepareStatement(
-                "INSERT INTO account(`username`, `password`, `salt`) VALUES(?, ?, ?)" ) )
+        try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
+                .prepareStatement( "INSERT INTO account(`username`, `password`, `salt`) VALUES(?, ?, ?)" ) )
         {
             statement.setString( 1, username );
             final String salt = getNewSalt();

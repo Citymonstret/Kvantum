@@ -176,6 +176,7 @@ final class Worker extends AutoCloseable
         if ( session.isPresent() )
         {
             request.setSession( session.get() );
+            server.getSessionManager().setSessionLastActive( session.get().get( "id" ).toString() );
         } else
         {
             Logger.warn( "Could not initialize session!" );

@@ -45,6 +45,7 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.session.ISessionCreator;
+import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
 import com.github.intellectualsites.iserver.api.session.SessionManager;
 import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
@@ -267,7 +268,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         this.router = router;
 
         this.cacheManager = new CacheManager();
-        this.sessionManager = new SessionManager( this );
 
         if ( CoreConfig.MySQL.enabled )
         {
@@ -382,6 +382,16 @@ public final class Server implements IntellectualServer, ISessionCreator
                 e.printStackTrace();
             }
         }
+
+        final ISessionDatabase sessionDatabase;
+        if ( CoreConfig.Sessions.enableDb )
+        {
+            sessionDatabase = new SessionDatabase( this.getGlobalAccountManager().getApplicationStructure() );
+        } else
+        {
+            sessionDatabase = new DumbSessionDatabase();
+        }
+        this.sessionManager = new SessionManager( this, sessionDatabase );
     }
 
     private void printLicenseInfo()

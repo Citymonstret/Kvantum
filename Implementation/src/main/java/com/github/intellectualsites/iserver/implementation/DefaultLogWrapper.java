@@ -19,7 +19,6 @@
 package com.github.intellectualsites.iserver.implementation;
 
 import com.diogonunes.jcdp.color.ColoredPrinter;
-import com.diogonunes.jcdp.color.api.Ansi;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
 import com.sun.media.jfxmedia.logging.Logger;
@@ -42,6 +41,9 @@ public class DefaultLogWrapper implements LogWrapper
     @Override
     public void log(String prefix, String prefix1, String timeStamp, String message, String thread)
     {
+        /*
+        TODO: Get this to work again.
+
         final Ansi.FColor priorityColor;
         switch ( prefix1 )
         {
@@ -77,10 +79,11 @@ public class DefaultLogWrapper implements LogWrapper
         printer.print( message, Ansi.Attribute.NONE, Ansi.FColor.NONE, Ansi.BColor.NONE );
         printer.print( System.lineSeparator() );
         printer.clear();
+        */
 
         ( (Server) ServerImplementation.getImplementation() ).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
                 message, System.lineSeparator() );
-        // System.out.printf("[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator());
+        System.out.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator() );
         // printer.println("Hello",Ansi.Attribute.BOLD,Ansi.FColor.GREEN,Ansi.BColor.YELLOW)
     }
 

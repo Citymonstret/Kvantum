@@ -46,6 +46,14 @@ public class CoreConfig
     public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
 
+    @ConfigSection(name = "sessions")
+    public static class Sessions
+    {
+
+        public static boolean enableDb = true;
+        public static int sessionTimeout = 86400;
+    }
+
     // Transient makes sure that this is ignored by the config factory
     private transient static boolean preConfigured = false;
 
