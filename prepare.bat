@@ -1,9 +1,15 @@
 @echo off &setlocal
 
+echo.
+echo Executing gradlew build tasks.
+
+call gradlew :clean
 call gradlew :writeVersionToFile
-call gradlew :licenseFormatMain
+call gradlew licenseFormat
 call gradlew :build
-call gradlew :shadowJar
+
+echo.
+echo Replacing version variables.
 
 set /p oldVersion=< old-version.txt
 set /p newVersion=< version.txt
@@ -19,9 +25,18 @@ call:DoReplace "%oldVersion%" "%newVersion%" README.md README.md
 call:DoReplace "%oldVersion%" "%newVersion%" start.bat start.bat
 call:DoReplace "%oldVersion%" "%newVersion%" start.sh start.sh
 
-copy /Y .\build\libs\IntellectualServer-%newVersion%-all.jar .\
+echo.
+echo Copying built jar to .\bin\
 
-git add IntellectualServer-%newVersion%-all.jar
+copy /Y .\build\libs\IntellectualServer-%newVersion%.jar .\bin\
+
+echo.
+echo Adding jar to git changelog
+
+git add .\bin\IntellectualServer-%newVersion%.jar
+
+echo.
+echo Done!
 
 exit /b
 
@@ -29,5 +44,4 @@ exit /b
 echo ^(Get-Content "%3"^) ^| ForEach-Object { $_ -replace %1, %2 } ^| Set-Content %4>Rep.ps1
 Powershell.exe -executionpolicy ByPass -File Rep.ps1
 if exist Rep.ps1 del Rep.ps1
-echo Done
-pause
+echo Successfully replaced text in "%4"!
