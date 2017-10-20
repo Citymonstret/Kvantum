@@ -25,13 +25,13 @@ allprojects {
         mapping 'java', 'SLASHSTAR_STYLE'
         ext.year = 2017
     }
-    group 'com.github.intellectualsites'
     repositories {
         maven { url "https://jitpack.io" }
         maven { url "http://repo.maven.apache.org/maven2" }
     }
 }
 
+group 'com.github.intellectualsites'
 version = 'BETA-0.0.3'
 
 subprojects {
