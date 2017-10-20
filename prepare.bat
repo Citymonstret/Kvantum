@@ -1,7 +1,7 @@
 @echo off &setlocal
 
 call gradlew :writeVersionToFile
-call gradlew :licenseFormatMain
+call gradlew licenseFormat
 call gradlew :build
 call gradlew :shadowJar
 

@@ -1,6 +1,6 @@
-/**
+/*
  * IntellectualServer is a web server, written entirely in the Java language.
- * Copyright (C) 2015 IntellectualSites
+ * Copyright (C) 2017 IntellectualSites
  *
  * This program is free software; you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by

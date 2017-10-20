@@ -7,7 +7,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-        classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
     }
 }
 
@@ -23,9 +22,6 @@ version 'BETA-1.0.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-license {
-    header rootProject.file('HEADER')
-}
 
 repositories {
     maven { url "https://jitpack.io" }
