@@ -15,49 +15,35 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.5'
 }
 
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'idea'
-apply plugin: 'com.github.hierynomus.license'
-
-subprojects {
+allprojects {
     apply plugin: 'com.github.hierynomus.license'
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+
     license {
         header rootProject.file('HEADER')
         mapping 'java', 'SLASHSTAR_STYLE'
         ext.year = 2017
     }
-}
-
-group = 'com.github.intellectualsites'
-version = 'BETA-1.0.2'
-
-description = """"""
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-license {
-    header rootProject.file('HEADER')
-    mapping 'java', 'SLASHSTAR_STYLE'
-    ext.year = 2017
-}
-
-repositories {
-    maven { url "https://jitpack.io" }
-    maven { url "http://repo.maven.apache.org/maven2" }
-    flatDir {
-        dirs 'libs'
+    repositories {
+        maven { url "https://jitpack.io" }
+        maven { url "http://repo.maven.apache.org/maven2" }
     }
 }
+
+group 'com.github.intellectualsites'
+version = 'BETA-0.0.3'
+
+subprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+description = """"""
 
 task writeVersionToFile << {
     File file = new File(projectDir, "version.txt")
     new File(projectDir, "old-version.txt").text = file.text
     file.text = version
-}
-
-dependencies {
-    compileOnly 'org.projectlombok:lombok:1.16.18'
-    compile project(':Implementation')
 }

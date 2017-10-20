@@ -18,35 +18,25 @@
  */
 package com.github.intellectualsites.iserver.implementation;
 
+import com.diogonunes.jcdp.color.ColoredPrinter;
+import com.diogonunes.jcdp.color.api.Ansi;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
 import com.sun.media.jfxmedia.logging.Logger;
-import print.color.Ansi;
-import print.color.ColoredPrinter;
-import print.color.ColoredPrinterI;
-import print.color.ColoredPrinterWIN;
 
 import java.text.SimpleDateFormat;
 
 /**
- * The default log handler. Uses Ansi for colored output
+ * The default log handler. UsesAnsi.FColor for colored output
  */
 public class DefaultLogWrapper implements LogWrapper
 {
 
-    private final ColoredPrinterI coloredPrinter;
+    private final ColoredPrinter printer;
 
     public DefaultLogWrapper()
     {
-        if ( System.getProperty( "os.name" ).startsWith( "win" ) )
-        {
-            this.coloredPrinter = new ColoredPrinterWIN.Builder( Logger.INFO, false )
-                    .withFormat( new SimpleDateFormat() ).build();
-        } else
-        {
-            this.coloredPrinter = new ColoredPrinter.Builder( Logger.INFO, false )
-                    .withFormat( new SimpleDateFormat() ).build();
-        }
+        printer = new ColoredPrinter.Builder( Logger.INFO, false ).withFormat( new SimpleDateFormat() ).build();
     }
 
     @Override
@@ -72,25 +62,26 @@ public class DefaultLogWrapper implements LogWrapper
                 break;
         }
 
-        coloredPrinter.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( prefix, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
-        coloredPrinter.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( thread, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
-        coloredPrinter.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( timeStamp, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
-        coloredPrinter.print( "] ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( prefix1, Ansi.Attribute.BOLD, priorityColor, Ansi.BColor.NONE );
-        coloredPrinter.print( " > ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        coloredPrinter.print( message, Ansi.Attribute.NONE, Ansi.FColor.NONE, Ansi.BColor.NONE );
-        coloredPrinter.print( System.lineSeparator() );
-        coloredPrinter.clear();
+
+        printer.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( prefix, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
+        printer.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( thread, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
+        printer.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( timeStamp, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
+        printer.print( "] ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( prefix1, Ansi.Attribute.BOLD, priorityColor, Ansi.BColor.NONE );
+        printer.print( " > ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
+        printer.print( message, Ansi.Attribute.NONE, Ansi.FColor.NONE, Ansi.BColor.NONE );
+        printer.print( System.lineSeparator() );
+        printer.clear();
 
         ( (Server) ServerImplementation.getImplementation() ).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
                 message, System.lineSeparator() );
         // System.out.printf("[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator());
-        // coloredPrinter.println("Hello", Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.YELLOW)
+        // printer.println("Hello",Ansi.Attribute.BOLD,Ansi.FColor.GREEN,Ansi.BColor.YELLOW)
     }
 
     @Override

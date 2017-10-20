@@ -11,19 +11,14 @@ buildscript {
 }
 
 group 'com.github.intellectualsites'
-version 'ALPHA-1.0.0'
+version = 'BETA-1.0.2'
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 repositories {
-    maven { url "https://jitpack.io" }
-    maven { url "http://repo.maven.apache.org/maven2" }
     flatDir {
         dirs '../libs'
     }

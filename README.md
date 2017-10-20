@@ -24,8 +24,8 @@ We are using JitPack as our maven repo
 </repositories>
 
 <dependency>
-    <groupId>com.github.IntellectualSites</groupId>
-    <artifactId>IntellectualServer</artifactId>
+    <groupId>com.github.IntellectualSites.IntellectualServer</groupId>
+    <artifactId>Implementation</artifactId>
     <version>BETA-1.0.2</version>
 </dependency>
 ```
