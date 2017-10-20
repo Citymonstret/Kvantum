@@ -40,7 +40,7 @@ subprojects {
 }
 
 group = 'com.github.intellectualsites'
-version = 'BETA-1.0.0'
+version = 'BETA-1.0.1'
 
 description = """"""
 
