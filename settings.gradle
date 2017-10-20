@@ -1,7 +1,8 @@
 rootProject.name = 'IntellectualServer'
 include 'FileSystem'
-include 'ServerImplementation'
 include 'ServerAPI'
 include 'Crush'
 include 'Assert'
 include 'WindowsLauncher'
+include 'Implementation'
+
