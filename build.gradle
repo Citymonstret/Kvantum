@@ -21,6 +21,15 @@ apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'com.github.hierynomus.license'
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
 subprojects {
     apply plugin: 'com.github.hierynomus.license'
     license {
