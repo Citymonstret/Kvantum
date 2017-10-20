@@ -3,10 +3,10 @@
 echo.
 echo Executing gradlew build tasks.
 
-call gradlew :clean
-call gradlew :writeVersionToFile
+call gradlew clean
+call gradlew writeVersionToFile
 call gradlew licenseFormat
-call gradlew :build
+call gradlew build
 
 echo.
 echo Replacing version variables.
@@ -28,12 +28,11 @@ call:DoReplace "%oldVersion%" "%newVersion%" start.sh start.sh
 echo.
 echo Copying built jar to .\bin\
 
-copy /Y .\build\libs\IntellectualServer-%newVersion%-all.jar .\bin\
+copy /Y .\ServerImplementation\build\libs\ServerImplementation-%newVersion%-all.jar .\bin\
 
-REM echo.
-REM echo Adding jar to git changelog
-REM
-REM git add .\bin\IntellectualServer-%newVersion%-all.jar
+echo.
+echo Adding jar to git changelog
+git add .\bin\ServerImplementation-%newVersion%-all.jar
 
 echo.
 echo Done!
