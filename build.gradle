@@ -60,11 +60,21 @@ jar {
     }
 }
 
+shadowJar {
+    classifier = null
+}
+
 task writeVersionToFile << {
     File file = new File(projectDir, "version.txt")
     new File(projectDir, "old-version.txt").text = file.text
     file.text = version
 }
+
+task finalize << {
+    rootProject.tasks.shadowJar.execute()
+}
+
+build.finalizedBy finalize
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.18'
