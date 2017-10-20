@@ -18,17 +18,7 @@ task wrapper(type: Wrapper) {
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'com.github.hierynomus.license'
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
-}
 
 subprojects {
     apply plugin: 'com.github.hierynomus.license'
@@ -40,7 +30,7 @@ subprojects {
 }
 
 group = 'com.github.intellectualsites'
-version = 'BETA-1.0.1'
+version = 'BETA-1.0.2'
 
 description = """"""
 
@@ -61,39 +51,13 @@ repositories {
     }
 }
 
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'IntellectualServer',
-                'Implementation-Version': version,
-                'Main-Class': 'com.github.intellectualsites.iserver.IntellectualServerMain'
-    }
-}
-
-shadowJar {
-    classifier = null
-}
-
 task writeVersionToFile << {
     File file = new File(projectDir, "version.txt")
     new File(projectDir, "old-version.txt").text = file.text
     file.text = version
 }
 
-task finalize << {
-    rootProject.tasks.shadowJar.execute()
-}
-
-build.finalizedBy finalize
-
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.18'
-    testCompile 'junit:junit:4.12'
-    compile group: 'com.cedarsoftware', name: 'json-io', version: '2.9.3'
-    // compile group: 'org.yaml', name: 'snakeyaml', version: '1.14'
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.8.7'
-    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.13'
-    compile name: 'JCDP-1.25-win'
-    compile group: 'com.beust', name: 'jcommander', version: '1.48'
-    compile project(":ServerAPI")
-    compile project(":Crush")
+    compile project(':Implementation')
 }

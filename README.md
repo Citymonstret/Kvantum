@@ -26,6 +26,6 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>com.github.IntellectualSites</groupId>
     <artifactId>IntellectualServer</artifactId>
-    <version>BETA-1.0.1</version>
+    <version>BETA-1.0.2</version>
 </dependency>
 ```

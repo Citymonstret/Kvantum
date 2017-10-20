@@ -18,8 +18,8 @@
  */
 package windows;
 
-import com.github.intellectualsites.iserver.IntellectualServerMain;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
+import com.github.intellectualsites.iserver.implementation.IntellectualServerMain;
 import dorkbox.systemTray.SystemTray;
 
 public class WindowsLauncher

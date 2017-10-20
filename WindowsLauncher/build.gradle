@@ -29,7 +29,15 @@ repositories {
     }
 }
 
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'IntellectualServer',
+                'Implementation-Version': version,
+                'Main-Class': 'windows.WindowsLauncher'
+    }
+}
+
 dependencies {
-    compile rootProject
+    compile project(':Implementation')
     compile "com.dorkbox:SystemTray:3.10"
 }
