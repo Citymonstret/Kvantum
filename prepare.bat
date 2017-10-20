@@ -28,12 +28,12 @@ call:DoReplace "%oldVersion%" "%newVersion%" start.sh start.sh
 echo.
 echo Copying built jar to .\bin\
 
-copy /Y .\build\libs\IntellectualServer-%newVersion%.jar .\bin\
+copy /Y .\build\libs\IntellectualServer-%newVersion%-all.jar .\bin\
 
-echo.
-echo Adding jar to git changelog
-
-git add .\bin\IntellectualServer-%newVersion%.jar
+REM echo.
+REM echo Adding jar to git changelog
+REM
+REM git add .\bin\IntellectualServer-%newVersion%-all.jar
 
 echo.
 echo Done!

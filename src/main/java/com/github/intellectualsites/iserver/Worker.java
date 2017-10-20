@@ -122,7 +122,7 @@ final class Worker extends AutoCloseable
      * Warning: The thread will be locked until a new worker is available
      * @return The next available worker
      */
-    protected static Worker getAvailableWorker()
+    static Worker getAvailableWorker()
     {
         Worker worker = Assert.notNull( availableWorkers ).poll();
         while ( worker == null )

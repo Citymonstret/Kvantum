@@ -40,7 +40,7 @@ subprojects {
 }
 
 group = 'com.github.intellectualsites'
-version = 'BETA-1.0.1'
+version = 'BETA-1.0.2'
 
 description = """"""
 
@@ -67,10 +67,6 @@ jar {
                 'Implementation-Version': version,
                 'Main-Class': 'com.github.intellectualsites.iserver.IntellectualServerMain'
     }
-}
-
-shadowJar {
-    classifier = null
 }
 
 task writeVersionToFile << {
