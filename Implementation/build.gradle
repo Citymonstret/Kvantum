@@ -10,6 +10,9 @@ buildscript {
     }
 }
 
+group 'com.github.intellectualsites'
+version = 'BETA-0.0.3'
+
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.18'
     compile group: 'com.diogonunes', name: 'JCDP', version: '2.0.3.1'

@@ -10,6 +10,9 @@ buildscript {
     }
 }
 
+group 'com.github.intellectualsites'
+version = 'BETA-0.0.3'
+
 repositories {
     maven { url "https://jitpack.io" }
     maven { url "http://repo.maven.apache.org/maven2" }

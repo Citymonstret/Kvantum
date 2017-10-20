@@ -9,3 +9,6 @@ buildscript {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
+
+group 'com.github.intellectualsites'
+version = 'BETA-0.0.3'
