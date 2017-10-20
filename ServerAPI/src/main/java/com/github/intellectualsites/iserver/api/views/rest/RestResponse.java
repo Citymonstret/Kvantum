@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.views.rest;
 import com.github.intellectualsites.iserver.api.matching.ViewPattern;
 import com.github.intellectualsites.iserver.api.request.HttpMethod;
 import com.github.intellectualsites.iserver.api.request.Request;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ public abstract class RestResponse
     private final ViewPattern viewPattern;
     @Getter
     private final String contentType;
+    @Getter(AccessLevel.PROTECTED)
     private final ApiRequirements apiRequirements;
 
     public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern)
