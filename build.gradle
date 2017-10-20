@@ -15,11 +15,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.5'
 }
 
-apply plugin: 'maven'
-apply plugin: 'idea'
-
 allprojects {
     apply plugin: 'com.github.hierynomus.license'
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+
     license {
         header rootProject.file('HEADER')
         mapping 'java', 'SLASHSTAR_STYLE'
