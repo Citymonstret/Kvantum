@@ -10,6 +10,9 @@ buildscript {
     }
 }
 
+group 'com.github.intellectualsites'
+version = 'BETA-1.0.2'
+
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
