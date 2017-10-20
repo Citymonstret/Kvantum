@@ -26,12 +26,13 @@ allprojects {
         ext.year = 2017
     }
     group 'com.github.intellectualsites'
-    version = 'BETA-1.0.2'
     repositories {
         maven { url "https://jitpack.io" }
         maven { url "http://repo.maven.apache.org/maven2" }
     }
 }
+
+version = 'BETA-0.0.3'
 
 subprojects {
     apply plugin: 'java'
