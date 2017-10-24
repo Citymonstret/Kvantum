@@ -65,6 +65,11 @@ public abstract class RestResponse
 
     public boolean contentTypeMatches(final Request request)
     {
+        if ( this.contentType.isEmpty() )
+        {
+            // We simply don't care.
+            return true;
+        }
         final String supplied = request.getHeader( "Accept" );
         if ( supplied.isEmpty() )
         {
@@ -74,14 +79,13 @@ public abstract class RestResponse
         final String[] parts = supplied.split( "\\s+" );
         for ( String part : parts )
         {
-            if ( part.equals( this.contentType ) )
+            if ( part.equals( "*/*" ) || part.equals( this.contentType ) )
             {
                 return true;
             }
         }
         return false;
     }
-
     protected final boolean matches(Request request)
     {
         final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
