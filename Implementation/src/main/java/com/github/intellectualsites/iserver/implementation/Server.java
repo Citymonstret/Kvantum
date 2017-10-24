@@ -58,6 +58,10 @@ import com.github.intellectualsites.iserver.implementation.commands.AccountComma
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerException;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerInitializationException;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerStartException;
+import com.github.intellectualsites.iserver.implementation.mongo.MongoAccountManager;
+import com.github.intellectualsites.iserver.implementation.mongo.MongoSessionDatabase;
+import com.github.intellectualsites.iserver.implementation.sqlite.SQLiteAccountManager;
+import com.github.intellectualsites.iserver.implementation.sqlite.SQLiteSessionDatabase;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
 import lombok.AccessLevel;
@@ -76,7 +80,7 @@ public final class Server implements IntellectualServer, ISessionCreator
 {
 
     // Private Static
-    @SuppressWarnings( "ALL" )
+    @SuppressWarnings("ALL")
     @Getter(AccessLevel.PACKAGE)
     private static Server instance;
     // Private Final
@@ -341,14 +345,34 @@ public final class Server implements IntellectualServer, ISessionCreator
             this.commandManager.getManagerOptions().getFindCloseMatches( false );
             this.commandManager.getManagerOptions().setRequirePrefix( false );
 
-            ApplicationStructure applicationStructure = new ApplicationStructure( "core" )
+            ApplicationStructure applicationStructure = null;
+            switch ( CoreConfig.Application.databaseImplementation )
             {
-                @Override
-                public IAccountManager createNewAccountManager()
-                {
-                    return new AccountManager( this );
-                }
-            };
+                case "sqlite":
+                    applicationStructure = new SQLiteApplicationStructure( "core" )
+                    {
+                        @Override
+                        public IAccountManager createNewAccountManager()
+                        {
+                            return new SQLiteAccountManager( this );
+                        }
+                    };
+                    break;
+                case "mongo":
+                    applicationStructure = new MongoApplicationStructure( "core" )
+                    {
+                        @Override
+                        public IAccountManager createNewAccountManager()
+                        {
+                            return new MongoAccountManager( this );
+                        }
+                    };
+                    break;
+                default:
+                    Logger.error( "Unknown application database implementation: %s", CoreConfig.Application
+                            .databaseImplementation );
+                    break;
+            }
             this.globalAccountManager = applicationStructure.getAccountManager();
             try
             {
@@ -386,7 +410,30 @@ public final class Server implements IntellectualServer, ISessionCreator
         final ISessionDatabase sessionDatabase;
         if ( CoreConfig.Sessions.enableDb )
         {
-            sessionDatabase = new SessionDatabase( this.getGlobalAccountManager().getApplicationStructure() );
+            switch ( CoreConfig.Application.databaseImplementation.toLowerCase() )
+            {
+                case "sqlite":
+                    sessionDatabase = new SQLiteSessionDatabase( (SQLiteApplicationStructure) this
+                            .getGlobalAccountManager()
+                            .getApplicationStructure() );
+                    break;
+                case "mongo":
+                    sessionDatabase = new MongoSessionDatabase( (MongoApplicationStructure) this
+                            .getGlobalAccountManager().getApplicationStructure() );
+                    break;
+                default:
+                    Logger.error( "Unknown database implementation (%s). Using a DumbSessionDatabase instead.",
+                            CoreConfig.Application.databaseImplementation );
+                    sessionDatabase = new DumbSessionDatabase();
+                    break;
+            }
+            try
+            {
+                sessionDatabase.setup();
+            } catch ( Exception e )
+            {
+                e.printStackTrace();
+            }
         } else
         {
             sessionDatabase = new DumbSessionDatabase();
@@ -678,8 +725,8 @@ public final class Server implements IntellectualServer, ISessionCreator
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
         // to limit to only error messages or such
-        if ( (mode == LogModes.MODE_DEBUG && !CoreConfig.debug) || mode < LogModes.lowestLevel || mode > LogModes
-            .highestLevel )
+        if ( ( mode == LogModes.MODE_DEBUG && !CoreConfig.debug ) || mode < LogModes.lowestLevel || mode > LogModes
+                .highestLevel )
         {
             return;
         }

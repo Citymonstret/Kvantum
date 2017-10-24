@@ -44,16 +44,14 @@ public class Account
      * @param id       (Unique) account ID
      * @param username Account username
      * @param password Account password
-     * @param salt     Salt used when generating password
      * @param manager  Account manager implementation
      */
-    public Account(final int id, final String username, final String password, final String salt, final IAccountManager
+    public Account(final int id, final String username, final String password, final IAccountManager
             manager)
     {
         Assert.isPositive( id );
         Assert.notEmpty( username );
         Assert.notEmpty( password );
-        Assert.notEmpty( salt );
         Assert.notNull( manager );
 
         this.username = username;

@@ -1,19 +1,17 @@
-package com.github.intellectualsites.iserver.implementation;
+package com.github.intellectualsites.iserver.implementation.sqlite;
 
-import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
-import com.github.intellectualsites.iserver.api.util.ApplicationStructure;
+import com.github.intellectualsites.iserver.api.util.SQLiteApplicationStructure;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 @RequiredArgsConstructor
-public class SessionDatabase implements ISessionDatabase
+public class SQLiteSessionDatabase implements ISessionDatabase
 {
 
-    private final ApplicationStructure applicationStructure;
+    private final SQLiteApplicationStructure applicationStructure;
 
     @Override
     public void setup() throws Exception
@@ -26,7 +24,7 @@ public class SessionDatabase implements ISessionDatabase
         );
     }
 
-    private long containsSession(final String sessionID)
+    public long containsSession(final String sessionID)
     {
         long ret = -1;
         try ( final PreparedStatement statement = this.applicationStructure
@@ -45,27 +43,6 @@ public class SessionDatabase implements ISessionDatabase
             e.printStackTrace();
         }
         return ret;
-    }
-
-    @Override
-    public boolean isValid(final String session)
-    {
-        long lastActive = containsSession( session );
-        if ( lastActive == -1 )
-        {
-            return false;
-        }
-        long difference = ( System.currentTimeMillis() - lastActive ) / 1000;
-        if ( difference >= CoreConfig.Sessions.sessionTimeout )
-        {
-            if ( CoreConfig.debug )
-            {
-                Logger.debug( "Deleted outdated session: %s", session );
-            }
-            deleteSession( session );
-            return false;
-        }
-        return true;
     }
 
     @Override

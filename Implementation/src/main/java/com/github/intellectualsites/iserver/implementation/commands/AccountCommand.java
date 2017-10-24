@@ -45,6 +45,8 @@ public class AccountCommand extends Command
         this.createCommand( new DumpData() );
         this.createCommand( new TestPass() );
         this.createCommand( new CreateAccount() );
+        this.createCommand( new SetData() );
+        this.createCommand( new DeleteData() );
 
         this.structure = applicationStructure;
     }
@@ -53,12 +55,76 @@ public class AccountCommand extends Command
     {
         if ( instance.getArguments().length < 1 )
         {
-            send( "Available Subcommands: create, testpass, dumpdata" );
+            send( "Available Subcommands: create, testpass, dumpdata, setdata, deletedata" );
         } else
         {
             super.handle( instance.getCaller(), instance.getArguments() );
         }
         return true;
+    }
+
+    @CommandDeclaration(
+            command = "deletedata"
+    )
+    public class DeleteData extends Command
+    {
+
+        DeleteData()
+        {
+            this.withArgument( "username", new StringParser(), "Username!" );
+            this.withArgument( "key", new StringParser(), "Data key!" );
+        }
+
+        @Override
+        public boolean onCommand(final CommandInstance instance)
+        {
+            String key = instance.getString( "key" );
+            String username = instance.getValue( "username", String.class );
+            Optional<Account> account = structure.getAccountManager().getAccount( username );
+            if ( !account.isPresent() )
+            {
+                send( "There is no such account!" );
+            } else
+            {
+                account.get().removeData( key );
+                send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                        .getRawData(), ": ", ", " ) );
+            }
+            return true;
+        }
+    }
+
+    @CommandDeclaration(
+            command = "setdata"
+    )
+    public class SetData extends Command
+    {
+
+        SetData()
+        {
+            this.withArgument( "username", new StringParser(), "Username!" );
+            this.withArgument( "key", new StringParser(), "Data key!" );
+            this.withArgument( "value", new StringParser(), "Data value!" );
+        }
+
+        @Override
+        public boolean onCommand(final CommandInstance instance)
+        {
+            String key = instance.getString( "key" );
+            String value = instance.getString( "value" );
+            String username = instance.getValue( "username", String.class );
+            Optional<Account> account = structure.getAccountManager().getAccount( username );
+            if ( !account.isPresent() )
+            {
+                send( "There is no such account!" );
+            } else
+            {
+                account.get().setData( key, value );
+                send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                        .getRawData(), ": ", ", " ) );
+            }
+            return true;
+        }
     }
 
     @CommandDeclaration(
@@ -73,7 +139,7 @@ public class AccountCommand extends Command
         }
 
         @Override
-        public boolean onCommand(CommandInstance instance)
+        public boolean onCommand(final CommandInstance instance)
         {
             if ( instance.getArguments().length < 1 )
             {
@@ -108,7 +174,7 @@ public class AccountCommand extends Command
         }
 
         @Override
-        public boolean onCommand(CommandInstance instance)
+        public boolean onCommand(final CommandInstance instance)
         {
             String username = instance.getValue( "username", String.class );
             String password = instance.getValue( "password", String.class );
@@ -143,7 +209,7 @@ public class AccountCommand extends Command
         }
 
         @Override
-        public boolean onCommand(CommandInstance instance)
+        public boolean onCommand(final CommandInstance instance)
         {
             String username = instance.getValue( "username", String.class );
             String password = instance.getValue( "password", String.class );

@@ -31,6 +31,8 @@ import java.util.Optional;
 public interface IAccountManager
 {
 
+    static final String SESSION_ACCOUNT_CONSTANT = "__user_id__";
+
     /**
      * Check if a given password matches the real password
      *
@@ -86,20 +88,33 @@ public interface IAccountManager
      * @return {@link Optional} containing the account if it exsists
      *                          otherwise an empty optional ({@link Optional#empty()} is returned.
      */
-    Optional<Account> getAccount(ISession session);
+    default Optional<Account> getAccount(final ISession session)
+    {
+        if ( !session.contains( SESSION_ACCOUNT_CONSTANT ) )
+        {
+            return Optional.empty();
+        }
+        return getAccount( (int) session.get( SESSION_ACCOUNT_CONSTANT ) );
+    }
 
     /**
      * Bind an {@link Account} to a {@link ISession}
      * @param account Account
      * @param session Session
      */
-    void bindAccount(Account account, ISession session);
+    default void bindAccount(final Account account, final ISession session)
+    {
+        session.set( SESSION_ACCOUNT_CONSTANT, account.getId() );
+    }
 
     /**
      * Unbind any account from a {@link ISession}
      * @param session Session to be unbound
      */
-    void unbindAccount(ISession session);
+    default void unbindAccount(final ISession session)
+    {
+        session.set( SESSION_ACCOUNT_CONSTANT, null );
+    }
 
     /**
      * Set the data for an account

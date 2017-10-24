@@ -112,6 +112,19 @@ public class CoreConfig
 
     }
 
+    @ConfigSection(name = "mongodb")
+    public static class MongoDB
+    {
+
+        public static boolean enabled = false;
+        public static String uri = "mongodb://localhost:27017";
+
+        public static String dbSessions = "isites";
+        public static String dbAccounts = "isites";
+        public static String collectionSessions = "sessions";
+        public static String collectionAccounts = "accounts";
+    }
+
     @ConfigSection(name = "mysql")
     public static class MySQL
     {
@@ -123,9 +136,8 @@ public class CoreConfig
     @ConfigSection(name = "application")
     public static class Application
     {
-
         public static String main = "";
-
+        public static String databaseImplementation = "sqlite";
     }
 
 }

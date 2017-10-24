@@ -16,34 +16,30 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.iserver.implementation;
+package com.github.intellectualsites.iserver.implementation.sqlite;
 
 import com.github.intellectualsites.iserver.api.account.Account;
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
-import com.github.intellectualsites.iserver.api.session.ISession;
-import com.github.intellectualsites.iserver.api.util.ApplicationStructure;
 import com.github.intellectualsites.iserver.api.util.Assert;
+import com.github.intellectualsites.iserver.api.util.SQLiteApplicationStructure;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
 
-final public class AccountManager implements IAccountManager
+@RequiredArgsConstructor
+final public class SQLiteAccountManager implements IAccountManager
 {
-
-    private static final String SESSION_ACCOUNT_CONSTANT = "__user_id__";
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static final Optional<Account> EMPTY_OPTIONAL = Optional.empty();
 
-    private final ApplicationStructure applicationStructure;
-
-    public AccountManager(final ApplicationStructure applicationStructure)
-    {
-        this.applicationStructure = applicationStructure;
-    }
+    @Getter
+    private final SQLiteApplicationStructure applicationStructure;
 
     private static String getNewSalt()
     {
@@ -56,19 +52,14 @@ final public class AccountManager implements IAccountManager
     }
 
     @Override
-    public ApplicationStructure getApplicationStructure()
-    {
-        return applicationStructure;
-    }
-
-    @Override
     public void setup() throws Exception
     {
         this.applicationStructure.getDatabaseManager().executeUpdate( "CREATE TABLE IF NOT EXISTS account( id " +
                 "INTEGER PRIMARY KEY, username VARCHAR(64), password VARCHAR(255), salt VARCHAR(255), CONSTRAINT " +
                 "name_unique UNIQUE (username) )" );
         this.applicationStructure.getDatabaseManager().executeUpdate( "CREATE TABLE IF NOT EXISTS account_data ( id " +
-                "INTEGER PRIMARY KEY, account_id INTEGER, `key` VARCHAR(255), `value` VARCHAR(255))" );
+                "INTEGER PRIMARY KEY, account_id INTEGER, `key` VARCHAR(255), `value` VARCHAR(255), UNIQUE" +
+                "(account_id, `key`)" );
         if ( !getAccount( "admin" ).isPresent() )
         {
             Optional<Account> adminAccount = createAccount( "admin", "admin" );
@@ -141,10 +132,7 @@ final public class AccountManager implements IAccountManager
         {
             e.printStackTrace();
         }
-        if ( ret.isPresent() )
-        {
-            ServerImplementation.getImplementation().getCacheManager().setCachedAccount( ret.get() );
-        }
+        ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
         return ret;
     }
 
@@ -170,10 +158,7 @@ final public class AccountManager implements IAccountManager
         {
             e.printStackTrace();
         }
-        if ( ret.isPresent() )
-        {
-            ServerImplementation.getImplementation().getCacheManager().setCachedAccount( ret.get() );
-        }
+        ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
         return ret;
     }
 
@@ -183,29 +168,7 @@ final public class AccountManager implements IAccountManager
         final String username = resultSet.getString( "username" );
         final String password = resultSet.getString( "password" );
         final String salt = resultSet.getString( "salt" );
-        return new Account( id, username, password, salt, this );
-    }
-
-    @Override
-    public Optional<Account> getAccount(final ISession session)
-    {
-        if ( !session.contains( SESSION_ACCOUNT_CONSTANT ) )
-        {
-            return Optional.empty();
-        }
-        return getAccount( (int) session.get( SESSION_ACCOUNT_CONSTANT ) );
-    }
-
-    @Override
-    public void bindAccount(final Account account, final ISession session)
-    {
-        session.set( SESSION_ACCOUNT_CONSTANT, account.getId() );
-    }
-
-    @Override
-    public void unbindAccount(final ISession session)
-    {
-        session.set( SESSION_ACCOUNT_CONSTANT, null );
+        return new Account( id, username, password, this );
     }
 
     @Override
@@ -246,11 +209,22 @@ final public class AccountManager implements IAccountManager
     public void setData(Account account, String key, String value)
     {
         try ( final PreparedStatement statement = applicationStructure.getDatabaseManager().prepareStatement(
-                "INSERT INTO account_data(account_id, `key`, `value`) VALUES(?, ?, ?)" ) )
+                "INSERT OR IGNORE INTO account_data(account_id, `key`, `value`) VALUES(?, ?, ?)" ) )
         {
             statement.setInt( 1, account.getId() );
             statement.setString( 2, key );
             statement.setString( 3, value );
+            statement.executeUpdate();
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        try ( final PreparedStatement statement = applicationStructure.getDatabaseManager().prepareStatement(
+                "UPDATE account_data SET `value` = ? WHERE account_id = ? AND `key` = ?" ) )
+        {
+            statement.setInt( 2, account.getId() );
+            statement.setString( 3, key );
+            statement.setString( 1, value );
             statement.executeUpdate();
         } catch ( final Exception e )
         {

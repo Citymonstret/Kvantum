@@ -20,10 +20,6 @@ package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
-import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Created 11/13/2015 for IntellectualServer
@@ -34,21 +30,13 @@ import java.sql.SQLException;
 public abstract class ApplicationStructure
 {
 
-    private final IAccountManager accountManager;
-    private final String applicationName;
+    protected final String applicationName;
+    protected IAccountManager accountManager;
     private SQLiteManager database;
 
     public ApplicationStructure(final String applicationName)
     {
         this.applicationName = Assert.notEmpty( applicationName );
-        try
-        {
-            this.database = new SQLiteManager( this.applicationName );
-        } catch ( final IOException | SQLException e )
-        {
-            throw new IntellectualServerException( e );
-        }
-        this.accountManager = createNewAccountManager();
     }
 
     public abstract IAccountManager createNewAccountManager();
@@ -56,11 +44,6 @@ public abstract class ApplicationStructure
     public IAccountManager getAccountManager()
     {
         return this.accountManager;
-    }
-
-    public SQLiteManager getDatabaseManager()
-    {
-        return this.database;
     }
 
     @Override

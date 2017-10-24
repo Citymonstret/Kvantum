@@ -11,6 +11,12 @@ public class DumbSessionDatabase implements ISessionDatabase
     }
 
     @Override
+    public long containsSession(String sessionId)
+    {
+        return -1;
+    }
+
+    @Override
     public boolean isValid(String session)
     {
         return true;
