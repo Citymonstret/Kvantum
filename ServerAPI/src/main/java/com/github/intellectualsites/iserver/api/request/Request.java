@@ -287,8 +287,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      */
     public void addMeta(final String name, final Object var)
     {
-        Assert.notNull( name, var );
-
+        Assert.notNull( name );
         meta.put( name, var );
     }
 
