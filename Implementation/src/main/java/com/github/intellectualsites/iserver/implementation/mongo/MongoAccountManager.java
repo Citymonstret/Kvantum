@@ -59,6 +59,8 @@ public class MongoAccountManager implements IAccountManager
         {
             this.counters.insert( new BasicDBObject( "_id", "userId" ).append( "seq", 0 ) );
         }
+
+        this.checkAdmin();
     }
 
     private int getNextId()

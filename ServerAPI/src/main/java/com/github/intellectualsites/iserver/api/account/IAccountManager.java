@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.iserver.api.account;
 
+import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.ApplicationStructure;
 import org.mindrot.jbcrypt.BCrypt;
@@ -137,4 +138,19 @@ public interface IAccountManager
      */
     void loadData(final Account account);
 
+    default void checkAdmin()
+    {
+        if ( !getAccount( "admin" ).isPresent() )
+        {
+            Optional<Account> adminAccount = createAccount( "admin", "admin" );
+            if ( !adminAccount.isPresent() )
+            {
+                ServerImplementation.getImplementation().log( "Failed to create admin account :(" );
+            } else
+            {
+                ServerImplementation.getImplementation().log( "Created admin account with password \"admin\"" );
+                adminAccount.get().setData( "administrator", "true" );
+            }
+        }
+    }
 }

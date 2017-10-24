@@ -60,18 +60,7 @@ final public class SQLiteAccountManager implements IAccountManager
         this.applicationStructure.getDatabaseManager().executeUpdate( "CREATE TABLE IF NOT EXISTS account_data ( id " +
                 "INTEGER PRIMARY KEY, account_id INTEGER, `key` VARCHAR(255), `value` VARCHAR(255), UNIQUE" +
                 "(account_id, `key`) )" );
-        if ( !getAccount( "admin" ).isPresent() )
-        {
-            Optional<Account> adminAccount = createAccount( "admin", "admin" );
-            if ( !adminAccount.isPresent() )
-            {
-                ServerImplementation.getImplementation().log( "Failed to create admin account :(" );
-            } else
-            {
-                ServerImplementation.getImplementation().log( "Created admin account with password \"admin\"" );
-                adminAccount.get().setData( "administrator", "true" );
-            }
-        }
+        this.checkAdmin();
     }
 
     @Override
