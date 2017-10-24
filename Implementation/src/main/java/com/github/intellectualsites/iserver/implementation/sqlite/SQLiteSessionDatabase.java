@@ -20,7 +20,7 @@ public class SQLiteSessionDatabase implements ISessionDatabase
                 "CREATE TABLE IF NOT EXISTS sessions (" +
                         " session_id INTEGER PRIMARY KEY," +
                         " id VARCHAR (64) UNIQUE NOT NULL," +
-                        " last_active TIME DEFAULT (CURRENT_TIMESTAMP)"
+                        " last_active TIME DEFAULT (CURRENT_TIMESTAMP) )"
         );
     }
 

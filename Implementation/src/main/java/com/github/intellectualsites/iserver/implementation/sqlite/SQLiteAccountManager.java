@@ -59,7 +59,7 @@ final public class SQLiteAccountManager implements IAccountManager
                 "name_unique UNIQUE (username) )" );
         this.applicationStructure.getDatabaseManager().executeUpdate( "CREATE TABLE IF NOT EXISTS account_data ( id " +
                 "INTEGER PRIMARY KEY, account_id INTEGER, `key` VARCHAR(255), `value` VARCHAR(255), UNIQUE" +
-                "(account_id, `key`)" );
+                "(account_id, `key`) )" );
         if ( !getAccount( "admin" ).isPresent() )
         {
             Optional<Account> adminAccount = createAccount( "admin", "admin" );
