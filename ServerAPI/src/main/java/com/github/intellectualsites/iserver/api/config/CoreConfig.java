@@ -45,6 +45,7 @@ public class CoreConfig
     public static boolean enableSyntax = true;
     public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
+    public static boolean enableInputThread = true;
 
     @ConfigSection(name = "sessions")
     public static class Sessions

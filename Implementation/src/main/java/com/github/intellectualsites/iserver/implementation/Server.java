@@ -626,7 +626,7 @@ public final class Server implements IntellectualServer, ISessionCreator
 
         log( Message.STARTING_ON_PORT, CoreConfig.port );
 
-        if ( standalone )
+        if ( standalone && CoreConfig.enableInputThread )
         {
             new InputThread().start();
         }
