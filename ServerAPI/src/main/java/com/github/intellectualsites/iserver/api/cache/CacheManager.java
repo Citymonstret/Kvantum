@@ -18,19 +18,14 @@
  */
 package com.github.intellectualsites.iserver.api.cache;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.intellectualsites.iserver.api.account.Account;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
-import org.ehcache.Cache;
-import org.ehcache.config.builders.CacheConfigurationBuilder;
-import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.ehcache.config.units.MemoryUnit;
-import org.ehcache.expiry.Duration;
-import org.ehcache.expiry.Expirations;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -51,36 +46,16 @@ public final class CacheManager
 
     public CacheManager()
     {
-        org.ehcache.CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache( "cachedIncludes", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
-                        String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache.cachedIncludesHeapMB,
-                                MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration( Duration.of(
-                        CoreConfig.Cache.cachedIncludesExpiry, TimeUnit.SECONDS ) )
-                ) )
-                .withCache( "cachedBodies", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
-                        CachedResponse.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
-                                .cachedBodiesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
-                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS ) )
-                ) )
-                .withCache( "cachedFiles", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
-                        String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
-                                .cachedFilesHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations
-                        .timeToLiveExpiration( Duration.of( CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS ) )
-                ) )
-                .withCache( "cachedAccounts", CacheConfigurationBuilder.newCacheConfigurationBuilder( Integer.class,
-                        Account.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
-                                .cachedAccountsHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration
-                        ( Duration.of( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS ) ) ) )
-                .withCache( "cachedAccountIds", CacheConfigurationBuilder.newCacheConfigurationBuilder( String.class,
-                        Integer.class, ResourcePoolsBuilder.newResourcePoolsBuilder().heap( CoreConfig.Cache
-                                .cachedAccountIdsHeapMB, MemoryUnit.MB ) ).withExpiry( Expirations.timeToLiveExpiration
-                        ( Duration.of( CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS ) ) ) )
-                .build( true );
-        this.cachedIncludes = cacheManager.getCache( "cachedIncludes", String.class, String.class );
-        this.cachedFiles = cacheManager.getCache( "cachedFiles", String.class, String.class );
-        this.cachedBodies = cacheManager.getCache( "cachedBodies", String.class, CachedResponse.class );
-        this.cachedAccounts = cacheManager.getCache( "cachedAccounts", Integer.class, Account.class );
-        this.cachedAccountIds = cacheManager.getCache( "cachedAccountIds", String.class, Integer.class );
+        cachedIncludes = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedIncludesExpiry, TimeUnit
+                .SECONDS ).maximumSize( CoreConfig.Cache.cachedIncludesMaxItems ).build();
+        cachedFiles = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedFilesExpiry, TimeUnit
+                .SECONDS ).maximumSize( CoreConfig.Cache.cachedFilesMaxItems ).build();
+        cachedBodies = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit
+                .SECONDS ).maximumSize( CoreConfig.Cache.cachedBodiesMaxItems ).build();
+        cachedAccounts = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit
+                .SECONDS ).maximumSize( CoreConfig.Cache.cachedAccountsMaxItems ).build();
+        cachedAccountIds = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit
+                .SECONDS ).maximumSize( CoreConfig.Cache.cachedAccountIdsMaxItems ).build();
     }
 
     /**
@@ -93,18 +68,17 @@ public final class CacheManager
     {
         Assert.notNull( group );
 
-        return this.cachedIncludes.containsKey( group ) ?
-                cachedIncludes.get( group ) : null;
+        return this.cachedIncludes.getIfPresent( group );
     }
 
     public Optional<Account> getCachedAccount(final int id)
     {
-        return Optional.ofNullable( cachedAccounts.get( id ) );
+        return Optional.ofNullable( cachedAccounts.getIfPresent( id ) );
     }
 
     public Optional<Integer> getCachedId(final String username)
     {
-        return Optional.ofNullable( cachedAccountIds.get( username ) );
+        return Optional.ofNullable( cachedAccountIds.getIfPresent( username ) );
     }
 
     public void setCachedAccount(final Account account)
@@ -127,11 +101,7 @@ public final class CacheManager
             return Optional.empty();
         }
 
-        if ( cachedFiles.containsKey( file ) )
-        {
-            return Optional.of( cachedFiles.get( file ) );
-        }
-        return Optional.empty();
+        return Optional.ofNullable( cachedFiles.getIfPresent( file ) );
     }
 
     public void setCachedFile(final String file, final String content)
@@ -165,7 +135,7 @@ public final class CacheManager
     {
         Assert.notNull( view );
 
-        return this.cachedBodies.containsKey( view.toString() );
+        return this.cachedBodies.getIfPresent( view.toString() ) != null;
     }
 
     /**
@@ -198,6 +168,6 @@ public final class CacheManager
             ServerImplementation.getImplementation().log( "Accessing cached body: " + view );
         }
 
-        return this.cachedBodies.get( view.toString() );
+        return this.cachedBodies.getIfPresent( view.toString() );
     }
 }

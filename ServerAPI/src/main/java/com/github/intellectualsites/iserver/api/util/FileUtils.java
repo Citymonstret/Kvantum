@@ -207,10 +207,15 @@ public class FileUtils
 
     public static String getDocument(final File file, int buffer, boolean create)
     {
-        final Optional<String> cacheEntry = ServerImplementation.getImplementation().getCacheManager().getCachedFile(
-                file
-                        .toString
-                                () );
+        Optional<String> cacheEntry = Optional.empty();
+        try
+        {
+            cacheEntry = ServerImplementation.getImplementation().getCacheManager().getCachedFile(
+                    file.toString() );
+        } catch ( final Throwable e )
+        {
+            new IntellectualServerException( "Failed to read file (" + file + ") from cache", e ).printStackTrace();
+        }
         if ( cacheEntry.isPresent() )
         {
             return cacheEntry.get();
