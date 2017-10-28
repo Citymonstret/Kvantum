@@ -19,7 +19,6 @@
 package com.github.intellectualsites.iserver.implementation;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
-import com.github.intellectualsites.iserver.api.cache.CacheManager;
 import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.ConfigurationFile;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;

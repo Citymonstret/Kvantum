@@ -14,7 +14,6 @@ group 'com.github.intellectualsites'
 version = 'BETA-0.0.3'
 
 dependencies {
-    compile 'com.github.ben-manes.caffeine:caffeine:2.5.6'
     compile 'ch.qos.logback:logback-classic:1.1.5'
     // Used to simplify code creation
     compileOnly 'org.projectlombok:lombok:1.16.18'
