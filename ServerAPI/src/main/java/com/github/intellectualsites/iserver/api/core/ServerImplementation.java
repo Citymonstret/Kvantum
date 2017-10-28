@@ -53,4 +53,9 @@ public final class ServerImplementation
         return intellectualServer;
     }
 
+    public static boolean hasImplementation()
+    {
+        return getImplementation() != null;
+    }
+
 }

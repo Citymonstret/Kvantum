@@ -34,10 +34,7 @@ import com.github.intellectualsites.iserver.api.events.defaultevents.ServerReady
 import com.github.intellectualsites.iserver.api.events.defaultevents.ShutdownEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.StartupEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.ViewsInitializedEvent;
-import com.github.intellectualsites.iserver.api.logging.LogModes;
-import com.github.intellectualsites.iserver.api.logging.LogProvider;
-import com.github.intellectualsites.iserver.api.logging.LogWrapper;
-import com.github.intellectualsites.iserver.api.logging.Logger;
+import com.github.intellectualsites.iserver.api.logging.*;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.plugin.PluginLoader;
 import com.github.intellectualsites.iserver.api.plugin.PluginManager;
@@ -754,8 +751,9 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             msg = msg.replaceFirst( "%s", a.toString() );
         }
-        logWrapper.log( CoreConfig.logPrefix, prefix, TimeUtil.getTimeStamp(), msg,
-                Thread.currentThread().getName() );
+
+        logWrapper.log( LogContext.builder().applicationPrefix( CoreConfig.logPrefix ).logPrefix( prefix ).timeStamp(
+                TimeUtil.getTimeStamp() ).message( msg ).thread( Thread.currentThread().getName() ).build() );
     }
 
     @Override
@@ -773,8 +771,9 @@ public final class Server implements IntellectualServer, ISessionCreator
             workingMessage = message.replaceFirst( "%s", a.toString() );
         }
 
-        logWrapper.log( CoreConfig.logPrefix, provider.getLogIdentifier(), TimeUtil.getTimeStamp(),
-                workingMessage, Thread.currentThread().getName() );
+        logWrapper.log( LogContext.builder().applicationPrefix( CoreConfig.logPrefix ).logPrefix( provider
+                .getLogIdentifier() ).timeStamp( TimeUtil.getTimeStamp() ).thread( Thread.currentThread().getName() )
+                .message( workingMessage ).build() );
     }
 
     @Override

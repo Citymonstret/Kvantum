@@ -18,73 +18,35 @@
  */
 package com.github.intellectualsites.iserver.implementation;
 
-import com.diogonunes.jcdp.color.ColoredPrinter;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.logging.LogContext;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
-import com.sun.media.jfxmedia.logging.Logger;
-
-import java.text.SimpleDateFormat;
+import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.text.StrSubstitutor;
 
 /**
  * The default log handler. UsesAnsi.FColor for colored output
  */
+@AllArgsConstructor
 public class DefaultLogWrapper implements LogWrapper
 {
 
-    private final ColoredPrinter printer;
+    private final String format;
 
     public DefaultLogWrapper()
     {
-        printer = new ColoredPrinter.Builder( Logger.INFO, false ).withFormat( new SimpleDateFormat() ).build();
+        this( "[${applicationPrefix}][${logPrefix}][${thread}][${timeStamp}] ${message}" );
     }
 
     @Override
-    public void log(String prefix, String prefix1, String timeStamp, String message, String thread)
+    public void log(final LogContext logContext)
     {
-        /*
-        TODO: Get this to work again.
-
-        final Ansi.FColor priorityColor;
-        switch ( prefix1 )
+        final String replacedMessage = StrSubstitutor.replace( format, logContext.toMap() );
+        if ( ServerImplementation.hasImplementation() )
         {
-            case "Debug":
-                priorityColor = Ansi.FColor.CYAN;
-                break;
-            case "Info":
-                priorityColor = Ansi.FColor.WHITE;
-                break;
-            case "Error":
-                priorityColor = Ansi.FColor.RED;
-                break;
-            case "Warning":
-                priorityColor = Ansi.FColor.YELLOW;
-                break;
-            default:
-                priorityColor = Ansi.FColor.NONE;
-                break;
+            ( (Server) ServerImplementation.getImplementation() ).logStream.println( replacedMessage );
         }
-
-
-        printer.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( prefix, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
-        printer.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( thread, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
-        printer.print( "]", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( "[", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( timeStamp, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE );
-        printer.print( "] ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( prefix1, Ansi.Attribute.BOLD, priorityColor, Ansi.BColor.NONE );
-        printer.print( " > ", Ansi.Attribute.NONE, Ansi.FColor.BLACK, Ansi.BColor.NONE );
-        printer.print( message, Ansi.Attribute.NONE, Ansi.FColor.NONE, Ansi.BColor.NONE );
-        printer.print( System.lineSeparator() );
-        printer.clear();
-        */
-
-        ( (Server) ServerImplementation.getImplementation() ).logStream.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp,
-                message, System.lineSeparator() );
-        System.out.printf( "[%s][%s][%s][%s] %s%s", prefix, prefix1, thread, timeStamp, message, System.lineSeparator() );
-        // printer.println("Hello",Ansi.Attribute.BOLD,Ansi.FColor.GREEN,Ansi.BColor.YELLOW)
+        System.out.println( replacedMessage );
     }
 
     @Override

@@ -34,5 +34,4 @@ jar {
 
 dependencies {
     compile project(':Implementation')
-    compile "com.dorkbox:SystemTray:3.10"
 }

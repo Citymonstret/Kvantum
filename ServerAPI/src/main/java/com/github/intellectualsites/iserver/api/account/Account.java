@@ -36,6 +36,7 @@ public class Account
     private final int id;
     @Getter
     private final String username;
+    @Getter
     private final String password;
     private final Map<String, String> data;
     private final IAccountManager manager;

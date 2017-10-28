@@ -24,41 +24,31 @@ import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.github.intellectualsites.iserver.api.views.errors.View404;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
+@Builder
 final public class RequestManager extends Router
 {
 
-    private final List<RequestHandler> views;
-    private Generator<Request, RequestHandler> error404Generator = (request) -> View404.construct( request.getQuery()
-            .getFullRequest() );
+    private static Generator<Request, RequestHandler> DEFAULT_404_GENERATOR =
+            (request) -> View404.construct( request.getQuery().getFullRequest() );
 
-    public RequestManager()
-    {
-        this.views = new ArrayList<>();
-    }
+    @Builder.Default
+    private List<RequestHandler> views = new ArrayList<>();
 
-    private Generator<Request, RequestHandler> getError404Generator()
-    {
-        return error404Generator;
-    }
-
-    /**
-     * This allows you to replace the Error 404 generator, for a custom 404 screen
-     * The default one uses {@link View404}, which allows you to use a custom html file
-     *
-     * @param generator New generator
-     */
-    public void setError404Generator(final Generator<Request, RequestHandler> generator)
-    {
-        Assert.notNull( generator );
-
-        this.error404Generator = generator;
-    }
+    @Setter
+    @Getter
+    @NonNull
+    @Builder.Default
+    private Generator<Request, RequestHandler> error404Generator = DEFAULT_404_GENERATOR;
 
     /**
      * Register a view to the request manager
