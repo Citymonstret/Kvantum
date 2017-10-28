@@ -37,7 +37,7 @@
 
 package com.github.intellectualsites.iserver.crush.syntax;
 
-import com.github.intellectualsites.iserver.api.cache.CacheManager;
+import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.request.Request;
@@ -68,7 +68,7 @@ final public class Include extends Syntax
             boolean setCache = false;
             if ( CoreConfig.Cache.enabled )
             {
-                CacheManager manager = ServerImplementation.getImplementation().getCacheManager();
+                ICacheManager manager = ServerImplementation.getImplementation().getCacheManager();
                 String s = manager.getCachedInclude( matcher.group() );
                 if ( s != null )
                 {

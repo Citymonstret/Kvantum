@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.implementation;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.cache.CacheManager;
+import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.ConfigurationFile;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
@@ -97,7 +98,7 @@ public final class Server implements IntellectualServer, ISessionCreator
     PrintStream logStream;
     // Public
     @Getter
-    private volatile CacheManager cacheManager;
+    private volatile ICacheManager cacheManager;
     @Getter
     private boolean silent = false;
     @Getter

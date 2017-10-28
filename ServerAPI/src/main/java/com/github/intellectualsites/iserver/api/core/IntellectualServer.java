@@ -19,7 +19,7 @@
 package com.github.intellectualsites.iserver.api.core;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
-import com.github.intellectualsites.iserver.api.cache.CacheManager;
+import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.ConfigurationFile;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.events.Event;
@@ -188,7 +188,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
      */
     void log(String message, int mode, Object... args);
 
-    CacheManager getCacheManager();
+    ICacheManager getCacheManager();
 
     LogWrapper getLogWrapper();
 

@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * handles all runtime caching
  */
 @SuppressWarnings("ALL")
-public final class CacheManager
+public final class CacheManager implements ICacheManager
 {
 
     private final Cache<String, String> cachedIncludes;
@@ -64,6 +64,7 @@ public final class CacheManager
      * @param group Include block (matcher.group())
      * @return string|null
      */
+    @Override
     public String getCachedInclude(final String group)
     {
         Assert.notNull( group );
@@ -71,22 +72,26 @@ public final class CacheManager
         return this.cachedIncludes.getIfPresent( group );
     }
 
+    @Override
     public Optional<Account> getCachedAccount(final int id)
     {
         return Optional.ofNullable( cachedAccounts.getIfPresent( id ) );
     }
 
+    @Override
     public Optional<Integer> getCachedId(final String username)
     {
         return Optional.ofNullable( cachedAccountIds.getIfPresent( username ) );
     }
 
+    @Override
     public void setCachedAccount(final Account account)
     {
         this.cachedAccounts.put( account.getId(), account );
         this.cachedAccountIds.put( account.getUsername(), account.getId() );
     }
 
+    @Override
     public Optional<String> getCachedFile(final String file)
     {
         Assert.notEmpty( file );
@@ -104,6 +109,7 @@ public final class CacheManager
         return Optional.ofNullable( cachedFiles.getIfPresent( file ) );
     }
 
+    @Override
     public void setCachedFile(final String file, final String content)
     {
         Assert.notEmpty( file );
@@ -118,6 +124,7 @@ public final class CacheManager
      * @param group    matcher.group()
      * @param document Generated document
      */
+    @Override
     public void setCachedInclude(final String group, final String document)
     {
         Assert.notNull( group, document );
@@ -131,6 +138,7 @@ public final class CacheManager
      * @param view RequestHandler
      * @return true if there is a ResponseBody cached, else false
      */
+    @Override
     public boolean hasCache(final RequestHandler view)
     {
         Assert.notNull( view );
@@ -145,6 +153,7 @@ public final class CacheManager
      * @param responseBody ResponseBody (will generate a CachedResponseBody)
      * @see CachedResponse
      */
+    @Override
     public void setCache(final RequestHandler view, final ResponseBody responseBody)
     {
         Assert.notNull( view, responseBody );
@@ -159,6 +168,7 @@ public final class CacheManager
      * @return the cached ResponseBody
      * @see #hasCache(RequestHandler) To check if the view has a cache
      */
+    @Override
     public CachedResponse getCache(final RequestHandler view)
     {
         Assert.notNull( view );
