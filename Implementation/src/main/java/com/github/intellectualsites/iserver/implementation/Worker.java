@@ -173,6 +173,7 @@ final class Worker extends AutoCloseable
     private void handle()
     {
         Optional<ISession> session = server.getSessionManager().getSession( request, output );
+
         if ( session.isPresent() )
         {
             request.setSession( session.get() );
@@ -274,7 +275,7 @@ final class Worker extends AutoCloseable
                 bytes = body.getBytes();
             }
 
-            for ( final Map.Entry<String, String> postponedCookie : request.postponedCookies.entrySet() )
+            for ( final Map.Entry<String, String> postponedCookie : request.postponedCookies.entries() )
             {
                 body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
             }

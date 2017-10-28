@@ -41,7 +41,7 @@ public class TimeUtil
 
     public static String getTimeStamp()
     {
-        return getTimeStamp( LogFormat );
+        return getTimeStamp( LogFormat, new Date() );
     }
 
     /**
@@ -50,18 +50,24 @@ public class TimeUtil
      *
      * @return RFC 7231 formatted timestamp
      */
+    public static String getHTTPTimeStamp(final Date date)
+    {
+        return getTimeStamp( HTTPFormat, date );
+    }
+
     public static String getHTTPTimeStamp()
     {
-        return getTimeStamp( HTTPFormat );
+        return getTimeStamp( HTTPFormat, new Date() );
     }
 
-    public static String getTimeStamp(final String format)
+
+    public static String getTimeStamp(final String format, final Date date)
     {
-        return getTimeStamp( new SimpleDateFormat( format ) );
+        return getTimeStamp( new SimpleDateFormat( format ), date );
     }
 
-    public static String getTimeStamp(final SimpleDateFormat format)
+    public static String getTimeStamp(final SimpleDateFormat format, final Date date)
     {
-        return format.format( new Date() );
+        return format.format( date );
     }
 }

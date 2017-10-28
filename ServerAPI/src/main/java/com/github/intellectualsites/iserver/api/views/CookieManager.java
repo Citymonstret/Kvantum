@@ -21,9 +21,9 @@ package com.github.intellectualsites.iserver.api.views;
 import com.github.intellectualsites.iserver.api.request.Cookie;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.util.Assert;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
 
 /**
  * This is an utility class
@@ -35,7 +35,7 @@ import java.util.Map;
 final public class CookieManager
 {
 
-    private static final Map<String, Cookie> EMPTY_COOKIES = new HashMap<>( 0 );
+    private static final ListMultimap<String, Cookie> EMPTY_COOKIES = ArrayListMultimap.create( 0, 0 );
 
     /**
      * Get all cookies from a HTTP Request
@@ -43,7 +43,7 @@ final public class CookieManager
      * @param r HTTP Request
      * @return an array containing the cookies
      */
-    public static Map<String, Cookie> getCookies(final Request r)
+    public static ListMultimap<String, Cookie> getCookies(final Request r)
     {
         Assert.isValid( r );
 
@@ -57,7 +57,9 @@ final public class CookieManager
         raw = raw.replaceFirst( " ", "" );
 
         final String[] pieces = raw.split( "; " );
-        final Map<String, Cookie> cookies = new HashMap<>( pieces.length );
+
+        final ListMultimap<String, Cookie> cookies = MultimapBuilder.hashKeys( pieces.length ).arrayListValues()
+                .build();
 
         for ( final String piece : pieces )
         {

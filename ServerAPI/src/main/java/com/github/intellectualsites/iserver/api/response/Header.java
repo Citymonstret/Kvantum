@@ -20,12 +20,12 @@ package com.github.intellectualsites.iserver.api.response;
 
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.TimeUtil;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
 
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @SuppressWarnings({ "unused" })
 final public class Header
@@ -245,7 +245,8 @@ final public class Header
      */
     public static final HeaderOption HEADER_RETRY_AFTER = HeaderOption.create( "Retry-After" );
 
-    private final Map<HeaderOption, String> headers = new HashMap<>();
+    private final ListMultimap<HeaderOption, String> headers = MultimapBuilder.hashKeys().arrayListValues().build();
+
     @Getter
     private String status;
     @Getter
@@ -278,13 +279,33 @@ final public class Header
         return this;
     }
 
+    private static String getCookieString(final String cookie, final String value, final Date expires)
+    {
+        return cookie + "=" + value + "; Expires=" + TimeUtil
+                .getHTTPTimeStamp( expires );
+    }
+
+    public Collection<String> getMultiple(final HeaderOption key)
+    {
+        Assert.notNull( key );
+
+        final Collection<String> values = new ArrayList<>();
+
+        if ( this.headers.containsKey( key ) )
+        {
+            values.addAll( this.headers.get( key ) );
+        }
+
+        return values;
+    }
+
     public Optional<String> get(final HeaderOption key)
     {
         Assert.notNull( key );
 
         if ( this.headers.containsKey( key ) )
         {
-            return Optional.of( this.headers.get( key ) );
+            return Optional.of( this.headers.get( key ).get( 0 ) );
         }
         return Optional.empty();
     }
@@ -293,7 +314,7 @@ final public class Header
     {
         final StringBuilder temporary = new StringBuilder();
         temporary.append( this.format ).append( " " ).append( this.status ).append( "\n" );
-        for ( final Map.Entry<HeaderOption, String> entry : this.headers.entrySet() )
+        for ( final Map.Entry<HeaderOption, String> entry : this.headers.entries() )
         {
             temporary.append( entry.getKey() ).append( ": " ).append( entry.getValue() ).append( "\n" );
         }
@@ -308,7 +329,7 @@ final public class Header
         try
         {
             out.write( ( this.format + " " + this.status + "\n" ).getBytes() );
-            for ( final Map.Entry<HeaderOption, String> entry : this.headers.entrySet() )
+            for ( final Map.Entry<HeaderOption, String> entry : this.headers.entries() )
             {
                 out.write( ( entry.getKey() + ": " + entry.getValue() + "\n" ).getBytes() );
             }
@@ -322,18 +343,6 @@ final public class Header
         return this;
     }
 
-    public String[] dump()
-    {
-        final String[] dump = new String[ this.headers.size() + 1 ];
-        dump[ 0 ] = "HTTP/1.1 " + this.status;
-        int index = 1;
-        for ( final Map.Entry<HeaderOption, String> entry : this.headers.entrySet() )
-        {
-            dump[ index++ ] = entry.getKey() + ": " + entry.getValue();
-        }
-        return dump;
-    }
-
     public void redirect(final String newURL)
     {
         Assert.notNull( newURL );
@@ -343,24 +352,43 @@ final public class Header
         setStatus( Header.STATUS_TEMPORARY_REDIRECT );
     }
 
-    public Header setCookie(final String cookie, final String value)
+    public String[] dump()
     {
-        Assert.notNull( cookie, value );
-
-        final String v;
-        if ( this.headers.containsKey( HEADER_SET_COOKIE ) )
+        final String[] dump = new String[ this.headers.size() + 1 ];
+        dump[ 0 ] = "HTTP/1.1 " + this.status;
+        int index = 1;
+        for ( final Map.Entry<HeaderOption, String> entry : this.headers.entries() )
         {
-            v = this.headers.get( HEADER_SET_COOKIE ) + "," + cookie + "=" + value;
-        } else
-        {
-            v = cookie + "=" + value;
+            dump[ index++ ] = entry.getKey() + ": " + entry.getValue();
         }
-        return set( HEADER_SET_COOKIE, v );
+        return dump;
+    }
+
+    public Header setCookie(final String cookie, final String value, final Date expires)
+    {
+        Assert.notNull( cookie, value, expires );
+        this.headers.put( HEADER_SET_COOKIE, getCookieString( cookie, value, expires ) );
+        return this;
     }
 
     public Header removeCookie(final String cookie)
     {
         return setCookie( Assert.notNull( cookie ), Header.COOKIE_DELETED );
+    }
+
+    public Header setCookie(final String cookie, final String value)
+    {
+        Assert.notNull( cookie, value );
+
+        final String cookieString = cookie + "=" + value;
+
+        if ( this.headers.containsEntry( HEADER_SET_COOKIE, cookieString ) )
+        {
+            this.headers.remove( HEADER_SET_COOKIE, cookieString );
+        }
+        this.headers.put( HEADER_SET_COOKIE, cookieString );
+
+        return this;
     }
 
 }

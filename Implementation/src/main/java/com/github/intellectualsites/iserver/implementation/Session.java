@@ -21,9 +21,11 @@ package com.github.intellectualsites.iserver.implementation;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 final class Session implements ISession
@@ -34,10 +36,16 @@ final class Session implements ISession
     @Getter
     private long sessionId = 0;
 
+    @Setter
+    @Getter
+    private String sessionKey;
+
     Session()
     {
-        sessionStorage = new HashMap<>();
-        sessionId = id++;
+        this.sessionKey = UUID.randomUUID().toString();
+        this.sessionStorage = new HashMap<>();
+        this.sessionId = id++;
+        this.sessionStorage.put( "id", "n/a" );
     }
 
     @Override
@@ -59,7 +67,7 @@ final class Session implements ISession
     }
 
     @Override
-    public void set(final String s, final Object o)
+    public ISession set(final String s, final Object o)
     {
         Assert.notNull( s );
 
@@ -70,6 +78,8 @@ final class Session implements ISession
         {
             sessionStorage.put( s.toLowerCase(), o );
         }
+
+        return this;
     }
 
 }

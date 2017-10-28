@@ -23,8 +23,12 @@ import com.github.intellectualsites.iserver.api.util.VariableProvider;
 public interface ISession extends VariableProvider
 {
 
+    String getSessionKey();
+
+    void setSessionKey(final String sessionKey);
+
     long getSessionId();
 
-    void set(final String s, final Object o);
+    ISession set(final String s, final Object o);
 
 }

@@ -26,6 +26,8 @@ import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.views.CookieManager;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -59,14 +61,14 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private static final String HEADER_AUTHORIZATION = "Authorization";
 
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
-    public Map<String, String> postponedCookies = new HashMap<>();
+    public ListMultimap<String, String> postponedCookies = ArrayListMultimap.create();
     @Getter
     private ProtocolType protocolType;
     private Map<String, Object> meta;
     @Getter
     private Map<String, String> headers;
     @Getter
-    private Map<String, Cookie> cookies;
+    private ListMultimap<String, Cookie> cookies = ArrayListMultimap.create();
     @Getter
     private Query query;
     @Setter

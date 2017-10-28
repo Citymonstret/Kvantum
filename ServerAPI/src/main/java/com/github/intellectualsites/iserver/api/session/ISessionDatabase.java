@@ -3,12 +3,16 @@ package com.github.intellectualsites.iserver.api.session;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 
+import java.util.Map;
+
 public interface ISessionDatabase
 {
 
     void setup() throws Exception;
 
-    long containsSession(String sessionId);
+    long containsSession(String sessionID);
+
+    Map<String, String> getSessionLoad(String sessionID);
 
     default boolean isValid(final String session)
     {
@@ -30,7 +34,7 @@ public interface ISessionDatabase
         return true;
     }
 
-    void storeSession(String session);
+    void storeSession(ISession session);
 
     void updateSession(String session);
 

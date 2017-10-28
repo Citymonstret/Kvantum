@@ -1,11 +1,15 @@
 package com.github.intellectualsites.iserver.implementation.mongo;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
+import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
 import com.github.intellectualsites.iserver.api.util.MongoApplicationStructure;
 import com.mongodb.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class MongoSessionDatabase implements ISessionDatabase
@@ -13,6 +17,7 @@ public class MongoSessionDatabase implements ISessionDatabase
 
     private static final String FIELD_SESSION_ID = "sessionId";
     private static final String FIELD_LAST_ACTIVE = "lastActive";
+    private static final String FIELD_SESSION_KEY = "sessionKey";
 
     @Getter
     private final MongoApplicationStructure applicationStructure;
@@ -41,16 +46,34 @@ public class MongoSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public void storeSession(final String session)
+    public Map<String, String> getSessionLoad(final String sessionID)
     {
-        if ( containsSession( session ) != -1 )
+
+        final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
+        final DBCursor cursor = collection.find( object );
+        final Map<String, String> map = new HashMap<>();
+
+        if ( cursor.hasNext() )
         {
-            updateSession( session );
+            final DBObject session = cursor.next();
+            map.put( "sessionKey", session.get( FIELD_SESSION_KEY ).toString() );
+        }
+
+        return map;
+    }
+
+    @Override
+    public void storeSession(final ISession session)
+    {
+        if ( containsSession( session.get( "id" ).toString() ) != -1 )
+        {
+            updateSession( session.get( "id" ).toString() );
         } else
         {
             final DBObject object = new BasicDBObject()
-                    .append( FIELD_SESSION_ID, session )
-                    .append( FIELD_LAST_ACTIVE, System.currentTimeMillis() );
+                    .append( FIELD_SESSION_ID, session.get( "id" ).toString() )
+                    .append( FIELD_LAST_ACTIVE, System.currentTimeMillis() )
+                    .append( FIELD_SESSION_KEY, session.getSessionKey() );
             collection.insert( object );
         }
     }

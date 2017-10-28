@@ -174,7 +174,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         try
         {
             this.logStream = new PrintStream( new FileOutputStream( new File( logFolder,
-                    TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) );
+                    TimeUtil.getTimeStamp( TimeUtil.LogFileFormat, new Date() ) + ".txt" ) ) );
             System.setErr( new PrintStream( new ErrorOutputStream( logWrapper ), true ) );
         } catch ( FileNotFoundException e )
         {

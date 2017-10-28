@@ -44,27 +44,41 @@ public final class SessionManager implements ProviderFactory<ISession>
     private final ISessionCreator sessionCreator;
     private final ISessionDatabase sessionDatabase;
 
+    private static final String SESSION_KEY = "intellectual_session";
+    private static final String SESSION_PASS = "intellectual_key";
+    
     private ISession createSession(final Request r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
 
         final String sessionID = UUID.randomUUID().toString();
-        r.postponedCookies.put( "session", sessionID );
         if ( CoreConfig.debug )
         {
-            Message.SESSION_SET.log( "session", sessionID );
+            Message.SESSION_SET.log( SESSION_KEY, sessionID );
         }
         final ISession session = createSession( sessionID );
-        r.getCookies().put( "session", new Cookie( "session", sessionID ) );
+        saveCookies( r, session, sessionID );
         return session;
+    }
+
+    private void saveCookies(final Request r, final ISession session, final String sessionID)
+    {
+        r.postponedCookies.put( SESSION_KEY, sessionID );
+        r.postponedCookies.put( SESSION_PASS, session.getSessionKey() );
+        // Make sure that the cookies aren't duplicated
+        r.getCookies().removeAll( SESSION_KEY );
+        r.getCookies().removeAll( SESSION_PASS );
+        r.getCookies().put( SESSION_KEY, new Cookie( SESSION_KEY, sessionID ) );
+        r.getCookies().put( SESSION_PASS, new Cookie( SESSION_PASS, session.getSessionKey() ) );
     }
 
     private ISession createSession(final String sessionID)
     {
-        final ISession session = sessionCreator.createSession();
-        session.set( "id", sessionID );
+        Assert.notEmpty( sessionID );
+
+        final ISession session = sessionCreator.createSession().set( "id", sessionID );
         this.sessions.put( sessionID, session );
-        this.sessionDatabase.storeSession( sessionID );
+        this.sessionDatabase.storeSession( session );
         return session;
     }
 
@@ -72,7 +86,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     {
         Assert.notNull( r, re );
 
-        re.getHeader().setCookie( "session", "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
+        re.getHeader().setCookie( SESSION_KEY, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
     }
 
     public Optional<ISession> getSession(final Request r, final BufferedOutputStream out)
@@ -81,55 +95,88 @@ public final class SessionManager implements ProviderFactory<ISession>
 
         ISession session = null;
 
-        // Check cookies to see if present
-        for ( Cookie cookie : r.getCookies().values() )
+        String sessionCookie = null;
+        String sessionPassCookie = null;
+
+        //
+        // STEP 1: Check if the client provides the required headers
+        //
+        for ( final Cookie cookie : r.getCookies().values() )
         {
-            // If a cookie is registered
-            if ( cookie.getName().equalsIgnoreCase( "session" ) )
+            if ( sessionCookie == null && cookie.getName().equalsIgnoreCase( SESSION_KEY ) )
             {
-                // Cookie was found
-                final String sessionID = cookie.getValue();
-                // Check if session is valid
-                if ( sessions.containsKey( sessionID ) )
-                {
-                    session = sessions.get( sessionID );
-                    if ( CoreConfig.debug )
-                    {
-                        Message.SESSION_FOUND.log( session, sessionID, r );
-                    }
-                    long difference = ( System.currentTimeMillis() - (long) session.get( "last_active" ) ) / 1000;
-                    if ( difference >= CoreConfig.Sessions.sessionTimeout )
-                    {
-                        if ( CoreConfig.debug )
-                        {
-                            Logger.debug( "Deleted outdated session: %s", session );
-                        }
-                        this.sessions.remove( sessionID );
-                        this.sessionDatabase.deleteSession( sessionID );
-                        return Optional.empty();
-                    }
-                } else
-                {
-                    if ( sessionDatabase.isValid( sessionID ) )
-                    {
-                        session = createSession( sessionID );
-                        break;
-                    }
-                    // Session isn't valid, remove old cookie
-                    if ( out != null )
-                    {
-                        ServerImplementation.getImplementation()
-                                .log( "Deleting invalid session cookie (%s) for request %s", cookie.getValue(), r );
-                        session = createSession( r, out );
-                        r.postponedCookies.put( "session", session.get( "id" ).toString() );
-                        r.getCookies().put( "session", new Cookie( "session", session.get( "id" ).toString() ) );
-                    }
-                }
+                sessionCookie = cookie.getValue();
+            } else if ( sessionPassCookie == null && cookie.getName().equalsIgnoreCase( SESSION_PASS ) )
+            {
+                sessionPassCookie = cookie.getValue();
+            }
+            if ( sessionCookie != null && sessionPassCookie != null )
+            {
                 break;
             }
         }
 
-        // No session found
+        //
+        // STEP 2 (1): Validate the provided headers
+        //
+        if ( sessionCookie != null && sessionPassCookie != null )
+        {
+            if ( this.sessions.containsKey( sessionCookie ) )
+            {
+                session = sessions.get( sessionCookie );
+
+                if ( CoreConfig.debug )
+                {
+                    Message.SESSION_FOUND.log( session, sessionCookie, r );
+                }
+
+                long difference = ( System.currentTimeMillis() - (long) session.get( "last_active" ) ) / 1000;
+                if ( difference >= CoreConfig.Sessions.sessionTimeout )
+                {
+                    if ( CoreConfig.debug )
+                    {
+                        Logger.debug( "Deleted outdated session: %s", session );
+                    }
+                    this.sessions.remove( sessionCookie );
+                    this.sessionDatabase.deleteSession( sessionCookie );
+                    session = null;
+                }
+
+            } else
+            {
+                if ( sessionDatabase.isValid( sessionCookie ) )
+                {
+                    final Map<String, String> sessionLoad = sessionDatabase.getSessionLoad( sessionCookie );
+                    session = createSession( sessionCookie );
+                    session.setSessionKey( sessionLoad.get( "sessionKey" ) );
+                    return Optional.of( session );
+                } else
+                {
+                    // Session isn't valid, remove old cookie
+                    if ( out != null )
+                    {
+                        ServerImplementation.getImplementation()
+                                .log( "Deleting invalid session cookie for request %s", r );
+                        session = createSession( r, out );
+                    }
+                }
+            }
+
+            if ( session != null && !session.getSessionKey().equalsIgnoreCase( sessionPassCookie ) )
+            {
+                if ( CoreConfig.debug )
+                {
+                    Logger.debug( "Deleted session: %s (Cause: %s)", session, "Wrong session key" );
+                }
+                this.sessions.remove( sessionCookie );
+                this.sessionDatabase.deleteSession( sessionCookie );
+                session = null;
+            }
+        }
+
+        //
+        // STEP 2 (2): Create a new session
+        //
         if ( session == null )
         {
             session = createSession( r, out );

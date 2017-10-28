@@ -1,11 +1,14 @@
 package com.github.intellectualsites.iserver.implementation.sqlite;
 
+import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
 import com.github.intellectualsites.iserver.api.util.SQLiteApplicationStructure;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class SQLiteSessionDatabase implements ISessionDatabase
@@ -20,7 +23,8 @@ public class SQLiteSessionDatabase implements ISessionDatabase
                 "CREATE TABLE IF NOT EXISTS sessions (" +
                         " session_id INTEGER PRIMARY KEY," +
                         " id VARCHAR (64) UNIQUE NOT NULL," +
-                        " last_active TIME DEFAULT (CURRENT_TIMESTAMP) )"
+                        " last_active TIME DEFAULT (CURRENT_TIMESTAMP)," +
+                        " session_key VARCHAR (64) NOT NULL )"
         );
     }
 
@@ -46,18 +50,41 @@ public class SQLiteSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public void storeSession(final String session)
+    public Map<String, String> getSessionLoad(String sessionID)
     {
-        if ( containsSession( session ) != -1 )
+        final Map<String, String> returnMap = new HashMap<>();
+        try ( final PreparedStatement statement = this.applicationStructure
+                .getDatabaseManager().prepareStatement( "SELECT * FROM sessions WHERE id = ?" ) )
         {
-            updateSession( session );
+            statement.setString( 1, sessionID );
+            try ( final ResultSet resultSet = statement.executeQuery() )
+            {
+                if ( resultSet.next() )
+                {
+                    returnMap.put( "sessionKey", resultSet.getString( "session_key" ) );
+                }
+            }
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        return returnMap;
+    }
+
+    @Override
+    public void storeSession(final ISession session)
+    {
+        if ( containsSession( session.get( "id" ).toString() ) != -1 )
+        {
+            updateSession( session.get( "id" ).toString() );
         } else
         {
             try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
-                    .prepareStatement( "INSERT INTO sessions(`id`,`last_active`) VALUES(?, ?)" ) )
+                    .prepareStatement( "INSERT INTO sessions(`id`,`last_active`, `session_key`) VALUES(?, ?, ?)" ) )
             {
-                statement.setString( 1, session );
+                statement.setString( 1, session.get( "id" ).toString() );
                 statement.setLong( 2, System.currentTimeMillis() );
+                statement.setString( 3, session.getSessionKey() );
                 statement.executeUpdate();
             } catch ( final Exception e )
             {
