@@ -1,7 +1,9 @@
-package com.github.intellectualsites.iserver.api.util;
+package com.github.intellectualsites.iserver.implementation;
 
 import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
+import com.github.intellectualsites.iserver.api.util.ApplicationStructure;
+import com.github.intellectualsites.iserver.api.util.SQLiteManager;
 import lombok.Getter;
 
 import java.io.IOException;

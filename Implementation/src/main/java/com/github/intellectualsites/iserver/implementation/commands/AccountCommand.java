@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.iserver.implementation.commands;
 
-import com.github.intellectualsites.iserver.api.account.Account;
+import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.util.ApplicationStructure;
 import com.github.intellectualsites.iserver.api.util.Assert;
@@ -80,7 +80,7 @@ public class AccountCommand extends Command
         {
             String key = instance.getString( "key" );
             String username = instance.getValue( "username", String.class );
-            Optional<Account> account = structure.getAccountManager().getAccount( username );
+            Optional<IAccount> account = structure.getAccountManager().getAccount( username );
             if ( !account.isPresent() )
             {
                 send( "There is no such account!" );
@@ -113,7 +113,7 @@ public class AccountCommand extends Command
             String key = instance.getString( "key" );
             String value = instance.getString( "value" );
             String username = instance.getValue( "username", String.class );
-            Optional<Account> account = structure.getAccountManager().getAccount( username );
+            Optional<IAccount> account = structure.getAccountManager().getAccount( username );
             if ( !account.isPresent() )
             {
                 send( "There is no such account!" );
@@ -147,7 +147,7 @@ public class AccountCommand extends Command
             } else
             {
                 String username = instance.getValue( "username", String.class );
-                Optional<Account> account = structure.getAccountManager().getAccount( username );
+                Optional<IAccount> account = structure.getAccountManager().getAccount( username );
                 if ( !account.isPresent() )
                 {
                     send( "There is no such account!" );
@@ -214,7 +214,7 @@ public class AccountCommand extends Command
             String username = instance.getValue( "username", String.class );
             String password = instance.getValue( "password", String.class );
 
-            Optional<Account> accountOptional = structure.getAccountManager().getAccount( username );
+            Optional<IAccount> accountOptional = structure.getAccountManager().getAccount( username );
             if ( !accountOptional.isPresent() )
             {
                 send( "There is no such account!" );

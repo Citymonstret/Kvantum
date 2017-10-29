@@ -20,7 +20,7 @@ package com.github.intellectualsites.iserver.implementation;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.intellectualsites.iserver.api.account.Account;
+import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.cache.CachedResponse;
 import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
@@ -43,7 +43,7 @@ public final class CacheManager implements ICacheManager
     private final Cache<String, String> cachedIncludes;
     private final Cache<String, String> cachedFiles;
     private final Cache<String, CachedResponse> cachedBodies;
-    private final Cache<Integer, Account> cachedAccounts;
+    private final Cache<Integer, IAccount> cachedAccounts;
     private final Cache<String, Integer> cachedAccountIds;
 
     public CacheManager()
@@ -75,7 +75,7 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
-    public Optional<Account> getCachedAccount(final int id)
+    public Optional<IAccount> getCachedAccount(final int id)
     {
         return Optional.ofNullable( cachedAccounts.getIfPresent( id ) );
     }
@@ -87,7 +87,7 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
-    public void setCachedAccount(final Account account)
+    public void setCachedAccount(final IAccount account)
     {
         this.cachedAccounts.put( account.getId(), account );
         this.cachedAccountIds.put( account.getUsername(), account.getId() );

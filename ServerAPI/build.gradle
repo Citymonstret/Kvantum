@@ -17,8 +17,6 @@ dependencies {
     compile 'ch.qos.logback:logback-classic:1.1.5'
     // Used to simplify code creation
     compileOnly 'org.projectlombok:lombok:1.16.18'
-    // Powers the MongoDB implementation
-    compile 'org.mongodb:mongo-java-driver:3.5.0'
     // Mostly used for its awesome map implementations
     compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // Makes input handling better and more fluent

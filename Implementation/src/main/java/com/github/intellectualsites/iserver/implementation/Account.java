@@ -16,10 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.iserver.api.account;
+package com.github.intellectualsites.iserver.implementation;
 
+import com.github.intellectualsites.iserver.api.account.IAccount;
+import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Transient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,56 +37,65 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A data structure representing an account, managed by {@link IAccountManager}
  */
-public class Account
+@NoArgsConstructor
+@Entity("accounts")
+public class Account implements IAccount
 {
 
+    @Id
     @Getter
-    private final int id;
+    private int id;
     @Getter
-    private final String username;
+    @NonNull
+    private String username;
     @Getter
-    private final String password;
-    private final Map<String, String> data;
-    private final IAccountManager manager;
+    @NonNull
+    private String password;
+    @NonNull
+    private Map<String, String> data;
+    @Setter
+    @Transient
+    private transient IAccountManager manager;
 
-    /**
-     * @param id       (Unique) account ID
-     * @param username Account username
-     * @param password Account password
-     * @param manager  Account manager implementation
-     */
-    public Account(final int id, final String username, final String password, final IAccountManager
-            manager)
+    public Account(final int id, final String username, final String password, final Map<String, String> data)
     {
-        Assert.isPositive( id );
-        Assert.notEmpty( username );
-        Assert.notEmpty( password );
-        Assert.notNull( manager );
-
+        this.id = id;
         this.username = username;
         this.password = password;
-        this.id = id;
-        this.data = new ConcurrentHashMap<>();
-        this.manager = manager;
-
-        this.manager.loadData( this );
+        this.data = data;
     }
 
+    public Account(final int userID, final String username, final String password)
+    {
+        this( userID, username, password, getDefaultDataSet() );
+    }
+
+    private static Map<String, String> getDefaultDataSet()
+    {
+        final Map<String, String> map = new ConcurrentHashMap<>();
+        map.put( "created", "true" );
+        return map;
+    }
+
+    @Override
     public Map<String, String> getRawData()
     {
         return new HashMap<>( data );
     }
 
+    @Override
     public void internalMetaUpdate(final String key, final String value)
     {
         this.data.put( key, value );
     }
 
+    @Override
     public boolean passwordMatches(final String password)
     {
-        return manager.checkPassword( password, this.password );
+        return IAccountManager.checkPassword( password, this.password );
     }
 
+    @Override
     public Optional<String> getData(final String key)
     {
         Assert.notEmpty( key );
@@ -86,6 +103,7 @@ public class Account
         return Optional.ofNullable( data.get( key ) );
     }
 
+    @Override
     public void setData(final String key, final String value)
     {
         Assert.notEmpty( key );
@@ -99,6 +117,7 @@ public class Account
         this.manager.setData( this, key, value );
     }
 
+    @Override
     public void removeData(final String key)
     {
         Assert.notEmpty( key );

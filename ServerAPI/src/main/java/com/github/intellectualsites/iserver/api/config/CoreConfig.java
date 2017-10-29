@@ -121,9 +121,8 @@ public class CoreConfig
         public static String uri = "mongodb://localhost:27017";
 
         public static String dbSessions = "isites";
-        public static String dbAccounts = "isites";
+        public static String dbMorphia = "isites";
         public static String collectionSessions = "sessions";
-        public static String collectionAccounts = "accounts";
     }
 
     @ConfigSection(name = "mysql")

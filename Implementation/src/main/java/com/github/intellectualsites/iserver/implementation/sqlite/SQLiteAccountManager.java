@@ -18,11 +18,12 @@
  */
 package com.github.intellectualsites.iserver.implementation.sqlite;
 
-import com.github.intellectualsites.iserver.api.account.Account;
+import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.util.Assert;
-import com.github.intellectualsites.iserver.api.util.SQLiteApplicationStructure;
+import com.github.intellectualsites.iserver.implementation.Account;
+import com.github.intellectualsites.iserver.implementation.SQLiteApplicationStructure;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -36,7 +37,7 @@ final public class SQLiteAccountManager implements IAccountManager
 {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static final Optional<Account> EMPTY_OPTIONAL = Optional.empty();
+    private static final Optional<IAccount> EMPTY_OPTIONAL = Optional.empty();
 
     @Getter
     private final SQLiteApplicationStructure applicationStructure;
@@ -64,12 +65,12 @@ final public class SQLiteAccountManager implements IAccountManager
     }
 
     @Override
-    public Optional<Account> createAccount(final String username, final String password)
+    public Optional<IAccount> createAccount(final String username, final String password)
     {
         Assert.notEmpty( username );
         Assert.notEmpty( password );
 
-        Optional<Account> ret = EMPTY_OPTIONAL;
+        Optional<IAccount> ret = EMPTY_OPTIONAL;
         if ( getAccount( username ).isPresent() )
         {
             return ret;
@@ -92,12 +93,12 @@ final public class SQLiteAccountManager implements IAccountManager
         return ret;
     }
 
-    public Optional<Account> getAccount(final String username)
+    public Optional<IAccount> getAccount(final String username)
     {
         Assert.notEmpty( username );
 
         Optional<Integer> accountId = ServerImplementation.getImplementation().getCacheManager().getCachedId( username );
-        Optional<Account> ret = EMPTY_OPTIONAL;
+        Optional<IAccount> ret = EMPTY_OPTIONAL;
         if ( accountId.isPresent() )
         {
             ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId.get() );
@@ -122,12 +123,14 @@ final public class SQLiteAccountManager implements IAccountManager
             e.printStackTrace();
         }
         ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
+        ret.ifPresent( account -> account.setManager( this ) );
         return ret;
     }
 
-    public Optional<Account> getAccount(final int accountId)
+    public Optional<IAccount> getAccount(final int accountId)
     {
-        Optional<Account> ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId );
+        Optional<IAccount> ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount(
+                accountId );
         if ( ret.isPresent() )
         {
             return ret;
@@ -148,20 +151,23 @@ final public class SQLiteAccountManager implements IAccountManager
             e.printStackTrace();
         }
         ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
+        ret.ifPresent( account -> account.setManager( this ) );
         return ret;
     }
 
-    private Account getAccount(final ResultSet resultSet) throws Exception
+    private IAccount getAccount(final ResultSet resultSet) throws Exception
     {
         final int id = resultSet.getInt( "id" );
         final String username = resultSet.getString( "username" );
         final String password = resultSet.getString( "password" );
         final String salt = resultSet.getString( "salt" );
-        return new Account( id, username, password, this );
+        final IAccount account = new Account( id, username, password );
+        account.setManager( this );
+        return account;
     }
 
     @Override
-    public void loadData(final Account account)
+    public void loadData(final IAccount account)
     {
         try ( final PreparedStatement statement = applicationStructure.getDatabaseManager().prepareStatement(
                 "SELECT * FROM account_data WHERE account_id = ?" ) )
@@ -180,7 +186,7 @@ final public class SQLiteAccountManager implements IAccountManager
     }
 
     @Override
-    public void removeData(Account account, String key)
+    public void removeData(IAccount account, String key)
     {
         try ( final PreparedStatement statement = applicationStructure.getDatabaseManager().prepareStatement( "DELETE" +
                 " FROM account_data WHERE account_id = ? AND `key` = ?" ) )
@@ -195,7 +201,7 @@ final public class SQLiteAccountManager implements IAccountManager
     }
 
     @Override
-    public void setData(Account account, String key, String value)
+    public void setData(IAccount account, String key, String value)
     {
         try ( final PreparedStatement statement = applicationStructure.getDatabaseManager().prepareStatement(
                 "INSERT OR IGNORE INTO account_data(account_id, `key`, `value`) VALUES(?, ?, ?)" ) )

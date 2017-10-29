@@ -3,7 +3,7 @@ package com.github.intellectualsites.iserver.implementation.mongo;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
-import com.github.intellectualsites.iserver.api.util.MongoApplicationStructure;
+import com.github.intellectualsites.iserver.implementation.MongoApplicationStructure;
 import com.mongodb.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,7 @@ package com.github.intellectualsites.iserver.implementation.sqlite;
 
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
-import com.github.intellectualsites.iserver.api.util.SQLiteApplicationStructure;
+import com.github.intellectualsites.iserver.implementation.SQLiteApplicationStructure;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;

@@ -1,6 +1,6 @@
 package com.github.intellectualsites.iserver.api.cache;
 
-import com.github.intellectualsites.iserver.api.account.Account;
+import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 
@@ -11,11 +11,11 @@ public interface ICacheManager
 
     String getCachedInclude(String group);
 
-    Optional<Account> getCachedAccount(int id);
+    Optional<IAccount> getCachedAccount(int id);
 
     Optional<Integer> getCachedId(String username);
 
-    void setCachedAccount(Account account);
+    void setCachedAccount(IAccount account);
 
     Optional<String> getCachedFile(String file);
 

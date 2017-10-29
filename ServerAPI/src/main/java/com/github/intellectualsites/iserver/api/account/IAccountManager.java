@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @SuppressWarnings("ALL")
 /**
- * Manages {@link Account} and depends on {@link ApplicationStructure}
+ * Manages {@link IAccount} and depends on {@link ApplicationStructure}
  */
 public interface IAccountManager
 {
@@ -41,7 +41,7 @@ public interface IAccountManager
      * @param password  Real password
      * @return true if the passwords are matching
      */
-    default boolean checkPassword(final String candidate, final String password)
+    static boolean checkPassword(final String candidate, final String password)
     {
         return BCrypt.checkpw( candidate, password );
     }
@@ -59,37 +59,37 @@ public interface IAccountManager
     void setup() throws Exception;
 
     /**
-     * Create an {@link Account}
+     * Create an {@link IAccount}
      * @param username Account username
      * @param password Account password
      * @return {@link Optional} containing the account if it was created successfully,
      *                          otherwise an empty optional ({@link Optional#empty()} is returned.
      */
-    Optional<Account> createAccount(String username, String password);
+    Optional<IAccount> createAccount(String username, String password);
 
     /**
-     * Get an {@link Account} by username.
+     * Get an {@link IAccount} by username.
      * @param username Account username
      * @return {@link Optional} containing the account if it exsists
      *                          otherwise an empty optional ({@link Optional#empty()} is returned.
      */
-    Optional<Account> getAccount(String username);
+    Optional<IAccount> getAccount(String username);
 
     /**
-     * Get an {@link Account} by ID.
+     * Get an {@link IAccount} by ID.
      * @param accountId Account ID
      * @return {@link Optional} containing the account if it exsists
      *                          otherwise an empty optional ({@link Optional#empty()} is returned.
      */
-    Optional<Account> getAccount(int accountId);
+    Optional<IAccount> getAccount(int accountId);
 
     /**
-     * Get an {@link Account} by session.
+     * Get an {@link IAccount} by session.
      * @param session session.
      * @return {@link Optional} containing the account if it exsists
      *                          otherwise an empty optional ({@link Optional#empty()} is returned.
      */
-    default Optional<Account> getAccount(final ISession session)
+    default Optional<IAccount> getAccount(final ISession session)
     {
         if ( !session.contains( SESSION_ACCOUNT_CONSTANT ) )
         {
@@ -99,11 +99,11 @@ public interface IAccountManager
     }
 
     /**
-     * Bind an {@link Account} to a {@link ISession}
+     * Bind an {@link IAccount} to a {@link ISession}
      * @param account Account
      * @param session Session
      */
-    default void bindAccount(final Account account, final ISession session)
+    default void bindAccount(final IAccount account, final ISession session)
     {
         session.set( SESSION_ACCOUNT_CONSTANT, account.getId() );
     }
@@ -123,26 +123,26 @@ public interface IAccountManager
      * @param key Data key
      * @param value Data value
      */
-    void setData(Account account, String key, String value);
+    void setData(IAccount account, String key, String value);
 
     /**
      * Remove a data value from an account
      * @param account Account
      * @param key Data key
      */
-    void removeData(Account account, String key);
+    void removeData(IAccount account, String key);
 
     /**
-     * Load the data into a {@link Account}
+     * Load the data into a {@link IAccount}
      * @param account Account to be loaded
      */
-    void loadData(final Account account);
+    void loadData(final IAccount account);
 
     default void checkAdmin()
     {
         if ( !getAccount( "admin" ).isPresent() )
         {
-            Optional<Account> adminAccount = createAccount( "admin", "admin" );
+            Optional<IAccount> adminAccount = createAccount( "admin", "admin" );
             if ( !adminAccount.isPresent() )
             {
                 ServerImplementation.getImplementation().log( "Failed to create admin account :(" );

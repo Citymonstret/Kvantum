@@ -1,12 +1,15 @@
 package com.github.intellectualsites.iserver.implementation.mongo;
 
-import com.github.intellectualsites.iserver.api.account.Account;
+import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.util.Assert;
-import com.github.intellectualsites.iserver.api.util.MongoApplicationStructure;
-import com.mongodb.*;
+import com.github.intellectualsites.iserver.implementation.Account;
+import com.github.intellectualsites.iserver.implementation.MongoApplicationStructure;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -23,10 +26,10 @@ public class MongoAccountManager implements IAccountManager
     private static final String FIELD_DATA = "data";
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static final Optional<Account> EMPTY_OPTIONAL = Optional.empty();
+    private static final Optional<IAccount> EMPTY_OPTIONAL = Optional.empty();
     @Getter
     private final MongoApplicationStructure applicationStructure;
-    private DBCollection collection;
+
     private DBCollection counters;
 
     private static String getNewSalt()
@@ -39,22 +42,11 @@ public class MongoAccountManager implements IAccountManager
         return BCrypt.hashpw( password, salt );
     }
 
-    private Account dboToAccount(final DBObject object)
-    {
-        final int userID = (int) object.get( FIELD_USER_ID );
-        final String username = object.get( FIELD_USERNAME ).toString();
-        final String password = object.get( FIELD_PASSWORD ).toString();
-
-        return new Account( userID, username, password, this );
-    }
-
     @Override
     public void setup() throws Exception
     {
-        DB database = applicationStructure.getMongoClient().getDB( CoreConfig.MongoDB.dbAccounts );
-        this.collection = database.getCollection( CoreConfig.MongoDB.collectionAccounts );
+        DB database = applicationStructure.getMongoClient().getDB( CoreConfig.MongoDB.dbMorphia );
         this.counters = database.getCollection( "counters" );
-
         if ( !this.counters.find( new BasicDBObject( "_id", "userId" ) ).hasNext() )
         {
             this.counters.insert( new BasicDBObject( "_id", "userId" ).append( "seq", 0 ) );
@@ -70,7 +62,7 @@ public class MongoAccountManager implements IAccountManager
     }
 
     @Override
-    public Optional<Account> createAccount(final String username, final String password)
+    public Optional<IAccount> createAccount(final String username, final String password)
     {
         Assert.notEmpty( username );
         Assert.notEmpty( password );
@@ -80,24 +72,21 @@ public class MongoAccountManager implements IAccountManager
             return EMPTY_OPTIONAL;
         }
 
-        final String salt = getNewSalt();
-        final DBObject account = new BasicDBObject()
-                .append( FIELD_USER_ID, getNextId() )
-                .append( FIELD_USERNAME, username )
-                .append( FIELD_PASSWORD, hashPassword( password, salt ) )
-                .append( FIELD_DATA, new BasicDBObject( "created", true ) );
-        collection.insert( account );
+        final String hashedPassword = hashPassword( password, getNewSalt() );
+        final Account account = new Account( getNextId(), username, hashedPassword );
+        account.setManager( this );
+        this.applicationStructure.getMorphiaDatastore().save( account );
 
-        return getAccount( username );
+        return Optional.of( account );
     }
 
     @Override
-    public Optional<Account> getAccount(final String username)
+    public Optional<IAccount> getAccount(final String username)
     {
         Assert.notEmpty( username );
 
         Optional<Integer> accountId = ServerImplementation.getImplementation().getCacheManager().getCachedId( username );
-        Optional<Account> ret = EMPTY_OPTIONAL;
+        Optional<IAccount> ret = EMPTY_OPTIONAL;
         if ( accountId.isPresent() )
         {
             ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId.get() );
@@ -106,70 +95,55 @@ public class MongoAccountManager implements IAccountManager
         {
             return ret;
         }
-
-        final DBObject query = new BasicDBObject( FIELD_USERNAME, username );
-        final DBCursor cursor = collection.find( query );
-
-        if ( cursor.hasNext() )
-        {
-            final Account account = dboToAccount( cursor.one() );
-            ret = Optional.of( account );
-        }
-
+        ret = Optional.ofNullable( applicationStructure.getMorphiaDatastore().createQuery( Account.class )
+                .field( "username" ).equal( username ).get() );
         ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
+        ret.ifPresent( account -> account.setManager( this ) );
         return ret;
     }
 
     @Override
-    public Optional<Account> getAccount(final int accountId)
+    public Optional<IAccount> getAccount(final int accountId)
     {
-        Optional<Account> ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId );
+        Optional<IAccount> ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount(
+                accountId );
         if ( ret.isPresent() )
         {
             return ret;
         }
 
-        final DBObject query = new BasicDBObject( FIELD_USER_ID, accountId );
-        final DBCursor cursor = collection.find( query );
-
-        if ( cursor.hasNext() )
-        {
-            final Account account = dboToAccount( cursor.one() );
-            ret = Optional.of( account );
-        }
-
+        ret = Optional.ofNullable( applicationStructure.getMorphiaDatastore().createQuery( Account.class )
+                .field( "userId" ).equal( accountId ).get() );
         ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
+        ret.ifPresent( account -> account.setManager( this ) );
         return ret;
     }
 
     @Override
-    public void setData(final Account account, final String key, final String value)
+    public void setData(final IAccount account, final String key, final String value)
     {
-        collection.update( new BasicDBObject( FIELD_USER_ID, account.getId() ),
-                new BasicDBObject( "$set", new BasicDBObject( FIELD_DATA + "." + key, value ) ) );
+        applicationStructure.getMorphiaDatastore().update(
+                applicationStructure.getMorphiaDatastore().createQuery( Account.class )
+                        .field( "username" ).equal( account.getUsername() ),
+                applicationStructure.getMorphiaDatastore().createUpdateOperations( Account.class )
+                        .set( "data." + key, value )
+        );
     }
 
     @Override
-    public void removeData(final Account account, final String key)
+    public void removeData(final IAccount account, final String key)
     {
-        collection.update( new BasicDBObject( FIELD_USER_ID, account.getId() ),
-                new BasicDBObject( "$unset", new BasicDBObject( FIELD_DATA + "." + key, 1 ) ) );
+        applicationStructure.getMorphiaDatastore().update(
+                applicationStructure.getMorphiaDatastore().createQuery( Account.class )
+                        .field( "username" ).equal( account.getUsername() ),
+                applicationStructure.getMorphiaDatastore().createUpdateOperations( Account.class )
+                        .removeFirst( "data." + key )
+        );
     }
 
     @Override
-    public void loadData(final Account account)
+    public void loadData(final IAccount account)
     {
-        final DBCursor cursor = collection.find( new BasicDBObject(
-                        new BasicDBObject( FIELD_USER_ID, account.getId() ) ),
-                new BasicDBObject( "data", 1 ) );
-        if ( cursor.hasNext() )
-        {
-            final DBObject container = cursor.next();
-            final DBObject data = (BasicDBObject) container.get( "data" );
-            for ( final String key : data.keySet() )
-            {
-                account.internalMetaUpdate( key, data.get( key ).toString() );
-            }
-        }
+        // Done automatically
     }
 }
