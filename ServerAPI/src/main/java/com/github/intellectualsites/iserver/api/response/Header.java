@@ -273,8 +273,14 @@ final public class Header
 
     public Header set(final HeaderOption key, final String value)
     {
+        return set( key, value, false );
+    }
+
+    public Header set(final HeaderOption key, final String value, final boolean allowDuplicates)
+    {
         Assert.notNull( key, value );
 
+        this.headers.removeAll( key );
         this.headers.put( key, value );
         return this;
     }
