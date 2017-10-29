@@ -105,7 +105,7 @@ public class ViewPattern
                 this.parts.add( new Variable( matcher.group(), Variable.TYPE_REQUIRED ) );
             } else if ( ( matcher = PATTERN_VARIABLE_OPTIONAL.matcher( token ) ).matches() )
             {
-                if ( matcher.group( 2 ).isEmpty() )
+                if ( matcher.group( 2 ) == null || matcher.group( 2 ).isEmpty() )
                 {
                     this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_OPTIONAL ) );
                 } else
