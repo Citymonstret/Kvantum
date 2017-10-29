@@ -127,3 +127,8 @@ dist/
 nbdist/
 .nb-gradle/
 
+/documentation/texSource/_minted-IntellectualServer/
+/documentation/texSource/IntellectualServer.aux
+/documentation/texSource/IntellectualServer.log
+/documentation/texSource/IntellectualServer.out
+/documentation/texSource/IntellectualServer.synctex.gz
