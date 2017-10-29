@@ -20,11 +20,6 @@ import java.util.Optional;
 public class MongoAccountManager implements IAccountManager
 {
 
-    private static final String FIELD_USER_ID = "userId";
-    private static final String FIELD_USERNAME = "username";
-    private static final String FIELD_PASSWORD = "password";
-    private static final String FIELD_DATA = "data";
-
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static final Optional<IAccount> EMPTY_OPTIONAL = Optional.empty();
     @Getter
