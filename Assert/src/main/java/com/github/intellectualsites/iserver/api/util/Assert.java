@@ -123,6 +123,16 @@ public class Assert
         }
     }
 
+    public static void isFalse(final boolean a)
+    {
+        equals( a, false );
+    }
+
+    public static void isTrue(final boolean a)
+    {
+        equals( a, true );
+    }
+
     /**
      * Will only pass if a is equal to b
      *
@@ -156,5 +166,17 @@ public class Assert
     public static void notEmpty(final byte[] array)
     {
         equals( array != null && array.length > 0, true );
+    }
+
+    public static <T> T isNull(final T o)
+    {
+        try
+        {
+            equals( o == null, true );
+        } catch ( final com.github.intellectualsites.iserver.api.util.AssertionError a )
+        {
+            throw new com.github.intellectualsites.iserver.api.util.AssertionError( o, "was not null" );
+        }
+        return o;
     }
 }

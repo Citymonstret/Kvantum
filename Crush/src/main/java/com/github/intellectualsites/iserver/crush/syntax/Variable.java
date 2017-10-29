@@ -56,7 +56,7 @@ final public class Variable extends Syntax
 
     public Variable()
     {
-        super( Pattern.compile( "\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?\\}\\}" ) );
+        super( Pattern.compile( "\\{\\{([a-zA-Z0-9]*)\\.([@A-Za-z0-9_\\-]*)( [|]{2} [A-Z]*)?}}" ) );
         filters = new HashMap<>();
         Set<Filter> preFilters = new LinkedHashSet<>();
         preFilters.add( new Uppercase() );

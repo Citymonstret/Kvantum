@@ -18,10 +18,11 @@
  */
 package com.github.intellectualsites.iserver.api.matching;
 
-import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.util.Assert;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -54,10 +55,11 @@ import java.util.*;
 public class ViewPattern
 {
 
-    // Compiler variable: Show debug messages
-    private static final boolean debug = false;
+    private static final Pattern PATTERN_VARIABLE_REQUIRED = Pattern.compile( "<([a-zA-Z0-9]*)>" );
+    private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)]" );
+    private static final Pattern PATTERN_VARIABLE_STATIC = Pattern.compile( "([a-zA-Z0-9]*)" );
 
-    private final List<Part> parts;
+    private final List<Part> parts = new ArrayList<>();
     private final String raw;
 
     /**
@@ -69,57 +71,54 @@ public class ViewPattern
         Assert.notNull( in );
 
         this.raw = in;
+
         final SmartString string = new SmartString( raw.toLowerCase() );
         string.replaceLastIf( '/', SmartString.nil );
-        this.parts = new ArrayList<>();
-        boolean openOptional = false;
-        boolean openRequired = false;
-        boolean first = true;
-        String name = "";
-        for ( final char c : string )
+        string.replaceFirstIf( '/', SmartString.nil );
+
+        final List<Integer> delimiterTypes = new ArrayList<>();
+        for ( final Character c : string )
         {
-            if ( c == '<' )
+            if ( c.equals( '.' ) )
             {
-                if ( !name.isEmpty() )
-                {
-                    parts.add( new Static( name ) );
-                }
-                openRequired = true;
-                name = "";
-            } else if ( c == '[' )
+                delimiterTypes.add( 0 );
+            } else if ( c.equals( '/' ) )
             {
-                if ( !name.isEmpty() )
-                {
-                    parts.add( new Static( name ) );
-                }
-                openOptional = true;
-                name = "";
-            } else if ( openRequired && c == '>' )
-            {
-                openRequired = false;
-                parts.add( new Variable( name, Variable.TYPE_REQUIRED ) );
-                name = "";
-            } else if ( openOptional && c == ']' )
-            {
-                openOptional = false;
-                parts.add( new Variable( name, Variable.TYPE_OPTIONAL ) );
-                name = "";
-            } else if ( c == '/' )
-            {
-                if ( !name.isEmpty() )
-                {
-                    parts.add( new Static( name ) );
-                    name = "";
-                }
-                parts.add( new Split() );
-            } else
-            {
-                name += c;
+                delimiterTypes.add( 1 );
             }
         }
-        if ( !name.isEmpty() )
+        final Iterator<Integer> delimiterIterator = delimiterTypes.iterator();
+
+        final StringTokenizer stringTokenizer = new StringTokenizer( string.toString(), "\\/." );
+        while ( stringTokenizer.hasMoreTokens() )
         {
-            parts.add( new Static( name ) );
+            final String token = stringTokenizer.nextToken();
+            if ( token.isEmpty() )
+            {
+                continue;
+            }
+            Matcher matcher;
+            if ( ( matcher = PATTERN_VARIABLE_REQUIRED.matcher( token ) ).matches() )
+            {
+                this.parts.add( new Variable( matcher.group(), Variable.TYPE_REQUIRED ) );
+            } else if ( ( matcher = PATTERN_VARIABLE_OPTIONAL.matcher( token ) ).matches() )
+            {
+                this.parts.add( new Variable( matcher.group(), Variable.TYPE_OPTIONAL ) );
+            } else if ( ( matcher = PATTERN_VARIABLE_STATIC.matcher( token ) ).matches() )
+            {
+                this.parts.add( new Static( matcher.group() ) );
+            }
+            if ( stringTokenizer.hasMoreTokens() && delimiterIterator.hasNext() )
+            {
+                final int delimiterType = delimiterIterator.next();
+                if ( delimiterType == 0 )
+                {
+                    this.parts.add( new Dot() );
+                } else if ( delimiterType == 1 )
+                {
+                    this.parts.add( new Split() );
+                }
+            }
         }
     }
 
@@ -142,7 +141,7 @@ public class ViewPattern
             url = new SmartString( in );
         }
 
-        url.replaceIf( 0, '/', SmartString.nil );
+        url.replaceFirstIf( '/', SmartString.nil );
         url.replaceLastIf( '/', SmartString.nil );
 
         if ( parts.isEmpty() )
@@ -156,45 +155,79 @@ public class ViewPattern
             }
         }
 
-        final String[] p = url.toString().split( "((?<=/)|(?=/))" );
-        final List<String> finalList = new ArrayList<>();
-        for ( final String l : p )
+        final List<Integer> delimiterTypes = new ArrayList<>();
+        for ( final Character c : url )
         {
-            if ( l.contains( "." ) )
+            if ( c.equals( '.' ) )
             {
-                final String[] k = l.split( "(?=\\.)" );
-                finalList.add( k[ 0 ] );
-                finalList.add( k[ 1 ] );
-            } else
+                delimiterTypes.add( 0 );
+            } else if ( c.equals( '/' ) )
             {
-                finalList.add( l );
+                delimiterTypes.add( 1 );
             }
         }
 
+        final Iterator<Integer> delimiterIterator = delimiterTypes.iterator();
+        int currentDelimiter = -1;
+
         final Map<String, String> variables = new HashMap<>();
-        final Iterator<String> stringIterator = finalList.iterator();
-
+        final StringTokenizer stringTokenizer = new StringTokenizer( url.toString(), "\\/." );
         Part lastPart = null;
-
         final List<Part> passed = new ArrayList<>();
+
+        int iterator = -1;
 
         for ( final Part part : parts )
         {
+            iterator++;
 
-            boolean has = stringIterator.hasNext();
-            String next = has ? stringIterator.next() : "";
+            if ( part instanceof Split || part instanceof Dot )
+            {
+                if ( delimiterIterator.hasNext() )
+                {
+                    currentDelimiter = delimiterIterator.next();
+                } else
+                {
+                    currentDelimiter = -1;
+                }
+                lastPart = part;
+
+                if ( ( iterator + 1 ) < parts.size() &&
+                        ( ( parts.get( iterator + 1 ) instanceof Variable &&
+                                ( ( (Variable) parts.get( iterator + 1 ) ).getType() ) == Variable.TYPE_REQUIRED ) ||
+                                parts.get( iterator + 1 ) instanceof Static ) )
+                {
+                    if ( part instanceof Split && currentDelimiter != 1 )
+                    {
+                        return null;
+                    } else if ( part instanceof Dot && currentDelimiter != 0 )
+                    {
+                        return null;
+                    }
+                }
+                continue;
+            }
+
+            boolean has = stringTokenizer.hasMoreTokens();
+            String next = has ? stringTokenizer.nextToken() : "";
 
             if ( part instanceof Variable )
             {
                 Variable v = (Variable) part;
+
                 if ( v.getType() == Variable.TYPE_REQUIRED )
                 {
                     if ( !has )
                     {
-                        if ( debug )
-                        {
-                            ServerImplementation.getImplementation().log( "Missing required type: " + part );
-                        }
+                        return null;
+                    }
+                } else if ( has )
+                {
+                    if ( lastPart instanceof Split && currentDelimiter != 1 )
+                    {
+                        return null;
+                    } else if ( lastPart instanceof Dot && currentDelimiter != 0 )
+                    {
                         return null;
                     }
                 }
@@ -202,20 +235,11 @@ public class ViewPattern
             {
                 if ( !has )
                 {
-                    if ( debug )
-                    {
-                        ServerImplementation.getImplementation().log( "Missing static type: " + part );
-                    }
                     return null;
                 } else
                 {
                     if ( !next.equalsIgnoreCase( part.toString() ) )
                     {
-                        if ( debug )
-                        {
-                            ServerImplementation.getImplementation().log( "Non-Matching static type: " + part + " | " + next + " | " +
-                                    this.parts + " | " + url + " | " + passed );
-                        }
                         return null;
                     }
                 }
@@ -227,15 +251,12 @@ public class ViewPattern
                 variables.put( variable.getName(), next );
             }
 
+            lastPart = part;
             passed.add( part );
         }
-        if ( stringIterator.hasNext() )
+
+        if ( stringTokenizer.hasMoreTokens() )
         {
-            if ( debug )
-            {
-                ServerImplementation.getImplementation().log( "Too Many: " + stringIterator.next() + " | " +
-                        this.parts + " | " + url + " | " + passed + " | " + this.raw );
-            }
             return null;
         }
         return variables;
@@ -409,6 +430,21 @@ public class ViewPattern
                     return chars[ index++ ];
                 }
             };
+        }
+
+        public void replaceFirstIf(char c1, char c2)
+        {
+            replaceIf( 0, c1, c2 );
+        }
+    }
+
+    private static final class Dot extends Part
+    {
+
+        @Override
+        public String toString()
+        {
+            return ".";
         }
     }
 
