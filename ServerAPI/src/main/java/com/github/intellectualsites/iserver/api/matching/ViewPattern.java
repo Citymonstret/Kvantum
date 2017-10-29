@@ -19,6 +19,8 @@
 package com.github.intellectualsites.iserver.api.matching;
 
 import com.github.intellectualsites.iserver.api.util.Assert;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -56,7 +58,7 @@ public class ViewPattern
 {
 
     private static final Pattern PATTERN_VARIABLE_REQUIRED = Pattern.compile( "<([a-zA-Z0-9]*)>" );
-    private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)]" );
+    private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)(=[a-zA-Z0-9]*)?]" );
     private static final Pattern PATTERN_VARIABLE_STATIC = Pattern.compile( "([a-zA-Z0-9]*)" );
 
     private final List<Part> parts = new ArrayList<>();
@@ -103,10 +105,16 @@ public class ViewPattern
                 this.parts.add( new Variable( matcher.group(), Variable.TYPE_REQUIRED ) );
             } else if ( ( matcher = PATTERN_VARIABLE_OPTIONAL.matcher( token ) ).matches() )
             {
-                this.parts.add( new Variable( matcher.group(), Variable.TYPE_OPTIONAL ) );
+                if ( matcher.group( 2 ).isEmpty() )
+                {
+                    this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_OPTIONAL ) );
+                } else
+                {
+                    this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_OPTIONAL, matcher.group( 2 ) ) );
+                }
             } else if ( ( matcher = PATTERN_VARIABLE_STATIC.matcher( token ) ).matches() )
             {
-                this.parts.add( new Static( matcher.group() ) );
+                this.parts.add( new Static( matcher.group( 1 ) ) );
             }
             if ( stringTokenizer.hasMoreTokens() && delimiterIterator.hasNext() )
             {
@@ -248,7 +256,13 @@ public class ViewPattern
             if ( part instanceof Variable )
             {
                 final Variable variable = (Variable) part;
-                variables.put( variable.getName(), next );
+                if ( next.isEmpty() && variable.hasDefaultValue() )
+                {
+                    variables.put( variable.getName(), variable.getDefaultValue() );
+                } else
+                {
+                    variables.put( variable.getName(), next );
+                }
             }
 
             lastPart = part;
@@ -458,27 +472,26 @@ public class ViewPattern
         }
     }
 
+    @AllArgsConstructor
     private static class Variable extends Part
     {
 
         private static int TYPE_REQUIRED = 0, TYPE_OPTIONAL = 1;
+        @Getter
         private final String name;
+        @Getter
         private final int type;
+        @Getter
+        private final String defaultValue;
 
         Variable(String name, int type)
         {
-            this.name = name;
-            this.type = type;
+            this( name, type, null );
         }
 
-        public String getName()
+        public boolean hasDefaultValue()
         {
-            return name;
-        }
-
-        public int getType()
-        {
-            return type;
+            return this.getDefaultValue() != null;
         }
 
         @Override
