@@ -25,9 +25,9 @@ import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 
 @CommandDeclaration(
-
         command = "stop",
-        description = "Stop the server"
+        description = "Stop the server",
+        usage = "/stop"
 )
 public class Stop extends Command
 {

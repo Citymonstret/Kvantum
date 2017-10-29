@@ -26,7 +26,9 @@ import com.intellectualsites.commands.CommandInstance;
 
 
 @CommandDeclaration(
-        command = "show"
+        command = "show",
+        usage = "/show c OR /show w",
+        description = "View license and warranty information"
 )
 public class Show extends Command
 {

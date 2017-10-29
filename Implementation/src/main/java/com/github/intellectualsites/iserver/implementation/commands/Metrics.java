@@ -28,7 +28,9 @@ import com.intellectualsites.commands.CommandInstance;
  * the logger
  */
 @CommandDeclaration(
-        command = "metrics"
+        command = "metrics",
+        usage = "/metrics",
+        description = "View server metrics"
 )
 public class Metrics extends Command
 {

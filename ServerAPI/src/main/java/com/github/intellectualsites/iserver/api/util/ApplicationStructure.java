@@ -32,7 +32,6 @@ public abstract class ApplicationStructure
 
     protected final String applicationName;
     protected IAccountManager accountManager;
-    private SQLiteManager database;
 
     public ApplicationStructure(final String applicationName)
     {

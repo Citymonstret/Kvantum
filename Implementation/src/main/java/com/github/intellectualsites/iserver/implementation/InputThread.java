@@ -23,10 +23,7 @@ import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.events.Event;
 import com.github.intellectualsites.iserver.api.logging.InternalJlineManager;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
-import com.github.intellectualsites.iserver.implementation.commands.Dump;
-import com.github.intellectualsites.iserver.implementation.commands.Metrics;
-import com.github.intellectualsites.iserver.implementation.commands.Show;
-import com.github.intellectualsites.iserver.implementation.commands.Stop;
+import com.github.intellectualsites.iserver.implementation.commands.*;
 import com.intellectualsites.commands.CommandHandlingOutput;
 import com.intellectualsites.commands.CommandResult;
 import org.jline.reader.EndOfFileException;
@@ -53,6 +50,8 @@ public final class InputThread extends Thread
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Dump() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Metrics() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Show() );
+        ServerImplementation.getImplementation().getCommandManager().addCommand( new Help( ServerImplementation
+                .getImplementation().getCommandManager() ) );
 
         new AutoCloseable() {
 

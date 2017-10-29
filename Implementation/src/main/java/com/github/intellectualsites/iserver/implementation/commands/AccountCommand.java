@@ -31,7 +31,9 @@ import com.intellectualsites.commands.parser.impl.StringParser;
 import java.util.Optional;
 
 @CommandDeclaration(
-        command = "account"
+        command = "account",
+        usage = "/account [subcommand]",
+        description = "Manage accounts"
 )
 public class AccountCommand extends Command
 {

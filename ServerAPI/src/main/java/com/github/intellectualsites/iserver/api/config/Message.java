@@ -66,6 +66,9 @@ public enum Message
     CLEARED_VIEWS( "Cleared views ( %s )", LogModes.MODE_INFO ),
     SESSION_SET( "Set session (%s=%s)", LogModes.MODE_DEBUG ),
     SESSION_FOUND( "Found session (%s=%s) for request %s", LogModes.MODE_DEBUG ),
+    CMD_HELP_HEADER( "# Available Commands ( Page %s/%s ) " ),
+    CMD_HELP_ITEM( "> Command: /%s | Usage: %s | Description: %s " ),
+    CMD_HELP_FOOTER( "# Type '/help %s' to see the next page" ),
     REQUEST_HANDLER_DUMP( "> RequestHandler - Class '%s', Pattern: '%s'" );
 
     private final String message;

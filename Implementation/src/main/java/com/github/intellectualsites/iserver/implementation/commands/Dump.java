@@ -25,7 +25,8 @@ import com.intellectualsites.commands.CommandInstance;
 
 @CommandDeclaration(
         command = "dump",
-        description = "Dump information from the router"
+        description = "Dump information from the router",
+        usage = "/dump"
 )
 public class Dump extends Command
 {
