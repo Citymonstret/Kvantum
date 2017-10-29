@@ -132,3 +132,12 @@ nbdist/
 /documentation/texSource/IntellectualServer.log
 /documentation/texSource/IntellectualServer.out
 /documentation/texSource/IntellectualServer.synctex.gz
+
+
+# Annoying IDEA files :/
+*.iml
+*.ipr
+
+# Keyserver and certificates
+*.jks
+*.crt
