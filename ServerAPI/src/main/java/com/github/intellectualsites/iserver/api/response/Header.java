@@ -280,7 +280,10 @@ final public class Header
     {
         Assert.notNull( key, value );
 
-        this.headers.removeAll( key );
+        if ( !allowDuplicates )
+        {
+            this.headers.removeAll( key );
+        }
         this.headers.put( key, value );
         return this;
     }
