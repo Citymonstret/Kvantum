@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.iserver.api.account;
 
+import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.ApplicationStructure;
@@ -25,14 +26,17 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
 
-@SuppressWarnings("ALL")
 /**
  * Manages {@link IAccount} and depends on {@link ApplicationStructure}
+ * <p>
+ * The global implementation can be retrieved using
+ * {@link IntellectualServer#getGlobalAccountManager()}
+ * </p>
  */
 public interface IAccountManager
 {
 
-    static final String SESSION_ACCOUNT_CONSTANT = "__user_id__";
+    String SESSION_ACCOUNT_CONSTANT = "__user_id__";
 
     /**
      * Check if a given password matches the real password

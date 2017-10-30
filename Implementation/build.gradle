@@ -13,6 +13,10 @@ buildscript {
 group 'com.github.intellectualsites'
 version = 'BETA-0.0.3'
 
+sourceSets {
+    instrumentTest.
+}
+
 dependencies {
     // Powers the MongoDB implementation
     compile 'org.mongodb:mongo-java-driver:3.5.0'

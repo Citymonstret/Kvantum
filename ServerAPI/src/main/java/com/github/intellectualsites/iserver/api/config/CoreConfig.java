@@ -46,6 +46,7 @@ public class CoreConfig
     public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
     public static boolean enableInputThread = true;
+    public static boolean exitOnStop = true;
 
     @ConfigSection(name = "sessions")
     public static class Sessions
@@ -123,14 +124,6 @@ public class CoreConfig
         public static String dbSessions = "isites";
         public static String dbMorphia = "isites";
         public static String collectionSessions = "sessions";
-    }
-
-    @ConfigSection(name = "mysql")
-    public static class MySQL
-    {
-
-        public static boolean enabled = false;
-
     }
 
     @ConfigSection(name = "application")

@@ -100,8 +100,6 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
                 parserableStringGenerator, ", " ) );
     }
 
-    boolean isMysqlEnabled();
-
     /**
      * Add a view binding to the engine
      *

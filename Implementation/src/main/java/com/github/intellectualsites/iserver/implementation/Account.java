@@ -34,9 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * A data structure representing an account, managed by {@link IAccountManager}
- */
 @NoArgsConstructor
 @Entity("accounts")
 public class Account implements IAccount
@@ -48,7 +45,6 @@ public class Account implements IAccount
     @Getter
     @NonNull
     private String username;
-    @Getter
     @NonNull
     private String password;
     @NonNull

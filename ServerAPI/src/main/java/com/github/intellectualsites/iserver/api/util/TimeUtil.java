@@ -28,20 +28,20 @@ import java.util.Locale;
 public class TimeUtil
 {
 
-    public final static SimpleDateFormat LogFileFormat;
-    private final static SimpleDateFormat HTTPFormat;
-    private final static SimpleDateFormat LogFormat;
+    public final static SimpleDateFormat logFileFormat;
+    private final static SimpleDateFormat httpFormat;
+    private final static SimpleDateFormat logFormat;
 
     static
     {
-        HTTPFormat = new SimpleDateFormat( "EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.US );
-        LogFormat = new SimpleDateFormat( "HH:mm:ss", Locale.US );
-        LogFileFormat = new SimpleDateFormat( "dd MMM yyyy kk-mm-ss", Locale.US );
+        httpFormat = new SimpleDateFormat( "EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.US );
+        logFormat = new SimpleDateFormat( "HH:mm:ss", Locale.US );
+        logFileFormat = new SimpleDateFormat( "dd MMM yyyy kk-mm-ss", Locale.US );
     }
 
     public static String getTimeStamp()
     {
-        return getTimeStamp( LogFormat, new Date() );
+        return getTimeStamp( logFormat, new Date() );
     }
 
     /**
@@ -52,12 +52,12 @@ public class TimeUtil
      */
     public static String getHTTPTimeStamp(final Date date)
     {
-        return getTimeStamp( HTTPFormat, date );
+        return getTimeStamp( httpFormat, date );
     }
 
     public static String getHTTPTimeStamp()
     {
-        return getTimeStamp( HTTPFormat, new Date() );
+        return getTimeStamp( httpFormat, new Date() );
     }
 
 

@@ -130,7 +130,8 @@ final class SocketHandler implements ISocketHandler
         Message.WAITING_FOR_EXECUTOR_SERVICE.log();
         try
         {
-            this.executorService.awaitTermination( 5, TimeUnit.SECONDS );
+            this.executorService.shutdownNow();
+            this.executorService.awaitTermination( 10, TimeUnit.SECONDS );
         } catch ( InterruptedException e )
         {
             e.printStackTrace();

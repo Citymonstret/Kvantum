@@ -118,7 +118,6 @@ public final class Server implements IntellectualServer, ISessionCreator
     private ServerSocket serverSocket;
     private SSLServerSocket sslServerSocket;
     private ConfigurationFile configViews;
-    private MySQLConnManager mysqlConnManager;
     @Setter
     @Getter
     private EventCaller eventCaller;
@@ -135,77 +134,71 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     /**
-     * @param standalone Whether or not the server should run as a standalone application,
-     *                   or as an integrated application
-     * @param coreFolder The main folder (in which configuration files and alike are stored)
-     * @param logWrapper The log implementation
-     * @throws IntellectualServerInitializationException If anything was to fail
+     * @param serverContext ServerContext that will be used to initialize the server
+     * @throws IntellectualServerException If anything was to fail
      */
-    Server(final boolean standalone, File coreFolder, final LogWrapper logWrapper, final Router
-            router)
-            throws IntellectualServerInitializationException
+    Server(final ServerContext serverContext)
+            throws IntellectualServerException
     {
-        Assert.notNull( coreFolder, logWrapper );
+        this.coreFolder = serverContext.getCoreFolder();
+        this.logWrapper = serverContext.getLogWrapper();
+        this.standalone = serverContext.isStandalone();
+        this.router = serverContext.getRouter();
 
-        // This setups the "instance" instance
+        //
+        // Setup singleton references
+        //
         InstanceFactory.setupInstanceAutomagic( this );
         ServerImplementation.registerServerImplementation( this );
 
-        // Make sure that the main folder is created
+        //
+        // Setup and initialize the file system
+        //
         coreFolder = new File( coreFolder, ".iserver" ); // Makes everything more portable
         if ( !coreFolder.exists() && !coreFolder.mkdirs() )
         {
             throw new IntellectualServerInitializationException( "Failed to create the core folder: " + coreFolder );
         }
-
-        this.coreFolder = coreFolder;
-        this.logWrapper = logWrapper;
-        this.standalone = standalone;
-
-        // Setup the proprietary file system
         this.fileSystem = new IntellectualFileSystem( coreFolder.toPath() );
-
         final File logFolder = FileUtils.attemptFolderCreation( new File( coreFolder, "log" ) );
-
-        // Setup log-to-file
         try
         {
-            this.logStream = new PrintStream( new FileOutputStream( new File( logFolder,
-                    TimeUtil.getTimeStamp( TimeUtil.LogFileFormat, new Date() ) + ".txt" ) ) );
+            FileUtils.addToZip( new File( logFolder, "old.zip" ),
+                    logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ), true );
+            // System.setOut( new PrintStream( new TeeOutputStream( System.out,
+            //         new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat ) + ".txt" ) ) ) ) );
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+
+        //
+        // Setup the log-to-file system and the error stream
+        //
+        try
+        {
+            this.logStream = new LogStream( logFolder );
             System.setErr( new PrintStream( new ErrorOutputStream( logWrapper ), true ) );
         } catch ( FileNotFoundException e )
         {
             e.printStackTrace();
         }
 
-        printLicenseInfo();
+        //
+        // Print license information
+        //
+        this.printLicenseInfo();
 
-        // This adds the default view bindings
-        addViewBinding( "html", HTMLView.class );
-        addViewBinding( "css", CSSView.class );
-        addViewBinding( "javascript", JSView.class );
-        addViewBinding( "less", LessView.class );
-        addViewBinding( "img", ImgView.class );
-        addViewBinding( "download", DownloadView.class );
-        addViewBinding( "std", StandardView.class );
+        //
+        // Add default view bindings
+        //
+        this.addDefaultViewBindings();
 
+        //
+        // Setup the translation configuration file
+        //
         try
         {
-            FileUtils.addToZip( new File( logFolder, "old.zip" ),
-                    logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ), true );
-            // System.setOut( new PrintStream( new TeeOutputStream( System.out,
-            //         new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.LogFileFormat ) + ".txt" ) ) ) ) );
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            /*
-      This is the configuration file
-      used for translations of logging messages
-     */
             translations = new YamlConfiguration( "translations",
                     new File( new File( coreFolder, "config" ), "translations.yml" ) );
             translations.loadFile();
@@ -239,11 +232,17 @@ public final class Server implements IntellectualServer, ISessionCreator
             e.printStackTrace();
         }
 
+        //
+        // Load the configuration file
+        //
         if ( !CoreConfig.isPreConfigured() )
         {
             ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
         }
 
+        //
+        // Enable the custom security manager
+        //
         if ( CoreConfig.enableSecurityManager )
         {
             try
@@ -255,84 +254,42 @@ public final class Server implements IntellectualServer, ISessionCreator
             }
         }
 
+        //
+        // Send a sample debug message
+        //
         if ( CoreConfig.debug )
         {
             log( Message.DEBUG );
         }
 
+        //
+        // Setup the internal engine
+        //
         this.socketHandler = new SocketHandler();
         Worker.setup( CoreConfig.workers );
 
+        //
+        // Setup default flags
+        //
         this.started = false;
         this.stopping = false;
 
-        this.router = router;
-
+        //
+        // Setup the cache manager
+        //
         this.cacheManager = new CacheManager();
 
-        if ( CoreConfig.MySQL.enabled )
-        {
-            this.mysqlConnManager = new MySQLConnManager();
-        }
-
+        //
+        // Load view configuration
+        //
         if ( !CoreConfig.disableViews )
         {
-            try
-            {
-                configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ), "views.yml" ) );
-                configViews.loadFile();
-                // These are the default views
-                Map<String, Object> views = new HashMap<>();
-                // HTML View
-                Map<String, Object> view = new HashMap<>();
-                view.put( "filter", "[file][extension]" );
-                view.put( "type", "std" );
-                Map<String, Object> opts = new HashMap<>();
-                opts.put( "folder", "./public" );
-                opts.put( "defaultExtension", "html" );
-                opts.put( "defaultFile", "index" );
-                opts.put( "excludeExtensions", Collections.singletonList( "txt" ) );
-                view.put( "options", opts );
-                views.put( "std", view );
-                configViews.setIfNotExists( "views", views );
-                final Path path = getFileSystem().getPath( "public" );
-                if ( !path.exists() )
-                {
-                    path.create();
-                }
-                if ( !path.getPath( "favicon.ico" ).exists() )
-                {
-                    Logger.info( "Creating public/favicon.ico" );
-                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
-                            "favicon.ico" )
-                    ) )
-                    {
-                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/favicon.ico" ), out, 1024 * 16 );
-                    } catch ( final Exception e )
-                    {
-                        e.printStackTrace();
-                    }
-                }
-
-                if ( !path.getPath( "index.html" ).exists() )
-                {
-                    Logger.info( "Creating public/index.html!" );
-                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
-                    ) )
-                    {
-                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
-                    } catch ( final Exception e )
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                configViews.saveFile();
-            } catch ( final Exception e )
-            {
-                throw new IntellectualServerInitializationException( "Couldn't load in views", e );
-            }
+            this.loadViewConfiguration();
         }
 
+        //
+        // Setup the internal application
+        //
         if ( standalone )
         {
             // Makes the application closable in ze terminal
@@ -368,7 +325,8 @@ public final class Server implements IntellectualServer, ISessionCreator
                 default:
                     Logger.error( "Unknown application database implementation: %s", CoreConfig.Application
                             .databaseImplementation );
-                    break;
+                    throw new IntellectualServerInitializationException( "Cannot load - Invalid session database " +
+                            "implementation provided" );
             }
             this.globalAccountManager = applicationStructure.getAccountManager();
             try
@@ -381,6 +339,9 @@ public final class Server implements IntellectualServer, ISessionCreator
             getCommandManager().createCommand( new AccountCommand( applicationStructure ) );
         }
 
+        //
+        // Load external application
+        //
         if ( !CoreConfig.Application.main.isEmpty() )
         {
             try
@@ -404,6 +365,9 @@ public final class Server implements IntellectualServer, ISessionCreator
             }
         }
 
+        //
+        // Load the session database
+        //
         final ISessionDatabase sessionDatabase;
         if ( CoreConfig.Sessions.enableDb )
         {
@@ -435,7 +399,80 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             sessionDatabase = new DumbSessionDatabase();
         }
+
+        //
+        // Setup the session manager implementation
+        //
         this.sessionManager = new SessionManager( this, sessionDatabase );
+    }
+
+    private void loadViewConfiguration() throws IntellectualServerException
+    {
+        try
+        {
+            configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ), "views.yml" ) );
+            configViews.loadFile();
+            // These are the default views
+            Map<String, Object> views = new HashMap<>();
+            // HTML View
+            Map<String, Object> view = new HashMap<>();
+            view.put( "filter", "[file][extension]" );
+            view.put( "type", "std" );
+            Map<String, Object> opts = new HashMap<>();
+            opts.put( "folder", "./public" );
+            opts.put( "defaultExtension", "html" );
+            opts.put( "defaultFile", "index" );
+            opts.put( "excludeExtensions", Collections.singletonList( "txt" ) );
+            view.put( "options", opts );
+            views.put( "std", view );
+            configViews.setIfNotExists( "views", views );
+            final Path path = getFileSystem().getPath( "public" );
+            if ( !path.exists() )
+            {
+                path.create();
+            }
+            if ( !path.getPath( "favicon.ico" ).exists() )
+            {
+                Logger.info( "Creating public/favicon.ico" );
+                try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
+                        "favicon.ico" )
+                ) )
+                {
+                    FileUtils.copyFile( getClass().getResourceAsStream( "/template/favicon.ico" ), out, 1024 * 16 );
+                } catch ( final Exception e )
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            if ( !path.getPath( "index.html" ).exists() )
+            {
+                Logger.info( "Creating public/index.html!" );
+                try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
+                ) )
+                {
+                    FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
+                } catch ( final Exception e )
+                {
+                    e.printStackTrace();
+                }
+            }
+            configViews.saveFile();
+        } catch ( final Exception e )
+        {
+            throw new IntellectualServerInitializationException( "Couldn't load in views", e );
+        }
+    }
+
+    private void addDefaultViewBindings()
+    {
+        addViewBinding( "html", HTMLView.class );
+        addViewBinding( "css", CSSView.class );
+        addViewBinding( "javascript", JSView.class );
+        addViewBinding( "less", LessView.class );
+        addViewBinding( "img", ImgView.class );
+        addViewBinding( "download", DownloadView.class );
+        addViewBinding( "std", StandardView.class );
     }
 
     private void printLicenseInfo()
@@ -456,12 +493,6 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public boolean isMysqlEnabled()
-    {
-        return CoreConfig.MySQL.enabled;
-    }
-
-    @Override
     public void addViewBinding(final String key, final Class<? extends View> c)
     {
         Assert.notNull( c );
@@ -476,6 +507,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         return Optional.ofNullable( this.globalAccountManager );
     }
 
+    @SuppressWarnings( "ALL" )
     @Override
     public void validateViews()
     {
@@ -552,12 +584,6 @@ public final class Server implements IntellectualServer, ISessionCreator
 
         this.log( Message.CALLING_EVENT, "startup" );
         this.handleEvent( new StartupEvent( this ) );
-
-        if ( CoreConfig.MySQL.enabled )
-        {
-            this.log( Message.MYSQL_INIT );
-            this.mysqlConnManager.init();
-        }
 
         // Validating views
         this.log( Message.VALIDATING_VIEWS );
@@ -806,7 +832,7 @@ public final class Server implements IntellectualServer, ISessionCreator
             e.printStackTrace();
         }
 
-        if ( standalone )
+        if ( standalone && CoreConfig.exitOnStop )
         {
             System.exit( 0 );
         }

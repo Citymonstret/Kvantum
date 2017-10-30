@@ -48,7 +48,7 @@ public class ServerContext
         Server server = null;
         try
         {
-            server = new Server( standalone, coreFolder, logWrapper, router );
+            server = new Server( this );
         } catch ( final Exception e )
         {
             e.printStackTrace();

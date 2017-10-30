@@ -6,10 +6,19 @@ import com.github.intellectualsites.iserver.api.views.RequestHandler;
 
 import java.util.Optional;
 
+/**
+ * Interface that manages all IntellectualServer caching.
+ */
 public interface ICacheManager
 {
 
-    String getCachedInclude(String group);
+    /**
+     * Get the file content for a cached Crush <pre>{{include}}</pre> file
+     * @param file File
+     * @return null if the file is not stored in the cache, otherwise
+     *         the file content
+     */
+    String getCachedInclude(String file);
 
     Optional<IAccount> getCachedAccount(int id);
 
