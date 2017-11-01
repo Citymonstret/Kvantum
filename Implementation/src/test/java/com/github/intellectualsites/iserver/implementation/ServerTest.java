@@ -1,18 +1,10 @@
 package com.github.intellectualsites.iserver.implementation;
 
-import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.core.IntellectualServer;
-import com.github.intellectualsites.iserver.api.util.RequestManager;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,12 +17,6 @@ class ServerTest extends com.github.intellectualsites.iserver.implementation.Gen
     void stop()
     {
         assertTimeout( Duration.ofSeconds( 10 ), () -> serverInstance.stopServer() );
-    }
-
-    @Test
-    void getAccountManager()
-    {
-        assertTrue( serverInstance.getAccountManager().isPresent() );
     }
 
     @Test
@@ -125,15 +111,6 @@ class ServerTest extends com.github.intellectualsites.iserver.implementation.Gen
     void isStarted()
     {
         assertFalse( serverInstance.isStarted() );
-    }
-
-    @Test
-    void getGlobalAccountManager()
-    {
-        if ( serverInstance.isStandalone() )
-        {
-            assertNotNull( serverInstance.getAccountManager() );
-        }
     }
 
     @Test
