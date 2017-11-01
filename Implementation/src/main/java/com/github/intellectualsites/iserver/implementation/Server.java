@@ -69,6 +69,7 @@ import sun.misc.Signal;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -121,13 +122,12 @@ public final class Server implements IntellectualServer, ISessionCreator
     @Setter
     @Getter
     private EventCaller eventCaller;
-    private ApplicationStructure mainApplicationStructure;
-    @Getter
-    private IAccountManager globalAccountManager;
     @Getter
     private FileSystem fileSystem;
     @Getter
     private CommandManager commandManager;
+    @Getter
+    private ApplicationStructure applicationStructure;
 
     {
         viewBindings = new HashMap<>();
@@ -299,7 +299,6 @@ public final class Server implements IntellectualServer, ISessionCreator
             this.commandManager.getManagerOptions().getFindCloseMatches( false );
             this.commandManager.getManagerOptions().setRequirePrefix( false );
 
-            ApplicationStructure applicationStructure = null;
             switch ( CoreConfig.Application.databaseImplementation )
             {
                 case "sqlite":
@@ -328,28 +327,14 @@ public final class Server implements IntellectualServer, ISessionCreator
                     throw new IntellectualServerInitializationException( "Cannot load - Invalid session database " +
                             "implementation provided" );
             }
-            this.globalAccountManager = applicationStructure.getAccountManager();
-            try
-            {
-                this.globalAccountManager.setup();
-            } catch ( Exception e )
-            {
-                e.printStackTrace();
-            }
-            getCommandManager().createCommand( new AccountCommand( applicationStructure ) );
-        }
-
-        //
-        // Load external application
-        //
-        if ( !CoreConfig.Application.main.isEmpty() )
+        } else if ( !CoreConfig.Application.main.isEmpty() )
         {
             try
             {
                 Class temp = Class.forName( CoreConfig.Application.main );
                 if ( temp.getSuperclass().equals( ApplicationStructure.class ) )
                 {
-                    this.mainApplicationStructure = (ApplicationStructure) temp.newInstance();
+                    this.applicationStructure = (ApplicationStructure) temp.newInstance();
                 } else
                 {
                     log( Message.APPLICATION_DOES_NOT_EXTEND, CoreConfig.Application.main );
@@ -365,6 +350,18 @@ public final class Server implements IntellectualServer, ISessionCreator
             }
         }
 
+        try
+        {
+            this.getApplicationStructure().getAccountManager().setup();
+            if ( this.getCommandManager() != null )
+            {
+                getCommandManager().createCommand( new AccountCommand( applicationStructure ) );
+            }
+        } catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
+
         //
         // Load the session database
         //
@@ -375,12 +372,13 @@ public final class Server implements IntellectualServer, ISessionCreator
             {
                 case "sqlite":
                     sessionDatabase = new SQLiteSessionDatabase( (SQLiteApplicationStructure) this
-                            .getGlobalAccountManager()
+                            .getApplicationStructure().getAccountManager()
                             .getApplicationStructure() );
                     break;
                 case "mongo":
                     sessionDatabase = new MongoSessionDatabase( (MongoApplicationStructure) this
-                            .getGlobalAccountManager().getApplicationStructure() );
+                            .getApplicationStructure().getAccountManager()
+                            .getApplicationStructure() );
                     break;
                 default:
                     Logger.error( "Unknown database implementation (%s). Using a DumbSessionDatabase instead.",
@@ -499,12 +497,6 @@ public final class Server implements IntellectualServer, ISessionCreator
         Assert.notEmpty( key );
 
         viewBindings.put( key, c );
-    }
-
-    @Override
-    public Optional<IAccountManager> getAccountManager()
-    {
-        return Optional.ofNullable( this.globalAccountManager );
     }
 
     @SuppressWarnings( "ALL" )
@@ -630,11 +622,7 @@ public final class Server implements IntellectualServer, ISessionCreator
             Message.VIEWS_DISABLED.log();
         }
 
-        if ( mainApplicationStructure != null )
-        {
-            mainApplicationStructure.registerViews( this );
-        }
-
+        this.applicationStructure.registerViews( this );
         this.handleEvent( new ViewsInitializedEvent( this ) );
 
         router.dump( this );
@@ -663,19 +651,22 @@ public final class Server implements IntellectualServer, ISessionCreator
         {
             boolean run = true;
 
-            int port = CoreConfig.port + 1;
+            int port = CoreConfig.port;
             while ( run )
             {
                 try
                 {
-                    serverSocket = new ServerSocket( port++ );
+                    serverSocket = new ServerSocket( ++port );
                     run = false;
-                    log( "Specified port was occupied, running on " + ( port - 1 ) + " instead" );
+                    log( "Specified port was occupied, running on %s instead", "" + port );
 
                     CoreConfig.port = port;
-                } catch ( final Exception ex )
+                } catch ( final BindException ex )
                 {
                     continue;
+                } catch ( final Exception ex )
+                {
+                    ex.printStackTrace();
                 }
             }
         }

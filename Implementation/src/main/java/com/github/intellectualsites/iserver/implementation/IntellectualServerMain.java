@@ -27,8 +27,11 @@ import com.github.intellectualsites.iserver.api.logging.LogWrapper;
 import com.github.intellectualsites.iserver.api.util.RequestManager;
 import com.github.intellectualsites.iserver.api.util.TimeUtil;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerInitializationException;
+import org.apache.commons.lang3.SystemUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.Optional;
 
 @SuppressWarnings("ALL")
@@ -42,6 +45,34 @@ final public class IntellectualServerMain
      */
     public static void main(final String[] args) throws Throwable
     {
+        if ( SystemUtils.IS_OS_LINUX )
+        {
+            System.out.println( "Server running on Linux! Checking privileges..." );
+
+            boolean isPrivileged = false;
+
+            final Process process = Runtime.getRuntime().exec( new String[]{ "id", "-u" } );
+            try ( BufferedReader reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) ) )
+            {
+                String line = reader.readLine();
+                if ( line != null )
+                {
+                    isPrivileged = line.equals( "0" );
+                }
+            }
+            process.destroyForcibly();
+
+            if ( !isPrivileged )
+            {
+                System.out.println(
+                        "\nWARNING\n" +
+                                "The server is not privileged, and might therefore not be able to bind to port 80.\n" +
+                                "Not running as a previleged user may also cause complications with file creation. Beware.\n"
+                );
+            }
+        }
+
+
         final Options options = new Options();
         final JCommander jCommander = new JCommander( options, args );
         jCommander.setProgramName( "IntellectualServer" );

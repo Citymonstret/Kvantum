@@ -18,7 +18,6 @@
  */
 package com.github.intellectualsites.iserver.api.core;
 
-import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.ConfigurationFile;
 import com.github.intellectualsites.iserver.api.config.Message;
@@ -32,10 +31,7 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.session.SessionManager;
 import com.github.intellectualsites.iserver.api.socket.ISocketHandler;
-import com.github.intellectualsites.iserver.api.util.Assert;
-import com.github.intellectualsites.iserver.api.util.CollectionUtil;
-import com.github.intellectualsites.iserver.api.util.Generator;
-import com.github.intellectualsites.iserver.api.util.Metrics;
+import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.github.intellectualsites.iserver.api.views.View;
 import com.github.intellectualsites.iserver.files.FileSystem;
@@ -47,7 +43,6 @@ import com.intellectualsites.commands.parser.Parserable;
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /**
@@ -108,8 +103,6 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
      * @see #validateViews()
      */
     void addViewBinding(String key, Class<? extends View> c);
-
-    Optional<IAccountManager> getAccountManager();
 
     /**
      * Validate the views, and make sure they
@@ -204,11 +197,7 @@ public interface IntellectualServer extends CommandCaller<IntellectualServer>
 
     boolean isStarted();
 
-    /**
-     * Get the account manager instance
-     * @return The account manager instance
-     */
-    IAccountManager getGlobalAccountManager();
+    ApplicationStructure getApplicationStructure();
 
     /**
      * Log a message

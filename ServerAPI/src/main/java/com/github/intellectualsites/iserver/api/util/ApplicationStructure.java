@@ -20,30 +20,24 @@ package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
+import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-/**
- * Created 11/13/2015 for IntellectualServer
- *
- * @author Citymonstret
- */
-@SuppressWarnings("unused")
+@RequiredArgsConstructor
 public abstract class ApplicationStructure
 {
 
     protected final String applicationName;
+
+    @Getter
     protected IAccountManager accountManager;
 
-    public ApplicationStructure(final String applicationName)
-    {
-        this.applicationName = Assert.notEmpty( applicationName );
-    }
+    @Getter
+    protected ISessionDatabase sessionDatabase;
 
     public abstract IAccountManager createNewAccountManager();
 
-    public IAccountManager getAccountManager()
-    {
-        return this.accountManager;
-    }
 
     @Override
     public String toString()

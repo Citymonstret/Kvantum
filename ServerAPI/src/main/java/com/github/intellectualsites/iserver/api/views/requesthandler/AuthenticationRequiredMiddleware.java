@@ -22,16 +22,15 @@ import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.request.Request;
 
-import java.util.Optional;
-
 public class AuthenticationRequiredMiddleware extends Middleware
 {
 
     @Override
     public void handle(Request request, MiddlewareQueue queue)
     {
-        final Optional<IAccountManager> accountManager = ServerImplementation.getImplementation().getAccountManager();
-        if ( accountManager.isPresent() && accountManager.get().getAccount( request.getSession() ).isPresent() )
+        final IAccountManager accountManager = ServerImplementation.getImplementation()
+                .getApplicationStructure().getAccountManager();
+        if ( accountManager != null && accountManager.getAccount( request.getSession() ).isPresent() )
         {
             queue.handle( request );
         } else
