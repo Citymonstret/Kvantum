@@ -27,20 +27,25 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.HeaderProvider;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.ProviderFactory;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.AllArgsConstructor;
 
 import java.io.BufferedOutputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 @AllArgsConstructor
 public final class SessionManager implements ProviderFactory<ISession>
 {
 
-    private final Map<String, ISession> sessions = new HashMap<>();
+    private final Cache<String, ISession> sessions = CacheBuilder.newBuilder()
+            .maximumSize( CoreConfig.Cache.cachedSessionsMaxItems )
+            .expireAfterAccess( CoreConfig.Sessions.sessionTimeout, TimeUnit.SECONDS ).build();
+
     private final ISessionCreator sessionCreator;
     private final ISessionDatabase sessionDatabase;
 
@@ -121,9 +126,11 @@ public final class SessionManager implements ProviderFactory<ISession>
         //
         if ( sessionCookie != null && sessionPassCookie != null )
         {
-            if ( this.sessions.containsKey( sessionCookie ) )
+            if ( this.sessions.getIfPresent( sessionCookie ) != null )
             {
-                session = sessions.get( sessionCookie );
+                session = sessions.getIfPresent( sessionCookie );
+
+                assert session != null;
 
                 if ( CoreConfig.debug )
                 {
@@ -137,7 +144,7 @@ public final class SessionManager implements ProviderFactory<ISession>
                     {
                         Logger.debug( "Deleted outdated session: %s", session );
                     }
-                    this.sessions.remove( sessionCookie );
+                    this.sessions.invalidate( sessionCookie );
                     this.sessionDatabase.deleteSession( sessionCookie );
                     session = null;
                 }
@@ -168,7 +175,7 @@ public final class SessionManager implements ProviderFactory<ISession>
                 {
                     Logger.debug( "Deleted session: %s (Cause: %s)", session, "Wrong session key" );
                 }
-                this.sessions.remove( sessionCookie );
+                this.sessions.invalidate( sessionCookie );
                 this.sessionDatabase.deleteSession( sessionCookie );
                 session = null;
             }
@@ -187,11 +194,7 @@ public final class SessionManager implements ProviderFactory<ISession>
 
     public Optional<ISession> getSession(final String sessionID)
     {
-        if ( sessions.containsKey( sessionID ) )
-        {
-            return Optional.of( sessions.get( sessionID ) );
-        }
-        return Optional.empty();
+        return Optional.ofNullable( sessions.getIfPresent( sessionID ) );
     }
 
     public void setSessionLastActive(final String sessionID)

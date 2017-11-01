@@ -25,6 +25,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This is an utility class
  * created to handle all
@@ -35,6 +39,8 @@ import com.google.common.collect.MultimapBuilder;
 final public class CookieManager
 {
 
+    private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" +
+            "(?<value>.*)" );
     private static final ListMultimap<String, Cookie> EMPTY_COOKIES = ArrayListMultimap.create( 0, 0 );
 
     /**
@@ -47,29 +53,26 @@ final public class CookieManager
     {
         Assert.isValid( r );
 
-        String raw = r.getHeader( "Cookie" );
+        String raw = r.getHeader( "Cookie" ).replaceAll( "\\s", "" );
 
         if ( raw.isEmpty() )
         {
             return EMPTY_COOKIES;
         }
 
-        raw = raw.replaceFirst( " ", "" );
-
-        final String[] pieces = raw.split( "; " );
-
-        final ListMultimap<String, Cookie> cookies = MultimapBuilder.hashKeys( pieces.length ).arrayListValues()
+        final ListMultimap<String, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues()
                 .build();
 
-        for ( final String piece : pieces )
+        final StringTokenizer cookieTokenizer = new StringTokenizer( raw, ";" );
+        while ( cookieTokenizer.hasMoreTokens() )
         {
-            final String[] subPieces = piece.split( "=" );
-            if ( subPieces.length == 1 )
+            final String cookieString = cookieTokenizer.nextToken();
+
+            final Matcher matcher = PATTERN_COOKIE.matcher( cookieString );
+            if ( matcher.matches() )
             {
-                cookies.put( subPieces[ 0 ], new Cookie( subPieces[ 0 ], "" ) );
-            } else
-            {
-                cookies.put( subPieces[ 0 ], new Cookie( subPieces[ 0 ], subPieces[ 1 ] ) );
+                cookies.put( matcher.group( "key" ), new Cookie( matcher.group( "key" ),
+                        matcher.group( "value" ) ) );
             }
         }
 

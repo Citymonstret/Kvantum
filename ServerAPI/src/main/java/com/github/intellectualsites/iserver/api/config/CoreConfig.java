@@ -119,6 +119,7 @@ public class CoreConfig
         public static int cachedBodiesMaxItems = 1000;
         public static int cachedFilesExpiry = 60 * 60 * 24;
         public static int cachedFilesMaxItems = 1000;
+        public static int cachedSessionsMaxItems = 1000;
 
     }
 

@@ -265,6 +265,10 @@ final class Worker extends AutoCloseable
             return handleSendStatusOnly( Header.STATUS_HTTP_VERSION_NOT_SUPPORTED );
         } catch ( final Exception ex )
         {
+            if ( CoreConfig.debug )
+            {
+                ex.printStackTrace();
+            }
             return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
         }
 
