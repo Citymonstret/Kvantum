@@ -22,7 +22,6 @@ import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.URI;
@@ -73,23 +72,6 @@ public class FileUtils
         return folder;
     }
 
-    public static void copyFile(final File in, final File out)
-    {
-        try ( final FileInputStream inStream = new FileInputStream( in ) )
-        {
-            try ( final FileOutputStream outStream = new FileOutputStream( out ) )
-            {
-                copyFile( inStream, outStream, 16 * 1024 );
-            } catch ( final Exception ee )
-            {
-                ee.printStackTrace();
-            }
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Copy a file from one location to another
      *
@@ -107,7 +89,9 @@ public class FileUtils
             final byte[] buffer = new byte[ size ];
             int length;
             while ( ( length = in.read( buffer ) ) > 0 )
+            {
                 out.write( buffer, 0, length );
+            }
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -136,24 +120,10 @@ public class FileUtils
         return getDocument( file, buffer, false );
     }
 
-    public static byte[] getBytes(final File file, final int buffer)
-    {
-        byte[] bytes = new byte[ 0 ];
-        try
-        {
-            BufferedInputStream stream = new BufferedInputStream( new FileInputStream( file ), buffer );
-            bytes = IOUtils.toByteArray( stream );
-            stream.close();
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-        return bytes;
-    }
-
-    public static String getDocument(final File file, int buffer, boolean create)
+    public static String getDocument(final File file, final int buffer, final boolean create)
     {
         Optional<String> cacheEntry = Optional.empty();
+
         try
         {
             cacheEntry = ServerImplementation.getImplementation().getCacheManager().getCachedFile(
@@ -162,12 +132,13 @@ public class FileUtils
         {
             new IntellectualServerException( "Failed to read file (" + file + ") from cache", e ).printStackTrace();
         }
+
         if ( cacheEntry.isPresent() )
         {
             return cacheEntry.get();
         }
 
-        StringBuilder document = new StringBuilder();
+        final StringBuilder document = new StringBuilder();
         try
         {
             if ( !file.exists() )
@@ -183,13 +154,14 @@ public class FileUtils
                 }
             }
 
-            BufferedReader reader = new BufferedReader( new FileReader( file ), buffer );
-            String line;
-            while ( ( line = reader.readLine() ) != null )
+            try ( BufferedReader reader = new BufferedReader( new FileReader( file ), buffer ) )
             {
-                document.append( line ).append( "\n" );
+                String line;
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    document.append( line ).append( "\n" );
+                }
             }
-            reader.close();
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -200,27 +172,4 @@ public class FileUtils
         return content;
     }
 
-    /**
-     * Get the size of a file or directory
-     *
-     * @param file File
-     * @return Size of file
-     */
-    public static long getSize(final File file)
-    {
-        long size = 0;
-        if ( file.isDirectory() )
-        {
-            final File[] files = file.listFiles();
-            if ( files == null )
-                return size;
-            for ( final File f : files )
-                if ( f.isFile() )
-                    size += f.length();
-                else
-                    size += getSize( file );
-        } else if ( file.isFile() )
-            size += file.length();
-        return size;
-    }
 }
