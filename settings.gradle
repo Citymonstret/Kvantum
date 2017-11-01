@@ -3,6 +3,5 @@ include 'FileSystem'
 include 'ServerAPI'
 include 'Crush'
 include 'Assert'
-include 'WindowsLauncher'
 include 'Implementation'
 

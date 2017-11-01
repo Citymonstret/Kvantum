@@ -13,6 +13,14 @@ buildscript {
 group 'com.github.intellectualsites'
 version = 'BETA-0.0.3'
 
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'IntellectualServer',
+                'Implementation-Version': version,
+                'Main-Class': 'com.github.intellectualsites.iserver.implementation.IntellectualServerMain'
+    }
+}
+
 dependencies {
     // Powers the MongoDB implementation
     compile 'org.mongodb:mongo-java-driver:3.5.0'
