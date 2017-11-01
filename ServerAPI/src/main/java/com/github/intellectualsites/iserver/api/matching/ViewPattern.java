@@ -58,7 +58,7 @@ public class ViewPattern
 {
 
     private static final Pattern PATTERN_VARIABLE_REQUIRED = Pattern.compile( "<([a-zA-Z0-9]*)>" );
-    private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)(=[a-zA-Z0-9]*)?]" );
+    private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)(=([a-zA-Z0-9]*))?]" );
     private static final Pattern PATTERN_VARIABLE_STATIC = Pattern.compile( "([a-zA-Z0-9]*)" );
 
     private final List<Part> parts = new ArrayList<>();
@@ -102,15 +102,15 @@ public class ViewPattern
             Matcher matcher;
             if ( ( matcher = PATTERN_VARIABLE_REQUIRED.matcher( token ) ).matches() )
             {
-                this.parts.add( new Variable( matcher.group(), Variable.TYPE_REQUIRED ) );
+                this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_REQUIRED ) );
             } else if ( ( matcher = PATTERN_VARIABLE_OPTIONAL.matcher( token ) ).matches() )
             {
-                if ( matcher.group( 2 ) == null || matcher.group( 2 ).isEmpty() )
+                if ( matcher.group( 3 ) == null || matcher.group( 3 ).isEmpty() )
                 {
                     this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_OPTIONAL ) );
                 } else
                 {
-                    this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_OPTIONAL, matcher.group( 2 ) ) );
+                    this.parts.add( new Variable( matcher.group( 1 ), Variable.TYPE_OPTIONAL, matcher.group( 3 ) ) );
                 }
             } else if ( ( matcher = PATTERN_VARIABLE_STATIC.matcher( token ) ).matches() )
             {
@@ -256,9 +256,12 @@ public class ViewPattern
             if ( part instanceof Variable )
             {
                 final Variable variable = (Variable) part;
-                if ( next.isEmpty() && variable.hasDefaultValue() )
+                if ( next.isEmpty() )
                 {
-                    variables.put( variable.getName(), variable.getDefaultValue() );
+                    if ( variable.hasDefaultValue() )
+                    {
+                        variables.put( variable.getName(), variable.getDefaultValue() );
+                    }
                 } else
                 {
                     variables.put( variable.getName(), next );
