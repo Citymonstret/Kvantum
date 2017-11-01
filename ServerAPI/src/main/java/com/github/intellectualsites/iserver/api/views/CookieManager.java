@@ -40,7 +40,7 @@ final public class CookieManager
 {
 
     private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" +
-            "(?<value>.*)" );
+            "(?<value>.*)?" );
     private static final ListMultimap<String, Cookie> EMPTY_COOKIES = ArrayListMultimap.create( 0, 0 );
 
     /**
@@ -71,8 +71,14 @@ final public class CookieManager
             final Matcher matcher = PATTERN_COOKIE.matcher( cookieString );
             if ( matcher.matches() )
             {
-                cookies.put( matcher.group( "key" ), new Cookie( matcher.group( "key" ),
-                        matcher.group( "value" ) ) );
+                if ( matcher.groupCount() < 2 )
+                {
+                    cookies.put( matcher.group( "key" ), new Cookie( matcher.group( "key" ), "" ) );
+                } else
+                {
+                    cookies.put( matcher.group( "key" ), new Cookie( matcher.group( "key" ),
+                            matcher.group( "value" ) ) );
+                }
             }
         }
 
