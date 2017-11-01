@@ -19,29 +19,22 @@
 package com.github.intellectualsites.iserver.implementation;
 
 import com.codahale.metrics.Timer;
-import com.github.intellectualsites.iserver.api.cache.CacheApplicable;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
-import com.github.intellectualsites.iserver.api.logging.LogModes;
-import com.github.intellectualsites.iserver.api.logging.Logger;
+import com.github.intellectualsites.iserver.api.exceptions.ProtocolNotSupportedException;
 import com.github.intellectualsites.iserver.api.request.HttpMethod;
 import com.github.intellectualsites.iserver.api.request.PostRequest;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
+import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
-import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import com.github.intellectualsites.iserver.api.util.LambdaUtil;
-import com.github.intellectualsites.iserver.api.validation.RequestValidation;
-import com.github.intellectualsites.iserver.api.validation.ValidationException;
-import com.github.intellectualsites.iserver.api.views.RequestHandler;
-import com.github.intellectualsites.iserver.api.views.errors.ViewException;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerException;
-import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.BASE64Encoder;
 
 import java.io.BufferedOutputStream;
@@ -51,7 +44,10 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * This is the worker that is responsible for nearly everything.
@@ -60,18 +56,15 @@ import java.util.*;
 final class Worker extends AutoCloseable
 {
 
-    private static byte[] empty = "NULL".getBytes();
     private static Queue<Worker> availableWorkers;
-
-    private static final String CONTENT_TYPE = "content_type";
 
     private final MessageDigest messageDigestMd5;
     private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
     private final ReusableGzipOutputStream reusableGzipOutputStream;
     private final IntellectualServer server;
-    private Request request;
-    private BufferedOutputStream output;
+
+    private WorkerContext workerContext;
 
     private Worker()
     {
@@ -108,6 +101,7 @@ final class Worker extends AutoCloseable
 
     /**
      * Setup the handler with a specified number of worker instances
+     *
      * @param n Number of worker instances (must be positive)
      */
     static void setup(final int n)
@@ -120,6 +114,7 @@ final class Worker extends AutoCloseable
     /**
      * Poll the worker queue until a worker is available.
      * Warning: The thread will be locked until a new worker is available
+     *
      * @return The next available worker
      */
     static Worker getAvailableWorker()
@@ -170,186 +165,23 @@ final class Worker extends AutoCloseable
         return compressed;
     }
 
-    private void handle()
+    void sendToClient(final ResponseBody body, byte[] bytes)
     {
-        Optional<ISession> session = server.getSessionManager().getSession( request, output );
-
-        if ( session.isPresent() )
-        {
-            request.setSession( session.get() );
-            server.getSessionManager().setSessionLastActive( session.get().get( "id" ).toString() );
-        } else
-        {
-            Logger.warn( "Could not initialize session!" );
-        }
-
-        final RequestHandler requestHandler = server.getRouter().match( request );
-
-        String textContent = "";
-        byte[] bytes = empty;
-
-        boolean shouldCache = false;
-        boolean cache = false;
-        ResponseBody body;
-
-        try
-        {
-            if ( !requestHandler.getValidationManager().isEmpty() )
-            {
-                if ( request.getQuery().getMethod() == HttpMethod.POST )
-                {
-                    for ( final RequestValidation<PostRequest> validator : requestHandler.getValidationManager()
-                            .getValidators(
-                                    RequestValidation.ValidationStage.POST_PARAMETERS ) )
-                    {
-                        final RequestValidation.ValidationResult result = validator.validate( request
-                                .getPostRequest() );
-                        if ( !result.isSuccess() )
-                        {
-                            throw new ValidationException( result );
-                        }
-                    }
-                } else
-                {
-                    for ( final RequestValidation<Request.Query> validator : requestHandler.getValidationManager()
-                            .getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
-                    {
-                        final RequestValidation.ValidationResult result = validator.validate( request.getQuery() );
-                        if ( !result.isSuccess() )
-                        {
-                            throw new ValidationException( result );
-                        }
-                    }
-                }
-            }
-
-            if ( CoreConfig.Cache.enabled && requestHandler instanceof CacheApplicable
-                    && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
-            {
-                cache = true;
-                if ( !server.getCacheManager().hasCache( requestHandler ) )
-                {
-                    shouldCache = true;
-                }
-            }
-
-            if ( !cache || shouldCache )
-            { // Either it's a non-cached view, or there is no cache stored
-                body = requestHandler.handle( request );
-            } else
-            { // Just read from memory
-                body = server.getCacheManager().getCache( requestHandler );
-            }
-
-            boolean skip = false;
-            if ( body == null )
-            {
-                final Object redirect = request.getMeta( "internalRedirect" );
-                if ( redirect != null && redirect instanceof Request )
-                {
-                    this.request = (Request) redirect;
-                    this.request.removeMeta( "internalRedirect" );
-                    handle();
-                    return;
-                } else
-                {
-                    skip = true;
-                }
-            }
-
-            if ( skip )
-            {
-                return;
-            }
-
-            if ( shouldCache )
-            {
-                server.getCacheManager().setCache( requestHandler, body );
-            }
-
-            if ( body.isText() )
-            {
-                textContent = body.getContent();
-            } else
-            {
-                bytes = body.getBytes();
-            }
-
-            for ( final Map.Entry<String, String> postponedCookie : request.postponedCookies.entries() )
-            {
-                body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
-            }
-
-            // Start: CTYPE
-            // Desc: To allow worker procedures to filter based on content type
-            final Optional<String> contentType = body.getHeader().get( Header.HEADER_CONTENT_TYPE );
-            if ( contentType.isPresent() )
-            {
-                request.addMeta( CONTENT_TYPE, contentType.get() );
-            } else
-            {
-                request.addMeta( CONTENT_TYPE, null );
-            }
-            // End: CTYPE
-
-            if ( request.getQuery().getMethod().hasBody() )
-            {
-                if ( body.isText() )
-                {
-                    for ( final WorkerProcedure.Handler<String> handler : workerProcedureInstance.getStringHandlers() )
-                    {
-                        textContent = handler.act( requestHandler, request, textContent );
-                    }
-                    bytes = textContent.getBytes();
-                }
-
-                if ( !workerProcedureInstance.getByteHandlers().isEmpty() )
-                {
-                    Byte[] wrapper = ArrayUtils.toObject( bytes );
-                    for ( final WorkerProcedure.Handler<Byte[]> handler : workerProcedureInstance.getByteHandlers() )
-                    {
-                        wrapper = handler.act( requestHandler, request, wrapper );
-                    }
-                    bytes = ArrayUtils.toPrimitive( wrapper );
-                }
-            }
-        } catch ( final Exception e )
-        {
-            server.log( "Error When Handling Request: %s", e.getMessage(), LogModes.MODE_ERROR );
-            e.printStackTrace();
-
-            body = new ViewException( e ).generate( request );
-            bytes = body.getContent().getBytes();
-
-            if ( CoreConfig.verbose )
-            {
-                e.printStackTrace();
-            }
-        }
-
-        boolean gzip = false;
-        if ( CoreConfig.gzip )
-        {
-            if ( request.getHeader( "Accept-Encoding" ).contains( "gzip" ) )
-            {
-                gzip = true;
-                body.getHeader().set( Header.HEADER_CONTENT_ENCODING, "gzip" );
-            } else
-            {
-                Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
-            }
-        }
+        workerContext.determineGzipStatus();
 
         if ( CoreConfig.contentMd5 )
         {
             body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Checksum( bytes ) );
         }
 
-        body.getHeader().apply( output );
+        //
+        // Send the header to the client
+        //
+        body.getHeader().apply( workerContext.getOutput() );
 
         try
         {
-            if ( gzip )
+            if ( workerContext.isGzip() )
             {
                 try
                 {
@@ -359,96 +191,189 @@ final class Worker extends AutoCloseable
                     new IntellectualServerException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
                 }
             }
-            output.write( bytes );
+            workerContext.getOutput().write( bytes );
         } catch ( final Exception e )
         {
             new IntellectualServerException( "Failed to write to the client", e )
                     .printStackTrace();
         }
-        try
-        {
-            output.flush();
-        } catch ( final Exception e )
-        {
-            new IntellectualServerException( "Failed to flush to the client", e )
-                    .printStackTrace();
-        }
 
-        if ( CoreConfig.debug )
-        {
-            server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%skB'",
-                    requestHandler.getName(), body.isText() ? "text" : "bytes", (bytes.length / 1000)
-            );
-        }
+        //
+        // Make sure everything is written
+        //
+        workerContext.flushOutput();
 
-        request.setValid( false );
+        //
+        // Invalidate request to make sure that it isn't handled anywhere else, again (wouldn't work)
+        //
+        workerContext.getRequest().setValid( false );
     }
 
     /**
-     * Prepares a request, then calls {@link #handle}
-     * @param remote Client com.plotsquared.iserver.internal.IntellectualSocket
+     * Prepares a request
+     * @param remote Client
+     * @return boolean success status
      */
-    private void handle(final Socket remote) throws Exception
+    private boolean prepare(final Socket remote) throws Exception
     {
-        // Used for metrics
-        final Timer.Context timerContext = ServerImplementation.getImplementation()
-                .getMetrics().registerRequestHandling();
         if ( CoreConfig.verbose )
-        { // Do we want to output a load of useless information?
-            server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
+        {
+            this.server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
         }
-        final BufferedReader input;
-        { // Read the actual request
-            try
+
+        final BufferedReader input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), CoreConfig.Buffer.in );
+        this.workerContext.setOutput( new BufferedOutputStream( remote.getOutputStream(), CoreConfig.Buffer.out ) );
+
+        //
+        // Read the request
+        //
+        final List<String> lines = new ArrayList<>();
+        String str;
+        while ( ( str = input.readLine() ) != null && !str.isEmpty() )
+        {
+            //
+            // Make sure that a request line (in case of headers: both the key and the value
+            // doesn't exceed the limit. This is to prevent the client from sending enormous requests
+            //
+            // The string length is multiplied by two, to get the number of bytes in the string
+            //
+            if ( ( str.length() * 2 ) > CoreConfig.Limits.limitRequestLineSize )
             {
-                input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), CoreConfig.Buffer.in );
-                output = new BufferedOutputStream( remote.getOutputStream(), CoreConfig.Buffer.out );
-
-                final List<String> lines = new ArrayList<>();
-                String str;
-                while ( ( str = input.readLine() ) != null && !str.isEmpty() )
-                {
-                    lines.add( str );
-                }
-
-                request = new Request( lines, remote );
-
-                if ( request.getQuery().getMethod() == HttpMethod.POST )
-                {
-                    final int cl = Integer.parseInt( request.getHeader( "Content-Length" ).substring( 1 ) );
-                    request.setPostRequest( PostRequest.construct( request, cl, input ) );
-                }
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-                return;
+                return handleSendStatusOnly( Header.STATUS_PAYLOAD_TOO_LARGE );
             }
+
+            lines.add( str );
         }
+
+        //
+        // Make sure that the client cannot send an extreme number of lines in their request to bypass
+        // the size limit. This is to prevent DOS attacks, and also... who sends 100+ headers?
+        //
+        if ( lines.size() > CoreConfig.Limits.limitRequestLines )
+        {
+            return handleSendStatusOnly( Header.STATUS_PAYLOAD_TOO_LARGE );
+        }
+
+        //
+        // Generate a new request
+        //
+        try
+        {
+            workerContext.setRequest( new Request( lines, remote ) );
+        } catch ( final ProtocolNotSupportedException ex )
+        {
+            return handleSendStatusOnly( Header.STATUS_HTTP_VERSION_NOT_SUPPORTED );
+        } catch ( final Exception ex )
+        {
+            return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
+        }
+
+        //
+        // If the client sent a post request, then make sure to the read the request field
+        //
+        if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST )
+        {
+            final Request request = workerContext.getRequest();
+            final int cl = Integer.parseInt( workerContext.getRequest().getHeader( "Content-Length" )
+                    .substring( 1 ) );
+            request.setPostRequest( PostRequest.construct( workerContext.getRequest(), cl, input ) );
+        }
+
+        //
+        // Log the request
+        //
         if ( !server.isSilent() )
         {
-            server.log( request.buildLog() );
+            server.log( workerContext.getRequest().buildLog() );
         }
-        handle();
-        timerContext.stop();
+
+        return true;
+    }
+
+    /**
+     * This method sends only a HTTP status to the client
+     * See {@link Header} for status constants
+     * <p>
+     * This method will generate a new response and then flush the output (see {@link WorkerContext#flushOutput()}
+     *
+     * @param status Status code
+     * @return false
+     */
+    private boolean handleSendStatusOnly(final String status)
+    {
+        Response response = new Response();
+        response.getHeader().clear();
+        response.getHeader().setStatus( status );
+        response.getHeader().set( Header.HEADER_CONNECTION, "close" );
+        response.getHeader().apply( workerContext.getOutput() );
+        workerContext.flushOutput();
+
+        if ( CoreConfig.debug )
+        {
+            server.log( "Request was served with HTTP Status: %s", status );
+        }
+
+        return false;
     }
 
     /**
      * Accepts a remote socket and handles the incoming request,
-     * also makes sure its handled and closed down successfully
+     * also makes sure its handled and closed down successfully.
+     *
+     * This method passes the request to {@link #prepare(Socket)}
+     *
      * @param remote socket to accept
      */
     void run(final Socket remote)
     {
+        //
+        // Setup the metrics object
+        //
+        final Timer.Context timerContext = ServerImplementation.getImplementation()
+                .getMetrics().registerRequestHandling();
+
+        this.workerContext = new WorkerContext( server, workerProcedureInstance );
+
+        //
+        // Handle the remote socket
+        //
         if ( remote != null && !remote.isClosed() )
         {
             try
             {
-                handle( remote );
+                if ( this.prepare( remote ) )
+                {
+                    this.workerContext.handle( this );
+                }
             } catch ( final Exception e )
             {
                 new IntellectualServerException( "Failed to handle incoming socket", e ).printStackTrace();
             }
         }
+
+        //
+        // Close the remote socket
+        //
+        this.closeRemote( remote );
+
+        //
+        // Make sure the metric is logged
+        //
+        timerContext.stop();
+
+        //
+        // Add the worker back to the pool
+        //
+        availableWorkers.add( this );
+    }
+
+    /**
+     * Close the remote socket, prints any exceptions
+     *
+     * @param remote Remote socket
+     */
+    private void closeRemote(final Socket remote)
+    {
         if ( remote != null && !remote.isClosed() )
         {
             try
@@ -459,13 +384,11 @@ final class Worker extends AutoCloseable
                 e.printStackTrace();
             }
         }
-
-        // Add the worker back to the poll
-        availableWorkers.add( this );
     }
 
     /**
      * MD5-ify the input
+     *
      * @param input Input text to be digested
      * @return md5-ified digested text
      */

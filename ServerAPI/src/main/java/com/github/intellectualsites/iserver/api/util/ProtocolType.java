@@ -18,10 +18,21 @@
  */
 package com.github.intellectualsites.iserver.api.util;
 
+import java.util.Locale;
+import java.util.Optional;
+
 public enum ProtocolType
 {
 
     HTTP,
-    HTTPS
+    HTTPS;
+
+    public static Optional<ProtocolType> getByName(final String name)
+    {
+        Assert.notEmpty( name );
+
+        final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
+        return LambdaUtil.getFirst( values(), type -> type.name().equals( fixed ) );
+    }
 
 }

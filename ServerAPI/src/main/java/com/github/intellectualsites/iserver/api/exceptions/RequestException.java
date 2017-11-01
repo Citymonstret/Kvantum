@@ -18,11 +18,13 @@
  */
 package com.github.intellectualsites.iserver.api.exceptions;
 
+import com.github.intellectualsites.iserver.api.request.Request;
+
 public class RequestException extends IntellectualServerException
 {
 
-    public RequestException(String message)
+    public RequestException(final String message, final Request request)
     {
-        super( "Failed to handle request: " + message );
+        super( String.format( "Failed to handle request (%s): %s", request, message ) );
     }
 }

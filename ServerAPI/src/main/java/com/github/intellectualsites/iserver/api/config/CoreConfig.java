@@ -96,6 +96,14 @@ public class CoreConfig
 
     }
 
+    @ConfigSection(name = "limits")
+    public static class Limits
+    {
+
+        public static int limitRequestLines = 100;
+        public static int limitRequestLineSize = 8190;
+    }
+
     @ConfigSection(name = "cache")
     public static class Cache
     {

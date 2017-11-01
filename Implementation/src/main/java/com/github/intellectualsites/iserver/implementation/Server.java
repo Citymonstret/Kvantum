@@ -164,9 +164,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         try
         {
             FileUtils.addToZip( new File( logFolder, "old.zip" ),
-                    logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ), true );
-            // System.setOut( new PrintStream( new TeeOutputStream( System.out,
-            //         new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat ) + ".txt" ) ) ) ) );
+                    logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ) );
         } catch ( final Exception e )
         {
             e.printStackTrace();

@@ -43,21 +43,45 @@ final public class Header
     public static final String POWERED_BY = "IntellectualServer";
     public static final String X_POWERED_BY = "Java/IntellectualServer 1.0";
 
-    public static final String STATUS_TEMPORARY_REDIRECT = "307 Temporary Redirect";
+    //
+    // 1xx Informational
+    //
+    public static final String STATUS_CONTINUE = "100 Continue";
+    public static final String STATUS_SWITCHING_PROTOCOLS = "101 Switching Protocols";
+    public static final String STATUS_PROCESSING = "102 Processing";
+
+    //
+    // 2xx Success
+    //
     public static final String STATUS_OK = "200 OK";
+    public static final String STATUS_CREATED = "2001 Created";
+    public static final String STATUS_NON_AUTHORITATIVE_INFORMATION = "203 Non-Authoriative Information";
+    public static final String STATUS_ACCEPTED = "202 Accepted";
+    public static final String STATUS_NO_CONTENT = "204 No Content";
+    public static final String STATUS_RESET_CONTENT = "205 Reset Content";
+    public static final String STATUS_PARTIAL_CONTENT = "206 Partial Content";
+
+    //
+    // 3xx Redirection
+    //
+    public static final String STATUS_MOVED_PERMANENTLY = "301 Moved Permanently";
+    public static final String STATUS_TEMPORARY_REDIRECT = "307 Temporary Redirect";
+
+    //
+    // 4xx Client errors
+    //
+    public static final String STATUS_BAD_REQUEST = "400 Bad Request";
     public static final String STATUS_ACCESS_DENIED = "401 Access Denied";
     public static final String STATUS_UNAUTHORIZED = "401 Unauthorized status";
     public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
     public static final String STATUS_NOT_ACCEPTABLE = "406 Not Acceptable";
-    public static final String STATUS_CONTINUE = "100 Continue";
-    public static final String STATUS_SWITCHING_PROTOCOLS = "101 Switching Protocols";
-    public static final String STATUS_PROCESSING = "102 Processing";
-    public static final String STATUS_CREATED = "201 Created";
-    public static final String STATUS_ACCEPTED = "202 Accepted";
-    public static final String STATUS_NON_AUTHORITATIVE_INFORMATION = "203 Non-Authoriative Information";
-    public static final String STATUS_NO_CONTENT = "204 No Content";
-    public static final String STATUS_RESET_CONTENT = "205 Reset Content";
-    public static final String STATUS_PARTIAL_CONTENT = "206 Partial Content";
+    public static final String STATUS_PAYLOAD_TOO_LARGE = "413 Payload Too Large";
+    public static final String STATUS_REQUEST_TIMEOUT = "408 Request Timeout";
+
+    //
+    // 5xx Server errors
+    //
+    public static final String STATUS_HTTP_VERSION_NOT_SUPPORTED = "505 HTTP Version Not Supported";
 
     public static final String ALLOW_ALL = "*";
     public static final String COOKIE_DELETED = "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT";
@@ -268,6 +292,8 @@ final public class Header
         Assert.notNull( status );
 
         this.status = status;
+        this.set( HEADER_STATUS, status );
+
         return this;
     }
 
@@ -400,4 +426,9 @@ final public class Header
         return this;
     }
 
+    public Header clear()
+    {
+        this.headers.clear();
+        return this;
+    }
 }

@@ -18,6 +18,10 @@
  */
 package com.github.intellectualsites.iserver.api.validation;
 
+import com.github.intellectualsites.iserver.api.request.HttpMethod;
+import com.github.intellectualsites.iserver.api.request.PostRequest;
+import com.github.intellectualsites.iserver.api.request.Request;
+
 import java.util.*;
 
 public class ValidationManager
@@ -49,6 +53,34 @@ public class ValidationManager
     {
         this.empty = false;
         this.validators.get( validator.getStage() ).add( validator );
+    }
+
+    public void validate(final Request request) throws ValidationException
+    {
+        if ( request.getQuery().getMethod() == HttpMethod.POST )
+        {
+            for ( final RequestValidation<PostRequest> validator :
+                    this.getValidators( RequestValidation.ValidationStage.POST_PARAMETERS ) )
+            {
+                final RequestValidation.ValidationResult result = validator.validate( request
+                        .getPostRequest() );
+                if ( !result.isSuccess() )
+                {
+                    throw new ValidationException( result );
+                }
+            }
+        } else
+        {
+            for ( final RequestValidation<Request.Query> validator :
+                    this.getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
+            {
+                final RequestValidation.ValidationResult result = validator.validate( request.getQuery() );
+                if ( !result.isSuccess() )
+                {
+                    throw new ValidationException( result );
+                }
+            }
+        }
     }
 
 }

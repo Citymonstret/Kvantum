@@ -25,10 +25,12 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 @UtilityClass
 public class FileUtils
@@ -39,81 +41,25 @@ public class FileUtils
      *
      * @param zipFile Zip File
      * @param files   Files to add to the zip
-     * @param delete  If the original files should be deleted
      * @throws Exception If anything goes wrong
      */
-    public static void addToZip(final File zipFile, final File[] files, final boolean delete) throws Exception
+    public static void addToZip(final File zipFile, final File[] files) throws Exception
     {
         Assert.notNull( zipFile, files );
 
-        if ( !zipFile.exists() && !zipFile.createNewFile() )
+        final Map<String, String> env = new HashMap<String, String>()
         {
-            throw new IntellectualServerException( "Couldn't create " + zipFile );
-        }
-
-        final File temporary = File.createTempFile( zipFile.getName(), "" );
-        //noinspection ResultOfMethodCallIgnored
-        temporary.delete();
-
-        if ( !zipFile.renameTo( temporary ) )
-        {
-            throw new IntellectualServerException( "Couldn't rename " + zipFile + " to " + temporary );
-        }
-
-        final byte[] buffer = new byte[ 1024 * 16 ]; // 16mb
-
-        ZipInputStream zis = new ZipInputStream( new FileInputStream( temporary ) );
-        ZipOutputStream zos = new ZipOutputStream( new FileOutputStream( zipFile ) );
-
-        ZipEntry e = zis.getNextEntry();
-        while ( e != null )
-        {
-            String n = e.getName();
-
-            boolean no = true;
-            for ( File f : files )
             {
-                if ( f.getName().equals( n ) )
-                {
-                    no = false;
-                    break;
-                }
+                put( "create", "true" );
             }
-
-            if ( no )
-            {
-                zos.putNextEntry( new ZipEntry( n ) );
-                int len;
-                while ( ( len = zis.read( buffer ) ) > 0 )
-                {
-                    zos.write( buffer, 0, len );
-                }
-            }
-            e = zis.getNextEntry();
-        }
-        zis.close();
-        for ( File file : files )
+        };
+        final Path path = zipFile.toPath();
+        final URI uri = URI.create( "jar:" + path.toUri() );
+        try ( FileSystem fileSystem = FileSystems.newFileSystem( uri, env ) )
         {
-            InputStream in = new FileInputStream( file );
-            zos.putNextEntry( new ZipEntry( file.getName() ) );
-
-            int len;
-            while ( ( len = in.read( buffer ) ) > 0 )
+            for ( final File file : files )
             {
-                zos.write( buffer, 0, len );
-            }
-
-            zos.closeEntry();
-            in.close();
-        }
-        zos.close();
-        temporary.delete();
-
-        if ( delete )
-        {
-            for ( File f : files )
-            {
-                f.delete();
+                Files.move( file.toPath(), fileSystem.getPath( file.getName() ), StandardCopyOption.REPLACE_EXISTING );
             }
         }
     }

@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.request;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.ProtocolNotSupportedException;
 import com.github.intellectualsites.iserver.api.exceptions.RequestException;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.*;
@@ -28,15 +29,15 @@ import com.github.intellectualsites.iserver.api.views.CookieManager;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import javax.net.ssl.SSLSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The HTTP Request Class
@@ -51,6 +52,7 @@ import java.util.function.Predicate;
  * @author Citymonstret
  */
 @SuppressWarnings("unused")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable, RequestChild
 {
 
@@ -59,6 +61,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public static final String ALTERNATE_OUTCOME = "alternateOutcome";
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
+    private static final Pattern PATTERN_QUERY = Pattern.compile(
+            "(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!]*) " +
+                    "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?"
+    );
+    private static final Pattern PATTERN_HEADER = Pattern.compile( "(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)" );
 
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
     public ListMultimap<String, String> postponedCookies = ArrayListMultimap.create();
@@ -83,10 +90,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private boolean valid = true;
     private Authorization authorization;
 
-    private Request()
-    {
-    }
-
     /**
      * The request constructor
      *
@@ -98,37 +101,69 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     {
         Assert.notNull( request, socket );
 
-        protocolType = ( socket instanceof SSLSocket ) ? ProtocolType.HTTPS : ProtocolType.HTTP;
-
         this.socket = socket;
         this.headers = new HashMap<>();
 
-        // Read the request line per line
-        for ( final String part : request )
+        boolean hasQuery = false;
+        if ( !request.isEmpty() )
         {
-            final String[] subParts = part.split( ":" );
-            if ( subParts.length < 2 )
+            Matcher matcher;
+            for ( final String part : request )
             {
-                if ( headers.containsKey( "query" ) )
+                if ( !hasQuery )
                 {
-                    // This fixes issues with Nginx and proxy_pass
-                    continue;
-                }
-                if ( CoreConfig.verbose )
+                    matcher = PATTERN_QUERY.matcher( part );
+                    if ( matcher.matches() )
+                    {
+                        if ( CoreConfig.verbose )
+                        {
+                            ServerImplementation.getImplementation().log( "Query: " + matcher.group() );
+                        }
+
+                        this.headers.put( "query", matcher.group() );
+
+                        final Optional<HttpMethod> methodOptional = HttpMethod.getByName( matcher.group( "method" ) );
+                        if ( !methodOptional.isPresent() )
+                        {
+                            throw new RequestException( "Unknown request method: " + matcher.group( "method" ),
+                                    this );
+                        }
+
+                        final Optional<ProtocolType> protocolTypeOptional =
+                                ProtocolType.getByName( matcher.group( "prottype" ) );
+                        if ( !protocolTypeOptional.isPresent() )
+                        {
+                            throw new ProtocolNotSupportedException( "Request didn't specify valid protocol " +
+                                    "(Provided: " + matcher.group( "prottype" ) + ")", this );
+                        } else
+                        {
+                            this.protocolType = protocolTypeOptional.get();
+                            if ( this.protocolType == ProtocolType.HTTPS && !( socket instanceof SSLSocket ) )
+                            {
+                                throw new ProtocolNotSupportedException( "Requested HTTPS but not connected with SSL", this );
+                            }
+                        }
+
+                        final String resource = matcher.group( "resource" );
+                        this.query = new Query( methodOptional.get(), matcher.group( "resource" ) );
+                        hasQuery = true;
+                    }
+                } else
                 {
-                    ServerImplementation.getImplementation().log( "Query: " + subParts[ 0 ] );
+                    matcher = PATTERN_HEADER.matcher( part );
+                    if ( matcher.matches() )
+                    {
+                        headers.put( matcher.group( "key" ), matcher.group( "value" ) );
+                    }
                 }
-                headers.put( "query", subParts[ 0 ] );
-            } else
-            {
-                headers.put( subParts[ 0 ], subParts[ 1 ] );
             }
         }
-        if ( !this.headers.containsKey( "query" ) )
+
+        if ( !hasQuery )
         {
-            throw new RequestException( "Couldn't find query header..." );
+            throw new RequestException( "Couldn't find query header...", this );
         }
-        this.getResourceRequest();
+
         this.cookies = CookieManager.getCookies( this );
         this.meta = new HashMap<>();
         if ( this.headers.containsKey( HEADER_AUTHORIZATION ) )
@@ -236,28 +271,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         }
 
         return "";
-    }
-
-    public Query getResourceRequest()
-    {
-        if ( this.query != null )
-        {
-            return getQuery();
-        }
-        final String[] parts = getHeader( "query" ).split( " " );
-        if ( parts.length < 3 )
-        {
-            this.query = new Query( HttpMethod.GET, "/" );
-        } else
-        {
-            final Optional<HttpMethod> methodOptional = HttpMethod.getByName( parts[ 0 ] );
-            if ( !methodOptional.isPresent() )
-            {
-                throw new RequestException( "Unknown request method: " + parts[ 0 ] );
-            }
-            this.query = new Query( methodOptional.get(), parts[ 1 ] );
-        }
-        return this.query;
     }
 
     /**
