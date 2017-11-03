@@ -82,6 +82,7 @@ final public class Header
     // 5xx Server errors
     //
     public static final String STATUS_HTTP_VERSION_NOT_SUPPORTED = "505 HTTP Version Not Supported";
+    public static final String STATUS_INTERNAL_ERROR = "500 Internal Server Error";
 
     public static final String ALLOW_ALL = "*";
     public static final String COOKIE_DELETED = "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT";

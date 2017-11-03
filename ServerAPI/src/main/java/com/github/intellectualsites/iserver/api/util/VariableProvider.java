@@ -24,7 +24,7 @@ import java.util.Map;
  * The variable provider class - Can get quite confusing.
  * <p>
  * This generates a variable based on a key, and is accessed like
- * * <pre>
+ * <pre>
  * {@code
  * {{PROVIDER.NAME}}
  * }
@@ -49,7 +49,7 @@ public interface VariableProvider
      *
      * @param variable Variable Key
      * @return The object (or null)
-     * @see #contains(String) - Use this to check if it exists
+     * @see #contains(String) Use this to check if it exists
      */
     Object get(final String variable);
 

@@ -112,14 +112,6 @@ class WorkerContext
         }
     }
 
-    /**
-     * Try to find a suitable handler for the request
-     */
-    private void matchRequestHandler()
-    {
-        this.requestHandler = server.getRouter().match( request );
-    }
-
     void handle(final Worker worker)
     {
         //
@@ -130,7 +122,7 @@ class WorkerContext
         {
             this.request.requestSession();
         }
-        this.matchRequestHandler();
+        this.requestHandler = server.getRouter().match( request );
 
         //
         // Scope variables
@@ -238,12 +230,14 @@ class WorkerContext
             server.log( "Error When Handling Request: %s", e.getMessage(), LogModes.MODE_ERROR );
             e.printStackTrace();
 
-            body = new ViewException( e ).generate( request );
-            bytes = body.getContent().getBytes();
-
-            if ( CoreConfig.verbose )
+            if ( CoreConfig.debug )
             {
-                e.printStackTrace();
+                body = new ViewException( e ).generate( request );
+                bytes = body.getContent().getBytes();
+            } else
+            {
+                worker.handleSendStatusOnly( Header.STATUS_INTERNAL_ERROR );
+                return;
             }
         }
 

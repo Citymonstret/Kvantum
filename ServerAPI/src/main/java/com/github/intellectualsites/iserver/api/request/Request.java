@@ -166,12 +166,17 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         if ( !hasQuery )
         {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Request | Headers: %s",
+                        StringUtil.join( this.headers, "=", ", " ) );
+            }
             throw new RequestException( "Couldn't find query header...", this );
         }
 
         this.cookies = CookieManager.getCookies( this );
-
         this.meta = new HashMap<>();
+
         if ( this.headers.containsKey( HEADER_AUTHORIZATION ) )
         {
             this.authorization = new Authorization( this.headers.get( HEADER_AUTHORIZATION ) );

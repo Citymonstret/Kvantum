@@ -303,7 +303,7 @@ final class Worker extends AutoCloseable
      * @param status Status code
      * @return false
      */
-    private boolean handleSendStatusOnly(final String status)
+    boolean handleSendStatusOnly(final String status)
     {
         Response response = new Response();
         response.getHeader().clear();
