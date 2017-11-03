@@ -13,6 +13,8 @@ buildscript {
 group 'com.github.intellectualsites'
 version = 'BETA-0.0.3'
 
+apply plugin: 'com.github.johnrengelman.shadow'
+
 jar {
     manifest {
         attributes 'Implementation-Title': 'IntellectualServer',
