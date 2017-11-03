@@ -52,21 +52,28 @@
 \tableofcontents
 \clearpage
 
-\section{Introduction}
-IntellectualServer is a lightweight, innovative, portable and embeddable web server. The server is written entirely in Java (Java 8, to be exact). IntellectualServer is meant to be as versatile as it could possibly be, and it is intended to be used both as a library and as a standalone application. 
+\section{Introduction}\label{sec:introduction}
+IntellectualServer is a lightweight, innovative, portable and embeddable web server.
+The server is written entirely in Java (Java 8, to be exact).
+IntellectualServer is meant to be as versatile as it could possibly be, and it is intended to be used both as a library and as a standalone application.
 
 This manual aims to provide the information necessary to \textbf{A:} install the web server as a standalone application, and \textbf{B:} use IntellectualServer in your own project.
 
 \newpage
 
-\section{Development}
-This section aims to provide further insight into how IntellectualServer is built, and how it can be implemented into programs. The library can be used as an embedded web server or a customizable standalone application. IntellectualServer also has a plugin system, that allows you to load JARs as plugins during runtime. This allows you to customize and extend IntellectualServer, without modifying the main executable. 
+\section{Development}\label{sec:development}
+This section aims to provide further insight into how IntellectualServer is built, and how it can be implemented into programs.
+The library can be used as an embedded web server or a customizable standalone application.
+IntellectualServer also has a plugin system, that allows you to load JARs as plugins during runtime.
+This allows you to customize and extend IntellectualServer, without modifying the main executable.
 
-\subsection{Getting Started}
-It is highly recommended that you use a build manager when working with IntellectualServer. IntellectualServer uses JitPack\footnote{https://jitpack.io} as its Maven repository. 
+\subsection{Getting Started}\label{subsec:gettingStarted}
+It is highly recommended that you use a build manager when working with IntellectualServer.
+IntellectualServer uses JitPack\footnote{https://jitpack.io} as its Maven repository.
 
 \subsubsection{Artifacts}
-IntellectualServer distributes a couple of different artifacts. This manual will focus on the API and the Implementation. 
+IntellectualServer distributes a couple of different artifacts.
+This manual will focus on the API and the Implementation.
 
 Use:
 \begin{itemize}
@@ -77,7 +84,8 @@ Use:
 
 
 \subsubsection{Maven}
-You need to add JitPack to your repository list. This can be done as follows:
+You need to add JitPack to your repository list.
+This can be done as follows:
 \begin{listing}[H]
 \caption{Add maven repository}
 \begin{minted}{xml}
@@ -90,7 +98,8 @@ You need to add JitPack to your repository list. This can be done as follows:
 \end{minted}
 \end{listing}
 
-Then you add the IntellectualServer artifact of your liking. The following example will load the Implementation:
+Then you add the IntellectualServer artifact of your liking.
+The following example will load the Implementation:
 \begin{listing}[H]
 \caption{Add maven dependency}
 \begin{minted}{xml}
@@ -103,7 +112,8 @@ Then you add the IntellectualServer artifact of your liking. The following examp
 \end{listing}
 
 \subsubsection{Gradle}
-You need to add JitPack to your repository list. This can be done as follows:
+You need to add JitPack to your repository list.
+This can be done as follows:
 \begin{listing}[H]
 \caption{Add Gradle repository}
 \begin{minted}{groovy}
@@ -116,7 +126,8 @@ allprojects {
 \end{minted}
 \end{listing}
 
-Then you add the IntellectualServer artifact of your liking. The following example will load the Implementation:
+Then you add the IntellectualServer artifact of your liking.
+The following example will load the Implementation:
 \begin{listing}[H]
 \caption{Add Gradle dependency}
 \begin{minted}{groovy}
