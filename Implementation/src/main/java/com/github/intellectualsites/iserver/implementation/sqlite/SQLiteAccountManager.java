@@ -56,7 +56,7 @@ final public class SQLiteAccountManager implements IAccountManager
     public void setup() throws Exception
     {
         this.applicationStructure.getDatabaseManager().executeUpdate( "CREATE TABLE IF NOT EXISTS account( id " +
-                "INTEGER PRIMARY KEY, username VARCHAR(64), password VARCHAR(255), salt VARCHAR(255), CONSTRAINT " +
+                "INTEGER PRIMARY KEY, username VARCHAR(64), password VARCHAR(255), CONSTRAINT " +
                 "name_unique UNIQUE (username) )" );
         this.applicationStructure.getDatabaseManager().executeUpdate( "CREATE TABLE IF NOT EXISTS account_data ( id " +
                 "INTEGER PRIMARY KEY, account_id INTEGER, `key` VARCHAR(255), `value` VARCHAR(255), UNIQUE" +
@@ -76,12 +76,10 @@ final public class SQLiteAccountManager implements IAccountManager
             return ret;
         }
         try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
-                .prepareStatement( "INSERT INTO account(`username`, `password`, `salt`) VALUES(?, ?, ?)" ) )
+                .prepareStatement( "INSERT INTO account(`username`, `password`) VALUES(?, ?)" ) )
         {
             statement.setString( 1, username );
-            final String salt = getNewSalt();
-            statement.setString( 2, hashPassword( password, salt ) );
-            statement.setString( 3, salt );
+            statement.setString( 2, hashPassword( password, getNewSalt() ) );
             statement.executeUpdate();
         } catch ( final Exception e )
         {
@@ -160,7 +158,6 @@ final public class SQLiteAccountManager implements IAccountManager
         final int id = resultSet.getInt( "id" );
         final String username = resultSet.getString( "username" );
         final String password = resultSet.getString( "password" );
-        final String salt = resultSet.getString( "salt" );
         final IAccount account = new Account( id, username, password );
         account.setManager( this );
         return account;
