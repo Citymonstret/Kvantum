@@ -60,12 +60,6 @@ public final class CacheManager implements ICacheManager
                 .SECONDS ).maximumSize( CoreConfig.Cache.cachedAccountIdsMaxItems ).build();
     }
 
-    /**
-     * Get a cached include block
-     *
-     * @param group Include block (matcher.group())
-     * @return string|null
-     */
     @Override
     public String getCachedInclude(final String group)
     {
@@ -120,12 +114,6 @@ public final class CacheManager implements ICacheManager
         cachedFiles.put( file, content );
     }
 
-    /**
-     * Set a cached include block
-     *
-     * @param group    matcher.group()
-     * @param document Generated document
-     */
     @Override
     public void setCachedInclude(final String group, final String document)
     {
@@ -134,12 +122,6 @@ public final class CacheManager implements ICacheManager
         this.cachedIncludes.put( group, document );
     }
 
-    /**
-     * Check if there is a ResponseBody cached for the view
-     *
-     * @param view RequestHandler
-     * @return true if there is a ResponseBody cached, else false
-     */
     @Override
     public boolean hasCache(final RequestHandler view)
     {
@@ -148,13 +130,6 @@ public final class CacheManager implements ICacheManager
         return this.cachedBodies.getIfPresent( view.toString() ) != null;
     }
 
-    /**
-     * Add a cached ResponseBody
-     *
-     * @param view         RequestHandler for which the caching will apply
-     * @param responseBody ResponseBody (will generate a CachedResponseBody)
-     * @see CachedResponse
-     */
     @Override
     public void setCache(final RequestHandler view, final ResponseBody responseBody)
     {
@@ -163,13 +138,6 @@ public final class CacheManager implements ICacheManager
         this.cachedBodies.put( view.toString(), new CachedResponse( responseBody ) );
     }
 
-    /**
-     * Get the cached reponse for a view
-     *
-     * @param view RequestHandler
-     * @return the cached ResponseBody
-     * @see #hasCache(RequestHandler) To check if the view has a cache
-     */
     @Override
     public CachedResponse getCache(final RequestHandler view)
     {

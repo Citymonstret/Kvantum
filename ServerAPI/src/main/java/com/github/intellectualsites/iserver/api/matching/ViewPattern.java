@@ -181,7 +181,6 @@ public class ViewPattern
         final Map<String, String> variables = new HashMap<>();
         final StringTokenizer stringTokenizer = new StringTokenizer( url.toString(), "\\/." );
         Part lastPart = null;
-        final List<Part> passed = new ArrayList<>();
 
         int iterator = -1;
 
@@ -269,7 +268,6 @@ public class ViewPattern
             }
 
             lastPart = part;
-            passed.add( part );
         }
 
         if ( stringTokenizer.hasMoreTokens() )

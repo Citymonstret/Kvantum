@@ -19,17 +19,19 @@
 package com.github.intellectualsites.iserver.api.response;
 
 import com.github.intellectualsites.iserver.api.util.Assert;
+import lombok.*;
 
+@SuppressWarnings("unused")
+@EqualsAndHashCode(of = "text")
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HeaderOption
 {
 
+    @NonNull
+    @Getter
     private final String text;
+    @Getter
     private boolean cacheApplicable = true;
-
-    private HeaderOption(final String text)
-    {
-        this.text = Assert.notNull( text );
-    }
 
     public static HeaderOption create(final String text)
     {
@@ -39,16 +41,6 @@ public final class HeaderOption
     public static HeaderOption create(final String text, boolean cacheApplicable)
     {
         return new HeaderOption( Assert.notNull( text ) ).cacheApplicable( cacheApplicable );
-    }
-
-    public String getText()
-    {
-        return text;
-    }
-
-    public boolean isCacheApplicable()
-    {
-        return cacheApplicable;
     }
 
     private HeaderOption cacheApplicable(final boolean b)

@@ -70,14 +70,14 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
     }
 
     @Override
-    public boolean contains(String variable)
+    public boolean contains(final String variable)
     {
         String[] parts = variable.split( "@" );
         return configurations.containsKey( parts[ 0 ] ) && configurations.get( parts[ 0 ] ).contains( parts[ 1 ] );
     }
 
     @Override
-    public Object get(String variable)
+    public Object get(final String variable)
     {
         String[] parts = variable.split( "@" );
         return configurations.get( parts[ 0 ] ).get( parts[ 1 ] );

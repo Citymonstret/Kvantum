@@ -19,6 +19,7 @@
 package com.github.intellectualsites.iserver.api.config;
 
 import com.github.intellectualsites.iserver.api.util.Assert;
+import lombok.EqualsAndHashCode;
 
 /**
  * This is the configuration file that allows
@@ -26,6 +27,7 @@ import com.github.intellectualsites.iserver.api.util.Assert;
  *
  * @author Citymonstret
  */
+@EqualsAndHashCode(of = "name")
 public abstract class ConfigProvider implements ConfigurationFile
 {
 

@@ -70,7 +70,6 @@ public abstract class AutoCloseable implements java.lang.AutoCloseable
      * Close the AutoCloseable
      * Can only be called once per instance
      */
-    @Final
     final public void close()
     {
         if ( closed )

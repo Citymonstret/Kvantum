@@ -19,12 +19,14 @@
 package com.github.intellectualsites.iserver.api.request;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
  * A very simple representation of a cookie
  */
 @AllArgsConstructor
+@EqualsAndHashCode(of = { "name", "value" })
 public final class Cookie
 {
 

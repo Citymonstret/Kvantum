@@ -29,17 +29,20 @@ import com.github.intellectualsites.iserver.api.validation.ValidationManager;
 import com.github.intellectualsites.iserver.api.views.requesthandler.DebugMiddleware;
 import com.github.intellectualsites.iserver.api.views.requesthandler.MiddlewareQueue;
 import com.github.intellectualsites.iserver.api.views.requesthandler.MiddlewareQueuePopulator;
+import lombok.EqualsAndHashCode;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * A handler which uses an incoming
  * request to generate a response
  */
+@EqualsAndHashCode(of = "uniqueId")
 public abstract class RequestHandler
 {
 
@@ -49,6 +52,7 @@ public abstract class RequestHandler
 
     private final ValidationManager validationManager = new ValidationManager();
     private final Map<String, Method> alternateOutcomes = new HashMap<>();
+    private final String uniqueId = UUID.randomUUID().toString();
 
     {
         if ( CoreConfig.debug )

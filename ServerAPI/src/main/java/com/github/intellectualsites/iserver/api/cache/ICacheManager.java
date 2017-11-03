@@ -30,12 +30,38 @@ public interface ICacheManager
 
     void setCachedFile(String file, String content);
 
+    /**
+     * Set a cached include block
+     *
+     * @param group    matcher.group()
+     * @param document Generated document
+     */
     void setCachedInclude(String group, String document);
 
+    /**
+     * Check if there is a ResponseBody cached for the view
+     *
+     * @param view RequestHandler
+     * @return true if there is a ResponseBody cached, else false
+     */
     boolean hasCache(RequestHandler view);
 
+    /**
+     * Add a cached ResponseBody
+     *
+     * @param view RequestHandler for which the caching will apply
+     * @param body ResponseBody (will generate a CachedResponseBody)
+     * @see CachedResponse
+     */
     void setCache(RequestHandler view, ResponseBody body);
 
+    /**
+     * Get the cached reponse for a view
+     *
+     * @param view RequestHandler
+     * @return the cached ResponseBody
+     * @see #hasCache(RequestHandler) To check if the view has a cache
+     */
     CachedResponse getCache(RequestHandler view);
 
 }

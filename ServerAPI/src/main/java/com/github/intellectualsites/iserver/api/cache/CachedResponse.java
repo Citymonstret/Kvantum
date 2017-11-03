@@ -25,9 +25,9 @@ import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.Getter;
 
 /**
- * A saved response generated from a previous response, and saved in the {@link ICacheManager}
+ * A saved response generated from a previous response, and saved in the {@link ICacheManager}.
  */
-public class CachedResponse implements ResponseBody
+final public class CachedResponse implements ResponseBody
 {
 
     @Getter

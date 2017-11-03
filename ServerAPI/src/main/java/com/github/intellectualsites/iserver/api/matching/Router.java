@@ -21,21 +21,50 @@ package com.github.intellectualsites.iserver.api.matching;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
+import org.apache.commons.lang3.NotImplementedException;
 
+/**
+ * Router that is responsible for {@link RequestHandler} matching
+ */
+@SuppressWarnings("unused")
 public abstract class Router
 {
 
+    /**
+     * Attempt to match a request to a {@link RequestHandler}
+     *
+     * @param request Request to be matched
+     * @return Depends on implementation, but should return either the matched
+     * {@link RequestHandler} or null, may also return a Status 404 View.
+     */
     public abstract RequestHandler match(Request request);
 
+    /**
+     * Add a new {@link RequestHandler} to the router
+     *
+     * @param handler RequestHandler that is to be registered
+     * @return The added {@link RequestHandler}
+     */
     public abstract RequestHandler add(RequestHandler handler);
 
+    /**
+     * Attempts to remove a RequestHandler from the Router
+     * @param handler RequestHandler to be removed
+     */
     public abstract void remove(RequestHandler handler);
 
+    /**
+     * Clear all handlers from the router
+     */
     public abstract void clear();
 
+    /**
+     * Dump Router contents onto the server log
+     * @param server Server instance
+     */
     public void dump(final IntellectualServer server)
     {
-        // Override me
+        throw new NotImplementedException( "Dump has not been overridden by the Router implementation" );
     }
 
 }

@@ -22,6 +22,7 @@ import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.MapUtil;
 import com.github.intellectualsites.iserver.api.util.ProviderFactory;
 import com.github.intellectualsites.iserver.api.util.VariableProvider;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -31,14 +32,11 @@ import java.util.Optional;
  *
  * @author Citymonstret
  */
-public class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider
+@NoArgsConstructor
+final public class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider
 {
 
     private PostRequest p;
-
-    public PostProviderFactory()
-    {
-    }
 
     private PostProviderFactory(final PostRequest p)
     {

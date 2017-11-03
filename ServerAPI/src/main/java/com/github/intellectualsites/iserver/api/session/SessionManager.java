@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "WeakerAccess" })
 @AllArgsConstructor
 public final class SessionManager implements ProviderFactory<ISession>
 {

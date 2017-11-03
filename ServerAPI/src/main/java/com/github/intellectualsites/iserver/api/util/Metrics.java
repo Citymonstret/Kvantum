@@ -136,7 +136,7 @@ public class Metrics
         }
     }
 
-    public double convertRate(double rate)
+    public double convertRate(final double rate)
     {
         return rate * TimeUnit.SECONDS.toSeconds( 1 );
     }
@@ -151,7 +151,7 @@ public class Metrics
         return TimeUnit.MILLISECONDS.name();
     }
 
-    public double convertDuration(double duration)
+    public double convertDuration(final double duration)
     {
         return duration * durationFactor;
     }

@@ -21,7 +21,7 @@ package com.github.intellectualsites.iserver.api.logging;
 /**
  * Determines the level of the message that is to be sent
  */
-public class LogModes
+final public class LogModes
 {
 
     public static final int MODE_DEBUG = -1;

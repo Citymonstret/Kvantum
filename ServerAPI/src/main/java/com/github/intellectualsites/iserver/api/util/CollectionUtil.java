@@ -23,6 +23,7 @@ import lombok.experimental.UtilityClass;
 import java.util.*;
 
 @UtilityClass
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public final class CollectionUtil
 {
 

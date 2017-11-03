@@ -28,8 +28,8 @@ import com.github.intellectualsites.iserver.api.matching.ViewPattern;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
-import com.github.intellectualsites.iserver.api.util.Final;
 import com.github.intellectualsites.iserver.files.Path;
+import lombok.EqualsAndHashCode;
 
 import java.io.File;
 import java.util.HashMap;
@@ -45,6 +45,7 @@ import java.util.UUID;
  * @author Citymonstret
  */
 @SuppressWarnings("ALL")
+@EqualsAndHashCode(of = "internalName")
 public class View extends RequestHandler
 {
 
@@ -140,7 +141,6 @@ public class View extends RequestHandler
      * @see #containsOption(String) Check if the option exists before getting it
      */
     @SuppressWarnings("ALL")
-    @Final
     final public <T> T getOption(final String s)
     {
         Assert.notNull( s );
@@ -165,7 +165,6 @@ public class View extends RequestHandler
      *
      * @return options as string
      */
-    @Final
     final public String getOptionString()
     {
         final StringBuilder b = new StringBuilder();
@@ -182,7 +181,6 @@ public class View extends RequestHandler
      * @param s Key
      * @return True if the option is stored, False if it isn't
      */
-    @Final
     final public boolean containsOption(final String s)
     {
         Assert.notNull( s );
@@ -199,7 +197,6 @@ public class View extends RequestHandler
     /**
      * Register the view to the implemented {@link Router}
      */
-    @Final
     final public void register()
     {
         ServerImplementation.getImplementation().getRouter().add( this );
@@ -351,7 +348,6 @@ public class View extends RequestHandler
      *
      * @return file buffer
      */
-    @Final
     final protected int getBuffer()
     {
         if ( this.buffer == -1 )
@@ -374,7 +370,6 @@ public class View extends RequestHandler
      * @return True if the request Matches, False if not
      * @see #passes(Request) - This is called!
      */
-    @Final
     @Override
     final public boolean matches(final Request request)
     {

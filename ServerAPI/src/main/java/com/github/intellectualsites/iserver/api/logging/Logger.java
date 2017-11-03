@@ -19,26 +19,28 @@
 package com.github.intellectualsites.iserver.api.logging;
 
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public final class Logger
 {
 
-    public static void info(String message, final Object... args)
+    public static void info(final String message, final Object... args)
     {
         ServerImplementation.getImplementation().log( message, LogModes.MODE_INFO, args );
     }
 
-    public static void warn(String message, final Object... args)
+    public static void warn(final String message, final Object... args)
     {
         ServerImplementation.getImplementation().log( message, LogModes.MODE_WARNING, args );
     }
 
-    public static void error(String message, final Object... args)
+    public static void error(final String message, final Object... args)
     {
         ServerImplementation.getImplementation().log( message, LogModes.MODE_ERROR, args );
     }
 
-    public static void debug(String message, final Object... args)
+    public static void debug(final String message, final Object... args)
     {
         ServerImplementation.getImplementation().log( message, LogModes.MODE_DEBUG, args );
     }

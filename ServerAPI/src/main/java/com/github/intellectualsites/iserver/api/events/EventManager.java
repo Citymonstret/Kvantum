@@ -122,6 +122,7 @@ public class EventManager
             med = new ArrayList<>();
             hig = new ArrayList<>();
             for ( final com.github.intellectualsites.iserver.api.events.EventListener listener : entry.getValue() )
+            {
                 switch ( listener.getPriority() )
                 {
                     case LOW:
@@ -136,14 +137,21 @@ public class EventManager
                     default:
                         break;
                 }
+            }
             array = new com.github.intellectualsites.iserver.api.events.EventListener[ low.size() + med.size() + hig.size() ];
             index = 0;
             for ( final com.github.intellectualsites.iserver.api.events.EventListener listener : low )
+            {
                 array[ index++ ] = listener;
+            }
             for ( final com.github.intellectualsites.iserver.api.events.EventListener listener : med )
+            {
                 array[ index++ ] = listener;
+            }
             for ( final com.github.intellectualsites.iserver.api.events.EventListener listener : hig )
+            {
                 array[ index++ ] = listener;
+            }
             bakedListeners.put( entry.getKey(), array );
         }
 

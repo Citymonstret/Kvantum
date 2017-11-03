@@ -2,10 +2,12 @@ package com.github.intellectualsites.iserver.api.logging;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 public class LogContext
 {
 
@@ -28,5 +30,4 @@ public class LogContext
                 .put( "timeStamp", timeStamp )
                 .put( "message", message ).build();
     }
-
 }

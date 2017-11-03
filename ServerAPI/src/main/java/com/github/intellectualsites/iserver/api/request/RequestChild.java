@@ -18,9 +18,16 @@
  */
 package com.github.intellectualsites.iserver.api.request;
 
+@FunctionalInterface
 public interface RequestChild
 {
 
+    /**
+     * Get the parent {@link Request}
+     *
+     * @return Parent request, or if the request is not a child
+     * it may return itself
+     */
     Request getParent();
 
 }

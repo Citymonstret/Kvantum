@@ -43,7 +43,7 @@ public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProv
     }
 
     @Override
-    public Optional<MetaProvider> get(Request r)
+    public Optional<MetaProvider> get(final Request r)
     {
         return Optional.of( new MetaProvider( r ) );
     }
@@ -55,13 +55,13 @@ public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProv
     }
 
     @Override
-    public boolean contains(String variable)
+    public boolean contains(final String variable)
     {
         return r.getMeta( variable ) != null;
     }
 
     @Override
-    public Object get(String variable)
+    public Object get(final String variable)
     {
         return r.getMeta( variable );
     }

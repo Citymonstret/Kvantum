@@ -30,6 +30,7 @@ import lombok.Getter;
  *
  * @author Citymonstret
  */
+@SuppressWarnings("unused")
 public class Response implements ResponseBody
 {
 

@@ -23,7 +23,6 @@ import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.matching.ViewPattern;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
-import com.github.intellectualsites.iserver.api.util.Final;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 
 import java.util.Map;
@@ -101,7 +100,6 @@ public class SimpleRequestHandler extends RequestHandler
         return this.internalName;
     }
 
-    @Final
     final public void register()
     {
         ServerImplementation.getImplementation().getRouter().add( this );

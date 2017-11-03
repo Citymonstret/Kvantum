@@ -21,10 +21,12 @@ package com.github.intellectualsites.iserver.api.util;
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode(of = "applicationName")
 public abstract class ApplicationStructure
 {
 
@@ -45,8 +47,14 @@ public abstract class ApplicationStructure
         return this.applicationName;
     }
 
+    /**
+     * Register application specific views, this is just a placeholder method
+     * that makes sure that the views are added after all dependencies are setup
+     *
+     * @param server Server implementation (utility reference)
+     */
     public void registerViews(final IntellectualServer server)
     {
-        // Override me!
+        // Override me
     }
 }

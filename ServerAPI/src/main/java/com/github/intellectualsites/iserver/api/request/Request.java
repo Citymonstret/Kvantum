@@ -333,7 +333,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return meta.get( name );
     }
 
-    @Final
     public Map<String, String> getVariables()
     {
         return (Map<String, String>) getMeta( "variables" );

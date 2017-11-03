@@ -30,7 +30,7 @@ import java.util.Optional;
  * Manages {@link IAccount} and depends on {@link ApplicationStructure}
  * <p>
  * The global implementation can be retrieved using
- * {@link IntellectualServer#getGlobalAccountManager()}
+ * {@link IntellectualServer#getApplicationStructure()} then {@link ApplicationStructure#getAccountManager()}
  * </p>
  */
 public interface IAccountManager
@@ -140,8 +140,16 @@ public interface IAccountManager
      * Load the data into a {@link IAccount}
      * @param account Account to be loaded
      */
-    void loadData(final IAccount account);
+    void loadData(IAccount account);
 
+    /**
+     * Check if the admin account is created, otherwise a new admin account will be created
+     * with credentials:
+     * <ul>
+     * <li><b>Username:</b> admin</li>
+     * <li><b>Password:</b> admin</li>
+     * </ul>
+     */
     default void checkAdmin()
     {
         if ( !getAccount( "admin" ).isPresent() )

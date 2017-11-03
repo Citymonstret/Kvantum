@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+@SuppressWarnings({ "unused", "WeakerAccess" })
 @UtilityClass
 public final class LambdaUtil
 {
