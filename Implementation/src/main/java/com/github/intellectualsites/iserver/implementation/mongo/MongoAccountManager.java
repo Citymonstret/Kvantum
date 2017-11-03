@@ -17,7 +17,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class MongoAccountManager implements IAccountManager
+final public class MongoAccountManager implements IAccountManager
 {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

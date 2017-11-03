@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.core;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
+import lombok.EqualsAndHashCode;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -147,8 +148,11 @@ public final class WorkerProcedure
 
     }
 
+    @EqualsAndHashCode(of = "uniqueID")
     public static abstract class ByteHandler implements Handler<Byte[]>
     {
+
+        private final String uniqueID = UUID.randomUUID().toString();
 
         @Override
         public Class<Byte[]> getType()
@@ -157,8 +161,11 @@ public final class WorkerProcedure
         }
     }
 
+    @EqualsAndHashCode(of = "uniqueID")
     public static abstract class StringHandler implements Handler<String>
     {
+
+        private final String uniqueID = UUID.randomUUID().toString();
 
         @Override
         public final Class<String> getType()

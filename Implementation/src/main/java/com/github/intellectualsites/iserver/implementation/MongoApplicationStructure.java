@@ -22,7 +22,7 @@ public abstract class MongoApplicationStructure extends ApplicationStructure
     @Getter
     private final Datastore morphiaDatastore;
 
-    public MongoApplicationStructure(final String applicationName)
+    MongoApplicationStructure(final String applicationName)
     {
         super( applicationName );
 

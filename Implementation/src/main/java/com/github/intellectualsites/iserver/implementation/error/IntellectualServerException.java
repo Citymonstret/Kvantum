@@ -21,12 +21,12 @@ package com.github.intellectualsites.iserver.implementation.error;
 public class IntellectualServerException extends Exception
 {
 
-    public IntellectualServerException(String s, Throwable cause)
+    public IntellectualServerException(final String s, final Throwable cause)
     {
         super( "IntellectualServer: " + s, cause );
     }
 
-    public IntellectualServerException(String s)
+    public IntellectualServerException(final String s)
     {
         super( "IntellectualServer: " + s );
     }

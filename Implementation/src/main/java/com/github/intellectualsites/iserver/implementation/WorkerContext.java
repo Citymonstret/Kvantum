@@ -42,6 +42,9 @@ class WorkerContext
     private ResponseBody body;
     private boolean gzip;
 
+    /**
+     * Flush the output stream (I.e. send the stored bytes to the client)
+     */
     void flushOutput()
     {
         try
@@ -96,6 +99,19 @@ class WorkerContext
         }
     }
 
+    /**
+     * <p>
+     * Determine whether or not GZIP compression should be used.
+     * This depends on two things:
+     * <ol>
+     * <li>If GZIP compression is enabled in {@link CoreConfig}</li>
+     * <li>If the client has sent a "Accept-Encoding" header</li>
+     * </ol>
+     * </p>
+     * <p>
+     * The value can be fetched using {@link #isGzip()}
+     * </p>
+     */
     void determineGzipStatus()
     {
         if ( CoreConfig.gzip )
@@ -104,7 +120,7 @@ class WorkerContext
             {
                 this.gzip = true;
                 body.getHeader().set( Header.HEADER_CONTENT_ENCODING, "gzip" );
-            } else
+            } else if ( CoreConfig.debug )
             {
                 Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
             }

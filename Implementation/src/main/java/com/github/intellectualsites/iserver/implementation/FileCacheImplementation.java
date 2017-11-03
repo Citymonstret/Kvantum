@@ -23,11 +23,11 @@ import com.github.intellectualsites.iserver.files.FileCacheManager;
 
 import java.util.Optional;
 
-public class FileCacheImplementation implements FileCacheManager
+public final class FileCacheImplementation implements FileCacheManager
 {
 
     @Override
-    public Optional<String> readCachedFile(String string)
+    public Optional<String> readCachedFile(final String string)
     {
         if ( !CoreConfig.Cache.enabled )
         {
@@ -37,7 +37,7 @@ public class FileCacheImplementation implements FileCacheManager
     }
 
     @Override
-    public void writeCachedFile(String string, String content)
+    public void writeCachedFile(final String string, final String content)
     {
         if ( !CoreConfig.Cache.enabled )
         {

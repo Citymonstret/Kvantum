@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class SQLiteSessionDatabase implements ISessionDatabase
+final public class SQLiteSessionDatabase implements ISessionDatabase
 {
 
     private final SQLiteApplicationStructure applicationStructure;

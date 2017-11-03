@@ -18,10 +18,10 @@
  */
 package com.github.intellectualsites.iserver.implementation.error;
 
-public class IntellectualServerStartException extends IntellectualServerException
+final public class IntellectualServerStartException extends IntellectualServerException
 {
 
-    public IntellectualServerStartException(String s, Throwable cause)
+    public IntellectualServerStartException(final String s, final Throwable cause)
     {
         super( "Couldn't start IntellectualServer: " + s, cause );
     }

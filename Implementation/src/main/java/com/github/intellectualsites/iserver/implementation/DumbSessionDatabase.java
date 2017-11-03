@@ -5,7 +5,7 @@ import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
 
 import java.util.Map;
 
-public class DumbSessionDatabase implements ISessionDatabase
+public final class DumbSessionDatabase implements ISessionDatabase
 {
 
     @Override

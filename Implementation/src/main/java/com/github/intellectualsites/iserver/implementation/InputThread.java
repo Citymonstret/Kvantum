@@ -26,6 +26,7 @@ import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import com.github.intellectualsites.iserver.implementation.commands.*;
 import com.intellectualsites.commands.CommandHandlingOutput;
 import com.intellectualsites.commands.CommandResult;
+import lombok.Getter;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.UserInterruptException;
 
@@ -130,74 +131,12 @@ public final class InputThread extends Thread
                 return;
             }
         }
-
-        /* try ( BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) ) )
-        {
-            String line;
-
-            for ( ; ; )
-            {
-                if ( shouldStop || ServerImplementation.getImplementation().isStopping() )
-                {
-                    break;
-                }
-
-                line = in.readLine();
-                if ( line == null || line.isEmpty() )
-                {
-                    continue;
-                }
-                if ( line.startsWith( "/" ) )
-                {
-                    line = line.replace( "/", "" ).toLowerCase();
-                    final CommandResult result = ServerImplementation.getImplementation().getCommandManager().handle(
-                            ServerImplementation.getImplementation(), line );
-
-                    switch ( result.getCommandResult() )
-                    {
-                        case CommandHandlingOutput.NOT_PERMITTED:
-                            ServerImplementation.getImplementation().log( "Command Error: You are not allowed to execute that command!" );
-                            break;
-                        case CommandHandlingOutput.ERROR:
-                            ServerImplementation.getImplementation().log( "Something went wrong when executing the command!" );
-                            result.getStacktrace().printStackTrace();
-                            break;
-                        case CommandHandlingOutput.NOT_FOUND:
-                            if ( result.getClosestMatch() != null )
-                            {
-                                ServerImplementation.getImplementation().log( "Did you mean: /%s", result
-                                        .getClosestMatch().getCommand() );
-                            } else
-                            {
-                                ServerImplementation.getImplementation().log( "There is no such command: " + result
-                                        .getInput() );
-                            }
-                            break;
-                        case CommandHandlingOutput.WRONG_USAGE:
-                            ServerImplementation.getImplementation().log( "Command Usage: " + result.getCommand().getUsage() );
-                            break;
-                        case CommandHandlingOutput.SUCCESS:
-                            break;
-                        default:
-                            ServerImplementation.getImplementation().log( "Unknown command result: " + CommandHandlingOutput.nameField(
-                                    result.getCommandResult() ) );
-                            break;
-                    }
-                } else
-                {
-                    currentString = line;
-                    ServerImplementation.getImplementation().handleEvent( new TextEvent( line ) );
-                }
-            }
-        } catch ( final Exception ignored )
-        {
-        }
-        */
     }
 
-    public static class TextEvent extends Event
+    public static final class TextEvent extends Event
     {
 
+        @Getter
         private final String text;
 
         /**
@@ -210,11 +149,6 @@ public final class InputThread extends Thread
         {
             super( "inputtextevent" );
             this.text = text;
-        }
-
-        final public String getText()
-        {
-            return this.text;
         }
     }
 }

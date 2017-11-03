@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @Getter
 @Builder
-public class ServerContext
+public final class ServerContext
 {
 
     @Builder.Default

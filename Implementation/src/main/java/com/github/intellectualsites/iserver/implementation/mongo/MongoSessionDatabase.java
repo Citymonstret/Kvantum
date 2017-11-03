@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class MongoSessionDatabase implements ISessionDatabase
+final public class MongoSessionDatabase implements ISessionDatabase
 {
 
     private static final String FIELD_SESSION_ID = "sessionId";

@@ -18,16 +18,15 @@
  */
 package com.github.intellectualsites.iserver.implementation.error;
 
-
-public class IntellectualServerInitializationException extends IntellectualServerException
+final public class IntellectualServerInitializationException extends IntellectualServerException
 {
 
-    public IntellectualServerInitializationException(String s, Throwable cause)
+    public IntellectualServerInitializationException(final String s, final Throwable cause)
     {
         super( "Couldn't load IntellectualServer: " + s, cause );
     }
 
-    public IntellectualServerInitializationException(String s)
+    public IntellectualServerInitializationException(final String s)
     {
         super( "Couldn't load IntellectualServer: " + s );
     }

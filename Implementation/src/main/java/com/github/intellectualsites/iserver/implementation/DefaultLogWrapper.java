@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.implementation;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.logging.LogContext;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
+import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
@@ -41,6 +42,7 @@ public class DefaultLogWrapper implements LogWrapper
     @Override
     public void log(final LogContext logContext)
     {
+        Assert.notNull( logContext );
         final String replacedMessage = StrSubstitutor.replace( format, logContext.toMap() );
         if ( ServerImplementation.hasImplementation() )
         {
@@ -50,8 +52,9 @@ public class DefaultLogWrapper implements LogWrapper
     }
 
     @Override
-    public void log(String s)
+    public void log(final String s)
     {
+        Assert.notNull( s );
         System.out.println( s );
         ( (Server) ServerImplementation.getImplementation() ).logStream.println( s );
     }

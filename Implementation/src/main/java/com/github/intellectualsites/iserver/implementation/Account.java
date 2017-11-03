@@ -21,10 +21,7 @@ package com.github.intellectualsites.iserver.implementation;
 import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.util.Assert;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Transient;
@@ -34,8 +31,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+@EqualsAndHashCode(of = { "username", "id" })
 @NoArgsConstructor
 @Entity("accounts")
+@SuppressWarnings("WeakerAccess")
 public class Account implements IAccount
 {
 
