@@ -18,15 +18,15 @@
  */
 package com.github.intellectualsites.iserver.files;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public class Path
 {
 
@@ -57,11 +57,20 @@ public class Path
         this.exists = Files.exists( this.javaPath );
     }
 
+    /**
+     * Get the java nio version of this path
+     *
+     * @return {@link Path} version of this path
+     */
     final public java.nio.file.Path getJavaPath()
     {
         return this.javaPath;
     }
 
+    /**
+     * Calculate the size of the file (or files, if the current path is a directory)
+     * @return file(s) size | -1L if anything goes wrong
+     */
     public final long length()
     {
         try
@@ -74,6 +83,11 @@ public class Path
         return -1L;
     }
 
+    /**
+     * Attempt to read the file that the path is pointing to
+     * @return if the file is readable; the file content |
+     *         if the file isn't readable; an empty byte array
+     */
     final public byte[] readBytes()
     {
         if ( !exists )
@@ -94,6 +108,12 @@ public class Path
         return content;
     }
 
+    /**
+     * Attempt to read the file that the path is pointing to.
+     * Will first check the file cache, then attempt to read the file
+     * @return if the file is readable; the file content |
+     *         if the file isn't readable; an empty string
+     */
     final public String readFile()
     {
         final Optional<String> cacheEntry = fileSystem.getFileCacheManager().readCachedFile( toString() );
@@ -146,7 +166,7 @@ public class Path
         return fileSystem.getPath( this, path );
     }
 
-    Path getPathUnsafe(final String path)
+    private Path getPathUnsafe(final String path)
     {
         return fileSystem.getPathUnsafe( this, path );
     }
@@ -163,9 +183,12 @@ public class Path
     /**
      * Create the file/directory, if it doesn't exist
      * <p>
-     * Invokes {@link File#createNewFile()} if this path points to a file
+     * Invokes {@link Files#createFile(java.nio.file.Path, FileAttribute[]) Files.createFile} if this path points to a
+     * file
      * </br>
-     * Invokes {@link File#mkdirs()} if this path points to a directory
+     * Invokes {@link Files#createDirectories(java.nio.file.Path, FileAttribute[]) Files.createDirectories} if this
+     * path
+     * points to a directory
      * </p>
      * @return true if the file/directory was created
      */
@@ -189,15 +212,19 @@ public class Path
         return exists;
     }
 
+    /**
+     * See if the file is stored in the file cache
+     * @return true if the file is stored in the cache
+     *         | else false
+     */
     public boolean isCached()
     {
         return fileSystem.getFileCacheManager().readCachedFile( toString() ).isPresent();
-        // return Server.getInstance().getCacheManager().getCachedFile( toString() ).isPresent();
     }
 
     /**
      * Get the file extension
-     * @return File extension, if a directory an empty string
+     * @return if a file; file extension | if a directory; an empty string
      */
     public String getExtension()
     {
@@ -230,7 +257,7 @@ public class Path
                 final Path path = getPathUnsafe( p.getFileName().toString() );
                 this.subPaths.put( path.toString(), path );
             }
-        } catch ( IOException e )
+        } catch ( final IOException e )
         {
             e.printStackTrace();
         }
@@ -246,6 +273,12 @@ public class Path
         return getSubPaths( true );
     }
 
+    /**
+     * Get all sub paths
+     * @return Array containing the sub paths, will be empty if this isn't a directory
+     * @param includeFolders Whether or not (sub-)folders should be included
+     * @see #isFolder() to check if this is a directory or not
+     */
     public Collection<Path> getSubPaths(boolean includeFolders)
     {
         if ( this.subPaths == null )
@@ -259,6 +292,18 @@ public class Path
         return subPaths.values().stream().filter( path1 -> !path1.isFolder ).collect( Collectors.toList() );
     }
 
+
+    @Override
+    public boolean equals(final Object o)
+    {
+        return this == o || ( o != null && getClass() == o.getClass() && path.equals( ( (Path) o ).path ) );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return path.hashCode();
+    }
 
     @SafeVarargs
     public final Collection<Path> getSubPaths(final Predicate<Path>... filters)

@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * A very simple (and restrictive) file system
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public class FileSystem
 {
 
@@ -34,6 +34,7 @@ public class FileSystem
     /**
      * @param coreFolder The core folder (zero point) for this file system,
      *                   you cannot access any paths below it
+     * @param fileCacheManager Cache manager implementation
      */
     public FileSystem(final java.nio.file.Path coreFolder, final FileCacheManager fileCacheManager)
     {

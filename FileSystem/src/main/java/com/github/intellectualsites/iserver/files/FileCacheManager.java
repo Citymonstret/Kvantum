@@ -23,8 +23,19 @@ import java.util.Optional;
 public interface FileCacheManager
 {
 
+    /**
+     * Read a file from the file cache if it exists in the cache
+     *
+     * @param string (Unique) File identifier
+     * @return Optional file content
+     */
     Optional<String> readCachedFile(final String string);
 
+    /**
+     * Write a file to the file cache
+     * @param string (Unique) File identifier
+     * @param content File content
+     */
     void writeCachedFile(final String string, final String content);
 
 }
