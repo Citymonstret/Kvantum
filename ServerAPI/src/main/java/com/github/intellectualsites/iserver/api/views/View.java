@@ -45,7 +45,7 @@ import java.util.UUID;
  * @author Citymonstret
  */
 @SuppressWarnings("ALL")
-@EqualsAndHashCode(of = "internalName")
+@EqualsAndHashCode(of = "internalName", callSuper = false)
 public class View extends RequestHandler
 {
 

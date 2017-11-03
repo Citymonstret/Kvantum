@@ -54,6 +54,7 @@ public class CoreConfig
 
         public static boolean enableDb = true;
         public static int sessionTimeout = 86400;
+        public static boolean autoLoad = true;
     }
 
     // Transient makes sure that this is ignored by the config factory

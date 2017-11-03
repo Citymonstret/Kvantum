@@ -6,11 +6,9 @@ import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.logging.LogModes;
-import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
-import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.github.intellectualsites.iserver.api.views.errors.ViewException;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerException;
@@ -84,22 +82,6 @@ class WorkerContext
     }
 
     /**
-     * Load the request session
-     */
-    private void loadSession()
-    {
-        Optional<ISession> session = server.getSessionManager().getSession( request, output );
-        if ( session.isPresent() )
-        {
-            this.request.setSession( session.get() );
-            this.server.getSessionManager().setSessionLastActive( session.get().get( "id" ).toString() );
-        } else
-        {
-            Logger.warn( "Could not initialize session!" );
-        }
-    }
-
-    /**
      * <p>
      * Determine whether or not GZIP compression should be used.
      * This depends on two things:
@@ -143,7 +125,11 @@ class WorkerContext
         //
         // Pre-handling
         //
-        this.loadSession();
+        this.request.setOutputStream( this.output );
+        if ( CoreConfig.Sessions.autoLoad )
+        {
+            this.request.requestSession();
+        }
         this.matchRequestHandler();
 
         //

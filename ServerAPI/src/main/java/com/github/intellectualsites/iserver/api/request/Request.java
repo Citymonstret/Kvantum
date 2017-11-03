@@ -23,6 +23,7 @@ import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.exceptions.ProtocolNotSupportedException;
 import com.github.intellectualsites.iserver.api.exceptions.RequestException;
+import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.views.CookieManager;
@@ -32,6 +33,7 @@ import com.google.common.collect.ListMultimap;
 import lombok.*;
 
 import javax.net.ssl.SSLSocket;
+import java.io.BufferedOutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -89,6 +91,9 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     @Getter
     private boolean valid = true;
     private Authorization authorization;
+    @Getter
+    @Setter
+    protected BufferedOutputStream outputStream;
 
     /**
      * The request constructor
@@ -352,6 +357,25 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public Map<String, Object> getAllMeta()
     {
         return new HashMap<>( this.meta );
+    }
+
+    public void requestSession()
+    {
+        if ( this.session != null )
+        {
+            return;
+        }
+        final Optional<ISession> session = ServerImplementation.getImplementation().getSessionManager()
+                .getSession( this, this.outputStream );
+        if ( session.isPresent() )
+        {
+            setSession( session.get() );
+            ServerImplementation.getImplementation().getSessionManager()
+                    .setSessionLastActive( session.get().get( "id" ).toString() );
+        } else
+        {
+            Logger.warn( "Could not initialize session!" );
+        }
     }
 
     /**
