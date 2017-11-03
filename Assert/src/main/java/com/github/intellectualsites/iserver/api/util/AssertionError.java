@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.iserver.api.util;
 
+@SuppressWarnings("WeakerAccess")
 public class AssertionError extends RuntimeException
 {
 

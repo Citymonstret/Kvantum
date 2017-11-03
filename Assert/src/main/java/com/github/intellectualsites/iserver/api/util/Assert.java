@@ -23,6 +23,7 @@ package com.github.intellectualsites.iserver.api.util;
  * was solely made to give us more
  * control than we previously had.
  */
+@SuppressWarnings("unused")
 public class Assert
 {
 
