@@ -73,9 +73,6 @@ final public class FilePattern
                 String rawName = pattern;
                 for ( final Map.Entry<String, String> variable : variableMap.entrySet() )
                 {
-                    System.out.println( "Variable name:" + variable.getKey() );
-                    System.out.println( "Variable value:" + variable.getValue() );
-
                     rawName = rawName.replace( variable.getKey(), this.variableMapping.get( variable.getValue() ) );
                 }
                 this.compiledName = rawName;
