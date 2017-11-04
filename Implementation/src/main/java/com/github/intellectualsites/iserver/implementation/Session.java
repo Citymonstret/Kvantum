@@ -20,6 +20,7 @@ package com.github.intellectualsites.iserver.implementation;
 
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.Assert;
+import com.github.intellectualsites.iserver.api.util.VariableProvider;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +31,7 @@ import java.util.UUID;
 
 @EqualsAndHashCode(of = { "sessionId", "sessionKey" })
 @SuppressWarnings("unused")
-final class Session implements ISession, Cloneable
+final class Session implements ISession, Cloneable, VariableProvider
 {
 
     private static long id = 0L;

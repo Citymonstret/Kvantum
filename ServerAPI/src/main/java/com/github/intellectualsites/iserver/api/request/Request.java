@@ -26,7 +26,6 @@ import com.github.intellectualsites.iserver.api.exceptions.RequestException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.util.*;
-import com.github.intellectualsites.iserver.api.views.CookieManager;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;

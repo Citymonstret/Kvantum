@@ -108,7 +108,7 @@ final class Worker extends AutoCloseable
     {
         availableWorkers = new ArrayDeque<>( Assert.isPositive( n ).intValue() );
         LambdaUtil.collectionAssign( () -> availableWorkers, Worker::new, n );
-        ServerImplementation.getImplementation().log( "Available workers: " + availableWorkers.size() );
+        Message.WORKER_AVAILABLE.log( availableWorkers.size() );
     }
 
     /**
@@ -314,7 +314,7 @@ final class Worker extends AutoCloseable
 
         if ( CoreConfig.debug )
         {
-            server.log( "Request was served with HTTP Status: %s", status );
+            Message.REQUEST_SERVED_STATUS.log( status );
         }
 
         return false;

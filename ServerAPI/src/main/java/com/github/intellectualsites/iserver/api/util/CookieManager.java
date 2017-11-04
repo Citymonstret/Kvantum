@@ -16,11 +16,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.iserver.api.views;
+package com.github.intellectualsites.iserver.api.util;
 
 import com.github.intellectualsites.iserver.api.request.Cookie;
 import com.github.intellectualsites.iserver.api.request.Request;
-import com.github.intellectualsites.iserver.api.util.Assert;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;

@@ -29,7 +29,7 @@ public enum FileExtension
 {
     CSS( new String[]{ "css", }, Header.CONTENT_TYPE_CSS, "/* {cmt} */" ),
     LESS( new String[]{ "less", "css" }, Header.CONTENT_TYPE_CSS, "/* {cmt} */"),
-    HTML( new String[]{ "html", "xhtml", "htm" }, Header.CONTENT_TYPE_HTML, "<!-- {cmt} -->"),
+    HTML( new String[]{ "html", "xhtml", "htm", "vm" }, Header.CONTENT_TYPE_HTML, "<!-- {cmt} -->" ),
     PNG( new String[]{ "png" }, "image/png; charset=utf-8", "png", ReadType.BYTES, ""),
     ICO( new String[]{ "ico" }, "image/x-icon; charset=utf-8", "x-icon", ReadType.BYTES, ""),
     GIF( new String[]{ "gif" }, "image/gif; charset=utf-8", "gif", ReadType.BYTES, ""),

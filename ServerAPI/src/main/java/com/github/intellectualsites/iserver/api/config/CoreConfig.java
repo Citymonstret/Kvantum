@@ -70,11 +70,21 @@ public class CoreConfig
         CoreConfig.preConfigured = preConfigured;
     }
 
-    @ConfigSection(name = "crush")
-    public static class Crush
+    public static enum TemplatingEngine
+    {
+        CRUSH, VELOCITY, NONE
+    }
+
+    @ConfigSection(name = "templates")
+    public static class Templates
     {
 
-        public static boolean enable = true;
+        public static TemplatingEngine engine = TemplatingEngine.CRUSH;
+
+        public static boolean status(final TemplatingEngine engine)
+        {
+            return Templates.engine.equals( engine );
+        }
     }
 
     @ConfigSection(name = "ssl")

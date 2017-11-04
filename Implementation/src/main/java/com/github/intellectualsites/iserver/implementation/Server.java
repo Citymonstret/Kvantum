@@ -20,10 +20,7 @@ package com.github.intellectualsites.iserver.implementation;
 
 import com.github.intellectualsites.iserver.api.account.IAccountManager;
 import com.github.intellectualsites.iserver.api.cache.ICacheManager;
-import com.github.intellectualsites.iserver.api.config.ConfigurationFile;
-import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.config.Message;
-import com.github.intellectualsites.iserver.api.config.YamlConfiguration;
+import com.github.intellectualsites.iserver.api.config.*;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
@@ -34,21 +31,27 @@ import com.github.intellectualsites.iserver.api.events.defaultevents.ServerReady
 import com.github.intellectualsites.iserver.api.events.defaultevents.ShutdownEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.StartupEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.ViewsInitializedEvent;
-import com.github.intellectualsites.iserver.api.logging.*;
+import com.github.intellectualsites.iserver.api.logging.LogContext;
+import com.github.intellectualsites.iserver.api.logging.LogModes;
+import com.github.intellectualsites.iserver.api.logging.LogProvider;
+import com.github.intellectualsites.iserver.api.logging.LogWrapper;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.plugin.PluginLoader;
 import com.github.intellectualsites.iserver.api.plugin.PluginManager;
+import com.github.intellectualsites.iserver.api.request.PostProviderFactory;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.session.ISession;
 import com.github.intellectualsites.iserver.api.session.ISessionCreator;
 import com.github.intellectualsites.iserver.api.session.ISessionDatabase;
 import com.github.intellectualsites.iserver.api.session.SessionManager;
+import com.github.intellectualsites.iserver.api.templates.TemplateManager;
 import com.github.intellectualsites.iserver.api.util.*;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
 import com.github.intellectualsites.iserver.api.views.*;
 import com.github.intellectualsites.iserver.api.views.requesthandler.SimpleRequestHandler;
 import com.github.intellectualsites.iserver.crush.CrushEngine;
+import com.github.intellectualsites.iserver.files.Extension;
 import com.github.intellectualsites.iserver.files.FileSystem;
 import com.github.intellectualsites.iserver.files.Path;
 import com.github.intellectualsites.iserver.implementation.commands.AccountCommand;
@@ -59,6 +62,7 @@ import com.github.intellectualsites.iserver.implementation.mongo.MongoAccountMan
 import com.github.intellectualsites.iserver.implementation.mongo.MongoSessionDatabase;
 import com.github.intellectualsites.iserver.implementation.sqlite.SQLiteAccountManager;
 import com.github.intellectualsites.iserver.implementation.sqlite.SQLiteSessionDatabase;
+import com.github.intellectualsites.iserver.velocity.VelocityEngine;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
 import lombok.AccessLevel;
@@ -320,8 +324,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                     };
                     break;
                 default:
-                    Logger.error( "Unknown application database implementation: %s", CoreConfig.Application
-                            .databaseImplementation );
+                    Message.DATABASE_UNKNOWN.log( CoreConfig.Application.databaseImplementation );
                     throw new IntellectualServerInitializationException( "Cannot load - Invalid session database " +
                             "implementation provided" );
             }
@@ -379,8 +382,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                             .getApplicationStructure() );
                     break;
                 default:
-                    Logger.error( "Unknown database implementation (%s). Using a DumbSessionDatabase instead.",
-                            CoreConfig.Application.databaseImplementation );
+                    Message.DATABASE_SESSION_UNKNOWN.log( CoreConfig.Application.databaseImplementation );
                     sessionDatabase = new DumbSessionDatabase();
                     break;
             }
@@ -429,7 +431,7 @@ public final class Server implements IntellectualServer, ISessionCreator
             }
             if ( !path.getPath( "favicon.ico" ).exists() )
             {
-                Logger.info( "Creating public/favicon.ico" );
+                Message.CREATING.log( "public/favicon.ico" );
                 try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
                         "favicon.ico" )
                 ) )
@@ -441,9 +443,9 @@ public final class Server implements IntellectualServer, ISessionCreator
                 }
             }
 
-            if ( !path.getPath( "index.html" ).exists() )
+            if ( !path.getPath( "index", Extension.HTML ).exists() )
             {
-                Logger.info( "Creating public/index.html!" );
+                Message.CREATING.log( "public/index.html" );
                 try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
                 ) )
                 {
@@ -566,7 +568,13 @@ public final class Server implements IntellectualServer, ISessionCreator
             return;
         }
 
+        TemplateManager.get().addProviderFactory( ServerImplementation.getImplementation().getSessionManager() );
+        TemplateManager.get().addProviderFactory( ConfigVariableProvider.getInstance() );
+        TemplateManager.get().addProviderFactory( new PostProviderFactory() );
+        TemplateManager.get().addProviderFactory( new MetaProvider() );
+
         CrushEngine.getInstance().load();
+        VelocityEngine.getInstance().load();
 
         // Load Plugins
         this.loadPlugins();
@@ -656,8 +664,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 {
                     serverSocket = new ServerSocket( ++port );
                     run = false;
-                    log( "Specified port was occupied, running on %s instead", "" + port );
-
+                    Message.PORT_OCCUPIED.log( port );
                     CoreConfig.port = port;
                 } catch ( final BindException ex )
                 {

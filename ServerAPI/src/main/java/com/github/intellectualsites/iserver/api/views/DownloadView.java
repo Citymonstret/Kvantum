@@ -22,6 +22,7 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.FileExtension;
+import com.github.intellectualsites.iserver.api.util.IgnoreSyntax;
 
 import java.util.Map;
 
@@ -30,7 +31,7 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class DownloadView extends StaticFileView
+public class DownloadView extends StaticFileView implements IgnoreSyntax
 {
 
     public DownloadView(String filter, Map<String, Object> options)

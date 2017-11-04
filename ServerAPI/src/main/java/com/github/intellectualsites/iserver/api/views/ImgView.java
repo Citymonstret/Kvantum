@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.views;
 import com.github.intellectualsites.iserver.api.cache.CacheApplicable;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.util.FileExtension;
+import com.github.intellectualsites.iserver.api.util.IgnoreSyntax;
 
 import java.util.Map;
 
@@ -29,7 +30,7 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class ImgView extends StaticFileView implements CacheApplicable
+public class ImgView extends StaticFileView implements CacheApplicable, IgnoreSyntax
 {
 
     public ImgView(String filter, Map<String, Object> options)

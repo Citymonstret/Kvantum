@@ -19,9 +19,10 @@
 package com.github.intellectualsites.iserver.crush;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.request.Request;
+import com.github.intellectualsites.iserver.api.templates.TemplateManager;
 import com.github.intellectualsites.iserver.api.util.IgnoreSyntax;
 import com.github.intellectualsites.iserver.api.util.ProviderFactory;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
@@ -47,12 +48,12 @@ public class SyntaxHandler extends WorkerProcedure.StringHandler
 
         if ( CoreConfig.debug )
         {
-            ServerImplementation.getImplementation().log( "CrushEngine is reacting to %s", request );
+            Message.TEMPLATING_ENGINE_REACTING.log( "CrushEngine", request );
         }
         if ( !( requestHandler instanceof IgnoreSyntax ) )
         {
             final Map<String, ProviderFactory> factories = new HashMap<>();
-            for ( final ProviderFactory factory : crushEngine.providers )
+            for ( final ProviderFactory factory : TemplateManager.get().getProviders() )
             {
                 factories.put( factory.providerName().toLowerCase(), factory );
             }

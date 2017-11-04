@@ -114,7 +114,7 @@ final public class ForEachBlock extends Syntax
                 }
             } catch ( final Exception e )
             {
-                ServerImplementation.getImplementation().log( "Failed to finish the foor loop (" + provider + "." + variable + " -> " + variableName + ") -> " + e.getMessage() );
+                ServerImplementation.getImplementation().log( "Failed to finish the for loop (" + provider + "." + variable + " -> " + variableName + ") -> " + e.getMessage() );
             }
         }
         return content;

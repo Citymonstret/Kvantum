@@ -24,7 +24,7 @@ import com.github.intellectualsites.iserver.api.account.IAccount;
 import com.github.intellectualsites.iserver.api.cache.CachedResponse;
 import com.github.intellectualsites.iserver.api.cache.ICacheManager;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
@@ -94,7 +94,7 @@ public final class CacheManager implements ICacheManager
 
         if ( CoreConfig.debug )
         {
-            ServerImplementation.getImplementation().log( "Accessing cached file: " + file );
+            Message.CACHE_FILE_ACCESS.log( file );
         }
 
         if ( !CoreConfig.Cache.enabled )
@@ -145,7 +145,7 @@ public final class CacheManager implements ICacheManager
 
         if ( CoreConfig.debug )
         {
-            ServerImplementation.getImplementation().log( "Accessing cached body: " + view );
+            Message.CACHE_REQUEST_ACCESS.log( view );
         }
 
         return this.cachedBodies.getIfPresent( view.toString() );

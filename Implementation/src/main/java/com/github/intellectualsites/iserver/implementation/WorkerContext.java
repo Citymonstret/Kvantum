@@ -5,7 +5,6 @@ import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
-import com.github.intellectualsites.iserver.api.logging.LogModes;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
@@ -227,8 +226,12 @@ class WorkerContext
             }
         } catch ( final Exception e )
         {
-            server.log( "Error When Handling Request: %s", e.getMessage(), LogModes.MODE_ERROR );
-            e.printStackTrace();
+            Message.WORKER_FAILED_HANDLING.log( e.getMessage() );
+
+            if ( CoreConfig.verbose )
+            {
+                e.printStackTrace();
+            }
 
             if ( CoreConfig.debug )
             {
@@ -248,9 +251,8 @@ class WorkerContext
 
         if ( CoreConfig.debug )
         {
-            server.log( "Request was served by '%s', with the type '%s'. The total length of the content was '%skB'",
-                    requestHandler.getName(), body.isText() ? "text" : "bytes", ( bytes.length / 1000 )
-            );
+            Message.REQUEST_SERVED.log( requestHandler.getName(),
+                    body.isText() ? "text" : "bytes", ( bytes.length / 1000 ) );
         }
     }
 

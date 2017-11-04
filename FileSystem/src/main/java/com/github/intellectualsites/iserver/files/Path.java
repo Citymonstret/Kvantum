@@ -147,6 +147,18 @@ public class Path
         return this.path;
     }
 
+    public String getEntityName()
+    {
+        final String name = this.path;
+        final String[] pathTokens = name.split( "/" );
+        String entityToken = pathTokens[ pathTokens.length - 1 ];
+        if ( entityToken.contains( "." ) )
+        {
+            entityToken = entityToken.split( "\\." )[ 0 ];
+        }
+        return entityToken;
+    }
+
     /**
      * @return true if the path target is a directory
      */
@@ -164,6 +176,25 @@ public class Path
     public Path getPath(final String path)
     {
         return fileSystem.getPath( this, path );
+    }
+
+    public Path getPath(final String path, final Extension extension)
+    {
+        final Collection<Path> subPaths = getSubPaths();
+        for ( final Path subPath : subPaths )
+        {
+            if ( subPath.getEntityName().equalsIgnoreCase( path ) )
+            {
+                for ( final String ext : extension.getExtensions() )
+                {
+                    if ( subPath.getExtension().equalsIgnoreCase( ext ) )
+                    {
+                        return subPath;
+                    }
+                }
+            }
+        }
+        return getPath( path + "." + extension.getExtensions()[ 0 ] );
     }
 
     private Path getPathUnsafe(final String path)

@@ -18,17 +18,11 @@
  */
 package com.github.intellectualsites.iserver.crush;
 
-import com.github.intellectualsites.iserver.api.config.ConfigVariableProvider;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
-import com.github.intellectualsites.iserver.api.request.PostProviderFactory;
-import com.github.intellectualsites.iserver.api.util.Assert;
-import com.github.intellectualsites.iserver.api.util.MetaProvider;
-import com.github.intellectualsites.iserver.api.util.ProviderFactory;
 import com.github.intellectualsites.iserver.crush.syntax.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -37,7 +31,6 @@ public class CrushEngine
 
     private static CrushEngine instance;
     final Collection<Syntax> syntaxCollection = new LinkedHashSet<>();
-    final Collection<ProviderFactory> providers = new ArrayList<>();
 
     private CrushEngine()
     {
@@ -54,9 +47,10 @@ public class CrushEngine
 
     public void load()
     {
-        Message.TEMPLATING_ENGINE_STATUS.log( "CrushEngine", CoreConfig.Crush.enable );
+        Message.TEMPLATING_ENGINE_STATUS.log( "CrushEngine",
+                CoreConfig.Templates.status( CoreConfig.TemplatingEngine.CRUSH ) );
 
-        if ( !CoreConfig.Crush.enable )
+        if ( !CoreConfig.Templates.status( CoreConfig.TemplatingEngine.CRUSH ) )
         {
             return;
         }
@@ -68,19 +62,6 @@ public class CrushEngine
         this.syntaxCollection.add( new ForEachBlock() );
         this.syntaxCollection.add( new Variable() );
 
-        this.providers.add( ServerImplementation.getImplementation().getSessionManager() );
-        this.providers.add( ConfigVariableProvider.getInstance() );
-        this.providers.add( new PostProviderFactory() );
-        this.providers.add( new MetaProvider() );
-
         ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
     }
-
-    public void addProviderFactory(final ProviderFactory factory)
-    {
-        Assert.notNull( factory );
-
-        this.providers.add( factory );
-    }
-
 }
