@@ -52,7 +52,8 @@ public class HTMLView extends StaticFileView implements CacheApplicable
     @Override
     public boolean isApplicable(Request r)
     {
-        return true;
+        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
+        return cacheApplicableBoolean.orElse( true );
     }
 
     public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider

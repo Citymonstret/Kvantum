@@ -26,6 +26,7 @@ import org.lesscss.LessCompiler;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created 2015-04-22 for IntellectualServer
@@ -72,6 +73,7 @@ public class LessView extends StaticFileView implements CacheApplicable
     @Override
     public boolean isApplicable(Request r)
     {
-        return true;
+        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
+        return cacheApplicableBoolean.orElse( true );
     }
 }

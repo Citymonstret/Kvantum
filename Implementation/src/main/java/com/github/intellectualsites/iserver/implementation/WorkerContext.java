@@ -123,6 +123,12 @@ class WorkerContext
         }
         this.requestHandler = server.getRouter().match( request );
 
+        if ( this.requestHandler == null )
+        {
+            worker.handleSendStatusOnly( Header.STATUS_NOT_FOUND );
+            return;
+        }
+
         //
         // Scope variables
         //

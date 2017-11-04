@@ -73,6 +73,7 @@ final public class Header
     public static final String STATUS_BAD_REQUEST = "400 Bad Request";
     public static final String STATUS_ACCESS_DENIED = "401 Access Denied";
     public static final String STATUS_UNAUTHORIZED = "401 Unauthorized status";
+    public static final String STATUS_NOT_FOUND = "404 Not Found";
     public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
     public static final String STATUS_NOT_ACCEPTABLE = "406 Not Acceptable";
     public static final String STATUS_PAYLOAD_TOO_LARGE = "413 Payload Too Large";
