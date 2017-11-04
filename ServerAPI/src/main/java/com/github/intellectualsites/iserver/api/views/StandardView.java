@@ -38,14 +38,6 @@ public class StandardView extends StaticFileView implements CacheApplicable
     public StandardView(String filter, Map<String, Object> options)
     {
         super( filter, options, "STANDARD", new ArrayList<>( Arrays.asList( FileExtension.values() ) ) );
-        super.fileName = "{file}.{extension}";
-
-        if ( !options.containsKey( "defaultExtension" ) )
-        {
-            super.setOption( "defaultExtension", "html" );
-        }
-
-        super.defaultFile = ( getOptionSafe( "defaultFile" ).orElse( "index" ) ).toString();
 
         if ( options.containsKey( CONSTANT_EXCLUDE_EXTENSIONS ) )
         {

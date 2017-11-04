@@ -23,13 +23,16 @@ import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.exceptions.IntellectualServerException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
+import com.github.intellectualsites.iserver.api.matching.FilePattern;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.matching.ViewPattern;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.files.Path;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -82,15 +85,16 @@ public class View extends RequestHandler
 
     private final Map<String, Object> options;
     private final String internalName;
-    private final ViewPattern viewPattern;
     private final UUID uuid;
+
+    private final ViewPattern viewPattern;
+    @Getter(AccessLevel.PROTECTED)
+    private final FilePattern filePattern;
+
     public String relatedFolderPath;
-    public String fileName;
-    public String defaultFile;
-    protected String internalFileName;
-    protected String internalDefaultFile;
-    private int buffer = -1;
     private Path folder;
+
+    private int buffer = -1;
     private ViewReturn viewReturn;
 
     /**
@@ -125,10 +129,16 @@ public class View extends RequestHandler
         {
             this.options = options;
         }
+        if ( this.options.containsKey( "filePattern" ) )
+        {
+            this.filePattern = FilePattern.compile( this.options.get( "filePattern" ).toString() );
+        } else
+        {
+            this.filePattern = FilePattern.compile( "${file}.${extension}" );
+        }
         this.internalName = internalName;
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
-        this.relatedFolderPath = "{file}.{extension}";
         this.uuid = UUID.randomUUID();
     }
 
@@ -256,91 +266,56 @@ public class View extends RequestHandler
     {
         Assert.isValid( request );
 
-        Map<String, String> variables = (Map<String, String>) request.getMeta( "viewV" );
-        if ( variables == null )
+        if ( request.getMeta( "fileMatcher" ) == null )
         {
-            variables = (Map<String, String>) request.getMeta( "variables" );
+            throw new IntellectualServerException( "fileMatcher isn't set" );
         }
 
-        if ( internalFileName == null )
+        final FilePattern.FileMatcher fileMatcher = (FilePattern.FileMatcher) request.getMeta( "fileMatcher" );
+
+        if ( !fileMatcher.matches() )
         {
-            if ( containsOption( "filepattern" ) )
-            {
-                this.internalFileName = getOption( "filepattern" );
-            } else if ( fileName != null )
-            {
-                this.internalFileName = fileName;
-            } else
-            {
-                throw new IntellectualServerException( "getFile called without a filename set!" );
-            }
+            throw new IntellectualServerException( "getFile called when matches = false" );
         }
-        String n = internalFileName;
+
+        if ( CoreConfig.debug )
         {
-            String t = variables.get( VARIABLE_FILE );
+            ServerImplementation.getImplementation().log( "Translated file name: '%s'", fileMatcher.getFileName() );
+        }
 
-            if ( variables.containsKey( VARIABLE_FOLDER ) )
-            {
-                n = n.replace( PATTERN_VARIABLE_FOLDER, variables.get( VARIABLE_FOLDER ) );
-            }
-            if ( t == null || t.equals( "" ) )
-            {
-                if ( internalDefaultFile == null )
-                {
-                    if ( containsOption( "defaultfile" ) )
-                    {
-                        this.internalDefaultFile = getOption( "defaultfile" );
-                    } else if ( defaultFile != null )
-                    {
-                        this.internalDefaultFile = defaultFile;
-                    } else
-                    {
-                        throw new IntellectualServerException( "getFile called with empty file path, and no default file set!" );
-                    }
-                }
-                t = internalDefaultFile;
-                request.getVariables().put( VARIABLE_FILE, internalDefaultFile );
-            }
-            if ( !variables.containsKey( VARIABLE_FILE ) )
-            {
-                variables.put( VARIABLE_FILE, "index" );
-            }
-            n = n.replace( PATTERN_VARIABLE_FILE, variables.get( VARIABLE_FILE ) );
-            if ( variables.containsKey( VARIABLE_EXTENSION ) )
-            {
-                boolean skip = false;
-                if ( containsOption( "extensionRewrite" ) )
-                {
-                    Logger.debug( "Rewrite found for: " + toString() );
-                    final Map<String, Object> rewrite = (Map<String, Object>) getOption( "extensionRewrite" );
-                    if ( rewrite.containsKey( variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) ) )
-                    {
-                        final String rewritten = rewrite.get( variables.get( VARIABLE_EXTENSION ).replace( ".", "" )
-                        ).toString();
-                        Logger.debug( "Rewritten to: " + rewritten );
-                        n = n.replace( PATTERN_VARIABLE_EXTENSION, rewritten );
-                        skip = true;
-                    }
-                }
-                if ( !skip )
-                {
-                    n = n.replace( PATTERN_VARIABLE_EXTENSION, variables.get( VARIABLE_EXTENSION ).replace( ".", "" ) );
-                }
-            } else if ( containsOption( "defaultExtension" ) )
-            {
-                n = n.replace( PATTERN_VARIABLE_EXTENSION, getOption( "defaultExtension" ).toString().replace( ".", ""
-                ) );
-            } else
-            {
-                n = n.replace( PATTERN_VARIABLE_EXTENSION, "" );
-            }
+        String fileName = fileMatcher.getFileName();
 
+        if ( containsOption( "extensionRewrite" ) )
+        {
             if ( CoreConfig.debug )
             {
-                ServerImplementation.getImplementation().log( "Translated file name: '%s'", n );
+                Logger.debug( "Rewrite found for : " + toString() );
             }
+
+            final String variableExtension = request.getVariables().get( VARIABLE_EXTENSION );
+
+            final Map<String, Object> rewrite = getOption( "extensionRewrite" );
+            if ( rewrite.containsKey( variableExtension ) )
+            {
+                final String rewritten = rewrite.get( variableExtension ).toString();
+                if ( CoreConfig.debug )
+                {
+                    Logger.debug( "Rewrote %s to %s",
+                            variableExtension,
+                            rewritten
+                    );
+                }
+                fileName = fileName.replace( variableExtension, rewritten );
+            }
+
         }
-        return getFolder().getPath( n );
+
+        if ( CoreConfig.debug )
+        {
+            Logger.debug( "Final file name: " + fileName );
+        }
+
+        return getFolder().getPath( fileName );
     }
 
     /**
@@ -375,7 +350,7 @@ public class View extends RequestHandler
     {
         Assert.isValid( request );
 
-        final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
+        final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest().toLowerCase() );
         if ( map != null )
         {
             request.addMeta( CONSTANT_VARIABLES, map );
@@ -429,7 +404,8 @@ public class View extends RequestHandler
 
     /**
      * Set an internal option
-     * @param key Option key
+     *
+     * @param key   Option key
      * @param value Option value
      */
     public void setOption(final String key, final Object value)

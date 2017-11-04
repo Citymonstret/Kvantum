@@ -19,6 +19,7 @@
 package com.github.intellectualsites.iserver.api.views;
 
 import com.github.intellectualsites.iserver.api.logging.Logger;
+import com.github.intellectualsites.iserver.api.matching.FilePattern;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.Response;
@@ -27,6 +28,7 @@ import com.github.intellectualsites.iserver.files.Path;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class StaticFileView extends View
 {
@@ -45,15 +47,10 @@ public abstract class StaticFileView extends View
         final Map<String, String> variables = request.getVariables();
         FileExtension fileExtension;
 
-        if ( !variables.containsKey( "extension" ) || variables.get( "extension" ).isEmpty() )
+        if ( !variables.containsKey( "extension" ) )
         {
-            if ( containsOption( "defaultExtension" ) )
-            {
-                variables.put( "extension", getOption( "defaultExtension" ) );
-            } else
-            {
-                variables.put( "extension", extensionList.iterator().next().getExtension() );
-            }
+            final Optional<String> extensionOptional = getOptionSafe( "extension" );
+            extensionOptional.ifPresent( s -> variables.put( "extension", s ) );
         }
 
         check:
@@ -70,9 +67,13 @@ public abstract class StaticFileView extends View
             return false; // None matched
         }
 
+        final FilePattern.FileMatcher fileMatcher = getFilePattern().matcher( () -> variables );
+        request.addMeta( "fileMatcher", fileMatcher );
         request.addMeta( "extension", fileExtension );
+
         final Path file = getFile( request );
         request.addMeta( "file", file );
+
         final boolean exists = file.exists();
         if ( exists )
         {

@@ -41,7 +41,7 @@ public class LessView extends StaticFileView implements CacheApplicable
     {
         super( filter, options, "less", Collections.singletonList( FileExtension.LESS ) );
         super.relatedFolderPath = "./assets/less";
-        super.fileName = "{file}.less";
+        super.setOption( "extension", "css" );
     }
 
     public static String getLess(String content)

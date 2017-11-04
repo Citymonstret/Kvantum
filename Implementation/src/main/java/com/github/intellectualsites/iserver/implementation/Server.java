@@ -414,13 +414,12 @@ public final class Server implements IntellectualServer, ISessionCreator
             Map<String, Object> views = new HashMap<>();
             // HTML View
             Map<String, Object> view = new HashMap<>();
-            view.put( "filter", "[file][extension]" );
+            view.put( "filter", "[file=index].[extension=html]" );
             view.put( "type", "std" );
             Map<String, Object> opts = new HashMap<>();
             opts.put( "folder", "./public" );
-            opts.put( "defaultExtension", "html" );
-            opts.put( "defaultFile", "index" );
             opts.put( "excludeExtensions", Collections.singletonList( "txt" ) );
+            opts.put( "filePattern", "${file}.${extension}" );
             view.put( "options", opts );
             views.put( "std", view );
             configViews.setIfNotExists( "views", views );
