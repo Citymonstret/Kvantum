@@ -43,4 +43,5 @@ dependencies {
     compile project(":ServerAPI")
     compile project(":Crush")
     compile project(":Velocity")
+    compile project(":JTwig")
 }

@@ -65,6 +65,7 @@ import com.github.intellectualsites.iserver.implementation.sqlite.SQLiteSessionD
 import com.github.intellectualsites.iserver.velocity.VelocityEngine;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
+import crush.JTwigEngine;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -574,6 +575,7 @@ public final class Server implements IntellectualServer, ISessionCreator
 
         CrushEngine.getInstance().load();
         VelocityEngine.getInstance().load();
+        JTwigEngine.getInstance().load();
 
         // Load Plugins
         this.loadPlugins();

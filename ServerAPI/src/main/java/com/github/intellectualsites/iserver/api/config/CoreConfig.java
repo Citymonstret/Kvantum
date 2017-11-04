@@ -72,7 +72,7 @@ public class CoreConfig
 
     public static enum TemplatingEngine
     {
-        CRUSH, VELOCITY, NONE
+        CRUSH, VELOCITY, JTWIG, NONE
     }
 
     @ConfigSection(name = "templates")

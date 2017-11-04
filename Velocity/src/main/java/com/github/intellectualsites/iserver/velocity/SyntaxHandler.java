@@ -1,5 +1,7 @@
 package com.github.intellectualsites.iserver.velocity;
 
+import com.github.intellectualsites.iserver.api.config.CoreConfig;
+import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.templates.TemplateManager;
@@ -25,6 +27,11 @@ public class SyntaxHandler extends WorkerProcedure.StringHandler
 
         if ( !( requestHandler instanceof IgnoreSyntax ) )
         {
+            if ( CoreConfig.debug )
+            {
+                Message.TEMPLATING_ENGINE_REACTING.log( "VelocityEngine", request );
+            }
+
             final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
             final Map<String, Object> objects = new HashMap<>();
 
