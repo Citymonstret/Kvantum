@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable, RequestChild
+final public class Request implements ProviderFactory<Request>, VariableProvider, Validatable, RequestChild, VariableHolder
 {
 
     @SuppressWarnings("ALL")
@@ -342,6 +342,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         return meta.get( name );
     }
 
+    @Override
     public Map<String, String> getVariables()
     {
         return (Map<String, String>) getMeta( "variables" );
