@@ -278,8 +278,7 @@ final class Worker extends AutoCloseable
         if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST )
         {
             final Request request = workerContext.getRequest();
-            final int cl = Integer.parseInt( workerContext.getRequest().getHeader( "Content-Length" )
-                    .substring( 1 ) );
+            final int cl = Integer.parseInt( workerContext.getRequest().getHeader( "Content-Length" ) );
             request.setPostRequest( PostRequest.construct( workerContext.getRequest(), cl, input ) );
         }
 
