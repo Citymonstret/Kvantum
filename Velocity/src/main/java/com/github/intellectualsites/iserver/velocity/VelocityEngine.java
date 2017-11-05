@@ -1,18 +1,18 @@
 package com.github.intellectualsites.iserver.velocity;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.template.TemplateHandler;
 import org.apache.velocity.app.Velocity;
 
-public class VelocityEngine
+public class VelocityEngine extends TemplateHandler
 {
 
     private static VelocityEngine instance;
 
-
     private VelocityEngine()
     {
+        super( CoreConfig.TemplatingEngine.VELOCITY, "VelocityEngine" );
     }
 
     public static VelocityEngine getInstance()
@@ -24,19 +24,11 @@ public class VelocityEngine
         return instance;
     }
 
-    public void load()
+    @Override
+    public void onLoad()
     {
-        Message.TEMPLATING_ENGINE_STATUS.log( "VelocityEngine",
-                CoreConfig.Templates.status( CoreConfig.TemplatingEngine.VELOCITY ) );
-
-
-        if ( !CoreConfig.Templates.status( CoreConfig.TemplatingEngine.VELOCITY ) )
-        {
-            return;
-        }
-
         Velocity.init();
-        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler() );
+        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
     }
 
 }

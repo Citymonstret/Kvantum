@@ -31,6 +31,7 @@ import com.github.intellectualsites.iserver.api.events.defaultevents.ServerReady
 import com.github.intellectualsites.iserver.api.events.defaultevents.ShutdownEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.StartupEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.ViewsInitializedEvent;
+import com.github.intellectualsites.iserver.api.jtwig.JTwigEngine;
 import com.github.intellectualsites.iserver.api.logging.LogContext;
 import com.github.intellectualsites.iserver.api.logging.LogModes;
 import com.github.intellectualsites.iserver.api.logging.LogProvider;
@@ -65,7 +66,6 @@ import com.github.intellectualsites.iserver.implementation.sqlite.SQLiteSessionD
 import com.github.intellectualsites.iserver.velocity.VelocityEngine;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
-import crush.JTwigEngine;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -610,6 +610,7 @@ public final class Server implements IntellectualServer, ISessionCreator
                 {
                     options = new HashMap<>();
                 }
+                options.put( "internalName", entry.getKey() );
 
                 if ( viewBindings.containsKey( type.toLowerCase() ) )
                 {

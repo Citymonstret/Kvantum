@@ -30,6 +30,7 @@ public enum Message
     WAITING_FOR_EXECUTOR_SERVICE( "Waiting for the executor service to shutdown", LogModes.MODE_INFO ),
     TEMPLATING_ENGINE_STATUS( "Templating language '%s': %s", LogModes.MODE_INFO ),
     TEMPLATING_ENGINE_REACTING( "%s is reacting to: %s", LogModes.MODE_DEBUG ),
+    TEMPLATING_ENGINE_DEBUG_NOT_ENABLED( "Config does not enable templates for: %s", LogModes.MODE_DEBUG ),
     DISABLING_PLUGINS( "Disabling all plugins", LogModes.MODE_INFO ),
     DISABLED_PLUGIN( "Disabled plugin '%s'", LogModes.MODE_INFO ),
     MD5_DIGEST_NOT_FOUND( "Could not load the MD5 MessageDigest Instance %s", LogModes.MODE_ERROR ),

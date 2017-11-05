@@ -19,14 +19,14 @@
 package com.github.intellectualsites.iserver.crush;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.template.TemplateHandler;
 import com.github.intellectualsites.iserver.crush.syntax.*;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-public class CrushEngine
+public class CrushEngine extends TemplateHandler
 {
 
     private static CrushEngine instance;
@@ -34,6 +34,7 @@ public class CrushEngine
 
     private CrushEngine()
     {
+        super( CoreConfig.TemplatingEngine.CRUSH, "CrushEngine" );
     }
 
     public static CrushEngine getInstance()
@@ -45,16 +46,8 @@ public class CrushEngine
         return instance;
     }
 
-    public void load()
+    public void onLoad()
     {
-        Message.TEMPLATING_ENGINE_STATUS.log( "CrushEngine",
-                CoreConfig.Templates.status( CoreConfig.TemplatingEngine.CRUSH ) );
-
-        if ( !CoreConfig.Templates.status( CoreConfig.TemplatingEngine.CRUSH ) )
-        {
-            return;
-        }
-
         this.syntaxCollection.add( new Include() );
         this.syntaxCollection.add( new Comment() );
         this.syntaxCollection.add( new MetaBlock() );

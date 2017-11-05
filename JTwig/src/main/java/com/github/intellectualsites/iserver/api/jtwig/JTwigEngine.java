@@ -16,19 +16,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package crush;
+package com.github.intellectualsites.iserver.api.jtwig;
 
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.template.TemplateHandler;
 
-public class JTwigEngine
+public class JTwigEngine extends TemplateHandler
 {
 
     private static JTwigEngine instance;
 
     private JTwigEngine()
     {
+        super( CoreConfig.TemplatingEngine.JTWIG, "JTwigEngine" );
     }
 
     public static JTwigEngine getInstance()
@@ -40,16 +41,8 @@ public class JTwigEngine
         return instance;
     }
 
-    public void load()
+    public void onLoad()
     {
-        Message.TEMPLATING_ENGINE_STATUS.log( "JTwigEngine",
-                CoreConfig.Templates.status( CoreConfig.TemplatingEngine.JTWIG ) );
-
-        if ( !CoreConfig.Templates.status( CoreConfig.TemplatingEngine.JTWIG ) )
-        {
-            return;
-        }
-
-        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler() );
+        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
     }
 }

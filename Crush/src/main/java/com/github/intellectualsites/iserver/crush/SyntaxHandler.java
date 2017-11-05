@@ -18,12 +18,9 @@
  */
 package com.github.intellectualsites.iserver.crush;
 
-import com.github.intellectualsites.iserver.api.config.CoreConfig;
-import com.github.intellectualsites.iserver.api.config.Message;
-import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.request.Request;
+import com.github.intellectualsites.iserver.api.template.TemplateSyntaxHandler;
 import com.github.intellectualsites.iserver.api.templates.TemplateManager;
-import com.github.intellectualsites.iserver.api.util.IgnoreSyntax;
 import com.github.intellectualsites.iserver.api.util.ProviderFactory;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.github.intellectualsites.iserver.crush.syntax.Syntax;
@@ -31,48 +28,42 @@ import com.github.intellectualsites.iserver.crush.syntax.Syntax;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SyntaxHandler extends WorkerProcedure.StringHandler
+public class SyntaxHandler extends TemplateSyntaxHandler
 {
 
     private final CrushEngine crushEngine;
 
     SyntaxHandler(final CrushEngine crushEngine)
     {
+        super( crushEngine );
         this.crushEngine = crushEngine;
     }
 
     @Override
-    public String act(final RequestHandler requestHandler, final Request request, final String in)
+    public String handle(final RequestHandler requestHandler, final Request request, final String in)
     {
         String out = in;
+        final Map<String, ProviderFactory> factories = new HashMap<>();
+        for ( final ProviderFactory factory : TemplateManager.get().getProviders() )
+        {
+            factories.put( factory.providerName().toLowerCase(), factory );
+        }
+        final ProviderFactory z = requestHandler.getFactory( request );
+        if ( z != null )
+        {
+            factories.put( z.providerName().toLowerCase(), z );
+        }
+        factories.put( "request", request );
+        // This is how the crush engine works.
+        // Quite simple, yet powerful!
+        for ( final Syntax syntax : crushEngine.syntaxCollection )
+        {
+            if ( syntax.matches( out ) )
+            {
+                out = syntax.handle( out, request, factories );
+            }
+        }
 
-        if ( CoreConfig.debug )
-        {
-            Message.TEMPLATING_ENGINE_REACTING.log( "CrushEngine", request );
-        }
-        if ( !( requestHandler instanceof IgnoreSyntax ) )
-        {
-            final Map<String, ProviderFactory> factories = new HashMap<>();
-            for ( final ProviderFactory factory : TemplateManager.get().getProviders() )
-            {
-                factories.put( factory.providerName().toLowerCase(), factory );
-            }
-            final ProviderFactory z = requestHandler.getFactory( request );
-            if ( z != null )
-            {
-                factories.put( z.providerName().toLowerCase(), z );
-            }
-            factories.put( "request", request );
-            // This is how the crush engine works.
-            // Quite simple, yet powerful!
-            for ( final Syntax syntax : crushEngine.syntaxCollection )
-            {
-                if ( syntax.matches( out ) )
-                {
-                    out = syntax.handle( out, request, factories );
-                }
-            }
-        }
         return out;
     }
 }

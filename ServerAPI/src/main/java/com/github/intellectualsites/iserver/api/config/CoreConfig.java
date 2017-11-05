@@ -22,6 +22,9 @@ import com.intellectualsites.configurable.ConfigurationImplementation;
 import com.intellectualsites.configurable.annotations.ConfigSection;
 import com.intellectualsites.configurable.annotations.Configuration;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This is the configuration implementation that is
  * meant to control all easily accessible variables
@@ -80,6 +83,8 @@ public class CoreConfig
     {
 
         public static TemplatingEngine engine = TemplatingEngine.CRUSH;
+
+        public static List<String> applyTemplates = Arrays.asList( "ALL" );
 
         public static boolean status(final TemplatingEngine engine)
         {

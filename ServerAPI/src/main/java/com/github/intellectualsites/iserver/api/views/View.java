@@ -136,7 +136,13 @@ public class View extends RequestHandler
         {
             this.filePattern = FilePattern.compile( "${file}.${extension}" );
         }
-        this.internalName = internalName;
+        if ( options.containsKey( "internalName" ) )
+        {
+            this.internalName = options.get( "internalName" ).toString();
+        } else
+        {
+            this.internalName = internalName;
+        }
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
         this.uuid = UUID.randomUUID();
