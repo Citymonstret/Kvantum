@@ -29,12 +29,19 @@ import java.util.Map;
 final public class PostRequest implements RequestChild
 {
 
+    /*
+    TODO: Support more POST request body types, such as:
+    - JSON
+    - Xml
+    - Multipart forms
+     */
+
     public final String request;
     private final Map<String, String> vars;
     @Getter
     private final Request parent;
 
-    public PostRequest(final Request parent, final String request)
+    PostRequest(final Request parent, final String request)
     {
         Assert.notNull( request );
 
@@ -55,6 +62,15 @@ final public class PostRequest implements RequestChild
         }
     }
 
+    /**
+     * Construct a new post request
+     *
+     * @param parent Parent request
+     * @param cl     Content-Length (header value)
+     * @param input  Reader from which the request is to be read
+     * @return constructed request
+     * @throws Exception If the reader fails to construct a request
+     */
     public static PostRequest construct(final Request parent, final int cl, final BufferedReader input) throws Exception
     {
         final char[] chars = new char[ cl ];
@@ -67,6 +83,11 @@ final public class PostRequest implements RequestChild
         return StringUtil.join( vars, "=", "&" );
     }
 
+    /**
+     * Get a parameter
+     * @param k Parameter key
+     * @return Parameter value
+     */
     public String get(final String k)
     {
         Assert.notNull( k );
@@ -74,6 +95,11 @@ final public class PostRequest implements RequestChild
         return vars.get( k );
     }
 
+    /**
+     * Check if a parameter is stored
+     * @param k Parameter key
+     * @return True of the parameter is stored; else null
+     */
     public boolean contains(final String k)
     {
         Assert.notNull( k );
@@ -81,6 +107,10 @@ final public class PostRequest implements RequestChild
         return vars.containsKey( k );
     }
 
+    /**
+     * Get a copy of the internal parameter map
+     * @return copy of the internal map
+     */
     public Map<String, String> get()
     {
         return new HashMap<>( this.vars );
