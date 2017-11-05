@@ -7,6 +7,7 @@ call gradlew clean
 call gradlew writeVersionToFile
 call gradlew licenseFormat
 call gradlew build
+call gradlew shadowJar
 
 echo.
 echo Replacing version variables.
@@ -28,11 +29,11 @@ call:DoReplace "%oldVersion%" "%newVersion%" start.sh start.sh
 echo.
 echo Copying built jar to .\bin\
 
-copy /Y .\ServerImplementation\build\libs\ServerImplementation-%newVersion%-all.jar .\bin\
+copy /Y .\Implementation\build\libs\Implementation-%newVersion%-all.jar .\bin\
 
 echo.
 echo Adding jar to git changelog
-git add .\bin\ServerImplementation-%newVersion%-all.jar
+git add .\bin\Implementation-%newVersion%-all.jar
 
 echo.
 echo Done!

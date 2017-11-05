@@ -2,7 +2,7 @@
 set +v
 
 # Configuration
-version=BETA-1.0.2
+version=BETA-0.0.4
 minRam=256
 maxRam=1024
 # End of configuration
