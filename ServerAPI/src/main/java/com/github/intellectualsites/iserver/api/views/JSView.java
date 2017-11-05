@@ -39,6 +39,7 @@ public class JSView extends StaticFileView implements CacheApplicable
         super( filter, options, "javascript", Collections.singletonList( FileExtension.JAVASCRIPT ) );
         super.relatedFolderPath = "/assets/js";
         super.setOption( "extension", "js" );
+        super.defaultFilePattern = "${file}.js";
     }
 
     @Override

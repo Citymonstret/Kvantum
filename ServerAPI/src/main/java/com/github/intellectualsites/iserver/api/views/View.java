@@ -30,9 +30,7 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.files.Path;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -88,14 +86,14 @@ public class View extends RequestHandler
     private final UUID uuid;
 
     private final ViewPattern viewPattern;
-    @Getter(AccessLevel.PROTECTED)
-    private final FilePattern filePattern;
+    protected String defaultFilePattern = "${file}.${extension}";
 
     public String relatedFolderPath;
     private Path folder;
 
     private int buffer = -1;
     private ViewReturn viewReturn;
+    private FilePattern filePattern;
 
     /**
      * The constructor (Without prestored options)
@@ -129,13 +127,6 @@ public class View extends RequestHandler
         {
             this.options = options;
         }
-        if ( this.options.containsKey( "filePattern" ) )
-        {
-            this.filePattern = FilePattern.compile( this.options.get( "filePattern" ).toString() );
-        } else
-        {
-            this.filePattern = FilePattern.compile( "${file}.${extension}" );
-        }
         if ( options.containsKey( "internalName" ) )
         {
             this.internalName = options.get( "internalName" ).toString();
@@ -147,6 +138,22 @@ public class View extends RequestHandler
         this.viewReturn = viewReturn;
         this.uuid = UUID.randomUUID();
     }
+
+    protected FilePattern getFilePattern()
+    {
+        if ( this.filePattern == null )
+        {
+            if ( this.options.containsKey( "filePattern" ) )
+            {
+                this.filePattern = FilePattern.compile( this.options.get( "filePattern" ).toString() );
+            } else
+            {
+                this.filePattern = FilePattern.compile( defaultFilePattern );
+            }
+        }
+        return this.filePattern;
+    }
+
 
     /**
      * Get a stored option

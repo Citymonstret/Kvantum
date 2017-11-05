@@ -41,6 +41,7 @@ public class HTMLView extends StaticFileView implements CacheApplicable
     {
         super( filter, options, "html", Collections.singletonList( FileExtension.HTML ) );
         super.setOption( "extension", "html" );
+        super.defaultFilePattern = "${file}.html";
     }
 
     @Override

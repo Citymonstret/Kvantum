@@ -39,6 +39,7 @@ public class CSSView extends StaticFileView implements CacheApplicable
         super( filter, options, "css", Collections.singletonList( FileExtension.CSS ) );
         super.relatedFolderPath = "/assets/css";
         super.setOption( "extension", "css" );
+        super.defaultFilePattern = "${file}.css";
     }
 
     @Override
