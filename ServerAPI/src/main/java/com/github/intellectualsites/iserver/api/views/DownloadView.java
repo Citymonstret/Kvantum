@@ -41,15 +41,13 @@ public class DownloadView extends StaticFileView implements IgnoreSyntax
     }
 
     @Override
-    public Response generate(final Request r)
+    public void handle(final Request r, final Response response)
     {
-        final Response response = super.generate( r );
         final FileExtension extension = (FileExtension) r.getMeta( "extension" );
         response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + extension.getOption
                 () + "\"" );
         response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
         response.getHeader().set( Header.HEADER_CONTENT_LENGTH, r.getMeta( "file_length" ).toString() );
-        return response;
     }
 
 }

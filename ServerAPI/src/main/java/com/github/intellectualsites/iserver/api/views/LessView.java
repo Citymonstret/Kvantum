@@ -64,11 +64,10 @@ public class LessView extends StaticFileView implements CacheApplicable
     }
 
     @Override
-    public Response generate(final Request r)
+    public void handle(final Request r, final Response response)
     {
-        Response response = super.generate( r );
+        super.handle( r, response );
         response.setContent( getLess( response.getContent() ) );
-        return response;
     }
 
     @Override

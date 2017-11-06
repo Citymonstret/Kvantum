@@ -27,6 +27,7 @@ import com.github.intellectualsites.iserver.api.matching.FilePattern;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.matching.ViewPattern;
 import com.github.intellectualsites.iserver.api.request.Request;
+import com.github.intellectualsites.iserver.api.response.HeaderOption;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.files.Path;
@@ -77,6 +78,7 @@ public class View extends RequestHandler
     public static final String CONSTANT_BUFFER = "buffer";
     public static final String CONSTANT_VARIABLES = "variables";
     private static final String DEFAULT_RESPONSE = "<h1>Hello World!</h1>";
+    protected final Map<HeaderOption, String> headers = new HashMap<>();
     private final Map<String, Object> options;
     private final String internalName;
     private final UUID uuid;
@@ -85,7 +87,6 @@ public class View extends RequestHandler
     protected boolean forceHTTPS;
     protected String defaultFilePattern = "${file}.${extension}";
     private Path folder;
-
     private int buffer = -1;
     private ViewReturn viewReturn;
     private FilePattern filePattern;
@@ -124,6 +125,11 @@ public class View extends RequestHandler
         }
         this.internalName = options.getOrDefault( "internalName", internalName ).toString();
         this.forceHTTPS = (boolean) options.getOrDefault( "forceHTTPS", false );
+        if ( options.containsKey( "headers" ) )
+        {
+            ( (Map<String, String>) options.get( "headers" ) ).forEach( (key, value) ->
+                    headers.put( HeaderOption.getOrCreate( key ), value ) );
+        }
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
         this.uuid = UUID.randomUUID();
@@ -407,8 +413,35 @@ public class View extends RequestHandler
             return viewReturn.get( r );
         } else
         {
-            return new Response( this ).setContent( DEFAULT_RESPONSE );
+            final Response response = new Response( this );
+            this.applyDefaultHeaders( response );
+            this.handle( r, response );
+            return response;
         }
+    }
+
+    /**
+     * Apply default headers
+     *
+     * @param response Working response
+     */
+    final protected void applyDefaultHeaders(final Response response)
+    {
+        if ( !headers.isEmpty() )
+        {
+            headers.forEach( (header, value) -> response.getHeader().set( header, value ) );
+        }
+    }
+
+    /**
+     * OVERRIDE ME
+     *
+     * @param request  Incoming request
+     * @param response Working response
+     */
+    protected void handle(final Request request, final Response response)
+    {
+        response.setContent( DEFAULT_RESPONSE );
     }
 
     /**

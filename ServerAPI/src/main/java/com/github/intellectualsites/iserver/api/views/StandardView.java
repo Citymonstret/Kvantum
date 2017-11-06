@@ -59,9 +59,9 @@ public class StandardView extends StaticFileView implements CacheApplicable
     }
 
     @Override
-    public Response generate(final Request r)
+    public void handle(final Request r, final Response response)
     {
-        final Response response = super.generate( r );
+        super.handle( r, response ); // SUPER IMPORTANT!!!!!
 
         final FileExtension extension = (FileExtension) r.getMeta( "extension" );
         switch ( extension )
@@ -84,7 +84,5 @@ public class StandardView extends StaticFileView implements CacheApplicable
             default:
                 break;
         }
-
-        return response;
     }
 }

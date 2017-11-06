@@ -18,6 +18,8 @@
  */
 package com.github.intellectualsites.iserver.api.response;
 
+import com.github.intellectualsites.iserver.api.config.CoreConfig;
+import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.*;
 
@@ -55,6 +57,10 @@ public final class HeaderOption
         if ( headerOptionMap.containsKey( text.toLowerCase() ) )
         {
             return headerOptionMap.get( text.toLowerCase() );
+        }
+        if ( CoreConfig.debug )
+        {
+            Logger.debug( "View requested unknown header [%s] - Creating...", text );
         }
         return create( text );
     }

@@ -83,11 +83,10 @@ public abstract class StaticFileView extends View
     }
 
     @Override
-    public Response generate(Request r)
+    public void handle(final Request r, final Response response)
     {
         final Path path = (Path) r.getMeta( "file" );
         final FileExtension extension = (FileExtension) r.getMeta( "extension" );
-        final Response response = new Response( this );
         response.getHeader().set( Header.HEADER_CONTENT_TYPE, extension.getContentType() );
         if ( extension.getReadType() == FileExtension.ReadType.BYTES )
         {
@@ -97,6 +96,5 @@ public abstract class StaticFileView extends View
             response.setContent( extension.getComment( "Served to you by IntellectualServer" ) + System.lineSeparator()
                     + path.readFile() );
         }
-        return response;
     }
 }
