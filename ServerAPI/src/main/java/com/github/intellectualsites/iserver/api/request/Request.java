@@ -21,7 +21,6 @@ package com.github.intellectualsites.iserver.api.request;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
-import com.github.intellectualsites.iserver.api.exceptions.ProtocolNotSupportedException;
 import com.github.intellectualsites.iserver.api.exceptions.RequestException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.session.ISession;
@@ -133,19 +132,12 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
                                     this );
                         }
 
-                        final Optional<ProtocolType> protocolTypeOptional =
-                                ProtocolType.getByName( matcher.group( "prottype" ) );
-                        if ( !protocolTypeOptional.isPresent() )
+                        if ( socket instanceof SSLSocket )
                         {
-                            throw new ProtocolNotSupportedException( "Request didn't specify valid protocol " +
-                                    "(Provided: " + matcher.group( "prottype" ) + ")", this );
+                            this.protocolType = ProtocolType.HTTPS;
                         } else
                         {
-                            this.protocolType = protocolTypeOptional.get();
-                            if ( this.protocolType == ProtocolType.HTTPS && !( socket instanceof SSLSocket ) )
-                            {
-                                throw new ProtocolNotSupportedException( "Requested HTTPS but not connected with SSL", this );
-                            }
+                            this.protocolType = ProtocolType.HTTP;
                         }
 
                         final String resource = matcher.group( "resource" );
@@ -413,12 +405,18 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
             if ( resourceName.contains( "?" ) )
             {
                 final String[] parts = resource.split( "\\?" );
-                final String[] subParts = parts[ 1 ].split( "&" );
-                resourceName = parts[ 0 ];
-                for ( final String part : subParts )
+                if ( parts.length > 1 )
                 {
-                    final String[] subSubParts = part.split( "=" );
-                    this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
+                    final String[] subParts = parts[ 1 ].split( "&" );
+                    resourceName = parts[ 0 ];
+                    for ( final String part : subParts )
+                    {
+                        final String[] subSubParts = part.split( "=" );
+                        this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
+                    }
+                } else
+                {
+                    resourceName = resourceName.substring( 0, resourceName.length() - 1 );
                 }
             }
             this.resource = resourceName;

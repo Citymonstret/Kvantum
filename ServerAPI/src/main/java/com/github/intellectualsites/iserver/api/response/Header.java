@@ -382,11 +382,17 @@ final public class Header
 
     public void redirect(final String newURL)
     {
+        redirect( newURL, Header.STATUS_TEMPORARY_REDIRECT );
+    }
+
+    public void redirect(final String newURL, final String redirectHeader)
+    {
         Assert.notNull( newURL );
+        Assert.notNull( redirectHeader );
 
         set( Header.HEADER_LOCATION, newURL );
-        set( Header.HEADER_STATUS, Header.STATUS_TEMPORARY_REDIRECT );
-        setStatus( Header.STATUS_TEMPORARY_REDIRECT );
+        set( Header.HEADER_STATUS, redirectHeader );
+        setStatus( redirectHeader );
     }
 
     public String[] dump()

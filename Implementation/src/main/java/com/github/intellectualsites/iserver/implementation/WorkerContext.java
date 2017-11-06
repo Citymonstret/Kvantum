@@ -23,11 +23,14 @@ import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
+import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
+import com.github.intellectualsites.iserver.api.util.ProtocolType;
 import com.github.intellectualsites.iserver.api.views.RequestHandler;
 import com.github.intellectualsites.iserver.api.views.errors.ViewException;
+import com.github.intellectualsites.iserver.api.views.requesthandler.HTTPSRedirectHandler;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -145,6 +148,24 @@ class WorkerContext
         {
             worker.handleSendStatusOnly( Header.STATUS_NOT_FOUND );
             return;
+        }
+
+        if ( request.getProtocolType() != ProtocolType.HTTPS && this.requestHandler.forceHTTPS() )
+        {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Redirecting request [%s] to HTTPS version of [%s]", request, requestHandler );
+            }
+            if ( !CoreConfig.SSL.enable )
+            {
+                Logger.error( "RequestHandler (%s) forces HTTPS but SSL runner not enabled!" );
+                worker.handleSendStatusOnly( Header.STATUS_INTERNAL_ERROR );
+                return;
+            }
+            //
+            // TODO: Consider moving this to its own class...
+            //
+            this.requestHandler = HTTPSRedirectHandler.getInstance();
         }
 
         //

@@ -32,6 +32,7 @@ class CachedStaticView extends View implements CacheApplicable
     {
         super( matcher.filter(), matcher.name() );
         this.method = method;
+        this.forceHTTPS = matcher.forceHTTPS();
     }
 
     @Override

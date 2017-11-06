@@ -119,4 +119,15 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
         return "RESTHandler";
     }
 
+    /**
+     * OVERRIDE ME
+     *
+     * @return false
+     */
+    @Override
+    public boolean forceHTTPS()
+    {
+        return false;
+    }
+
 }

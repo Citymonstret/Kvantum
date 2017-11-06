@@ -209,4 +209,13 @@ public abstract class RequestHandler
      */
     abstract public String getName();
 
+    /**
+     * Indicate whether or not the request MUST
+     * be served over HTTPS
+     *
+     * @return boolean indicated whether or not the request must be served
+     * over HTTPS
+     */
+    public abstract boolean forceHTTPS();
+
 }

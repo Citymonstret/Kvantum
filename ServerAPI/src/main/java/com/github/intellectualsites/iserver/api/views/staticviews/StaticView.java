@@ -28,7 +28,7 @@ class StaticView extends SimpleRequestHandler
 
     StaticView(final ViewMatcher matcher, final ResponseMethod method)
     {
-        super( matcher.filter(), method );
+        super( matcher.filter(), method, matcher.forceHTTPS() );
         this.method = method;
     }
 

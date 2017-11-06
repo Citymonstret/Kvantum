@@ -38,4 +38,6 @@ public @interface ViewMatcher
 
     boolean cache() default true;
 
+    boolean forceHTTPS() default false;
+
 }

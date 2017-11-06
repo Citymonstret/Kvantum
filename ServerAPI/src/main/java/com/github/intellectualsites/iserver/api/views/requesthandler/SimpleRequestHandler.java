@@ -36,13 +36,20 @@ public class SimpleRequestHandler extends RequestHandler
 
     private final String pattern;
     private final BiConsumer<Request, Response> generator;
+    private final boolean forceHTTPS;
     private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
     private ViewPattern compiledPattern;
 
     protected SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator)
     {
+        this( pattern, generator, false );
+    }
+
+    protected SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator, boolean forceHTTPS)
+    {
         this.pattern = pattern;
         this.generator = generator;
+        this.forceHTTPS = forceHTTPS;
     }
 
     public static Builder builder()
@@ -98,6 +105,12 @@ public class SimpleRequestHandler extends RequestHandler
     public String getName()
     {
         return this.internalName;
+    }
+
+    @Override
+    public boolean forceHTTPS()
+    {
+        return this.forceHTTPS;
     }
 
     final public void register()

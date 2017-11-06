@@ -50,8 +50,6 @@ import java.util.UUID;
 public class View extends RequestHandler
 {
 
-    private static final String DEFAULT_RESPONSE = "<h1>Hello World!</h1>";
-
     /**
      * Variable corrensponding to {@link #PATTERN_VARIABLE_FILE}
      */
@@ -64,7 +62,6 @@ public class View extends RequestHandler
      * Variable corrensponding to {@link #PATTERN_VARIABLE_EXTENSION}
      */
     public static final String VARIABLE_EXTENSION = "extension";
-
     /**
      * Pattern corrensponding to {@link #VARIABLE_FILE}
      */
@@ -77,18 +74,16 @@ public class View extends RequestHandler
      * Pattern corrensponding to {@link #VARIABLE_EXTENSION}
      */
     public static final String PATTERN_VARIABLE_EXTENSION = "{extension}";
-
     public static final String CONSTANT_BUFFER = "buffer";
     public static final String CONSTANT_VARIABLES = "variables";
-
+    private static final String DEFAULT_RESPONSE = "<h1>Hello World!</h1>";
     private final Map<String, Object> options;
     private final String internalName;
     private final UUID uuid;
-
     private final ViewPattern viewPattern;
-    protected String defaultFilePattern = "${file}.${extension}";
-
     public String relatedFolderPath;
+    protected boolean forceHTTPS;
+    protected String defaultFilePattern = "${file}.${extension}";
     private Path folder;
 
     private int buffer = -1;
@@ -127,13 +122,8 @@ public class View extends RequestHandler
         {
             this.options = options;
         }
-        if ( options.containsKey( "internalName" ) )
-        {
-            this.internalName = options.get( "internalName" ).toString();
-        } else
-        {
-            this.internalName = internalName;
-        }
+        this.internalName = options.getOrDefault( "internalName", internalName ).toString();
+        this.forceHTTPS = (boolean) options.getOrDefault( "forceHTTPS", false );
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
         this.uuid = UUID.randomUUID();
@@ -215,6 +205,12 @@ public class View extends RequestHandler
     public final String getName()
     {
         return this.internalName;
+    }
+
+    @Override
+    public boolean forceHTTPS()
+    {
+        return this.forceHTTPS;
     }
 
     /**
