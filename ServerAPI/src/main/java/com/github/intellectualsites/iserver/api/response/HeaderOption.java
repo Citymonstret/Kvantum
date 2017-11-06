@@ -21,11 +21,16 @@ package com.github.intellectualsites.iserver.api.response;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 @EqualsAndHashCode(of = "text")
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HeaderOption
 {
+
+    private static Map<String, HeaderOption> headerOptionMap = new HashMap<>();
 
     @NonNull
     @Getter
@@ -35,12 +40,23 @@ public final class HeaderOption
 
     public static HeaderOption create(final String text)
     {
-        return new HeaderOption( Assert.notNull( text ) );
+        return create( text, true );
     }
 
     public static HeaderOption create(final String text, boolean cacheApplicable)
     {
-        return new HeaderOption( Assert.notNull( text ) ).cacheApplicable( cacheApplicable );
+        final HeaderOption headerOption = new HeaderOption( Assert.notNull( text ) ).cacheApplicable( cacheApplicable );
+        headerOptionMap.put( text.toLowerCase(), headerOption );
+        return headerOption;
+    }
+
+    public static HeaderOption getOrCreate(final String text)
+    {
+        if ( headerOptionMap.containsKey( text.toLowerCase() ) )
+        {
+            return headerOptionMap.get( text.toLowerCase() );
+        }
+        return create( text );
     }
 
     private HeaderOption cacheApplicable(final boolean b)
