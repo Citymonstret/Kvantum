@@ -773,7 +773,15 @@ public final class Server implements IntellectualServer, ISessionCreator
         String msg = message;
         for ( final Object a : args )
         {
-            msg = msg.replaceFirst( "%s", a.toString() );
+            String objectString;
+            if ( a == null )
+            {
+                objectString = "null";
+            } else
+            {
+                objectString = a.toString();
+            }
+            msg = msg.replaceFirst( "%s", objectString );
         }
 
         logWrapper.log( LogContext.builder().applicationPrefix( CoreConfig.logPrefix ).logPrefix( prefix ).timeStamp(

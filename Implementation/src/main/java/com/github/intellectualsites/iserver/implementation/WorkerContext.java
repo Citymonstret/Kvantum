@@ -39,6 +39,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.BufferedOutputStream;
+import java.net.SocketException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,6 +69,12 @@ class WorkerContext
         try
         {
             output.flush();
+        } catch ( final SocketException e )
+        {
+            if ( e.getMessage().equalsIgnoreCase( "Connection closed by remote host" ) && CoreConfig.debug )
+            {
+                Logger.warn( "Failed to serve request [%s]: Remote connection closed.", request );
+            }
         } catch ( final Exception e )
         {
             new IntellectualServerException( "Failed to flush to the client", e )

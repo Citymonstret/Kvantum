@@ -25,6 +25,8 @@ import com.github.intellectualsites.iserver.api.core.IntellectualServer;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.core.WorkerProcedure;
 import com.github.intellectualsites.iserver.api.exceptions.ProtocolNotSupportedException;
+import com.github.intellectualsites.iserver.api.exceptions.QueryException;
+import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.request.HttpMethod;
 import com.github.intellectualsites.iserver.api.request.PostRequest;
 import com.github.intellectualsites.iserver.api.request.Request;
@@ -263,12 +265,13 @@ final class Worker extends AutoCloseable
         } catch ( final ProtocolNotSupportedException ex )
         {
             return handleSendStatusOnly( Header.STATUS_HTTP_VERSION_NOT_SUPPORTED );
+        } catch ( final QueryException ex )
+        {
+            Logger.error( "Failed to read query (%s)", ex.getMessage() );
+            return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
         } catch ( final Exception ex )
         {
-            if ( CoreConfig.debug )
-            {
-                ex.printStackTrace();
-            }
+            ex.printStackTrace();
             return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
         }
 

@@ -21,6 +21,7 @@ package com.github.intellectualsites.iserver.api.request;
 import com.github.intellectualsites.iserver.api.config.CoreConfig;
 import com.github.intellectualsites.iserver.api.config.Message;
 import com.github.intellectualsites.iserver.api.core.ServerImplementation;
+import com.github.intellectualsites.iserver.api.exceptions.QueryException;
 import com.github.intellectualsites.iserver.api.exceptions.RequestException;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.session.ISession;
@@ -157,12 +158,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         if ( !hasQuery )
         {
-            if ( CoreConfig.debug )
-            {
-                Logger.debug( "Request | Headers: %s",
-                        StringUtil.join( this.headers, "=", ", " ) );
-            }
-            throw new RequestException( "Couldn't find query header...", this );
+            throw new QueryException( "Couldn't find query header...", this );
         }
 
         this.cookies = CookieManager.getCookies( this );
