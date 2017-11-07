@@ -43,6 +43,7 @@ IntellectualServer comes with default views for serving of static files (or pseu
 * Download - Sends binary representations of specified files to the client
 * Image - Serves images (of common formats)
 * Standard - Automatically detect and serve: HTML, JavaScript, CSS, LESS and Images.
+* **[TODO]** Precompiled Responses - Allow responses (including headers) to be compiled into raw bytes, which can then be sent to the client (Benefit: Fast!)
 
 ###### 2.2.2 Configuration
 The default views provide differenet configuration options to make sure that the content is served according to the requirements of the users:
@@ -58,6 +59,11 @@ IntellectualServer allows views/request handlers to be defined through:
 * (@)Annotations on inline methods
 * Fluent builder-patterns (IntellectualServer#createSimpleRequestHandler and SimpleRequestHandler#builder)
 * OOP (by extending View, or other more specific implementations for different levels of abstraction)
+
+##### 2.3.1 REST API
+IntellectualServer comes with some utilities and rest based views to allow the creation of REST based APIs
+* Utility to autogenerate response for invalid requests (missing parameters)
+* Auto-serving of JSON content through REST Handlers
 
 #### 2.4 Template Engine Support
 IntellectualServer provides support for the following templating engines:
@@ -96,10 +102,8 @@ IntellectualServer has a plugin system implementation that allows plugins to be 
 ### 4.3 Application Structure System
 Plugins and integrating applications can replace the internal application structure to provide server-wide alternate implementations for views and account management.
 
-# Changelog
-Changes to this document are outlined below, using the format:
+### 4.4 Middleware
+Middleware can be injected into request handlers to filter out unwanted requests, and also redirect them to other methods in the request handlers (alternate outcomes)
 
-**[Date of changes]**
-* \+ Added entries
-* \- Removed entries
-* \/ Changed entries
+### 4.5 Byte/String handlers
+Byte and String handlers can be added to the worker, to change generated requests after they have been generated. (Used for the tempalte engine support).
