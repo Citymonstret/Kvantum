@@ -107,3 +107,15 @@ Middleware can be injected into request handlers to filter out unwanted requests
 
 ### 4.5 Byte/String handlers
 Byte and String handlers can be added to the worker, to change generated requests after they have been generated. (Used for the tempalte engine support).
+
+### 4.6 Event System
+The server implementation can publish events, and plugins/applications may opt to subscribe to these events (and act accordingly).
+
+### 4.7 Socket Filters
+The socket handler can be extended to include filters, that can filter out requests before they are even read by the server.
+
+### 4.8 Configuration API
+IntellectualServer comes with some tools to simplify the creation of configuration files, and these files may also be read by the template systems (which provides configurable static variables).
+
+### 4.9 Validation API
+IntellectualServer includes a validation system that can be implemented into request handlers to filter out unwanted requests based on POST and GET parameters. 
