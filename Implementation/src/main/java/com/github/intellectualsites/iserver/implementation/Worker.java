@@ -33,23 +33,17 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.response.ResponseBody;
-import com.github.intellectualsites.iserver.api.util.Assert;
 import com.github.intellectualsites.iserver.api.util.AutoCloseable;
-import com.github.intellectualsites.iserver.api.util.LambdaUtil;
+import com.github.intellectualsites.iserver.api.util.Provider;
 import com.github.intellectualsites.iserver.implementation.error.IntellectualServerException;
-import sun.misc.BASE64Encoder;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * This is the worker that is responsible for nearly everything.
@@ -58,113 +52,35 @@ import java.util.Queue;
 final class Worker extends AutoCloseable
 {
 
-    private static Queue<Worker> availableWorkers;
-
-    private final MessageDigest messageDigestMd5;
-    private final BASE64Encoder encoder;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
-    private final ReusableGzipOutputStream reusableGzipOutputStream;
+    private final GzipHandler gzipHandler;
+    private final Md5Handler md5Handler;
     private final IntellectualServer server;
 
     private WorkerContext workerContext;
 
-    private Worker()
+    Worker()
     {
-        if ( CoreConfig.contentMd5 )
-        {
-            MessageDigest temporary = null;
-            try
-            {
-                temporary = MessageDigest.getInstance( "MD5" );
-            } catch ( final NoSuchAlgorithmException e )
-            {
-                Message.MD5_DIGEST_NOT_FOUND.log( e.getMessage() );
-            }
-            messageDigestMd5 = temporary;
-            encoder = new BASE64Encoder();
-        } else
-        {
-            messageDigestMd5 = null;
-            encoder = null;
-        }
-
-        if ( CoreConfig.gzip )
-        {
-            this.reusableGzipOutputStream = new ReusableGzipOutputStream();
-        } else
-        {
-            this.reusableGzipOutputStream = null;
-        }
+        this.md5Handler = createIf( Md5Handler::new, CoreConfig.contentMd5 );
+        this.gzipHandler = createIf( GzipHandler::new, CoreConfig.gzip );
 
         this.workerProcedureInstance = ServerImplementation.getImplementation()
                 .getProcedure().getInstance();
         this.server = ServerImplementation.getImplementation();
     }
 
-    /**
-     * Setup the handler with a specified number of worker instances
-     *
-     * @param n Number of worker instances (must be positive)
-     */
-    static void setup(final int n)
+    private <T> T createIf(final Provider<T> provider, final boolean condition)
     {
-        availableWorkers = new ArrayDeque<>( Assert.isPositive( n ).intValue() );
-        LambdaUtil.collectionAssign( () -> availableWorkers, Worker::new, n );
-        Message.WORKER_AVAILABLE.log( availableWorkers.size() );
-    }
-
-    /**
-     * Poll the worker queue until a worker is available.
-     * Warning: The thread will be locked until a new worker is available
-     *
-     * @return The next available worker
-     */
-    static Worker getAvailableWorker()
-    {
-        Worker worker = Assert.notNull( availableWorkers ).poll();
-        while ( worker == null )
+        if ( condition )
         {
-            worker = availableWorkers.poll();
+            return provider.provide();
         }
-        return worker;
+        return null;
     }
 
     @Override
     protected void handleClose()
     {
-        if ( CoreConfig.gzip )
-        {
-            try
-            {
-                this.reusableGzipOutputStream.close();
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Compress bytes using gzip
-     *
-     * @param data Bytes to compress
-     * @return GZIP compressed data
-     * @throws IOException If compression fails
-     */
-    private byte[] compress(final byte[] data) throws IOException
-    {
-        Assert.notNull( data );
-
-        reusableGzipOutputStream.reset();
-        reusableGzipOutputStream.write( data );
-        reusableGzipOutputStream.finish();
-        reusableGzipOutputStream.flush();
-
-        final byte[] compressed = reusableGzipOutputStream.getData();
-
-        Assert.equals( compressed != null && compressed.length > 0, true, "Failed to compress data" );
-
-        return compressed;
     }
 
     void sendToClient(final ResponseBody body, byte[] bytes)
@@ -173,14 +89,14 @@ final class Worker extends AutoCloseable
 
         if ( CoreConfig.contentMd5 )
         {
-            body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Checksum( bytes ) );
+            body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Handler.generateChecksum( bytes ) );
         }
 
         if ( workerContext.isGzip() )
         {
             try
             {
-                bytes = compress( bytes );
+                bytes = gzipHandler.compress( bytes );
                 if ( body.getHeader().hasHeader( Header.HEADER_CONTENT_LENGTH ) )
                 {
                     body.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + bytes.length );
@@ -375,7 +291,7 @@ final class Worker extends AutoCloseable
         //
         // Add the worker back to the pool
         //
-        availableWorkers.add( this );
+        WorkerPool.addWorker( this );
     }
 
     /**
@@ -395,24 +311,6 @@ final class Worker extends AutoCloseable
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * MD5-ify the input
-     *
-     * @param input Input text to be digested
-     * @return md5-ified digested text
-     */
-    private String md5Checksum(final byte[] input)
-    {
-        Assert.notNull( input );
-
-        // Make sure that the buffer is clean
-        messageDigestMd5.reset();
-        // Update the digest with the current input
-        messageDigestMd5.update( input );
-        // Now encode it, yay
-        return encoder.encode( messageDigestMd5.digest() );
     }
 
 }

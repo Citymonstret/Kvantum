@@ -269,7 +269,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         // Setup the internal engine
         //
         this.socketHandler = new SocketHandler();
-        Worker.setup( CoreConfig.workers );
+        WorkerPool.setupPool( CoreConfig.workers );
 
         //
         // Setup default flags

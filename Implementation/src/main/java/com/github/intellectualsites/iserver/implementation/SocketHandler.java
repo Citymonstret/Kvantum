@@ -26,6 +26,7 @@ import com.github.intellectualsites.iserver.api.core.ServerImplementation;
 import com.github.intellectualsites.iserver.api.logging.Logger;
 import com.github.intellectualsites.iserver.api.socket.ISocketHandler;
 import com.github.intellectualsites.iserver.api.socket.SocketFilter;
+import com.github.intellectualsites.iserver.implementation.error.IntellectualServerException;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -110,7 +111,15 @@ final class SocketHandler implements ISocketHandler
         {
             Logger.debug( "Accepting Socket: " + s.toString() );
         }
-        this.executorService.execute( () -> Worker.getAvailableWorker().run(  s  ) );
+        this.executorService.execute( () -> {
+            try
+            {
+                WorkerPool.getAvailableWorker().run( s );
+            } catch ( InterruptedException e )
+            {
+                new IntellectualServerException( "Failed to retrieve worker", e ).printStackTrace();
+            }
+        } );
     }
 
     @Override

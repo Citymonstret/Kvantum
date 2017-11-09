@@ -46,7 +46,7 @@ class ReusableGzipOutputStream extends DeflaterOutputStream
 
     ReusableGzipOutputStream()
     {
-        super( new ByteArrayOutputStream(), new Deflater( 9, true ) );
+        super( new ByteArrayOutputStream(), new Deflater( Deflater.BEST_SPEED, true ) );
         this.crc32 = new CRC32();
         this.bufferStream = (ByteArrayOutputStream) out;
     }
@@ -60,7 +60,6 @@ class ReusableGzipOutputStream extends DeflaterOutputStream
             this.writtenSize = 0;
             this.headerWritten = false;
             this.bufferStream.reset();
-            this.def.setLevel( Deflater.BEST_SPEED );
             this.written = false;
         }
     }
