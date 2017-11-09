@@ -371,6 +371,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         }
     }
 
+    public <T> T getMetaUnsafe(final String key)
+    {
+        return (T) this.getMeta( key );
+    }
+
     /**
      * The query, for example:
      * "http://localhost/query?example=this"

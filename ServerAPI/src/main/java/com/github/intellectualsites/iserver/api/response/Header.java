@@ -439,4 +439,10 @@ final public class Header
         this.headers.clear();
         return this;
     }
+
+    public boolean hasHeader(final HeaderOption headerOption)
+    {
+        return this.headers.containsKey( headerOption );
+    }
+
 }

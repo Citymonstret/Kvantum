@@ -176,6 +176,21 @@ final class Worker extends AutoCloseable
             body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Checksum( bytes ) );
         }
 
+        if ( workerContext.isGzip() )
+        {
+            try
+            {
+                bytes = compress( bytes );
+                if ( body.getHeader().hasHeader( Header.HEADER_CONTENT_LENGTH ) )
+                {
+                    body.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + bytes.length );
+                }
+            } catch ( final IOException e )
+            {
+                new IntellectualServerException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
+            }
+        }
+
         //
         // Send the header to the client
         //
@@ -183,16 +198,6 @@ final class Worker extends AutoCloseable
 
         try
         {
-            if ( workerContext.isGzip() )
-            {
-                try
-                {
-                    bytes = compress( bytes );
-                } catch ( final IOException e )
-                {
-                    new IntellectualServerException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
-                }
-            }
             workerContext.getOutput().write( bytes );
         } catch ( final Exception e )
         {

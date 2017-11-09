@@ -23,6 +23,7 @@ import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.FileExtension;
 import com.github.intellectualsites.iserver.api.util.IgnoreSyntax;
+import com.github.intellectualsites.iserver.files.Path;
 
 import java.util.Map;
 
@@ -43,11 +44,14 @@ public class DownloadView extends StaticFileView implements IgnoreSyntax
     @Override
     public void handle(final Request r, final Response response)
     {
-        final FileExtension extension = (FileExtension) r.getMeta( "extension" );
-        response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + extension.getOption
-                () + "\"" );
+        final Path path = r.getMetaUnsafe( "path" );
+        final String fileName = path.getEntityName();
+        final FileExtension extension = r.getMetaUnsafe( "extension" );
+
+        response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION,
+                String.format( "attachment; filename=\"%s.%s\"", fileName, extension.getOption() ) );
         response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
-        response.getHeader().set( Header.HEADER_CONTENT_LENGTH, r.getMeta( "file_length" ).toString() );
+        response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
     }
 
 }

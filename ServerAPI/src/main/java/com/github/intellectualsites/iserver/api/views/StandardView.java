@@ -23,6 +23,7 @@ import com.github.intellectualsites.iserver.api.request.Request;
 import com.github.intellectualsites.iserver.api.response.Header;
 import com.github.intellectualsites.iserver.api.response.Response;
 import com.github.intellectualsites.iserver.api.util.FileExtension;
+import com.github.intellectualsites.iserver.files.Path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,17 +64,20 @@ public class StandardView extends StaticFileView implements CacheApplicable
     {
         super.handle( r, response ); // SUPER IMPORTANT!!!!!
 
-        final FileExtension extension = (FileExtension) r.getMeta( "extension" );
+        final FileExtension extension = r.getMetaUnsafe( "extension" );
         switch ( extension )
         {
             case PDF:
             case TXT:
             case ZIP:
             {
-                response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + extension.getOption
-                        () + "\"" );
+                final Path path = r.getMetaUnsafe( "file" );
+                final String fileName = path.getEntityName();
+
+                response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION,
+                        String.format( "attachment; filename=\"%s.%s\"", fileName, extension.getOption() ) );
                 response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
-                response.getHeader().set( Header.HEADER_CONTENT_LENGTH, r.getMeta( "file_length" ).toString() );
+                response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
             }
             break;
             case LESS:

@@ -123,11 +123,11 @@ public class View extends RequestHandler
         {
             this.options = options;
         }
-        this.internalName = options.getOrDefault( "internalName", internalName ).toString();
-        this.forceHTTPS = (boolean) options.getOrDefault( "forceHTTPS", false );
-        if ( options.containsKey( "headers" ) )
+        this.internalName = this.options.getOrDefault( "internalName", internalName ).toString();
+        this.forceHTTPS = (boolean) this.options.getOrDefault( "forceHTTPS", false );
+        if ( this.options.containsKey( "headers" ) )
         {
-            ( (Map<String, String>) options.get( "headers" ) ).forEach( (key, value) ->
+            ( (Map<String, String>) this.options.get( "headers" ) ).forEach( (key, value) ->
                     headers.put( HeaderOption.getOrCreate( key ), value ) );
         }
         this.viewPattern = new ViewPattern( pattern );
