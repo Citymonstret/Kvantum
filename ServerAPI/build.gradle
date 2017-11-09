@@ -21,13 +21,13 @@ dependencies {
     // Mostly used for its awesome map implementations
     compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // Makes input handling better and more fluent
-    compile group: 'org.jline', name: 'jline', version: '3.3.0'
+    compile group: 'org.jline', name: 'jline', version: '3.5.1'
     // Has great string utilities
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
     // Command management system
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     // Password encryption
-    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.3m'
+    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
     // Auto-generated configuration files
     compile 'com.github.Sauilitired:Configurable:1.0.0'
     // Metrics system
@@ -37,7 +37,7 @@ dependencies {
     // Compiles .LESS files
     compile group: 'org.lesscss', name: 'lesscss', version: '1.7.0.1.1'
     // JSON Implementation
-    compile group: 'org.json', name: 'json', version: '20080701'
+    compile group: 'org.json', name: 'json', version: '20171018'
     //
     // Modules
     //

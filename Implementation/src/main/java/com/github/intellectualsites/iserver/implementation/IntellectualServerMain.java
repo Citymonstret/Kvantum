@@ -74,7 +74,9 @@ final public class IntellectualServerMain
 
 
         final Options options = new Options();
-        final JCommander jCommander = new JCommander( options, args );
+        final JCommander jCommander = new JCommander( options );
+        jCommander.parse( args );
+
         jCommander.setProgramName( "IntellectualServer" );
         if ( options.help )
         {

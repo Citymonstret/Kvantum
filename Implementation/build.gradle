@@ -26,17 +26,18 @@ jar {
 dependencies {
     // Powers the MongoDB implementation
     compile 'org.mongodb:mongo-java-driver:3.5.0'
-    compile 'org.mongodb.morphia:morphia:1.3.1'
+    compile 'org.mongodb.morphia:morphia:1.3.2'
     // Cache manager
-    compile 'com.github.ben-manes.caffeine:caffeine:2.5.6'
+    compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
     // Makes code pretty
     compileOnly 'org.projectlombok:lombok:1.16.18'
     // JSON IO Library
-    compile group: 'com.cedarsoftware', name: 'json-io', version: '2.9.3'
+    compile group: 'com.cedarsoftware', name: 'json-io', version: '4.10.0'
     // SQLite Driver
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.8.7'
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.20.1'
     // Program argument parser
-    compile group: 'com.beust', name: 'jcommander', version: '1.48'
+    compile group: 'com.beust', name: 'jcommander', version: '1.72'
+    compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
     //
     // Modules
     //

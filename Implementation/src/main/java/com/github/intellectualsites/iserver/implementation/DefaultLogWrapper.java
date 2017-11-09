@@ -23,11 +23,12 @@ import com.github.intellectualsites.iserver.api.logging.LogContext;
 import com.github.intellectualsites.iserver.api.logging.LogWrapper;
 import com.github.intellectualsites.iserver.api.util.Assert;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StrSubstitutor;
 
 /**
  * The default log handler. UsesAnsi.FColor for colored output
  */
+@SuppressWarnings( "WeakerAccess" )
 @AllArgsConstructor
 public class DefaultLogWrapper implements LogWrapper
 {
