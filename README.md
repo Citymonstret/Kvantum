@@ -1,7 +1,10 @@
 # IntellectualServer
 [![](https://jitpack.io/v/IntellectualSites/IntellectualServer.svg)](https://jitpack.io/#IntellectualSites/IntellectualServer)
 
-**NOTE: The project is currently still in development. Beware - Things *will* break.**
+**NOTE: The project is currently still in development. Beware - Things *will* break.** 
+
+## Progress
+You can see the current progress [here](https://github.com/IntellectualSites/IntellectualServer/blob/master/PROGRESS.md) along with *W.I.P* and *TODO*'s. 
 
 ## Description
 IntellectualServer is a lightweight, portable and (if you so desire) embeddable (HTTP/HTTPS) web server, written 
