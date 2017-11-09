@@ -32,10 +32,7 @@ import com.github.intellectualsites.iserver.api.events.defaultevents.ShutdownEve
 import com.github.intellectualsites.iserver.api.events.defaultevents.StartupEvent;
 import com.github.intellectualsites.iserver.api.events.defaultevents.ViewsInitializedEvent;
 import com.github.intellectualsites.iserver.api.jtwig.JTwigEngine;
-import com.github.intellectualsites.iserver.api.logging.LogContext;
-import com.github.intellectualsites.iserver.api.logging.LogModes;
-import com.github.intellectualsites.iserver.api.logging.LogProvider;
-import com.github.intellectualsites.iserver.api.logging.LogWrapper;
+import com.github.intellectualsites.iserver.api.logging.*;
 import com.github.intellectualsites.iserver.api.matching.Router;
 import com.github.intellectualsites.iserver.api.plugin.PluginLoader;
 import com.github.intellectualsites.iserver.api.plugin.PluginManager;
@@ -69,6 +66,7 @@ import com.intellectualsites.configurable.ConfigurationFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 import sun.misc.Signal;
 
 import javax.net.ssl.SSLServerSocket;
@@ -79,14 +77,19 @@ import java.net.ServerSocket;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+/**
+ * Main {@link IntellectualServer} implementation.
+ * <p>
+ *     Use {@link ServerImplementation#getImplementation()} to get an instance, rather
+ *     than {@link #getInstance()}.
+ * </p>
+ */
 public final class Server implements IntellectualServer, ISessionCreator
 {
 
-    // Private Static
     @SuppressWarnings("ALL")
     @Getter(AccessLevel.PACKAGE)
     private static Server instance;
-    // Private Final
     @Getter
     private final LogWrapper logWrapper;
     @Getter
@@ -99,9 +102,7 @@ public final class Server implements IntellectualServer, ISessionCreator
     private final SocketHandler socketHandler;
     @Getter
     private final Metrics metrics = new Metrics();
-    // Private
     PrintStream logStream;
-    // Public
     @Getter
     private volatile ICacheManager cacheManager;
     @Getter
@@ -110,7 +111,6 @@ public final class Server implements IntellectualServer, ISessionCreator
     private Router router;
     @Getter
     private SessionManager sessionManager;
-    // Package-Protected
     @Getter
     private ConfigurationFile translations;
     @Getter
@@ -490,6 +490,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         logWrapper.log();
     }
 
+    @Synchronized
     @Override
     public void addViewBinding(final String key, final Class<? extends View> c)
     {
@@ -519,6 +520,7 @@ public final class Server implements IntellectualServer, ISessionCreator
         toRemove.forEach( viewBindings::remove );
     }
 
+    @Synchronized
     @Override
     public void handleEvent(final Event event)
     {
@@ -741,7 +743,7 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public synchronized void log(final String message, final int mode, final Object... args)
+    public void log(final String message, final int mode, final Object... args)
     {
         // This allows us to customize what messages are
         // sent to the logging screen, and thus we're able
@@ -770,6 +772,13 @@ public final class Server implements IntellectualServer, ISessionCreator
                 prefix = "Info";
                 break;
         }
+
+        this.log( prefix, message, args );
+    }
+
+    @Synchronized
+    private void log(final String prefix, final String message, final Object... args)
+    {
         String msg = message;
         for ( final Object a : args )
         {
@@ -777,6 +786,9 @@ public final class Server implements IntellectualServer, ISessionCreator
             if ( a == null )
             {
                 objectString = "null";
+            } else if ( a instanceof LogFormatted )
+            {
+                objectString = ( ( LogFormatted ) a ).getLogFormatted();
             } else
             {
                 objectString = a.toString();
@@ -789,7 +801,7 @@ public final class Server implements IntellectualServer, ISessionCreator
     }
 
     @Override
-    public synchronized void log(final String message, final Object... args)
+    public void log(final String message, final Object... args)
     {
         this.log( message, LogModes.MODE_INFO, args );
     }
@@ -797,19 +809,12 @@ public final class Server implements IntellectualServer, ISessionCreator
     @Override
     public void log(final LogProvider provider, final String message, final Object... args)
     {
-        String workingMessage = message;
-        for ( final Object a : args )
-        {
-            workingMessage = message.replaceFirst( "%s", a.toString() );
-        }
-
-        logWrapper.log( LogContext.builder().applicationPrefix( CoreConfig.logPrefix ).logPrefix( provider
-                .getLogIdentifier() ).timeStamp( TimeUtil.getTimeStamp() ).thread( Thread.currentThread().getName() )
-                .message( workingMessage ).build() );
+        this.log( provider.getLogIdentifier(), message, args );
     }
 
+    @Synchronized
     @Override
-    public synchronized void stopServer()
+    public void stopServer()
     {
         Message.SHUTTING_DOWN.log();
         EventManager.getInstance().handle( new ShutdownEvent( this ) );

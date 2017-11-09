@@ -41,6 +41,7 @@ import java.util.Optional;
  */
 @Getter
 @Builder
+@SuppressWarnings( "WeakerAccess" )
 public final class ServerContext
 {
 
