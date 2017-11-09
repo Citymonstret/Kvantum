@@ -31,7 +31,7 @@ import java.util.UUID;
 
 @EqualsAndHashCode(of = { "sessionId", "sessionKey" })
 @SuppressWarnings("unused")
-final class Session implements ISession, Cloneable, VariableProvider
+final class Session implements ISession, VariableProvider
 {
 
     private static long id = 0L;
