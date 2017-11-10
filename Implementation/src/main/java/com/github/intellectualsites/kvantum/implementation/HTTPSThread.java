@@ -23,6 +23,9 @@ import com.github.intellectualsites.kvantum.api.util.Assert;
 
 import javax.net.ssl.SSLServerSocket;
 
+/**
+ * SSL implementation of the ordinary runner
+ */
 final class HTTPSThread extends Thread
 {
 

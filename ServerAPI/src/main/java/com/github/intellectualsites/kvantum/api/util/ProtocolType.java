@@ -21,17 +21,25 @@ package com.github.intellectualsites.kvantum.api.util;
 import java.util.Locale;
 import java.util.Optional;
 
+/**
+ * Protocol implementation enum
+ */
 public enum ProtocolType
 {
 
     HTTP,
     HTTPS;
 
-    public static Optional<ProtocolType> getByName(final String name)
+    /**
+     * Match a string to a {@link ProtocolType}, if possible
+     * @param string String to match, may not be null
+     * @return matched protocol type if found
+     */
+    public static Optional<ProtocolType> getByName(final String string)
     {
-        Assert.notEmpty( name );
+        Assert.notEmpty( string );
 
-        final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
+        final String fixed = string.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
         return LambdaUtil.getFirst( values(), type -> type.name().equals( fixed ) );
     }
 

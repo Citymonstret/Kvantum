@@ -39,8 +39,9 @@ final public class StaticViewManager
     public static void generate(final Object viewDeclaration) throws Exception
     {
         final Class<?> clazz = viewDeclaration.getClass();
-        final List<ReflectionUtils.AnnotatedMethod> annotatedMethods = ReflectionUtils.getAnnotatedMethods( ViewMatcher.class, clazz );
-        ( (IConsumer<ReflectionUtils.AnnotatedMethod>) annotatedMethod ->
+        final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
+                ReflectionUtils.getAnnotatedMethods( ViewMatcher.class, clazz );
+        ( (IConsumer<ReflectionUtils.AnnotatedMethod<ViewMatcher>>) annotatedMethod ->
         {
             final Method m = annotatedMethod.getMethod();
             final boolean usesAlternate = Arrays.equals( m.getParameterTypes(), alternativeParameters );
@@ -55,7 +56,7 @@ final public class StaticViewManager
                     new IllegalArgumentException( "M has wrong parameter types" ).printStackTrace();
                 } else
                 {
-                    final ViewMatcher matcher = (ViewMatcher) annotatedMethod.getAnnotation();
+                    final ViewMatcher matcher = annotatedMethod.getAnnotation();
                     final RequestHandler view;
                     if ( matcher.cache() )
                     {

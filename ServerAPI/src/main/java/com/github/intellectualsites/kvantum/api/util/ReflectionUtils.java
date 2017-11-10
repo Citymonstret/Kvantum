@@ -40,20 +40,25 @@ final public class ReflectionUtils
      * @param clazz Class in which the annotations are to be searched for
      * @return List containing the found annotations
      */
-    public static List<AnnotatedMethod> getAnnotatedMethods(final Class<? extends Annotation> a, final Class<?> clazz)
+    public static <A extends Annotation>  List<AnnotatedMethod<A>> getAnnotatedMethods(final Class<A> a,
+                                                            final Class<?> clazz)
     {
         Assert.notNull( a, clazz );
 
-        final List<AnnotatedMethod> annotatedMethods = new ArrayList<>();
+        final List<AnnotatedMethod<A>> annotatedMethods = new ArrayList<>();
         Class<?> c = clazz;
         while ( c != Object.class )
         {
             final List<Method> allMethods = new ArrayList<>( Arrays.asList( c.getDeclaredMethods() ) );
-            allMethods.stream().filter( method -> method.isAnnotationPresent( a ) ).forEach( method ->
-                    LambdaUtil.arrayForeach( method.getAnnotations(), a::isInstance, an -> annotatedMethods.add( new
-                            AnnotatedMethod( an, method ) ) ) );
+
+            allMethods.stream()
+                    .filter( method -> method.isAnnotationPresent( a ) )
+                    .forEach( method -> annotatedMethods
+                            .add( new AnnotatedMethod<>( method.getAnnotation( a ), method ) ) );
+
             c = c.getSuperclass();
         }
+
         return annotatedMethods;
     }
 
@@ -61,13 +66,13 @@ final public class ReflectionUtils
      * Value class for {@code @Annotated} methods
      */
     @Getter
-    public static class AnnotatedMethod
+    public static class AnnotatedMethod<A extends Annotation>
     {
 
-        private final Annotation annotation;
+        private final A annotation;
         private final Method method;
 
-        private AnnotatedMethod(final Annotation annotation, final Method method)
+        private AnnotatedMethod(final A annotation, final Method method)
         {
             Assert.notNull( annotation, method );
 

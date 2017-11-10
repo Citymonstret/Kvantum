@@ -62,7 +62,7 @@ public final class CollectionUtil
         return smartJoin( collection, Object::toString, joiner );
     }
 
-    public static boolean containsIgnoreCase(final Collection<? extends String> collection, String string)
+    public static boolean containsIgnoreCase(final Collection<? extends String> collection, final String string)
     {
         Assert.notNull( collection );
         Assert.notNull( string );
@@ -71,10 +71,9 @@ public final class CollectionUtil
         {
             return false;
         }
-        string = string.toLowerCase( Locale.ENGLISH );
         for ( final String entry : collection )
         {
-            if ( entry.equals( string ) )
+            if ( entry.equalsIgnoreCase( string ) )
             {
                 return true;
             }

@@ -23,6 +23,9 @@ import com.github.intellectualsites.kvantum.api.util.AutoCloseable;
 
 import java.io.IOException;
 
+/**
+ * This class is responsible for the GZIP compression in {@link Worker workers}
+ */
 final class GzipHandler extends AutoCloseable
 {
 
