@@ -32,7 +32,6 @@ import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.session.SessionManager;
 import com.github.intellectualsites.kvantum.api.socket.ISocketHandler;
 import com.github.intellectualsites.kvantum.api.util.*;
-import com.github.intellectualsites.kvantum.api.util.*;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import com.github.intellectualsites.kvantum.api.views.View;
 import com.github.intellectualsites.kvantum.files.FileSystem;
@@ -186,18 +185,46 @@ public interface Kvantum extends CommandCaller<Kvantum>
 
     ConfigurationFile getTranslations();
 
+    /**
+     * Get the main folder (configured_folder/.kvantum/)
+     * @return main folder
+     */
     File getCoreFolder();
 
+    /**
+     * Check to see if the server is in standalone mode
+     * @return boolean indicating whether or not the server is in standalone mode
+     */
     boolean isStandalone();
 
+    /**
+     * Get all view bindings
+     * @return map containing all view bindings
+     */
     Map<String, Class<? extends View>> getViewBindings();
 
+    /**
+     * Get the socket handler
+     * @return socket handler
+     */
     ISocketHandler getSocketHandler();
 
+    /**
+     * Check to see if the server is in silent mode
+     * @return boolean indicating whether or not the server is in silent mode
+     */
     boolean isSilent();
 
+    /**
+     * Check if the server is started
+     * @return boolean indicating whether or not the server has started
+     */
     boolean isStarted();
 
+    /**
+     * Get the application structure that is currently backing Kvantum
+     * @return Application structure
+     */
     ApplicationStructure getApplicationStructure();
 
     /**

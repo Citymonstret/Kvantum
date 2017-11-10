@@ -72,7 +72,6 @@ final public class KvantumMain
             }
         }
 
-
         final Options options = new Options();
         final JCommander jCommander = new JCommander( options );
         jCommander.parse( args );
@@ -90,7 +89,20 @@ final public class KvantumMain
             System.exit( 0 );
         } else
         {
-            final File file = new File( options.folder );
+            String folder = options.folder;
+            if ( folder.isEmpty() )
+            {
+                if ( System.getenv().containsKey( "KVANTUM_HOME" ) )
+                {
+                    folder = System.getenv( "KVANTUM_HOME" );
+                } else
+                {
+                    folder = "./";
+                }
+            }
+
+            final File file = new File( folder );
+
             final Optional<Kvantum> server = ServerContext.builder().coreFolder( file )
                     .standalone( true ).logWrapper( new DefaultLogWrapper() ).router( RequestManager.builder().build() )
                     .build().create();
@@ -165,7 +177,7 @@ final public class KvantumMain
     {
 
         @Parameter(names = "-folder", description = "Application base folder path")
-        private String folder = "./";
+        private String folder = "";
 
         @Parameter(names = "-help", description = "Show this list")
         private boolean help = false;
