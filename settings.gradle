@@ -1,4 +1,4 @@
-rootProject.name = 'IntellectualServer'
+rootProject.name = 'Kvantum'
 include 'FileSystem'
 include 'ServerAPI'
 include 'Crush'

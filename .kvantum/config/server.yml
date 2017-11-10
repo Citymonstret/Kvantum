@@ -1,0 +1,55 @@
+enableSecurityManager: true
+enableInputThread: true
+contentMd5: true
+cache:
+  cachedFilesExpiry: 86400
+  cachedAccountsMaxItems: 1000
+  cachedIncludesExpiry: 3600
+  cachedIncludesMaxItems: 1000
+  cachedAccountIdsExpiry: 86400
+  cachedBodiesMaxItems: 1000
+  cachedAccountsExpiry: 1800
+  cachedFilesMaxItems: 1000
+  cachedAccountIdsMaxItems: 1000
+  cachedSessionsMaxItems: 1000
+  enabled: false
+  cachedBodiesExpiry: 3600
+sessions:
+  enableDb: true
+  autoLoad: true
+  sessionTimeout: 86400
+debug: true
+webAddress: localhost
+templates:
+  engine: !!com.github.intellectualsites.kvantum.api.config.CoreConfig$TemplatingEngine 'JTWIG'
+  applyTemplates:
+  - std
+logPrefix: Web
+gzip: true
+ssl:
+  port: 8000
+  keyStorePassword: lol123
+  enable: true
+  keyStore: kvantum.jks
+verbose: true
+hostname: localhost
+enableSyntax: true
+application:
+  databaseImplementation: sqlite
+  main: ''
+port: 80
+buffer:
+  in: 1048576
+  out: 1048576
+workers: 1
+mongodb:
+  dbMorphia: isites
+  collectionSessions: sessions
+  dbSessions: isites
+  uri: mongodb://localhost:27017
+  enabled: false
+disableViews: false
+limits:
+  limitRequestLines: 100
+  limitRequestLineSize: 8190
+exitOnStop: true

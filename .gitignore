@@ -69,7 +69,7 @@ local.properties
 .idea/
 .ideaDataSources/
 
-.iserver/
+.kvantum/
 
 dataSources/
 
@@ -127,11 +127,11 @@ dist/
 nbdist/
 .nb-gradle/
 
-/documentation/texSource/_minted-IntellectualServer/
-/documentation/texSource/IntellectualServer.aux
-/documentation/texSource/IntellectualServer.log
-/documentation/texSource/IntellectualServer.out
-/documentation/texSource/IntellectualServer.synctex.gz
+/documentation/texSource/_minted-Kvantum/
+/documentation/texSource/Kvantum.aux
+/documentation/texSource/Kvantum.log
+/documentation/texSource/Kvantum.out
+/documentation/texSource/Kvantum.synctex.gz
 
 
 # Annoying IDEA files :/

@@ -1,7 +1,7 @@
 package your.package;
 
-import com.github.intellectualsites.iserver.api.core.IntellectualServer;
-import com.github.intellectualsites.iserver.api.util.RequestManager;
+import com.github.intellectualsites.kvantum.api.core.Kvantum;
+import com.github.intellectualsites.kvantum.api.util.RequestManager;
 
 import java.io.File;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class HelloWorld
                 .logWrapper( new DefaultLogWrapper() )
                 .router( RequestManager.builder().build() ).build();
 
-        final Optional<IntellectualServer> serverOptional = serverContext.create();
+        final Optional<Kvantum> serverOptional = serverContext.create();
 
         if ( !serverOptional.isPresent() )
         {
@@ -27,7 +27,7 @@ public class HelloWorld
         }
         else
         {
-            final IntellectualServer server = serverOptional.get();
+            final Kvantum server = serverOptional.get();
             server.createSimpleRequestHandler( "[file]", (request, response) -> response.setContent( "Hello World!" ) );
             server.start();
         }

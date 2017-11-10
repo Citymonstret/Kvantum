@@ -1,0 +1,14 @@
+views:
+  std:
+    filter: '[file=index].[extension=html]'
+    options:
+      filePattern: ${file}.${extension}
+      folder: ./public
+      excludeExtensions: [
+        ]
+      extensionRewrite:
+        html: twig
+      forceHTTPS: false
+      headers:
+        Potato: Llama
+    type: std

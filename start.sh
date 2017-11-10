@@ -10,4 +10,4 @@ maxRam=1024
 mkdir ./server/plugins
 echo Starting the server! Use /stop or CTRL+C to stop it
 sleep 5
-java -Xms${minRam}M -Xmx${maxRam}M -jar IntellectualServer-${version}-all.jar
+java -Xms${minRam}M -Xmx${maxRam}M -jar Kvantum-${version}-all.jar

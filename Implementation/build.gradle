@@ -17,9 +17,9 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'IntellectualServer',
+        attributes 'Implementation-Title': 'Kvantum',
                 'Implementation-Version': version,
-                'Main-Class': 'com.github.intellectualsites.iserver.implementation.IntellectualServerMain'
+                'Main-Class': 'com.github.intellectualsites.kvantum.implementation.KvantumMain'
     }
 }
 
