@@ -91,7 +91,7 @@ final public class KvantumObjectFactory<T>
             throw new IllegalArgumentException(
                     String.format( "Class [%s] does not have an @KvantumObject annotation!", clazz.getName() ) );
         }
-        final Map<String, InternalKvantumField> clazzFields = new TreeMap<>();
+        final Map<String, InternalKvantumField> clazzFields = new LinkedHashMap<>();
         KvantumField kvantumField;
         for ( final Field field : clazz.getDeclaredFields() )
         {
@@ -159,7 +159,7 @@ final public class KvantumObjectFactory<T>
         //
         // Now we have to find a suitable constructor
         //
-        final Set<String> kvantumConstructorParameters = new TreeSet<>();
+        final Set<String> kvantumConstructorParameters = new LinkedHashSet<>();
         Constructor<T> kvantumConstructor = null;
         for ( final Constructor<?> constructor : clazz.getDeclaredConstructors() )
         {

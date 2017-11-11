@@ -22,6 +22,7 @@ import com.github.intellectualsites.kvantum.api.account.IAccount;
 import com.github.intellectualsites.kvantum.api.account.IAccountManager;
 import com.github.intellectualsites.kvantum.api.account.roles.AccountRole;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
+import com.github.intellectualsites.kvantum.api.orm.KvantumObjectFactory;
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumConstructor;
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumField;
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumInsert;
@@ -43,18 +44,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("WeakerAccess")
 public class Account implements IAccount
 {
+    @Getter
+    private static final KvantumObjectFactory<Account> kvantumAccountFactory =
+            KvantumObjectFactory.from( Account.class );
 
     private static final String KEY_ROLE_LIST = "internalRoleList";
 
-    @KvantumField
+    @KvantumField( defaultValue = "-1" )
     @Id
     @Getter
     private int id;
-    @KvantumField
+    @KvantumField( defaultValue = "none" )
     @Getter
     @NonNull
     private String username;
-    @KvantumField
+    @KvantumField( defaultValue = "none" /* Just because */ )
     @NonNull
     private String password;
     @NonNull

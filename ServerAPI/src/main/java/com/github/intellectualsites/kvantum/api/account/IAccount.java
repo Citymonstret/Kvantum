@@ -19,6 +19,7 @@
 package com.github.intellectualsites.kvantum.api.account;
 
 import com.github.intellectualsites.kvantum.api.account.roles.AccountRole;
+import com.github.intellectualsites.kvantum.api.logging.LogFormatted;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Optional;
  * This is suitable for use throughout web applications as well. See
  * {@link IAccountManager} for account management
  */
-public interface IAccount
+public interface IAccount extends LogFormatted
 {
 
     /**
@@ -117,4 +118,9 @@ public interface IAccount
      */
     boolean isPermitted(String permissionKey);
 
+    @Override
+    default String getLogFormatted()
+    {
+        return String.format( "Account: { ID: %d, Username: %s }", getId(), getUsername() );
+    }
 }

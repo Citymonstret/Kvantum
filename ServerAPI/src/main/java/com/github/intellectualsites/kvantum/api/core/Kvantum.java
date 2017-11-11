@@ -35,6 +35,7 @@ import com.github.intellectualsites.kvantum.api.util.*;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import com.github.intellectualsites.kvantum.api.views.View;
 import com.github.intellectualsites.kvantum.files.FileSystem;
+import com.google.gson.Gson;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.callers.CommandCaller;
@@ -272,4 +273,12 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return true if the server is paused
      */
     boolean isPaused();
+
+    /**
+     * Get a GSON implementation with
+     * parsers for implementations
+     * @return GSON implementation
+     */
+    Gson getGson();
+
 }

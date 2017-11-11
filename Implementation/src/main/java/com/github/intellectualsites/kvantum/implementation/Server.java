@@ -61,6 +61,8 @@ import com.github.intellectualsites.kvantum.implementation.mongo.MongoSessionDat
 import com.github.intellectualsites.kvantum.implementation.sqlite.SQLiteAccountManager;
 import com.github.intellectualsites.kvantum.implementation.sqlite.SQLiteSessionDatabase;
 import com.github.intellectualsites.kvantum.velocity.VelocityEngine;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
 import lombok.AccessLevel;
@@ -103,6 +105,9 @@ public final class Server implements Kvantum, ISessionCreator
     @Getter
     private final Metrics metrics = new Metrics();
     PrintStream logStream;
+    @Getter
+    private final Gson gson = new GsonBuilder()
+        .registerTypeAdapter( Account.class, new AccountSerializer() ).create();
     @Getter
     private volatile ICacheManager cacheManager;
     @Getter

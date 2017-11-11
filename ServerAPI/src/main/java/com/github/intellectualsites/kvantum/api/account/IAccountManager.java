@@ -24,9 +24,11 @@ import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.util.ApplicationStructure;
+import com.github.intellectualsites.kvantum.api.util.SearchResultProvider;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link Kvantum#getApplicationStructure()} then {@link ApplicationStructure#getAccountManager()}
  * </p>
  */
-public interface IAccountManager
+public interface IAccountManager extends SearchResultProvider<IAccount>
 {
 
     String SESSION_ACCOUNT_CONSTANT = "__user_id__";
@@ -176,6 +178,45 @@ public interface IAccountManager
                 adminAccount.get().addRole( Administrator.instance );
             }
         }
+    }
+
+    /**
+     * Search for an account in the account database by
+     * comparing either user ID or username (or both)
+     * @param searchQuery Query containing the information
+     *                    that will be compared
+     * @return Optional
+     */
+    default Optional<IAccount> searchForAccount(final IAccount searchQuery)
+    {
+        boolean searchId = searchQuery.getId() != -1;
+        boolean searchUsername = searchQuery.getUsername() != null &&
+                !searchQuery.getUsername().equals( "none" ) &&
+                !searchQuery.getUsername().equals( "null" );
+        if ( searchId )
+        {
+            final Optional<IAccount> returnOptional = getAccount( searchQuery.getId() );
+            if ( returnOptional.isPresent() )
+            {
+                return returnOptional;
+            }
+        }
+        if ( searchUsername )
+        {
+            final Optional<IAccount> returnOptional = getAccount( searchQuery.getUsername() );
+            if ( returnOptional.isPresent() )
+            {
+                return returnOptional;
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    default Collection<? extends IAccount> getResults(final IAccount query)
+    {
+        final Optional<IAccount> accountOptional = searchForAccount( query );
+        return accountOptional.<Collection<? extends IAccount>>map( Collections::singletonList ).orElseGet( Collections::emptyList );
     }
 
     /**
