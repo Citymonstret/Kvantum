@@ -20,15 +20,16 @@ package com.github.intellectualsites.kvantum.implementation;
 
 import com.github.intellectualsites.kvantum.api.account.IAccount;
 import com.github.intellectualsites.kvantum.api.account.IAccountManager;
+import com.github.intellectualsites.kvantum.api.account.roles.AccountRole;
+import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.util.Assert;
+import com.github.intellectualsites.kvantum.api.util.StringList;
 import lombok.*;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Transient;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @EqualsAndHashCode(of = { "username", "id" })
@@ -37,6 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("WeakerAccess")
 public class Account implements IAccount
 {
+
+    private static final String KEY_ROLE_LIST = "internalRoleList";
 
     @Id
     @Getter
@@ -51,6 +54,9 @@ public class Account implements IAccount
     @Setter
     @Transient
     private transient IAccountManager manager;
+
+    private StringList rawRoleList;
+    private Collection<AccountRole> roleList;
 
     public Account(final int id, final String username, final String password, final Map<String, String> data)
     {
@@ -123,6 +129,77 @@ public class Account implements IAccount
         }
         this.data.remove( key );
         this.manager.removeData( this, key );
+    }
+
+    @Override
+    public Collection<AccountRole> getAccountRoles()
+    {
+        if ( this.roleList == null )
+        {
+            this.roleList = new HashSet<>();
+            this.rawRoleList = new StringList( getData( KEY_ROLE_LIST ).orElse( "" ) );
+            for ( final String string : rawRoleList )
+            {
+                final Optional<AccountRole> roleOptional = manager.getAccountRole( string );
+                if ( roleOptional.isPresent() )
+                {
+                    this.roleList.add( roleOptional.get() );
+                } else
+                {
+                    Logger.warn("Account [%s] has account role [%s] stored," +
+                            " but the role is not registered in  the account manager", getUsername(), string );
+                }
+            }
+        }
+        return this.roleList;
+    }
+
+    @Override
+    public void addRole(final AccountRole role)
+    {
+        if ( this.roleList == null )
+        {
+            this.getAccountRoles();
+        }
+        if ( this.roleList.contains( role ) )
+        {
+            return;
+        }
+        this.roleList.add( role );
+        this.rawRoleList.add( role.getRoleIdentifier() );
+        this.setData( KEY_ROLE_LIST, rawRoleList.toString() );
+    }
+
+    @Override
+    public void removeRole(final AccountRole role)
+    {
+        if ( this.roleList == null )
+        {
+            this.getAccountRoles();
+        }
+        if ( this.roleList.contains( role ) )
+        {
+            this.roleList.remove( role );
+            this.rawRoleList.remove( role.getRoleIdentifier() );
+            this.setData( KEY_ROLE_LIST, rawRoleList.toString() );
+        }
+    }
+
+    @Override
+    public boolean isPermitted(final String permissionKey)
+    {
+        if ( this.roleList == null )
+        {
+            this.getAccountRoles();
+        }
+        for ( final AccountRole role : this.getAccountRoles() )
+        {
+            if ( role.hasPermission( permissionKey ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

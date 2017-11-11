@@ -95,6 +95,7 @@ Kvantum comes with an account system, that is meant to remove the need for accou
 * Account data management
 * Account creation
 * Password management
+* Account role (permssion) system with API and persistent role storage
 
 ### 4.2 Plugin System
 Kvantum has a plugin system implementation that allows plugins to be loaded by the server at runtime

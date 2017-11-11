@@ -18,6 +18,9 @@
  */
 package com.github.intellectualsites.kvantum.api.account;
 
+import com.github.intellectualsites.kvantum.api.account.roles.AccountRole;
+
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -87,5 +90,31 @@ public interface IAccount
      * @param manager Account owner
      */
     void setManager(IAccountManager manager);
+
+    /**
+     * Get all roles that the account has been assigned
+     * @return collection containing all the user roles
+     */
+    Collection<AccountRole> getAccountRoles();
+
+    /**
+     * Add a role to the account
+     * @param role Role
+     */
+    void addRole(AccountRole role);
+
+    /**
+     * Remove a role from the account
+     * @param role role
+     */
+    void removeRole(AccountRole role);
+
+    /**
+     * Check if the account is permitted to perform an action
+     * @param permissionKey Permission key
+     * @return boolean indicating whether or not
+     *         the account has the given permission
+     */
+    boolean isPermitted(String permissionKey);
 
 }

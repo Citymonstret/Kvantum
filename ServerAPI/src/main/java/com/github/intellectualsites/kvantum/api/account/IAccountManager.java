@@ -18,13 +18,18 @@
  */
 package com.github.intellectualsites.kvantum.api.account;
 
+import com.github.intellectualsites.kvantum.api.account.roles.AccountRole;
+import com.github.intellectualsites.kvantum.api.account.roles.defaults.Administrator;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.util.ApplicationStructure;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages {@link IAccount} and depends on {@link ApplicationStructure}
@@ -37,6 +42,7 @@ public interface IAccountManager
 {
 
     String SESSION_ACCOUNT_CONSTANT = "__user_id__";
+    Map<String, AccountRole> ROLE_MAP = new ConcurrentHashMap<>();
 
     /**
      * Check if a given password matches the real password
@@ -152,6 +158,11 @@ public interface IAccountManager
      */
     default void checkAdmin()
     {
+        final Optional<AccountRole> administratorAccountRole = getAccountRole( Administrator.ADMIN_IDENTIFIER );
+        if ( !administratorAccountRole.isPresent() )
+        {
+            registerAccountRole( Administrator.instance );
+        }
         if ( !getAccount( "admin" ).isPresent() )
         {
             Optional<IAccount> adminAccount = createAccount( "admin", "admin" );
@@ -162,7 +173,41 @@ public interface IAccountManager
             {
                 Message.ACCOUNT_ADMIN_CREATED.log( "admin" );
                 adminAccount.get().setData( "administrator", "true" );
+                adminAccount.get().addRole( Administrator.instance );
             }
         }
     }
+
+    /**
+     * Register an account role
+     * @param role Role instance
+     */
+    default void registerAccountRole(final AccountRole role)
+    {
+        this.ROLE_MAP.put( role.getRoleIdentifier(), role );
+    }
+
+    /**
+     * Get all account roles that are registered in the manager
+     * @return registered account roles
+     */
+    default Collection<AccountRole> getRegisteredAccountRoles()
+    {
+        return this.ROLE_MAP.values();
+    }
+
+    /**
+     * Try to retrieve an account role based on its identifier
+     * @param roleIdentifier Role identifier ({@link AccountRole#getRoleIdentifier()})
+     * @return Optional
+     */
+    default Optional<AccountRole> getAccountRole(final String roleIdentifier)
+    {
+        if ( this.ROLE_MAP.containsKey( roleIdentifier ) )
+        {
+            return Optional.of( this.ROLE_MAP.get( roleIdentifier ) );
+        }
+        return Optional.empty();
+    }
+
 }
