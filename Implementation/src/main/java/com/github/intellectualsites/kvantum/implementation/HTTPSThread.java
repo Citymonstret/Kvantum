@@ -35,6 +35,7 @@ final class HTTPSThread extends Thread
     HTTPSThread(final SSLServerSocket sslSocket, final com.github.intellectualsites.kvantum.implementation.SocketHandler SocketHandler)
     {
         super( "SSL-Runner" );
+        this.setPriority( Thread.MAX_PRIORITY );
         this.SocketHandler = Assert.notNull( SocketHandler );
         this.sslSocket = Assert.notNull( sslSocket );
     }
