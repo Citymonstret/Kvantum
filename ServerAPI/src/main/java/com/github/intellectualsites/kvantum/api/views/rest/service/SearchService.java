@@ -69,7 +69,7 @@ final public class SearchService<T>
      * {@link com.github.intellectualsites.kvantum.api.account.IAccount#isPermitted(String)})
      */
     @Builder.Default
-    private final String permissionRequirement = "";
+    private String permissionRequirement = "";
 
     /**
      * Register the request handler in the server

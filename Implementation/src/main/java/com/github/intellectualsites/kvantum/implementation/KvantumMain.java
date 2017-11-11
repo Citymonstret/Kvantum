@@ -24,10 +24,8 @@ import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
 import com.github.intellectualsites.kvantum.api.logging.LogContext;
 import com.github.intellectualsites.kvantum.api.logging.LogWrapper;
-import com.github.intellectualsites.kvantum.api.util.ParameterScope;
 import com.github.intellectualsites.kvantum.api.util.RequestManager;
 import com.github.intellectualsites.kvantum.api.util.TimeUtil;
-import com.github.intellectualsites.kvantum.api.views.rest.Rest;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumInitializationException;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -127,35 +125,6 @@ final public class KvantumMain
                 }
                 try
                 {
-
-                    /* final Kvantum kvantumServer = server.get();
-                    kvantumServer.createSimpleRequestHandler( "/search", (request, response) -> {
-                        final IAccount searchQuery = Account.getKvantumAccountFactory().build( ParameterScope.GET )
-                                .parseRequest( request ).getParsedObject();
-                        final Optional<IAccount> account = kvantumServer.getApplicationStructure()
-                                .getAccountManager().searchForAccount( searchQuery );
-                        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
-                        if ( account.isPresent() )
-                        {
-                            response.setContent( Account.getGson().toJson( account.get() ) );
-                        } else
-                        {
-                            final JsonObject requestStatus = new JsonObject();
-                            requestStatus.add( "message", new JsonPrimitive( "No such account" ) );
-                            requestStatus.add( "query", Account.getGson().toJsonTree( searchQuery ) );
-                            response.setContent( Account.getGson().toJson( requestStatus ) );
-                        }
-                    } );
-                    */
-
-                    Rest.createSearch(
-                            "/search", /* URL Pattern */
-                            Account.class, /* Kvantum object class */
-                            ParameterScope.GET, /* GET or POST? */
-                            server.get().getApplicationStructure().getAccountManager() /* SearchResultProvide */
-                    );
-
-
                     server.get().start();
                 } catch ( final Exception e )
                 {

@@ -31,9 +31,8 @@ public class Rest
      * );}</pre>
      * </p>
      * <p>
-     * To limit the API to certain roles/permissions etc, you may just add a Middleware to the request handler.
-     * (See {@link RequestHandler#getMiddlewareQueuePopulator()} and
-     * {@link com.github.intellectualsites.kvantum.api.views.requesthandler.Middleware}
+     * To limit the request to certain roles, you should instead use {@link SearchService#builder()} and
+     * then {@link SearchService.SearchServiceBuilder#permissionRequirement(String)}
      * </p>
      * @param filter URL Filter ({@link com.github.intellectualsites.kvantum.api.matching.ViewPattern})
      * @param clazz Class, must comply to KvantumObject specifications (see {@link KvantumObjectFactory})
