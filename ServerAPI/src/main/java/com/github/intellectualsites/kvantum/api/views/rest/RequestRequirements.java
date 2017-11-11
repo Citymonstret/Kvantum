@@ -28,11 +28,32 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * A simple framework which allows for validation of requests by providing
+ * some static conditions that must be met.
+ * <p>
+ * This is especially useful when using {@link com.github.intellectualsites.kvantum.api.orm.KvantumObjectFactory}
+ * parsing
+ * </p>
+ * <p>
+ * Example:
+ * <pre>{@code
+ * final RequestRequirements requestRequirements = new RequestRequirements()
+ *      .addRequirement( new RequestRequirements.PostVariableRequirements( "username" ) );
+ * final RequestRequirements.RequirementStatus requirementStatus = requestRequirements.testRequirements( request );
+ * if ( !requirementStatus.passed() )
+ * {
+ *      Logger.debug( "Request failed checks: %s", requirementStatus.getMessage() );
+ * }
+ * }</pre>
+ * </p>
+ */
+@SuppressWarnings( { "unused", "WeakerAccess" } )
 @NoArgsConstructor
-public class ApiRequirements
+public class RequestRequirements
 {
 
-    private final Collection<ApiRequirement> requirements = new ArrayDeque<>();
+    private final Collection<RequestRequirement> requirements = new ArrayDeque<>();
 
     private static <K, V> Optional<V> mapOptional(Map<K, V> map, K instance)
     {
@@ -45,7 +66,7 @@ public class ApiRequirements
         }
     }
 
-    public ApiRequirements addRequirement(final ApiRequirement requirement)
+    public RequestRequirements addRequirement(final RequestRequirement requirement)
     {
         this.requirements.add( requirement );
         return this;
@@ -54,7 +75,7 @@ public class ApiRequirements
     public RequirementStatus testRequirements(final Request request)
     {
         RequirementStatus status;
-        for ( final ApiRequirement requirement : this.requirements )
+        for ( final RequestRequirement requirement : this.requirements )
         {
             if ( !( status = requirement.test( request ) ).passed )
             {
@@ -94,7 +115,7 @@ public class ApiRequirements
         }
     }
 
-    public abstract static class VariableRequirement extends ApiRequirement
+    public abstract static class VariableRequirement extends RequestRequirement
     {
 
         private final String key;
@@ -122,7 +143,7 @@ public class ApiRequirements
         }
     }
 
-    public abstract static class ApiRequirement
+    public abstract static class RequestRequirement
     {
 
         abstract RequirementStatus test(Request request);

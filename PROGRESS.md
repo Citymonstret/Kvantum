@@ -117,5 +117,12 @@ The socket handler can be extended to include filters, that can filter out reque
 ### 4.8 Configuration API
 Kvantum comes with some tools to simplify the creation of configuration files, and these files may also be read by the template systems (which provides configurable static variables).
 
-### 4.9 Validation API
+### 4.9 Validation API & Request Requirements
 Kvantum includes a validation system that can be implemented into request handlers to filter out unwanted requests based on POST and GET parameters. 
+
+Kvantum also includes another more fluent system that is especially handy in REST based applications, called 
+`RequestRequirements` that can be implemented per request, and even on demand. 
+
+### 4.10 POST/GET mapped ORM
+Kvantum includes a framework which allows you to map objects to <string,string> parameters from GET/POST requests and
+automatically generate objects based on these parameters

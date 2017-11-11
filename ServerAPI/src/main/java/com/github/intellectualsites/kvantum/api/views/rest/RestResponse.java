@@ -37,7 +37,7 @@ public abstract class RestResponse
     @Getter
     private final String contentType;
     @Getter(AccessLevel.PROTECTED)
-    private final ApiRequirements apiRequirements;
+    private final RequestRequirements requestRequirements;
 
     public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern)
     {
@@ -46,16 +46,16 @@ public abstract class RestResponse
 
     public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType)
     {
-        this( httpMethod, viewPattern, contentType, new ApiRequirements() );
+        this( httpMethod, viewPattern, contentType, new RequestRequirements() );
     }
 
-    public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType, ApiRequirements
-            apiRequirements)
+    public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType, RequestRequirements
+            requestRequirements)
     {
         this.httpMethod = httpMethod;
         this.viewPattern = viewPattern;
         this.contentType = contentType;
-        this.apiRequirements = apiRequirements;
+        this.requestRequirements = requestRequirements;
     }
 
     public boolean methodMatches(final Request request)
