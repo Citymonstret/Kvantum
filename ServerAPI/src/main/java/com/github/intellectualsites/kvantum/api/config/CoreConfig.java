@@ -158,4 +158,12 @@ public class CoreConfig
         public static String databaseImplementation = "sqlite";
     }
 
+    @ConfigSection(name = "middleware")
+    public static class Middleware
+    {
+
+        public static String loginRedirect = "login";
+
+    }
+
 }

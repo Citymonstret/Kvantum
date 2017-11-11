@@ -19,6 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views.requesthandler;
 
 import com.github.intellectualsites.kvantum.api.account.IAccountManager;
+import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.request.Request;
 
@@ -35,7 +36,7 @@ public class AuthenticationRequiredMiddleware extends Middleware
             queue.handle( request );
         } else
         {
-            request.internalRedirect( "login" );
+            request.internalRedirect( CoreConfig.Middleware.loginRedirect );
         }
     }
 
