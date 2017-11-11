@@ -27,6 +27,7 @@ import com.github.intellectualsites.kvantum.api.logging.LogWrapper;
 import com.github.intellectualsites.kvantum.api.util.RequestManager;
 import com.github.intellectualsites.kvantum.api.util.TimeUtil;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumInitializationException;
+import com.github.intellectualsites.kvantum.implementation.example.Examples;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
@@ -123,6 +124,10 @@ final public class KvantumMain
                 {
                     CoreConfig.workers = options.workers;
                 }
+                if ( !options.example.isEmpty() )
+                {
+                    Examples.loadExample( options.example );
+                }
                 try
                 {
                     server.get().start();
@@ -192,6 +197,9 @@ final public class KvantumMain
 
         @Parameter(names = "-workers", description = "Number of workers")
         private int workers = -1;
+
+        @Parameter(names = "-example", description = "Run an example view. Current examples: usersearch")
+        private String example;
 
     }
 }

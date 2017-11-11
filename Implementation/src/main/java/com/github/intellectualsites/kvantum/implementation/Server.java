@@ -562,6 +562,7 @@ public final class Server implements Kvantum, ISessionCreator
 
     @SuppressWarnings("ALL")
     @Override
+    @Synchronized
     public void start()
     {
         try
