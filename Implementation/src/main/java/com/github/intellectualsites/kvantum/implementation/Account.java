@@ -22,6 +22,10 @@ import com.github.intellectualsites.kvantum.api.account.IAccount;
 import com.github.intellectualsites.kvantum.api.account.IAccountManager;
 import com.github.intellectualsites.kvantum.api.account.roles.AccountRole;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
+import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumConstructor;
+import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumField;
+import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumInsert;
+import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumObject;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.StringList;
 import lombok.*;
@@ -32,6 +36,7 @@ import org.mongodb.morphia.annotations.Transient;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@KvantumObject
 @EqualsAndHashCode(of = { "username", "id" })
 @NoArgsConstructor
 @Entity("accounts")
@@ -41,12 +46,15 @@ public class Account implements IAccount
 
     private static final String KEY_ROLE_LIST = "internalRoleList";
 
+    @KvantumField
     @Id
     @Getter
     private int id;
+    @KvantumField
     @Getter
     @NonNull
     private String username;
+    @KvantumField
     @NonNull
     private String password;
     @NonNull
@@ -66,7 +74,9 @@ public class Account implements IAccount
         this.data = data;
     }
 
-    public Account(final int userID, final String username, final String password)
+    @KvantumConstructor
+    public Account(@KvantumInsert( "id" ) final int userID, @KvantumInsert( "username" ) final String username,
+                   @KvantumInsert( "password" ) final String password)
     {
         this( userID, username, password, getDefaultDataSet() );
     }
