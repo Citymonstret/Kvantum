@@ -9,6 +9,8 @@
 ## Progress
 You can see the current progress [here](https://github.com/IntellectualSites/Kvantum/blob/master/PROGRESS.md) along with *W.I.P* and *TODO*'s. 
 
+[![Project Stats](https://www.openhub.net/p/Kvantum/widgets/project_thin_badge.gif)](https://www.openhub.net/p/Kvantum)
+
 ## Description
 Kvantum is a lightweight, portable and (if you so desire) embeddable (HTTP/HTTPS) web server, written 
 entirely in java. It is meant to be easy to use, yet offer a wide variety of tools and utilities to simplify the 
