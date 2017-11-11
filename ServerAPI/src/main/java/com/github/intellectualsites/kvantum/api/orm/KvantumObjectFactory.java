@@ -22,6 +22,44 @@ import java.util.*;
 
 import static com.github.intellectualsites.kvantum.api.util.ParameterScope.GET;
 
+/**
+ * Framework for binding objects to GET/POST requests
+ * <p>
+ * Example:
+ * <pre>{@code
+ * @code @KvantumObject
+ *  public class RequestedUser
+ *  {
+ *      @code @Getter
+ *      @code @KvantumField ( default = "admin" )
+ *       private String username:
+ *
+ *      @code @Getter
+ *      @code @KvantumField
+ *       private int userId = -1;
+ *
+ *      @code @KvantumConstructor
+ *       public RequestedUser( @KvantumInsert( "userId" ) int userId,
+ *          @code @KvantumInsert( "username" ) String username
+ *       {
+ *          ...
+ *       }
+ *
+ *       // OR
+ *
+ *      @code @KvantumConstructor
+ *       public RequestedUser() {} // Here fields will be set directly!
+ *
+ *  }
+ *
+ * // THEN
+ *
+ * KvantumObjectFactory<RequestedUsser> factory = KvantumObjectFactory.from( RequestedUser.class );
+ * // skip parser result checking; DON'T ACTUALLY TO THAT...
+ * RequestedUser user = factory.build( ParameterScope.GET ).parseRequest( request ).getParsedObject();
+ * }</pre>
+ * </p>
+ */
 @RequiredArgsConstructor
 final public class KvantumObjectFactory<T>
 {
@@ -46,7 +84,7 @@ final public class KvantumObjectFactory<T>
      * @throws IllegalArgumentException If the class does not fit the specifications of a Kvantum object
      */
     @SuppressWarnings( "ALL" )
-    public static <T> KvantumObjectFactory<T> from(Class<T> clazz) throws IllegalArgumentException
+    public static <T> KvantumObjectFactory<T> from(final Class<T> clazz) throws IllegalArgumentException
     {
         if ( clazz.getAnnotation( KvantumObject.class ) == null )
         {
@@ -136,7 +174,7 @@ final public class KvantumObjectFactory<T>
                                 String.format( "Class [%s] does not have an appropriate constructor (missing " +
                                         "@KvantumField for parameter (%s)", clazz.getName(), parameter.getName() ) );
                     }
-                    kvantumConstructorParameters.add( insert.name() );
+                    kvantumConstructorParameters.add( insert.value() );
                 }
                 constructor.setAccessible( true );
                 kvantumConstructor = (Constructor<T>) constructor;

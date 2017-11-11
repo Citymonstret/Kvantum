@@ -126,3 +126,5 @@ Kvantum also includes another more fluent system that is especially handy in RES
 ### 4.10 POST/GET mapped ORM
 Kvantum includes a framework which allows you to map objects to <string,string> parameters from GET/POST requests and
 automatically generate objects based on these parameters
+
+* [**TODO**] Add more parser types (Current: String, Boolean, Integer)

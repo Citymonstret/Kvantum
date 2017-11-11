@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 public @interface KvantumInsert
 {
 
-    String name();
+   String value();
 
 }
