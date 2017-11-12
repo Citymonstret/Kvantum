@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.intellectualsites.kvantum.api.util.ParameterScope.GET;
 
@@ -64,6 +65,8 @@ import static com.github.intellectualsites.kvantum.api.util.ParameterScope.GET;
 final public class KvantumObjectFactory<T>
 {
 
+    private static final Map<Class<?>, KvantumObjectFactory<?>> factoryCache = new ConcurrentHashMap<>();
+
     private final InternalKvantumConstructor<T> constructor;
     private final Map<String, InternalKvantumField> fields;
 
@@ -74,9 +77,8 @@ final public class KvantumObjectFactory<T>
      * have a @KvantumConstructor annotated constructor, then a default no-args constructor must be available. If the
      * annotated @KvantumConstructor has no parameters, then the fields will be updated directly instead.
      * <p>
-     * This method is very
-     * expensive, so the generated factory should be reused. Do not use this method in performance-critical
-     * operations, instead generate it beforehand and store it somewhere.
+     * This method will store the generated factory in a concurrent cache, and will attempt to fetch
+     * the factory from the cache when the method is called.
      * </p>
      * @param clazz Class from which the factory will be generated
      * @param <T> Type
@@ -90,6 +92,10 @@ final public class KvantumObjectFactory<T>
         {
             throw new IllegalArgumentException(
                     String.format( "Class [%s] does not have an @KvantumObject annotation!", clazz.getName() ) );
+        }
+        if ( factoryCache.containsKey( clazz ) )
+        {
+            return (KvantumObjectFactory<T>) factoryCache.get( clazz );
         }
         final Map<String, InternalKvantumField> clazzFields = new LinkedHashMap<>();
         KvantumField kvantumField;
@@ -187,8 +193,10 @@ final public class KvantumObjectFactory<T>
                     String.format( "Class [%s] does not have an appropriate constructor", clazz.getName() ) );
         }
 
-        return new KvantumObjectFactory<>( new InternalKvantumConstructor<>( kvantumConstructor,
+        final val factory = new KvantumObjectFactory<>( new InternalKvantumConstructor<>( kvantumConstructor,
                 kvantumConstructorParameters ), clazzFields );
+        factoryCache.put( clazz, factory );
+        return factory;
     }
 
     public BuilderInstance build(final ParameterScope scope)
