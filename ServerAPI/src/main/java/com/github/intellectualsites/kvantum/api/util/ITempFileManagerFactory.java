@@ -16,14 +16,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.kvantum.api.socket;
+package com.github.intellectualsites.kvantum.api.util;
 
-public interface ISocketHandler
+/**
+ * Factory that creates new temporary file managers
+ */
+@FunctionalInterface
+public interface ITempFileManagerFactory
 {
 
-    void acceptSocket(SocketContext socketContext);
+    /**
+     * Create a new temporary file manager
+     *
+     * @return new temporary file manager
+     */
+    ITempFileManager newTempFileManager();
 
-    void breakSocketConnection(SocketContext socketContext);
-
-    void handleShutdown();
 }

@@ -281,4 +281,11 @@ public interface Kvantum extends CommandCaller<Kvantum>
      */
     Gson getGson();
 
+    /**
+     * Get the temporary file manager factory implementation
+     *
+     * @return ITempFileManagerFactory Implementation
+     */
+    ITempFileManagerFactory getTempFileManagerFactory();
+
 }

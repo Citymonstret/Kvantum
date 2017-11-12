@@ -25,13 +25,13 @@ import com.github.intellectualsites.kvantum.api.config.YamlConfiguration;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.socket.ISocketHandler;
+import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.socket.SocketFilter;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +45,8 @@ final class SocketHandler implements ISocketHandler
 {
 
     @SuppressWarnings("ALL")
-    public static final SocketFilter SOCKET_FILTER_IS_ACTIVE = Socket -> !Socket.isClosed() && Socket.isConnected();
-    public static final SocketFilter SOCKET_FILTER_ENABLE_SOCKET = Socket -> false;
+    public static final SocketFilter SOCKET_FILTER_IS_ACTIVE = socket -> socket.isActive();
+    public static final SocketFilter SOCKET_FILTER_ENABLE_SOCKET = socket -> false;
 
     private static final Map<String, SocketFilter> availableSocketFilters = new HashMap<>();
 
@@ -96,7 +96,7 @@ final class SocketHandler implements ISocketHandler
     }
 
     @Override
-    public void acceptSocket(final Socket s)
+    public void acceptSocket(final SocketContext s)
     {
         for ( final SocketFilter filter : socketFilters )
         {
@@ -123,15 +123,9 @@ final class SocketHandler implements ISocketHandler
     }
 
     @Override
-    public void breakSocketConnection(final Socket s)
+    public void breakSocketConnection(final SocketContext s)
     {
-        try
-        {
-            s.close();
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
+        s.close();
     }
 
     @Override

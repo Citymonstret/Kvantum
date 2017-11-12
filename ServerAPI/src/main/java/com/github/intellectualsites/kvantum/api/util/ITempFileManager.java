@@ -16,14 +16,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.kvantum.api.socket;
+package com.github.intellectualsites.kvantum.api.util;
 
-public interface ISocketHandler
+import java.nio.file.Path;
+import java.util.Optional;
+
+/**
+ * Manages per-request temporary files
+ */
+public interface ITempFileManager
 {
 
-    void acceptSocket(SocketContext socketContext);
+    /**
+     * Create a new temporary file
+     *
+     * @return new temporary file, if it was successfully created
+     */
+    Optional<Path> createTempFile();
 
-    void breakSocketConnection(SocketContext socketContext);
+    /**
+     * Delete all temporary files created in this manager
+     */
+    void clearTempFiles();
 
-    void handleShutdown();
 }

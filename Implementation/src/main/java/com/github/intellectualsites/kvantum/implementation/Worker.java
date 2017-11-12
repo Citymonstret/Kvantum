@@ -33,6 +33,7 @@ import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.response.Header;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.response.ResponseBody;
+import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.AutoCloseable;
 import com.github.intellectualsites.kvantum.api.util.Provider;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
@@ -41,7 +42,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,15 +139,17 @@ final class Worker extends AutoCloseable
      * @param remote Client
      * @return boolean success status
      */
-    private boolean prepare(final Socket remote) throws Exception
+    private boolean prepare(final SocketContext remote) throws Exception
     {
         if ( CoreConfig.verbose )
         {
-            this.server.log( Message.CONNECTION_ACCEPTED, remote.getInetAddress() );
+            this.server.log( Message.CONNECTION_ACCEPTED, remote.getAddress() );
         }
 
-        final BufferedReader input = new BufferedReader( new InputStreamReader( remote.getInputStream() ), CoreConfig.Buffer.in );
-        this.workerContext.setOutput( new BufferedOutputStream( remote.getOutputStream(), CoreConfig.Buffer.out ) );
+        final BufferedReader input = new BufferedReader( new InputStreamReader( remote.getSocket().getInputStream() ),
+                CoreConfig.Buffer.in );
+        this.workerContext.setOutput( new BufferedOutputStream( remote.getSocket()
+                .getOutputStream(), CoreConfig.Buffer.out ) );
 
         //
         // Read the request
@@ -252,11 +254,11 @@ final class Worker extends AutoCloseable
      * Accepts a remote socket and handles the incoming request,
      * also makes sure its handled and closed down successfully.
      *
-     * This method passes the request to {@link #prepare(Socket)}
+     * This method passes the request to {@link #prepare(SocketContext)}
      *
      * @param remote socket to accept
      */
-    void run(final Socket remote)
+    void run(final SocketContext remote)
     {
         //
         // Setup the metrics object
@@ -269,7 +271,7 @@ final class Worker extends AutoCloseable
         //
         // Handle the remote socket
         //
-        if ( remote != null && !remote.isClosed() )
+        if ( remote.isActive() )
         {
             try
             {
@@ -286,7 +288,7 @@ final class Worker extends AutoCloseable
         //
         // Close the remote socket
         //
-        this.closeRemote( remote );
+        remote.close();
 
         //
         // Make sure the metric is logged
@@ -298,24 +300,4 @@ final class Worker extends AutoCloseable
         //
         WorkerPool.addWorker( this );
     }
-
-    /**
-     * Close the remote socket, prints any exceptions
-     *
-     * @param remote Remote socket
-     */
-    private void closeRemote(final Socket remote)
-    {
-        if ( remote != null && !remote.isClosed() )
-        {
-            try
-            {
-                remote.close();
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }

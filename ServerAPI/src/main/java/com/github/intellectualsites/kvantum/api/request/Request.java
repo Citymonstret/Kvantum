@@ -25,15 +25,14 @@ import com.github.intellectualsites.kvantum.api.exceptions.QueryException;
 import com.github.intellectualsites.kvantum.api.exceptions.RequestException;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.session.ISession;
+import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.*;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import lombok.*;
 
-import javax.net.ssl.SSLSocket;
 import java.io.BufferedOutputStream;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
@@ -81,7 +80,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private Query query;
     @Setter
     private PostRequest postRequest;
-    private Socket socket;
+    private SocketContext socket;
     @NonNull
     @Setter
     @Getter
@@ -101,7 +100,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      * @param socket  The socket that sent the request
      * @throws RequestException if the request doesn't contain a query
      */
-    public Request(final Collection<String> request, final Socket socket)
+    public Request(final Collection<String> request, final SocketContext socket)
     {
         Assert.notNull( request, socket );
 
@@ -133,7 +132,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
                                     this );
                         }
 
-                        if ( socket instanceof SSLSocket )
+                        if ( socket.isSSL() )
                         {
                             this.protocolType = ProtocolType.HTTPS;
                         } else
@@ -168,6 +167,11 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         {
             this.authorization = new Authorization( this.headers.get( HEADER_AUTHORIZATION ) );
         }
+    }
+
+    public ITempFileManager getTempFileManager()
+    {
+        return this.socket.getTempFileManager();
     }
 
     @Override
@@ -279,7 +283,8 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     public String buildLog()
     {
         String msg = Message.REQUEST_LOG.toString();
-        for ( final Object a : new String[]{ socket.getRemoteSocketAddress().toString(), getHeader( "User-Agent" ),
+        for ( final Object a : new String[]{ socket.getSocket().getRemoteSocketAddress().toString(), getHeader(
+                "User-Agent" ),
                 getHeader( "query" ), getHeader( "Host" ), this.query.buildLog(), postRequest != null ? postRequest
                 .buildLog() : "" } )
         {
@@ -339,7 +344,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     @Override
     public String toString()
     {
-        return this.socket.getInetAddress().getHostName();
+        return this.socket.getAddress().getHostName();
     }
 
     public boolean hasMeta(final String key)

@@ -60,6 +60,7 @@ import com.github.intellectualsites.kvantum.implementation.mongo.MongoAccountMan
 import com.github.intellectualsites.kvantum.implementation.mongo.MongoSessionDatabase;
 import com.github.intellectualsites.kvantum.implementation.sqlite.SQLiteAccountManager;
 import com.github.intellectualsites.kvantum.implementation.sqlite.SQLiteSessionDatabase;
+import com.github.intellectualsites.kvantum.implementation.tempfiles.TempFileManagerFactory;
 import com.github.intellectualsites.kvantum.velocity.VelocityEngine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -104,6 +105,8 @@ public final class Server implements Kvantum, ISessionCreator
     private final SocketHandler socketHandler;
     @Getter
     private final Metrics metrics = new Metrics();
+    @Getter
+    private final ITempFileManagerFactory tempFileManagerFactory = new TempFileManagerFactory();
     PrintStream logStream;
     @Getter
     private final Gson gson = new GsonBuilder()

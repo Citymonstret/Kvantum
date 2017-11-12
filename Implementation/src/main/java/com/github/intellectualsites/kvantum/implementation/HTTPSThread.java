@@ -19,6 +19,7 @@
 package com.github.intellectualsites.kvantum.implementation;
 
 import com.github.intellectualsites.kvantum.api.config.Message;
+import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 
 import javax.net.ssl.SSLServerSocket;
@@ -55,7 +56,7 @@ final class HTTPSThread extends Thread
             }
             try
             {
-                this.socketHandler.acceptSocket( sslSocket.accept() );
+                this.socketHandler.acceptSocket( new SocketContext( sslSocket.accept() ) );
             } catch ( final Exception e )
             {
                 Message.TICK_ERROR.log();

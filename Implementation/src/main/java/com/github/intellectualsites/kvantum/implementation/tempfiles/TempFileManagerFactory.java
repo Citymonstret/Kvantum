@@ -16,14 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.github.intellectualsites.kvantum.api.socket;
+package com.github.intellectualsites.kvantum.implementation.tempfiles;
 
-public interface ISocketHandler
+import com.github.intellectualsites.kvantum.api.util.ITempFileManager;
+import com.github.intellectualsites.kvantum.api.util.ITempFileManagerFactory;
+
+final public class TempFileManagerFactory implements ITempFileManagerFactory
 {
 
-    void acceptSocket(SocketContext socketContext);
+    @Override
+    public ITempFileManager newTempFileManager()
+    {
+        return new TempFileManager();
+    }
 
-    void breakSocketConnection(SocketContext socketContext);
-
-    void handleShutdown();
 }

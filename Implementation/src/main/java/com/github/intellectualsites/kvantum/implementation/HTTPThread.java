@@ -19,6 +19,7 @@
 package com.github.intellectualsites.kvantum.implementation;
 
 import com.github.intellectualsites.kvantum.api.config.Message;
+import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 
 import java.net.ServerSocket;
@@ -52,7 +53,7 @@ final class HTTPThread extends Thread
             }
             try
             {
-                socketHandler.acceptSocket( serverSocket.accept() );
+                socketHandler.acceptSocket( new SocketContext( serverSocket.accept() ) );
             } catch ( final Exception e )
             {
                 if ( !serverSocket.isClosed() )
