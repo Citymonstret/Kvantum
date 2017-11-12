@@ -33,6 +33,8 @@ import com.google.common.collect.ListMultimap;
 import lombok.*;
 
 import java.io.BufferedOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
@@ -62,7 +64,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final Pattern PATTERN_QUERY = Pattern.compile(
-            "(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!]*) " +
+            "(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!%]*) " +
                     "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?"
     );
     private static final Pattern PATTERN_HEADER = Pattern.compile( "(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)" );
@@ -413,7 +415,18 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
                 final String[] parts = resource.split( "\\?" );
                 if ( parts.length > 1 )
                 {
-                    final String[] subParts = parts[ 1 ].split( "&" );
+                    String parameters = parts[ 1 ];
+                    try
+                    {
+                        parameters = URLDecoder.decode( parameters, StandardCharsets.UTF_8.toString() );
+                    } catch ( final UnsupportedEncodingException ignore )
+                    {
+                        if ( CoreConfig.debug )
+                        {
+                            ignore.printStackTrace();
+                        }
+                    }
+                    final String[] subParts = parameters.split( "&" );
                     resourceName = parts[ 0 ];
                     for ( final String part : subParts )
                     {
