@@ -54,6 +54,7 @@ public class CrushEngine extends TemplateHandler
         this.syntaxCollection.add( new IfStatement() );
         this.syntaxCollection.add( new ForEachBlock() );
         this.syntaxCollection.add( new Variable() );
+        this.syntaxCollection.add( new Macro() );
 
         ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
     }

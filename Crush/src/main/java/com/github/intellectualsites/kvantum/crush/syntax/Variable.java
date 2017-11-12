@@ -37,6 +37,8 @@
 
 package com.github.intellectualsites.kvantum.crush.syntax;
 
+import com.github.intellectualsites.kvantum.api.config.CoreConfig;
+import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
@@ -110,6 +112,10 @@ final public class Variable extends Syntax
                 }
             } else
             {
+                if ( CoreConfig.debug )
+                {
+                    Logger.debug( "Template requesting unknown variable factory [%s]", provider.toLowerCase() );
+                }
                 content = content.replace( matcher.group(), "" );
             }
         }
