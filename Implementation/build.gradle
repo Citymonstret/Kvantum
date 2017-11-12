@@ -31,8 +31,6 @@ dependencies {
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
     // Makes code pretty
     compileOnly 'org.projectlombok:lombok:1.16.18'
-    // JSON IO Library
-    compile group: 'com.cedarsoftware', name: 'json-io', version: '4.10.0'
     // SQLite Driver
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.20.1'
     // Program argument parser
