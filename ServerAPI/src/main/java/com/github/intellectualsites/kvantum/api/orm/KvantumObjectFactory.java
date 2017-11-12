@@ -24,12 +24,10 @@ import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumInsert;
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumObject;
 import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.util.ParameterScope;
+import com.github.intellectualsites.kvantum.api.util.Parsers;
 import com.github.intellectualsites.kvantum.api.views.rest.RequestRequirements;
 import com.intellectualsites.commands.parser.Parser;
 import com.intellectualsites.commands.parser.ParserResult;
-import com.intellectualsites.commands.parser.impl.BooleanParser;
-import com.intellectualsites.commands.parser.impl.IntegerParser;
-import com.intellectualsites.commands.parser.impl.StringParser;
 import lombok.*;
 
 import java.lang.reflect.Constructor;
@@ -124,7 +122,7 @@ final public class KvantumObjectFactory<T>
                 //
                 // Check if we're actually able to parse values for the field
                 //
-                final Optional<Parser<?>> parser = getParser( field );
+                final Optional<Parser<?>> parser = Parsers.getPrimitiveParser( field );
                 if ( !parser.isPresent() )
                 {
                     throw new IllegalArgumentException(
@@ -365,25 +363,6 @@ final public class KvantumObjectFactory<T>
         private final KvantumField kvantumField;
         private final Parser<?> parser;
 
-    }
-
-    private static Optional<Parser<?>> getParser(final Field field)
-    {
-        final Parser<?> parser;
-        if ( field.getType().equals( Integer.class ) || field.getType().equals( int.class ) )
-        {
-            parser = new IntegerParser();
-        } else if ( field.getType().equals( String.class ) )
-        {
-            parser = new StringParser();
-        } else if ( field.getType().equals( Boolean.class ) || field.getType().equals( boolean.class ) )
-        {
-            parser = new BooleanParser();
-        } else
-        {
-            parser = null;
-        }
-        return Optional.ofNullable( parser );
     }
 
 }

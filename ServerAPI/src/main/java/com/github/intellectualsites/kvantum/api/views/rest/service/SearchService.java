@@ -130,6 +130,7 @@ final public class SearchService<T>
                 final JsonObject requestStatus = new JsonObject();
                 requestStatus.add( "message", new JsonPrimitive( result.getError().getCause() ) );
                 response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+                return;
             }
             final T query = result.getParsedObject();
             final Collection<? extends T> queryResult = resultProvider.getResults( query );

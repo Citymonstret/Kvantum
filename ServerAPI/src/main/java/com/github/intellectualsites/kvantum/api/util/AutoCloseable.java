@@ -29,6 +29,9 @@ import java.util.function.Consumer;
  *
  * Uses WeakReferences, so this will not force your objects
  * to remain loaded.
+ *
+ * This class implements {@link java.lang.AutoCloseable} so any
+ * {@link AutoCloseable} objects may be used in try-with-resources
  */
 public abstract class AutoCloseable implements java.lang.AutoCloseable
 {
