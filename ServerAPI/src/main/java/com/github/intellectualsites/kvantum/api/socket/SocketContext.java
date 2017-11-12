@@ -36,8 +36,7 @@ final public class SocketContext
     @Getter
     private final Socket socket;
 
-    @Getter
-    private final ITempFileManager tempFileManager;
+    private ITempFileManager tempFileManager;
 
     /**
      * Construct a new socket context from a socket
@@ -47,8 +46,23 @@ final public class SocketContext
     public SocketContext(final Socket socket)
     {
         this.socket = socket;
-        this.tempFileManager = ServerImplementation.getImplementation().getTempFileManagerFactory()
-                .newTempFileManager();
+    }
+
+    /**
+     * Get a {@link ITempFileManager} for this socket instance.
+     * This loaded lazily, so it will be created on the first call to
+     * this method.
+     *
+     * @return ITempFileManager instance
+     */
+    public ITempFileManager getTempFileManager()
+    {
+        if ( tempFileManager == null )
+        {
+            this.tempFileManager = ServerImplementation.getImplementation().getTempFileManagerFactory()
+                    .newTempFileManager();
+        }
+        return tempFileManager;
     }
 
     /**
@@ -78,7 +92,10 @@ final public class SocketContext
         }
         try
         {
-            this.tempFileManager.clearTempFiles();
+            if ( this.tempFileManager != null )
+            {
+                this.tempFileManager.clearTempFiles();
+            }
         } catch ( final Exception e )
         {
             e.printStackTrace();
