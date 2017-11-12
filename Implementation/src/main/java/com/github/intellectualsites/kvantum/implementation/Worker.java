@@ -206,7 +206,8 @@ final class Worker extends AutoCloseable
         //
         // If the client sent a post request, then make sure to the read the request field
         //
-        if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST )
+        if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST && workerContext.getRequest()
+                .getHeader( "Content-Type" ).equalsIgnoreCase( "application/x-www-form-urlencoded" ) )
         {
             final Request request = workerContext.getRequest();
             final int cl = Integer.parseInt( workerContext.getRequest().getHeader( "Content-Length" ) );

@@ -82,6 +82,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     private Query query;
     @Setter
     private PostRequest postRequest;
+    @Getter
     private SocketContext socket;
     @NonNull
     @Setter
@@ -151,7 +152,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
                     matcher = PATTERN_HEADER.matcher( part );
                     if ( matcher.matches() )
                     {
-                        headers.put( matcher.group( "key" ), matcher.group( "value" ) );
+                        this.headers.put( matcher.group( "key" ).toLowerCase(), matcher.group( "value" ) );
                     }
                 }
             }
@@ -269,9 +270,9 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     {
         Assert.notNull( name );
 
-        if ( this.headers.containsKey( name ) )
+        if ( this.headers.containsKey( name.toLowerCase() ) )
         {
-            return this.headers.get( name );
+            return this.headers.get( name.toLowerCase() );
         }
 
         return "";

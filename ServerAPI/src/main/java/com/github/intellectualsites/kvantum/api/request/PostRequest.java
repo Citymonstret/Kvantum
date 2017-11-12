@@ -18,11 +18,14 @@
  */
 package com.github.intellectualsites.kvantum.api.request;
 
+import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.MapUtil;
 import lombok.Getter;
 
 import java.io.BufferedReader;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,11 +47,22 @@ final public class PostRequest implements RequestChild
     PostRequest(final Request parent, final String request)
     {
         Assert.notNull( request );
-
         this.parent = parent;
-        this.request = request;
+        String fixedRequest;
+        try
+        {
+            fixedRequest = URLDecoder.decode( request, StandardCharsets.UTF_8.toString() );
+        } catch ( final Exception e )
+        {
+            if ( CoreConfig.debug )
+            {
+                e.printStackTrace();
+            }
+            fixedRequest = request;
+        }
+        this.request = fixedRequest;
         this.vars = new HashMap<>();
-        for ( final String s : request.split( "&" ) )
+        for ( final String s : this.request.split( "&" ) )
         {
             if ( !s.isEmpty() )
             {
