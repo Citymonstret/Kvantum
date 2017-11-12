@@ -20,13 +20,12 @@ package com.github.intellectualsites.kvantum.implementation.sqlite;
 
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.session.ISessionDatabase;
+import com.github.intellectualsites.kvantum.api.session.SessionLoad;
 import com.github.intellectualsites.kvantum.implementation.SQLiteApplicationStructure;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 final public class SQLiteSessionDatabase implements ISessionDatabase
@@ -46,31 +45,10 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
         );
     }
 
-    public long containsSession(final String sessionID)
-    {
-        long ret = -1;
-        try ( final PreparedStatement statement = this.applicationStructure
-                .getDatabaseManager().prepareStatement( "SELECT last_active FROM sessions WHERE id = ?" ) )
-        {
-            statement.setString( 1, sessionID );
-            try ( final ResultSet resultSet = statement.executeQuery() )
-            {
-                if ( resultSet.next() )
-                {
-                    ret = resultSet.getLong( "last_active" );
-                }
-            }
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-        return ret;
-    }
-
     @Override
-    public Map<String, String> getSessionLoad(String sessionID)
+    public SessionLoad getSessionLoad(String sessionID)
     {
-        final Map<String, String> returnMap = new HashMap<>();
+        SessionLoad sessionLoad = null;
         try ( final PreparedStatement statement = this.applicationStructure
                 .getDatabaseManager().prepareStatement( "SELECT * FROM sessions WHERE id = ?" ) )
         {
@@ -79,20 +57,21 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
             {
                 if ( resultSet.next() )
                 {
-                    returnMap.put( "sessionKey", resultSet.getString( "session_key" ) );
+                    sessionLoad = new SessionLoad( resultSet.getInt( "session_id" ),
+                            resultSet.getString( "session_key" ), resultSet.getLong( "last_active" ) );
                 }
             }
         } catch ( final Exception e )
         {
             e.printStackTrace();
         }
-        return returnMap;
+        return sessionLoad;
     }
 
     @Override
     public void storeSession(final ISession session)
     {
-        if ( containsSession( session.get( "id" ).toString() ) != -1 )
+        if ( getSessionLoad( session.get( "id" ).toString() ) != null )
         {
             updateSession( session.get( "id" ).toString() );
         } else

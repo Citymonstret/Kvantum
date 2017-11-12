@@ -94,6 +94,7 @@ final class Worker extends AutoCloseable
 
         if ( workerContext.isGzip() )
         {
+            final Timer.Context context = ServerImplementation.getImplementation().getMetrics().registerCompression();
             try
             {
                 bytes = gzipHandler.compress( bytes );
@@ -105,6 +106,7 @@ final class Worker extends AutoCloseable
             {
                 new KvantumException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
             }
+            context.stop();
         }
 
         //
@@ -182,7 +184,10 @@ final class Worker extends AutoCloseable
         //
         try
         {
+            final Timer.Context metricContext = ServerImplementation.getImplementation().getMetrics()
+                    .registerRequestPreparation();
             workerContext.setRequest( new Request( lines, remote ) );
+            metricContext.stop();
         } catch ( final ProtocolNotSupportedException ex )
         {
             return handleSendStatusOnly( Header.STATUS_HTTP_VERSION_NOT_SUPPORTED );

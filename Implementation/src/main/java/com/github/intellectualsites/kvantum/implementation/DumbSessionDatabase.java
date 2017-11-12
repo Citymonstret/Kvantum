@@ -20,8 +20,7 @@ package com.github.intellectualsites.kvantum.implementation;
 
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.session.ISessionDatabase;
-
-import java.util.Map;
+import com.github.intellectualsites.kvantum.api.session.SessionLoad;
 
 public final class DumbSessionDatabase implements ISessionDatabase
 {
@@ -32,21 +31,9 @@ public final class DumbSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public long containsSession(String sessionId)
-    {
-        return -1;
-    }
-
-    @Override
-    public Map<String, String> getSessionLoad(String sessionID)
+    public SessionLoad getSessionLoad(String sessionID)
     {
         return null;
-    }
-
-    @Override
-    public boolean isValid(String session)
-    {
-        return true;
     }
 
     @Override

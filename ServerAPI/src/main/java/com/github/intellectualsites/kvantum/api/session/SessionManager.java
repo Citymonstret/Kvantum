@@ -30,9 +30,9 @@ import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.AllArgsConstructor;
+import lombok.Synchronized;
 
 import java.io.BufferedOutputStream;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +51,7 @@ public final class SessionManager implements ProviderFactory<ISession>
 
     private static final String SESSION_KEY = "intellectual_session";
     private static final String SESSION_PASS = "intellectual_key";
-    
+
     private ISession createSession(final Request r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
@@ -77,6 +77,7 @@ public final class SessionManager implements ProviderFactory<ISession>
         r.getCookies().put( SESSION_PASS, new Cookie( SESSION_PASS, session.getSessionKey() ) );
     }
 
+    @Synchronized
     private ISession createSession(final String sessionID)
     {
         Assert.notEmpty( sessionID );
@@ -94,6 +95,7 @@ public final class SessionManager implements ProviderFactory<ISession>
         re.getHeader().setCookie( SESSION_KEY, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
     }
 
+    @Synchronized
     public Optional<ISession> getSession(final Request r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
@@ -126,12 +128,8 @@ public final class SessionManager implements ProviderFactory<ISession>
         //
         if ( sessionCookie != null && sessionPassCookie != null )
         {
-            if ( this.sessions.getIfPresent( sessionCookie ) != null )
+            if ( ( session = this.sessions.getIfPresent( sessionCookie ) ) != null )
             {
-                session = sessions.getIfPresent( sessionCookie );
-
-                assert session != null;
-
                 if ( CoreConfig.debug )
                 {
                     Message.SESSION_FOUND.log( session, sessionCookie, r );
@@ -148,24 +146,20 @@ public final class SessionManager implements ProviderFactory<ISession>
                     this.sessionDatabase.deleteSession( sessionCookie );
                     session = null;
                 }
-
             } else
             {
-                if ( sessionDatabase.isValid( sessionCookie ) )
+                final SessionLoad load = sessionDatabase.isValid( sessionCookie );
+                if ( load != null )
                 {
-                    final Map<String, String> sessionLoad = sessionDatabase.getSessionLoad( sessionCookie );
                     session = createSession( sessionCookie );
-                    session.setSessionKey( sessionLoad.get( "sessionKey" ) );
+                    session.setSessionKey( load.getSessionKey() );
                     return Optional.of( session );
                 } else
                 {
                     // Session isn't valid, remove old cookie
-                    if ( out != null )
-                    {
-                        ServerImplementation.getImplementation()
-                                .log( "Deleting invalid session cookie for request %s", r );
-                        session = createSession( r, out );
-                    }
+                    ServerImplementation.getImplementation()
+                            .log( "Deleting invalid session cookie for request %s", r );
+                    session = null;
                 }
             }
 
@@ -184,7 +178,7 @@ public final class SessionManager implements ProviderFactory<ISession>
         //
         // STEP 2 (2): Create a new session
         //
-        if ( session == null )
+        if ( session == null && out != null )
         {
             session = createSession( r, out );
         }

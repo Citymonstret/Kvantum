@@ -21,25 +21,22 @@ package com.github.intellectualsites.kvantum.api.session;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 
-import java.util.Map;
-
 public interface ISessionDatabase
 {
 
     void setup() throws Exception;
 
-    long containsSession(String sessionID);
+    SessionLoad getSessionLoad(String sessionID);
 
-    Map<String, String> getSessionLoad(String sessionID);
-
-    default boolean isValid(final String session)
+    default SessionLoad isValid(final String session)
     {
-        long lastActive = containsSession( session );
-        if ( lastActive == -1 )
+        final SessionLoad sessionLoad = getSessionLoad( session );
+        if ( sessionLoad == null )
         {
-            return false;
+            return null;
         }
-        long difference = ( System.currentTimeMillis() - lastActive ) / 1000;
+
+        long difference = ( System.currentTimeMillis() - sessionLoad.getLastActive() ) / 1000;
         if ( difference >= CoreConfig.Sessions.sessionTimeout )
         {
             if ( CoreConfig.debug )
@@ -47,9 +44,9 @@ public interface ISessionDatabase
                 Logger.debug( "Deleted outdated session: %s", session );
             }
             deleteSession( session );
-            return false;
+            return null;
         }
-        return true;
+        return sessionLoad;
     }
 
     void storeSession(ISession session);

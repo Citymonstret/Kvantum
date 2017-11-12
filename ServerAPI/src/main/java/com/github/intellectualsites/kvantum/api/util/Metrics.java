@@ -20,6 +20,7 @@ package com.github.intellectualsites.kvantum.api.util;
 
 import com.codahale.metrics.*;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
+import lombok.Getter;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -47,20 +48,28 @@ import java.util.function.Consumer;
 public class Metrics
 {
 
+    @Getter
     private final MetricRegistry registry;
+
     private final Timer requestsHandling;
+    private final Timer compression;
+    private final Timer requestPreparation;
+    private final Timer contentHandling;
+    private final Timer sessionPreparation;
+
     private final double durationFactor;
 
     public Metrics()
     {
         this.registry = new MetricRegistry();
-        this.requestsHandling = this.registry.timer( "requestHandling" );
-        this.durationFactor = 1.0 / TimeUnit.MILLISECONDS.toNanos( 1 );
-    }
 
-    public MetricRegistry getRegistry()
-    {
-        return registry;
+        this.requestsHandling = this.registry.timer( "requestHandling" );
+        this.compression = this.registry.timer( "compression" );
+        this.requestPreparation = this.registry.timer( "requestPreparation" );
+        this.contentHandling = this.registry.timer( "contentHandling" );
+        this.sessionPreparation = this.registry.timer( "sessionPreparation" );
+
+        this.durationFactor = 1.0 / TimeUnit.MILLISECONDS.toNanos( 1 );
     }
 
     /**
@@ -175,6 +184,26 @@ public class Metrics
     public Timer.Context registerRequestHandling()
     {
         return requestsHandling.time();
+    }
+
+    public Timer.Context registerCompression()
+    {
+        return compression.time();
+    }
+
+    public Timer.Context registerRequestPreparation()
+    {
+        return requestPreparation.time();
+    }
+
+    public Timer.Context registerContentHandling()
+    {
+        return contentHandling.time();
+    }
+
+    public Timer.Context registerSessionPreparation()
+    {
+        return sessionPreparation.time();
     }
 
 }

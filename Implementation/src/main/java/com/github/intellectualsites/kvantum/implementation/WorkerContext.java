@@ -18,10 +18,12 @@
  */
 package com.github.intellectualsites.kvantum.implementation;
 
+import com.codahale.metrics.Timer;
 import com.github.intellectualsites.kvantum.api.cache.CacheApplicable;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
+import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.core.WorkerProcedure;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.request.Request;
@@ -147,7 +149,10 @@ class WorkerContext
         this.request.setOutputStream( this.output );
         if ( CoreConfig.Sessions.autoLoad )
         {
+            final Timer.Context context = ServerImplementation.getImplementation().getMetrics()
+                    .registerSessionPreparation();
             this.request.requestSession();
+            context.stop();
         }
         this.requestHandler = server.getRouter().match( request );
 
@@ -255,6 +260,8 @@ class WorkerContext
             //
             // Turn response into a byte array
             //
+            final Timer.Context metricContext = ServerImplementation.getImplementation().getMetrics()
+                    .registerContentHandling();
             if ( request.getQuery().getMethod().hasBody() )
             {
                 if ( body.isText() )
@@ -276,6 +283,7 @@ class WorkerContext
                     bytes = ArrayUtils.toPrimitive( wrapper );
                 }
             }
+            metricContext.stop();
         } catch ( final Exception e )
         {
             Message.WORKER_FAILED_HANDLING.log( e.getMessage() );

@@ -21,13 +21,11 @@ package com.github.intellectualsites.kvantum.implementation.mongo;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.session.ISessionDatabase;
+import com.github.intellectualsites.kvantum.api.session.SessionLoad;
 import com.github.intellectualsites.kvantum.implementation.MongoApplicationStructure;
 import com.mongodb.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 final public class MongoSessionDatabase implements ISessionDatabase
@@ -48,42 +46,27 @@ final public class MongoSessionDatabase implements ISessionDatabase
         this.collection = database.getCollection( CoreConfig.MongoDB.collectionSessions );
     }
 
-    public long containsSession(final String sessionID)
-    {
-        long ret = -1;
-
-        final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
-        final DBCursor cursor = collection.find( object );
-
-        if ( cursor.hasNext() )
-        {
-            ret = (long) cursor.next().get( FIELD_LAST_ACTIVE );
-        }
-
-        return ret;
-    }
-
     @Override
-    public Map<String, String> getSessionLoad(final String sessionID)
+    public SessionLoad getSessionLoad(final String sessionID)
     {
-
         final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
         final DBCursor cursor = collection.find( object );
-        final Map<String, String> map = new HashMap<>();
 
         if ( cursor.hasNext() )
         {
             final DBObject session = cursor.next();
-            map.put( "sessionKey", session.get( FIELD_SESSION_KEY ).toString() );
+
+            return new SessionLoad( (int) session.get( FIELD_SESSION_ID ),
+                    session.get( FIELD_SESSION_KEY ).toString(), (long) session.get( FIELD_LAST_ACTIVE ) );
         }
 
-        return map;
+        return null;
     }
 
     @Override
     public void storeSession(final ISession session)
     {
-        if ( containsSession( session.get( "id" ).toString() ) != -1 )
+        if ( getSessionLoad( session.get( "id" ).toString() ) != null )
         {
             updateSession( session.get( "id" ).toString() );
         } else
