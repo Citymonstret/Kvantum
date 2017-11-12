@@ -713,38 +713,7 @@ public final class Server implements Kvantum, ISessionCreator
             new HTTPSThread( sslServerSocket, socketHandler ).start();
         }
 
-        final Thread mainThread = new Thread( () -> {
-            // Main Loop
-            for ( ; ; )
-            {
-                if ( this.stopping )
-                {
-                    log( Message.SHUTTING_DOWN );
-                    break;
-                }
-                if ( paused )
-                {
-                    continue;
-                }
-                try
-                {
-                    socketHandler.acceptSocket( serverSocket.accept() );
-                } catch ( final Exception e )
-                {
-                    if ( !serverSocket.isClosed() )
-                    {
-                        log( Message.TICK_ERROR );
-                        e.printStackTrace();
-                    } else
-                    {
-                        break;
-                    }
-                }
-            }
-        } );
-        mainThread.setName( "http" );
-        mainThread.setPriority( Thread.MAX_PRIORITY );
-        mainThread.start();
+        new HTTPThread( serverSocket, socketHandler ).start();
     }
 
     @Override

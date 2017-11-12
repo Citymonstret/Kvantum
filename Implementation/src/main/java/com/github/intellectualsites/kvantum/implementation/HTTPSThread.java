@@ -29,14 +29,14 @@ import javax.net.ssl.SSLServerSocket;
 final class HTTPSThread extends Thread
 {
 
-    private final com.github.intellectualsites.kvantum.implementation.SocketHandler SocketHandler;
+    private final SocketHandler socketHandler;
     private final SSLServerSocket sslSocket;
 
-    HTTPSThread(final SSLServerSocket sslSocket, final com.github.intellectualsites.kvantum.implementation.SocketHandler SocketHandler)
+    HTTPSThread(final SSLServerSocket sslSocket, final SocketHandler socketHandler)
     {
-        super( "SSL-Runner" );
+        super( "https" );
         this.setPriority( Thread.MAX_PRIORITY );
-        this.SocketHandler = Assert.notNull( SocketHandler );
+        this.socketHandler = Assert.notNull( socketHandler );
         this.sslSocket = Assert.notNull( sslSocket );
     }
 
@@ -55,7 +55,7 @@ final class HTTPSThread extends Thread
             }
             try
             {
-                this.SocketHandler.acceptSocket( sslSocket.accept() );
+                this.socketHandler.acceptSocket( sslSocket.accept() );
             } catch ( final Exception e )
             {
                 Message.TICK_ERROR.log();
