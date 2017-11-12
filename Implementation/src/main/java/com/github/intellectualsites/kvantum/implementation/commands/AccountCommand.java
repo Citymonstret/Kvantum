@@ -22,7 +22,7 @@ import com.github.intellectualsites.kvantum.api.account.IAccount;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.util.ApplicationStructure;
 import com.github.intellectualsites.kvantum.api.util.Assert;
-import com.github.intellectualsites.kvantum.api.util.StringUtil;
+import com.github.intellectualsites.kvantum.api.util.MapUtil;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
@@ -89,7 +89,7 @@ public class AccountCommand extends Command
             } else
             {
                 account.get().removeData( key );
-                send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                send( "Data for account " + account.get().getId() + ": " + MapUtil.join( account.get()
                         .getRawData(), ": ", ", " ) );
             }
             return true;
@@ -122,7 +122,7 @@ public class AccountCommand extends Command
             } else
             {
                 account.get().setData( key, value );
-                send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                send( "Data for account " + account.get().getId() + ": " + MapUtil.join( account.get()
                         .getRawData(), ": ", ", " ) );
             }
             return true;
@@ -155,7 +155,7 @@ public class AccountCommand extends Command
                     send( "There is no such account!" );
                 } else
                 {
-                    send( "Data for account " + account.get().getId() + ": " + StringUtil.join( account.get()
+                    send( "Data for account " + account.get().getId() + ": " + MapUtil.join( account.get()
                             .getRawData(), ": ", ", " ) );
                 }
             }

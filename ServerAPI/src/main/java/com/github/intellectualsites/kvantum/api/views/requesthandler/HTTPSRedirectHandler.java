@@ -22,7 +22,7 @@ import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.response.Response;
-import com.github.intellectualsites.kvantum.api.util.StringUtil;
+import com.github.intellectualsites.kvantum.api.util.MapUtil;
 import com.github.intellectualsites.kvantum.api.util.ProtocolType;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import lombok.Getter;
@@ -54,7 +54,7 @@ final public class HTTPSRedirectHandler extends SimpleRequestHandler
         if ( !query.getParameters().isEmpty() )
         {
             urlBuilder.append( "?" )
-                    .append( StringUtil.join( query.getParameters(), "=", "&" ) );
+                    .append( MapUtil.join( query.getParameters(), "=", "&" ) );
         }
         response.getHeader().redirect( urlBuilder.toString() );
         if ( CoreConfig.debug )

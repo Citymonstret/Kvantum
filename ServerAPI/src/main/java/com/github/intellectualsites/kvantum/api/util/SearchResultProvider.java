@@ -20,10 +20,21 @@ package com.github.intellectualsites.kvantum.api.util;
 
 import java.util.Collection;
 
+/**
+ * An interface for objects that perform a query and returns a collection of results
+ *
+ * @param <T> Type
+ */
 @FunctionalInterface
 public interface SearchResultProvider<T>
 {
 
+    /**
+     * Get all results matching the given query
+     *
+     * @param query Query
+     * @return Collection containing all the matching results
+     */
     Collection<? extends T> getResults(T query);
 
 }

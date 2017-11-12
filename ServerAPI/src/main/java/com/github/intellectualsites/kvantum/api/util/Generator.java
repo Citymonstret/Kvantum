@@ -18,10 +18,22 @@
  */
 package com.github.intellectualsites.kvantum.api.util;
 
+/**
+ * An object that generates a given type from an inputted object
+ *
+ * @param <I> Input type
+ * @param <O> Output type
+ */
 @FunctionalInterface
 public interface Generator<I, O>
 {
 
+    /**
+     * Generate an object from the input
+     *
+     * @param input Input
+     * @return Generated object
+     */
     O generate(I input);
 
 }

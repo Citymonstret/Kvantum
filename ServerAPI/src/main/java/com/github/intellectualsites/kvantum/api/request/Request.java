@@ -27,7 +27,6 @@ import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.util.*;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
-import com.github.intellectualsites.kvantum.api.util.*;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import lombok.*;
@@ -436,7 +435,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
 
         public String getFullRequest()
         {
-            final String parameters = StringUtil.join( getParameters(), "=", "&" );
+            final String parameters = MapUtil.join( getParameters(), "=", "&" );
             return parameters.isEmpty() ? resource : resource + "?" + parameters;
         }
 

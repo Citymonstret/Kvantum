@@ -23,6 +23,9 @@ import lombok.experimental.UtilityClass;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+/**
+ * Utility class for dealing with singleton instances
+ */
 @SuppressWarnings( "ALL" )
 @UtilityClass
 public class InstanceFactory

@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.request;
 
 import com.github.intellectualsites.kvantum.api.util.Assert;
-import com.github.intellectualsites.kvantum.api.util.StringUtil;
+import com.github.intellectualsites.kvantum.api.util.MapUtil;
 import lombok.Getter;
 
 import java.io.BufferedReader;
@@ -80,7 +80,7 @@ final public class PostRequest implements RequestChild
 
     String buildLog()
     {
-        return StringUtil.join( vars, "=", "&" );
+        return MapUtil.join( vars, "=", "&" );
     }
 
     /**

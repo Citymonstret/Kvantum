@@ -20,13 +20,25 @@ package com.github.intellectualsites.kvantum.api.util;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
+/**
+ * Utility class for common {@link Collection collection} operations
+ */
 @UtilityClass
 @SuppressWarnings({ "unused", "WeakerAccess" })
 public final class CollectionUtil
 {
 
+    /**
+     * Clear a collection and return the amount of cleared objects
+     *
+     * @param collection Collection to be cleared
+     * @return Size of collection before clearing
+     */
     public static int clear(final Collection collection)
     {
         final int size = collection.size();
@@ -34,6 +46,13 @@ public final class CollectionUtil
         return size;
     }
 
+    /**
+     * Convert a list to a string list using {@link Object#toString()}
+     *
+     * @param collection Collection to be converted
+     * @param <T>        Type
+     * @return list of strings
+     */
     public static <T> List<String> toStringList(final Collection<T> collection)
     {
         final List<String> returnList = new ArrayList<>( collection.size() );
@@ -41,6 +60,16 @@ public final class CollectionUtil
         return returnList;
     }
 
+    /**
+     * Join all items in a list into a string, using a set delimiter
+     *
+     * @param collection      Collection to be joined
+     * @param stringGenerator String generator
+     * @param joiner          String that will be used to join the items
+     * @param <T>             Type
+     * @return Joined string
+     * @see #join(Collection, String) for an {@link Object#toString()} implementation
+     */
     public static <T> String smartJoin(final Collection<T> collection, final Generator<T, String> stringGenerator,
                                        final String joiner)
     {
@@ -57,11 +86,27 @@ public final class CollectionUtil
         return stringBuilder.toString();
     }
 
+    /**
+     * Join all items in a list into a string, using a set delimiter and {@link Object#toString()}
+     * as the string generator.
+     *
+     * @param collection Collection to be joined
+     * @param joiner     String that will be used to join the items
+     * @param <T>        Type
+     * @return Joined string
+     * @see #smartJoin(Collection, Generator, String) to customize the string generation behavior
+     */
     public static <T> String join(final Collection<T> collection, String joiner)
     {
         return smartJoin( collection, Object::toString, joiner );
     }
 
+    /**
+     * Check if a string collection contains a string, ignoring string casing
+     * @param collection Collecting
+     * @param string String
+     * @return true if the collection contains the string, regardless of casing
+     */
     public static boolean containsIgnoreCase(final Collection<? extends String> collection, final String string)
     {
         Assert.notNull( collection );

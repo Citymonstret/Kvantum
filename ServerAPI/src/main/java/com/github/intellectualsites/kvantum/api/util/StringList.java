@@ -32,6 +32,11 @@ final public class StringList implements Iterable<String>
 
     private final Collection<String> content;
 
+    /**
+     * Initialize a new string list
+     *
+     * @param string Initial content
+     */
     public StringList(final String string)
     {
         this.content = new ArrayList<>();
@@ -42,27 +47,53 @@ final public class StringList implements Iterable<String>
         }
     }
 
+    /**
+     * Remove an item from the list
+     *
+     * @param string Item to be removed
+     * @return True if the item was removed, else false
+     */
     public boolean remove(final String string)
     {
         return this.content.remove( string );
     }
 
+    /**
+     * Add an item to the list
+     *
+     * @param string Item to be added
+     * @return True if the item was added, else false
+     */
     public boolean add(final String string)
     {
         return this.content.add( string );
     }
 
+    /**
+     * Check if the list contains an item
+     *
+     * @param string Item
+     * @return True if the list contains the item, else false
+     */
     public boolean contains(final String string)
     {
         return this.content.contains( string );
     }
 
+    /**
+     * Convert the list to a string, joining with ","
+     * @return Joined list
+     */
     @Override
     public String toString()
     {
         return CollectionUtil.join( this.content, "," );
     }
 
+    /**
+     * Provide the item iterator. Delegate for {@link ArrayList#iterator()}
+     * @return list iterator
+     */
     @Override
     public Iterator<String> iterator()
     {

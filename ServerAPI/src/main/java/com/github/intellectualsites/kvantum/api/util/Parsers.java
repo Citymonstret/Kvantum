@@ -1,3 +1,21 @@
+/*
+ * Kvantum is a web server, written entirely in the Java language.
+ * Copyright (C) 2017 IntellectualSites
+ *
+ * This program is free software; you can redistribute it andor modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package com.github.intellectualsites.kvantum.api.util;
 
 import com.intellectualsites.commands.parser.Parser;
@@ -12,9 +30,20 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Common {@link Parser} utilities and implementations. Does not provide
+ * implementations already existing in Commands:
+ * <p>
+ * <ul>
+ * <li>For integer, see {@link IntegerParser}</li>
+ * <li>For String, see {@link StringParser}</li>
+ * <li>For boolean, see {@link BooleanParser}</li>
+ * </ul>
+ * </p>
+ */
 @SuppressWarnings({ "WeakerAccess", "unused" })
 @UtilityClass
-public class Parsers
+final public class Parsers
 {
 
     private static final Map<Type, Parser<?>> primitiveParserMap = MapBuilder.<Type, Parser<?>>newHashMap()
@@ -28,6 +57,12 @@ public class Parsers
             .put( double.class, new DoubleParser() )
             .put( boolean.class, new BooleanParser() ).get();
 
+    /**
+     * Get the parser for a primitive type (or String.class)
+     *
+     * @param field Type
+     * @return Parser, if it exists
+     */
     public static Optional<Parser<?>> getPrimitiveParser(final Field field)
     {
         return Optional.ofNullable( primitiveParserMap.getOrDefault( field.getGenericType(), null ) );

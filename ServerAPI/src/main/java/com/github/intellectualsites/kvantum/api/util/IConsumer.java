@@ -22,6 +22,11 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Extension of {@link Consumer}
+ *
+ * @param <T> Type
+ */
 public interface IConsumer<T> extends Consumer<T>
 {
 

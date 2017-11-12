@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Utility class for common File operations (both NIO and IO types)
+ */
 @UtilityClass
 public class FileUtils
 {
