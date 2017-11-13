@@ -26,8 +26,7 @@ import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.matching.ViewPattern;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
 import com.github.intellectualsites.kvantum.api.request.Request;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 
 import java.util.Map;
 
@@ -55,7 +54,7 @@ public final class RestDebug extends RestHandler
         }
 
         @Override
-        public JSONObject generate(Request request) throws JSONException
+        public JSONObject generate(Request request)
         {
             final JSONObject object = new JSONObject();
             final MetricRegistry registry = ServerImplementation.getImplementation().getMetrics().getRegistry();

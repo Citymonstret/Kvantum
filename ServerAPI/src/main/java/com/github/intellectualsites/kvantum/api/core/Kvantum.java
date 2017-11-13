@@ -23,6 +23,7 @@ import com.github.intellectualsites.kvantum.api.config.ConfigurationFile;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.events.Event;
 import com.github.intellectualsites.kvantum.api.events.EventCaller;
+import com.github.intellectualsites.kvantum.api.fileupload.KvantumFileUpload;
 import com.github.intellectualsites.kvantum.api.logging.LogModes;
 import com.github.intellectualsites.kvantum.api.logging.LogProvider;
 import com.github.intellectualsites.kvantum.api.logging.LogWrapper;
@@ -288,4 +289,10 @@ public interface Kvantum extends CommandCaller<Kvantum>
      */
     ITempFileManagerFactory getTempFileManagerFactory();
 
+    /**
+     * Get the global file upload instance
+     *
+     * @return global file upload instance
+     */
+    KvantumFileUpload getGlobalFileUpload();
 }

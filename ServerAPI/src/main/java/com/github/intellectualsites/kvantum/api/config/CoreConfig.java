@@ -110,6 +110,7 @@ public class CoreConfig
         public static int in = 1024 * 1024;
         public static int out = 1024 * 1024;
 
+        public static int lineQueInitialization = 20;
     }
 
     @ConfigSection(name = "limits")
@@ -118,7 +119,8 @@ public class CoreConfig
 
         public static int limitRequestLines = 100;
         public static int limitRequestLineSize = 8190;
-        public static int limitMultibodySize = 8190;
+        public static int limitPostMultipartSize = 8190;
+        public static int limitPostBasicSize = 8190;
 
     }
 

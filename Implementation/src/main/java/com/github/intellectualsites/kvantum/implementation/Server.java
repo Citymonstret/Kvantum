@@ -31,6 +31,7 @@ import com.github.intellectualsites.kvantum.api.events.defaultevents.ServerReady
 import com.github.intellectualsites.kvantum.api.events.defaultevents.ShutdownEvent;
 import com.github.intellectualsites.kvantum.api.events.defaultevents.StartupEvent;
 import com.github.intellectualsites.kvantum.api.events.defaultevents.ViewsInitializedEvent;
+import com.github.intellectualsites.kvantum.api.fileupload.KvantumFileUpload;
 import com.github.intellectualsites.kvantum.api.jtwig.JTwigEngine;
 import com.github.intellectualsites.kvantum.api.logging.*;
 import com.github.intellectualsites.kvantum.api.matching.Router;
@@ -107,6 +108,8 @@ public final class Server implements Kvantum, ISessionCreator
     private final Metrics metrics = new Metrics();
     @Getter
     private final ITempFileManagerFactory tempFileManagerFactory = new TempFileManagerFactory();
+    @Getter
+    private final KvantumFileUpload globalFileUpload = new KvantumFileUpload();
     PrintStream logStream;
     @Getter
     private final Gson gson = new GsonBuilder()

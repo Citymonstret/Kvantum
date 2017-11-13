@@ -28,12 +28,13 @@ import com.github.intellectualsites.kvantum.api.exceptions.ProtocolNotSupportedE
 import com.github.intellectualsites.kvantum.api.exceptions.QueryException;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
-import com.github.intellectualsites.kvantum.api.request.PostRequest;
 import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.post.*;
 import com.github.intellectualsites.kvantum.api.response.Header;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.response.ResponseBody;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
+import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.AutoCloseable;
 import com.github.intellectualsites.kvantum.api.util.Provider;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
@@ -42,8 +43,8 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * This is the worker that is responsible for nearly everything.
@@ -154,7 +155,7 @@ final class Worker extends AutoCloseable
         //
         // Read the request
         //
-        final List<String> lines = new ArrayList<>();
+        final Deque<String> lines = new ArrayDeque<>( CoreConfig.Buffer.lineQueInitialization );
         String str;
         while ( ( str = input.readLine() ) != null && !str.isEmpty() )
         {
@@ -208,12 +209,59 @@ final class Worker extends AutoCloseable
         //
         // If the client sent a post request, then make sure to the read the request field
         //
-        if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST && workerContext.getRequest()
-                .getHeader( "Content-Type" ).equalsIgnoreCase( "application/x-www-form-urlencoded" ) )
+        if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST )
         {
             final Request request = workerContext.getRequest();
-            final int cl = Integer.parseInt( workerContext.getRequest().getHeader( "Content-Length" ) );
-            request.setPostRequest( PostRequest.construct( workerContext.getRequest(), cl, input ) );
+            final String contentType = request.getHeader( "Content-Type" );
+
+            boolean isFormURLEncoded = false;
+            boolean isJSON = false;
+
+            if ( ( isFormURLEncoded = contentType.equalsIgnoreCase( "application/x-www-form-urlencoded" ) ) ||
+                    ( isJSON = EntityType.JSON.getContentType().equals( contentType ) ) )
+            {
+                final int contentLength;
+                try
+                {
+                    contentLength = Integer.parseInt( request.getHeader( "Content-Length" ) );
+                } catch ( final Exception ignored )
+                {
+                    return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
+                }
+                if ( contentLength >= CoreConfig.Limits.limitPostBasicSize )
+                {
+                    if ( CoreConfig.debug )
+                    {
+                        Logger.debug( "Supplied post body size too large (%s > %s)", contentLength,
+                                CoreConfig.Limits.limitPostBasicSize );
+                    }
+                    return handleSendStatusOnly( Header.STATUS_ENTITY_TOO_LARGE );
+                }
+                try
+                {
+                    final char[] characters = new char[ contentLength ];
+                    Assert.equals( input.read( characters ), contentLength );
+                    if ( isFormURLEncoded )
+                    {
+                        request.setPostRequest( new UrlEncodedPostRequest( request, new String( characters ) ) );
+                    } else
+                    {
+                        request.setPostRequest( new JsonPostRequest( request, new String( characters ) ) );
+                    }
+                } catch ( final Exception e )
+                {
+                    Logger.warn( "Failed to read url encoded post request (Request: %s): %s",
+                            request, e.getMessage() );
+                }
+            } else if ( contentType.startsWith( "multipart" ) )
+            {
+                request.setPostRequest( new MultipartPostRequest( request, "" ) );
+            } else
+            {
+                Logger.warn( "Request provided unknown post request type (Request: %s): %s", request,
+                        contentType );
+                request.setPostRequest( new DummyPostRequest( request, "" ) );
+            }
         }
 
         //

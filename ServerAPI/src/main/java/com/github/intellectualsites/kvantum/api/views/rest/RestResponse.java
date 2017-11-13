@@ -23,8 +23,7 @@ import com.github.intellectualsites.kvantum.api.request.HttpMethod;
 import com.github.intellectualsites.kvantum.api.request.Request;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 
 import java.util.Map;
 
@@ -96,6 +95,6 @@ public abstract class RestResponse
         return map != null;
     }
 
-    public abstract JSONObject generate(Request request) throws JSONException;
+    public abstract JSONObject generate(Request request);
 
 }

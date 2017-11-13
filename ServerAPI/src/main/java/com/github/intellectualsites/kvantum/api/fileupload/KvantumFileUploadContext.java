@@ -82,7 +82,7 @@ final public class KvantumFileUploadContext implements UploadContext
                 {
                     final String lineWithNewline = line + "\r\n";
                     read += ( lineWithNewline ).getBytes().length;
-                    if ( read >= CoreConfig.Limits.limitMultibodySize )
+                    if ( read >= CoreConfig.Limits.limitPostMultipartSize )
                     {
                         return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus
                                 .ENTITY_TOO_LARGE, null );

@@ -24,6 +24,7 @@ import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.exceptions.QueryException;
 import com.github.intellectualsites.kvantum.api.exceptions.RequestException;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
+import com.github.intellectualsites.kvantum.api.request.post.PostRequest;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.*;
@@ -239,10 +240,6 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
      */
     public PostRequest getPostRequest()
     {
-        if ( this.postRequest == null )
-        {
-            this.postRequest = new PostRequest( this, "&" );
-        }
         return this.postRequest;
     }
 
@@ -292,8 +289,7 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
         String msg = Message.REQUEST_LOG.toString();
         for ( final Object a : new String[]{ socket.getSocket().getRemoteSocketAddress().toString(), getHeader(
                 "User-Agent" ),
-                getHeader( "query" ), getHeader( "Host" ), this.query.buildLog(), postRequest != null ? postRequest
-                .buildLog() : "" } )
+                getHeader( "query" ), getHeader( "Host" ), this.query.buildLog() } )
         {
             msg = msg.replaceFirst( "%s", a.toString() );
         }

@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.request;
 
+import com.github.intellectualsites.kvantum.api.request.post.PostRequest;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.MapUtil;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;

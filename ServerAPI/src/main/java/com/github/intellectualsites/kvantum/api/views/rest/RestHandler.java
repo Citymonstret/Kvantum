@@ -24,8 +24,7 @@ import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.IgnoreSyntax;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +88,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
         try
         {
             jsonObject = restResponse.generate( request );
-        } catch ( JSONException e )
+        } catch ( final Exception e )
         {
             e.printStackTrace();
             try

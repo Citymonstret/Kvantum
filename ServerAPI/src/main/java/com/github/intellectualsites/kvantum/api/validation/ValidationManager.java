@@ -19,8 +19,8 @@
 package com.github.intellectualsites.kvantum.api.validation;
 
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
-import com.github.intellectualsites.kvantum.api.request.PostRequest;
 import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.post.PostRequest;
 
 import java.util.*;
 

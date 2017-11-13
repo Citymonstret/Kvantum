@@ -18,8 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.views.rest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 
 public enum ApiStatus
 {
@@ -27,7 +26,7 @@ public enum ApiStatus
     FAILURE,
     ERROR, PENDING;
 
-    public JSONObject getJSONObject() throws JSONException
+    public JSONObject getJSONObject()
     {
         final JSONObject object = new JSONObject();
         object.put( "statusCode", this.ordinal() );
