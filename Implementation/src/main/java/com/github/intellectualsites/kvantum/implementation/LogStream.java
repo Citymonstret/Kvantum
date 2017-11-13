@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.implementation;
 
+import com.github.intellectualsites.kvantum.api.io.AsyncBufferedOutputStream;
 import com.github.intellectualsites.kvantum.api.util.TimeUtil;
 
 import java.io.File;
@@ -31,8 +32,8 @@ final class LogStream extends PrintStream
 
     LogStream(final File logFolder) throws FileNotFoundException
     {
-        super( new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat, new Date() )
-                + ".txt" ) ) );
+        super(new AsyncBufferedOutputStream(new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat, new Date() )
+                + ".txt" ) )));
     }
 
 }
