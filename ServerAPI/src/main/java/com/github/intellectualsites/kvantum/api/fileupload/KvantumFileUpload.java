@@ -18,7 +18,6 @@
  */
 package com.github.intellectualsites.kvantum.api.fileupload;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileCleaningTracker;
@@ -76,25 +75,25 @@ public class KvantumFileUpload extends FileUpload
     /**
      * Delegate for {@link FileUpload#getItemIterator(RequestContext)}
      */
-    public FileItemIterator getItemIterator(final Request request) throws FileUploadException, IOException
+    public FileItemIterator getItemIterator(final KvantumFileUploadContext request) throws FileUploadException, IOException
     {
-        return super.getItemIterator( new KvantumFileUploadContext( request ) );
+        return super.getItemIterator( request );
     }
 
     /**
      * Delegate for {@link FileUpload#parseRequest(RequestContext)}
      */
-    public List<FileItem> parseRequest(final Request request) throws FileUploadException
+    public List<FileItem> parseRequest(final KvantumFileUploadContext request) throws FileUploadException
     {
-        return super.parseRequest( new KvantumFileUploadContext( request ) );
+        return super.parseRequest( request );
     }
 
     /**
      * Delegate for {@link FileUpload#parseParameterMap(RequestContext)}
      */
-    public Map<String, List<FileItem>> parseParameterMap(final Request request) throws FileUploadException
+    public Map<String, List<FileItem>> parseParameterMap(final KvantumFileUploadContext request) throws FileUploadException
     {
-        return super.parseParameterMap( new KvantumFileUploadContext( request ) );
+        return super.parseParameterMap( request );
     }
 
 }

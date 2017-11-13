@@ -18,7 +18,7 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 * HEAD - Serve headers through HEAD requests. HTTP message is not provided.
 * **[W.I.P]** POST - Send (and serve) content through POST requests
 	* Basic HTTP request messages are supported
-	* **[TODO]** multipart/form-data message format
+	* multipart/form-data message format
 	* **[TODO]** JSON message format
 * Other methods such as PUT, PATCH, DELETE etc are read into requests, but not handled by the default Kvantum implementation. This is intended behavior, and these methods are to be handled by the individual application implementations instead (per-project implementations are recommened).
 

@@ -33,6 +33,7 @@ import com.google.common.collect.ListMultimap;
 import lombok.*;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -95,6 +96,9 @@ final public class Request implements ProviderFactory<Request>, VariableProvider
     @Getter
     @Setter
     protected BufferedOutputStream outputStream;
+    @Getter
+    @Setter
+    private BufferedReader inputReader;
 
     /**
      * The request constructor

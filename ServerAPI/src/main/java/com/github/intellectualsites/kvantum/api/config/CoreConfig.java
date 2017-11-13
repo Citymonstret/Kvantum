@@ -118,6 +118,8 @@ public class CoreConfig
 
         public static int limitRequestLines = 100;
         public static int limitRequestLineSize = 8190;
+        public static int limitMultibodySize = 8190;
+
     }
 
     @ConfigSection(name = "cache")

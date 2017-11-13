@@ -36,7 +36,6 @@ final public class PostRequest implements RequestChild
     TODO: Support more POST request body types, such as:
     - JSON
     - Xml
-    - Multipart forms
      */
 
     public final String request;

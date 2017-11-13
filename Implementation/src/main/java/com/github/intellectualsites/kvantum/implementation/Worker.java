@@ -203,6 +203,8 @@ final class Worker extends AutoCloseable
             return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
         }
 
+        this.workerContext.getRequest().setInputReader( input );
+
         //
         // If the client sent a post request, then make sure to the read the request field
         //

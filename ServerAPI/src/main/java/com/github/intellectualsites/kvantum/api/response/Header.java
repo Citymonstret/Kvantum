@@ -77,6 +77,7 @@ final public class Header
     public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
     public static final String STATUS_NOT_ACCEPTABLE = "406 Not Acceptable";
     public static final String STATUS_PAYLOAD_TOO_LARGE = "413 Payload Too Large";
+    public static final String STATUS_ENTITY_TOO_LARGE = "413 Entity Too Large";
     public static final String STATUS_REQUEST_TIMEOUT = "408 Request Timeout";
 
     //
