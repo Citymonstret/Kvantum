@@ -199,7 +199,7 @@ final public class KvantumMain
         private int workers = -1;
 
         @Parameter(names = "-example", description = "Run an example view. Current examples: usersearch")
-        private String example;
+        private String example = "";
 
     }
 }
