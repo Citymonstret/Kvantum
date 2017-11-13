@@ -92,13 +92,13 @@ Kvantum has a built in console command system that can be extended programmatica
 ### 4.1 Account System
 Kvantum comes with an account system, that is meant to remove the need for account management boilerplate.
 * SQLite Account database implementation
-* MongoDB Account database implemenation
+* MongoDB Account database implementation
 * Account server-cache
 * Account session binding
 * Account data management
 * Account creation
 * Password management
-* Account role (permssion) system with API and persistent role storage
+* Account role (permission) system with API and persistent role storage
 
 ### 4.2 Plugin System
 Kvantum has a plugin system implementation that allows plugins to be loaded by the server at runtime
@@ -131,4 +131,4 @@ Kvantum also includes another more fluent system that is especially handy in RES
 Kvantum includes a framework which allows you to map objects to <string,string> parameters from GET/POST requests and
 automatically generate objects based on these parameters
 
-* [**TODO**] Add more parser types (Current: String, Boolean, Integer)
+* Currently supports: String, Boolean, Integer, Long, Short, Byte, Char, Double, Float
