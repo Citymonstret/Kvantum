@@ -32,8 +32,8 @@ final class LogStream extends PrintStream
 
     LogStream(final File logFolder) throws FileNotFoundException
     {
-        super(new AsyncBufferedOutputStream(new FileOutputStream( new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat, new Date() )
-                + ".txt" ) )));
+        super( new AsyncBufferedOutputStream( new FileOutputStream(
+                new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat, new Date() ) + ".txt" ) ) ) );
     }
 
 }

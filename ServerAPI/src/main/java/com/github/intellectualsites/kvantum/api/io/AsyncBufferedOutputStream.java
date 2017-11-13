@@ -18,10 +18,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  *
  * @author thomas.jungblut
  */
-public final class AsyncBufferedOutputStream extends FilterOutputStream {
+public final class AsyncBufferedOutputStream extends FilterOutputStream
+{
 
     private final FlushThread flusher = new FlushThread();
-    private final Thread flusherThread = new Thread(flusher, "FlushThread");
+    private final Thread flusherThread = new Thread( flusher, "FlushThread" );
     private final ConcurrentLinkedDeque<byte[]> buffers;
 
     private final byte[] buf;
@@ -31,16 +32,18 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
      * Creates an asynchronous buffered output stream with 8K buffer and 5 maximal
      * buffers.
      */
-    public AsyncBufferedOutputStream(OutputStream out) {
-        this(out, 8 * 1024, 5);
+    public AsyncBufferedOutputStream(OutputStream out)
+    {
+        this( out, 8 * 1024, 5 );
     }
 
     /**
      * Creates an asynchronous buffered output stream with defined buffersize and
      * 5 maximal buffers.
      */
-    public AsyncBufferedOutputStream(OutputStream out, int bufSize) {
-        this(out, bufSize, 5);
+    public AsyncBufferedOutputStream(OutputStream out, int bufSize)
+    {
+        this( out, bufSize, 5 );
     }
 
     /**
@@ -50,10 +53,11 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
      * @param bufSize    the buffer size.
      * @param maxBuffers the number of buffers to keep in parallel.
      */
-    public AsyncBufferedOutputStream(OutputStream out, int bufSize, int maxBuffers) {
-        super(out);
+    public AsyncBufferedOutputStream(OutputStream out, int bufSize, int maxBuffers)
+    {
+        super( out );
         buffers = new ConcurrentLinkedDeque<>();
-        buf = new byte[bufSize];
+        buf = new byte[ bufSize ];
         flusherThread.start();
     }
 
@@ -64,15 +68,17 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
      * @throws IOException if an I/O error occurs.
      */
     @Override
-    public synchronized void write(int b) throws IOException {
+    public synchronized void write(int b) throws IOException
+    {
         flushBufferIfSizeLimitReached();
         throwOnFlusherError();
-        buf[count++] = (byte) b;
+        buf[ count++ ] = (byte) b;
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
+    public void write(byte[] b) throws IOException
+    {
+        write( b, 0, b.length );
     }
 
     /**
@@ -85,18 +91,21 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
      * @throws IOException if an I/O error occurs.
      */
     @Override
-    public synchronized void write(byte[] b, int off, int len) throws IOException {
-        if ((off | len | (b.length - (len + off)) | (off + len)) < 0) {
+    public synchronized void write(byte[] b, int off, int len) throws IOException
+    {
+        if ( ( off | len | ( b.length - ( len + off ) ) | ( off + len ) ) < 0 )
+        {
             throw new IndexOutOfBoundsException();
         }
 
         int bytesWritten = 0;
-        while (bytesWritten < len) {
+        while ( bytesWritten < len )
+        {
             throwOnFlusherError();
             flushBufferIfSizeLimitReached();
 
-            int bytesToWrite = Math.min(len - bytesWritten, buf.length - count);
-            System.arraycopy(b, off + bytesWritten, buf, count, bytesToWrite);
+            int bytesToWrite = Math.min( len - bytesWritten, buf.length - count );
+            System.arraycopy( b, off + bytesWritten, buf, count, bytesToWrite );
             count += bytesToWrite;
             bytesWritten += bytesToWrite;
         }
@@ -109,68 +118,85 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
      * @throws IOException if an I/O error occurs.
      */
     @Override
-    public synchronized void flush() throws IOException {
+    public synchronized void flush() throws IOException
+    {
         forceFlush();
     }
 
-    private void flushBufferIfSizeLimitReached() throws IOException {
-        if (count >= buf.length) {
+    private void flushBufferIfSizeLimitReached() throws IOException
+    {
+        if ( count >= buf.length )
+        {
             forceFlush();
         }
     }
 
-    private void forceFlush() throws IOException {
-        if (count > 0) {
-            final byte[] copy = new byte[count];
-            System.arraycopy(buf, 0, copy, 0, copy.length);
-            buffers.add(copy);
+    private void forceFlush() throws IOException
+    {
+        if ( count > 0 )
+        {
+            final byte[] copy = new byte[ count ];
+            System.arraycopy( buf, 0, copy, 0, copy.length );
+            buffers.add( copy );
             count = 0;
         }
     }
 
     @Override
-    public synchronized void close() throws IOException {
+    public synchronized void close() throws IOException
+    {
         throwOnFlusherError();
 
         forceFlush();
         flusher.closed = true;
 
-        try {
+        try
+        {
             flusherThread.interrupt();
             flusherThread.join();
 
             throwOnFlusherError();
-        } catch (InterruptedException e) {
+        } catch ( InterruptedException e )
+        {
             // this is expected to happen
-        } finally {
+        } finally
+        {
             out.close();
         }
     }
 
-    private void throwOnFlusherError() throws IOException {
-        if (flusher != null && flusher.errorHappened) {
-            throw new IOException("caught flusher to fail writing asynchronously!",
-                    flusher.caughtException);
+    private void throwOnFlusherError() throws IOException
+    {
+        if ( flusher != null && flusher.errorHappened )
+        {
+            throw new IOException( "caught flusher to fail writing asynchronously!",
+                    flusher.caughtException );
         }
     }
 
-    class FlushThread implements Runnable {
+    class FlushThread implements Runnable
+    {
 
         volatile boolean closed = false;
         volatile boolean errorHappened = false;
         volatile Exception caughtException;
 
         @Override
-        public void run() {
+        public void run()
+        {
             // run the real flushing action to the underlying stream
-            try {
-                while (!closed) {
+            try
+            {
+                while ( !closed )
+                {
                     byte[] take = buffers.poll();
-                    if (take != null) {
-                        out.write(take);
+                    if ( take != null )
+                    {
+                        out.write( take );
                     }
                 }
-            } catch (Exception e) {
+            } catch ( Exception e )
+            {
                 caughtException = e;
                 errorHappened = true;
                 // yield this thread, an error happened
