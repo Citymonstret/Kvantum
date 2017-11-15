@@ -38,14 +38,41 @@ public interface ICacheManager
      */
     String getCachedInclude(String file);
 
+    /**
+     * Get a cached account based on the account ID, if it
+     * is stored in the cache
+     *
+     * @param id Account id
+     * @return Account if it is stored
+     * @see #getCachedId(String) to get the account ID from the account username
+     */
     Optional<IAccount> getCachedAccount(int id);
 
+    /**
+     * Get a cached account ID, if it is stored in the cache
+     * @param username Account username
+     * @return Account ID if it is stored
+     */
     Optional<Integer> getCachedId(String username);
 
+    /**
+     * Save an account to the cache
+     * @param account Account to save
+     */
     void setCachedAccount(IAccount account);
 
+    /**
+     * Get a cached file from the cache, if is stored
+     * @param file File name
+     * @return File, if it stored
+     */
     Optional<String> getCachedFile(String file);
 
+    /**
+     * Save an account to the cache
+     * @param file File name
+     * @param content File content
+     */
     void setCachedFile(String file, String content);
 
     /**

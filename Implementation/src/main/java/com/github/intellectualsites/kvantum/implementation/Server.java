@@ -170,7 +170,7 @@ public final class Server implements Kvantum, ISessionCreator
         //
         // Setup and initialize the file system
         //
-        coreFolder = new File( coreFolder, ".kvantum" ); // Makes everything more portable
+        coreFolder = new File( coreFolder, "kvantum" ); // Makes everything more portable
         if ( !coreFolder.exists() && !coreFolder.mkdirs() )
         {
             throw new KvantumInitializationException( "Failed to create the core folder: " + coreFolder );

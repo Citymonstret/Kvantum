@@ -56,6 +56,9 @@ public class Metrics
     private final Timer requestPreparation;
     private final Timer contentHandling;
     private final Timer sessionPreparation;
+    private final Timer workerContextHandling;
+    private final Timer workerPrepare;
+    private final Timer readInput;
 
     private final double durationFactor;
 
@@ -68,6 +71,9 @@ public class Metrics
         this.requestPreparation = this.registry.timer( "requestPreparation" );
         this.contentHandling = this.registry.timer( "contentHandling" );
         this.sessionPreparation = this.registry.timer( "sessionPreparation" );
+        this.workerContextHandling = this.registry.timer( "workerContextHandling" );
+        this.workerPrepare = this.registry.timer( "workerPrepare" );
+        this.readInput = this.registry.timer( "readInput" );
 
         this.durationFactor = 1.0 / TimeUnit.MILLISECONDS.toNanos( 1 );
     }
@@ -204,6 +210,21 @@ public class Metrics
     public Timer.Context registerSessionPreparation()
     {
         return sessionPreparation.time();
+    }
+
+    public Timer.Context registerWorkerContextHandling()
+    {
+        return workerContextHandling.time();
+    }
+
+    public Timer.Context registerWorkerPrepare()
+    {
+        return workerPrepare.time();
+    }
+
+    public Timer.Context registerReadInput()
+    {
+        return readInput.time();
     }
 
 }

@@ -19,18 +19,18 @@
 package com.github.intellectualsites.kvantum.api.events;
 
 import com.github.intellectualsites.kvantum.api.util.Assert;
+import lombok.Getter;
 
 /**
  * This is an event, in other words:
  * <br/>
  * Something that happens, that can be captured
  * using code
- *
- * @author Citymonstret
  */
 public abstract class Event
 {
 
+    @Getter
     private final String name;
     private final int accessor;
 
@@ -52,16 +52,6 @@ public abstract class Event
     public final String toString()
     {
         return this.getClass().getName();
-    }
-
-    /**
-     * Get the specified event name
-     *
-     * @return Event name
-     */
-    private String getName()
-    {
-        return this.name;
     }
 
     @Override

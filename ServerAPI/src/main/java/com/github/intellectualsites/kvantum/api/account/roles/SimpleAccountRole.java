@@ -29,6 +29,11 @@ public class SimpleAccountRole extends AccountRole
 
     private final Set<String> permissionSet = new HashSet<>();
 
+    /**
+     * Construct a new account role
+     *
+     * @param roleIdentifier Unique role identifier
+     */
     protected SimpleAccountRole(final String roleIdentifier)
     {
         super( roleIdentifier );

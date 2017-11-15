@@ -19,16 +19,14 @@
 package com.github.intellectualsites.kvantum.api.events;
 
 /**
- * This handles calling
- *
- * @author Citymonstret
+ * Responsible for handling {@link Event} broadcasting
  */
 @FunctionalInterface
 public interface EventCaller
 {
 
     /**
-     * Call an event
+     * Call an event and allow all listeners to act on it
      *
      * @param event Event to call
      */

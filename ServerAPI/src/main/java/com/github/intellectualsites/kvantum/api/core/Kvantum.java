@@ -162,6 +162,11 @@ public interface Kvantum extends CommandCaller<Kvantum>
     @SuppressWarnings("ALL")
     void start();
 
+    /**
+     * Get the worker procedure instance
+     *
+     * @return Worker procedure instance
+     */
     WorkerProcedure getProcedure();
 
     /**
@@ -181,10 +186,22 @@ public interface Kvantum extends CommandCaller<Kvantum>
      */
     void log(String message, int mode, Object... args);
 
+    /**
+     * Get the cache manager instance
+     * @return Cache manager instance
+     */
     ICacheManager getCacheManager();
 
+    /**
+     * Get the currently used log wrapper instance
+     * @return Log wrapper
+     */
     LogWrapper getLogWrapper();
 
+    /**
+     * Get the translation configuration file instance
+     * @return Translation file
+     */
     ConfigurationFile getTranslations();
 
     /**

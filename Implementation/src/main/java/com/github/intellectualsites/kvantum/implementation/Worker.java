@@ -148,6 +148,8 @@ final class Worker extends AutoCloseable
             this.server.log( Message.CONNECTION_ACCEPTED, remote.getAddress() );
         }
 
+        final Timer.Context readInput = ServerImplementation.getImplementation().getMetrics().registerReadInput();
+
         final BufferedReader input = new BufferedReader( new InputStreamReader( remote.getSocket().getInputStream() ),
                 CoreConfig.Buffer.in );
         this.workerContext.setOutput( new BufferedOutputStream( remote.getSocket()
@@ -173,6 +175,9 @@ final class Worker extends AutoCloseable
 
             lines.add( str );
         }
+
+
+        readInput.stop();
 
         //
         // Make sure that the client cannot send an extreme number of lines in their request to bypass
@@ -327,9 +332,16 @@ final class Worker extends AutoCloseable
         {
             try
             {
-                if ( this.prepare( remote ) )
+                final Timer.Context workerPrepare = ServerImplementation.getImplementation().getMetrics()
+                        .registerWorkerPrepare();
+                final boolean prepared = this.prepare( remote );
+                workerPrepare.stop();
+                if ( prepared )
                 {
+                    final Timer.Context contextTimerContext = ServerImplementation.getImplementation().getMetrics()
+                            .registerWorkerContextHandling();
                     this.workerContext.handle( this );
+                    contextTimerContext.stop();
                 }
             } catch ( final Exception e )
             {

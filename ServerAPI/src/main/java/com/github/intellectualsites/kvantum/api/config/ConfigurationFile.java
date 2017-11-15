@@ -63,6 +63,11 @@ public interface ConfigurationFile
      */
     <T> T get(String key);
 
+    /**
+     * Get all stored entries
+     *
+     * @return all entries
+     */
     Map<String, Object> getAll();
 
     /**

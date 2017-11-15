@@ -19,9 +19,7 @@
 package com.github.intellectualsites.kvantum.api.events;
 
 /**
- * This is the default event caller
- *
- * @author Citymonstret
+ * Default {@link EventCaller} implementation
  */
 public final class DefaultEventCaller implements EventCaller
 {

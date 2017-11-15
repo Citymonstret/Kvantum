@@ -30,7 +30,7 @@ public class Macro extends Syntax
 {
 
     private static final Pattern MACRO_USAGE = Pattern.compile(
-            "#(?<name>[A-Za-z0-9]+)([\\S\\s]*)\\((?<params>[\"A-Za-z0-9\\s]*)\\)([\\S\\s]*)#"
+            "#(?<name>[A-Za-z0-9]+) \\((?<params>[\"A-Za-z0-9\\s]*)\\)#"
     );
 
     private static final Pattern MACRO_USAGE_PARAM = Pattern.compile(

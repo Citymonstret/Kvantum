@@ -20,6 +20,9 @@ package com.github.intellectualsites.kvantum.api.account.roles.defaults;
 
 import com.github.intellectualsites.kvantum.api.account.roles.SimpleAccountRole;
 
+/**
+ * Default account role that is permitted to do everything
+ */
 @SuppressWarnings( "ALL" )
 final public class Administrator extends SimpleAccountRole
 {

@@ -107,8 +107,8 @@ public class CoreConfig
     public static class Buffer
     {
 
-        public static int in = 1024 * 1024;
-        public static int out = 1024 * 1024;
+        public static int in = 100_000;
+        public static int out = 100_000;
 
         public static int lineQueInitialization = 20;
     }
