@@ -11,6 +11,9 @@ You can see the current progress [here](https://github.com/IntellectualSites/Kva
 
 [![Project Stats](https://www.openhub.net/p/Kvantum/widgets/project_thin_badge.gif)](https://www.openhub.net/p/Kvantum)
 
+You can join the developer chat at discord: 
+[![Discord](https://img.shields.io/discord/380323926959587338.svg?style=flat-square)](https://discord.gg/Gb2TDk9)
+
 ## Description
 Kvantum is a lightweight, portable and (if you so desire) embeddable (HTTP/HTTPS) web server, written 
 entirely in java. It is meant to be easy to use, yet offer a wide variety of tools and utilities to simplify the 
