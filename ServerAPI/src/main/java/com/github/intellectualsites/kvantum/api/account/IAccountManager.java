@@ -191,8 +191,9 @@ public interface IAccountManager extends SearchResultProvider<IAccount>
     {
         boolean searchId = searchQuery.getId() != -1;
         boolean searchUsername = searchQuery.getUsername() != null &&
-                !searchQuery.getUsername().equals( "none" ) &&
-                !searchQuery.getUsername().equals( "null" );
+                searchQuery.getUsername() != null &&
+                !searchQuery.getUsername().isEmpty() &&
+                !"null".equals( searchQuery.getUsername() );
         if ( searchId )
         {
             final Optional<IAccount> returnOptional = getAccount( searchQuery.getId() );

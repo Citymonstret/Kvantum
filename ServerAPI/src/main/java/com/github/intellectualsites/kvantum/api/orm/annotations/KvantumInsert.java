@@ -30,4 +30,6 @@ public @interface KvantumInsert
 
     String value();
 
+    String defaultValue() default "null";
+
 }

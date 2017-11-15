@@ -19,8 +19,12 @@
 package com.github.intellectualsites.kvantum.api.orm;
 
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumField;
+import com.github.intellectualsites.kvantum.api.util.CollectionUtil;
 import com.intellectualsites.commands.parser.ParserResult;
 import lombok.*;
+import net.sf.oval.ConstraintViolation;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor( access = AccessLevel.PACKAGE )
@@ -63,6 +67,19 @@ final public class KvantumObjectParserResult<T>
             return "Failed to create new instance: \"" + exception.getMessage() + "\"";
         }
 
+    }
+
+    @AllArgsConstructor(access = AccessLevel.PACKAGE)
+    public static class KvantumObjectParserValidationFailed extends KvantumObjectParserError
+    {
+
+        private final List<ConstraintViolation> violations;
+
+        @Override
+        public String getCause()
+        {
+            return "Violations failed: " + CollectionUtil.join( violations, ", " );
+        }
     }
 
     @AllArgsConstructor( access = AccessLevel.PACKAGE )

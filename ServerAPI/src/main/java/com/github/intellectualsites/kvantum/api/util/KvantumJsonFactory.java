@@ -1,11 +1,15 @@
 package com.github.intellectualsites.kvantum.api.util;
 
+import com.google.gson.JsonPrimitive;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Utilities for common JSON procedures
+ */
 @UtilityClass
 public class KvantumJsonFactory
 {
@@ -35,6 +39,22 @@ public class KvantumJsonFactory
             e.printStackTrace();
         }
         return new JSONObject();
+    }
+
+    /**
+     * Get a {@link JsonPrimitive} instance for a given string. The
+     * string will be empty ({@code ""}) if the input string is null
+     *
+     * @param in String
+     * @return Parsed primitive
+     */
+    public static JsonPrimitive stringToPrimitive(final String in)
+    {
+        if ( in == null )
+        {
+            return new JsonPrimitive( "" );
+        }
+        return new JsonPrimitive( in );
     }
 
 }

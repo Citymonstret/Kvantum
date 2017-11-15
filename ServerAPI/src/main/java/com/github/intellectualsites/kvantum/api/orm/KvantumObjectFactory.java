@@ -29,6 +29,8 @@ import com.github.intellectualsites.kvantum.api.views.rest.RequestRequirements;
 import com.intellectualsites.commands.parser.Parser;
 import com.intellectualsites.commands.parser.ParserResult;
 import lombok.*;
+import net.sf.oval.ConstraintViolation;
+import net.sf.oval.Validator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -82,7 +84,9 @@ final public class KvantumObjectFactory<T>
 {
 
     private static final Map<Class<?>, KvantumObjectFactory<?>> factoryCache = new ConcurrentHashMap<>();
+    private static final Validator validator = new Validator();
 
+    private final KvantumObject kvantumObjectDeclaration;
     private final InternalKvantumConstructor<T> constructor;
     private final Map<String, InternalKvantumField> fields;
 
@@ -104,7 +108,8 @@ final public class KvantumObjectFactory<T>
     @SuppressWarnings( "ALL" )
     public static <T> KvantumObjectFactory<T> from(final Class<T> clazz) throws IllegalArgumentException
     {
-        if ( clazz.getAnnotation( KvantumObject.class ) == null )
+        final KvantumObject kvantumObject;
+        if ( ( kvantumObject = clazz.getAnnotation( KvantumObject.class ) ) == null )
         {
             throw new IllegalArgumentException(
                     String.format( "Class [%s] does not have an @KvantumObject annotation!", clazz.getName() ) );
@@ -181,7 +186,7 @@ final public class KvantumObjectFactory<T>
         //
         // Now we have to find a suitable constructor
         //
-        final Set<String> kvantumConstructorParameters = new LinkedHashSet<>();
+        final Set<InternalKvantumConstructorParameter> kvantumConstructorParameters = new LinkedHashSet<>();
         Constructor<T> kvantumConstructor = null;
         for ( final Constructor<?> constructor : clazz.getDeclaredConstructors() )
         {
@@ -196,7 +201,39 @@ final public class KvantumObjectFactory<T>
                                 String.format( "Class [%s] does not have an appropriate constructor (missing " +
                                         "@KvantumField for parameter (%s)", clazz.getName(), parameter.getName() ) );
                     }
-                    kvantumConstructorParameters.add( insert.value() );
+
+                    final String fieldName = insert.value();
+
+                    if ( !clazzFields.containsKey( fieldName ) )
+                    {
+                        throw new IllegalArgumentException(
+                                String.format( "Parameter '%s' in class '%s' is referring to kvantum field '%s'," +
+                                                " but no such kvantum field is declared",
+                                        parameter.getName(), clazz.getName(), fieldName ) );
+                    }
+
+                    final InternalKvantumField field = clazzFields.get( fieldName );
+                    final Object defaultValue;
+                    if ( "null".equals( insert.defaultValue() ) )
+                    {
+                        defaultValue = null;
+                    } else
+                    {
+                        final Parser<?> parser = field.getParser();
+                        final ParserResult<?> parserResult = parser.parse( insert.defaultValue() );
+                        if ( !parserResult.isParsed() )
+                        {
+                            throw new IllegalArgumentException(
+                                    String.format( "Parameter '%s' in class '%s' is referring to kvantum field '%s'," +
+                                                    " but default value cannot be parsed: %s",
+                                            parameter.getName(), clazz.getName(), fieldName, parserResult.getError() ) );
+                        }
+                        defaultValue = parserResult.getResult();
+                    }
+
+                    final InternalKvantumConstructorParameter kvantumConstructorParameter =
+                            new InternalKvantumConstructorParameter( fieldName, field, defaultValue );
+                    kvantumConstructorParameters.add( kvantumConstructorParameter );
                 }
                 constructor.setAccessible( true );
                 kvantumConstructor = (Constructor<T>) constructor;
@@ -209,8 +246,8 @@ final public class KvantumObjectFactory<T>
                     String.format( "Class [%s] does not have an appropriate constructor", clazz.getName() ) );
         }
 
-        final val factory = new KvantumObjectFactory<>( new InternalKvantumConstructor<>( kvantumConstructor,
-                kvantumConstructorParameters ), clazzFields );
+        final val factory = new KvantumObjectFactory<>( kvantumObject,
+                new InternalKvantumConstructor<>( kvantumConstructor, kvantumConstructorParameters ), clazzFields );
         factoryCache.put( clazz, factory );
         return factory;
     }
@@ -223,6 +260,64 @@ final public class KvantumObjectFactory<T>
         } else
         {
             return new PostBuilderInstance();
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    private static class InternalKvantumConstructor<T>
+    {
+
+        private final Constructor<T> javaConstructor;
+        private final Set<InternalKvantumConstructorParameter> constructorParameters;
+
+    }
+
+    @EqualsAndHashCode(of = "kvantumName")
+    @Getter
+    @AllArgsConstructor
+    private static class InternalKvantumField
+    {
+
+        private final String kvantumName;
+        private final Object defaultValue;
+        private final Field javaField;
+        private final KvantumField kvantumField;
+        private final Parser<?> parser;
+
+    }
+
+    @EqualsAndHashCode(of = "parameterName")
+    @Getter
+    @AllArgsConstructor
+    private static class InternalKvantumConstructorParameter
+    {
+
+        private final String parameterName;
+        private final InternalKvantumField internalKvantumField;
+        private final Object defaultValue;
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public final class GetBuilderInstance extends BuilderInstance
+    {
+
+        @Override
+        protected Map<String, String> getParameters(final Request request)
+        {
+            return request.getQuery().getParameters();
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public final class PostBuilderInstance extends BuilderInstance
+    {
+
+        @Override
+        protected Map<String, String> getParameters(final Request request)
+        {
+            return request.getPostRequest().get();
         }
     }
 
@@ -302,9 +397,17 @@ final public class KvantumObjectFactory<T>
             {
                 final Object[] constructorParameters = new Object[ constructor.getConstructorParameters().size() ];
                 int index = 0;
-                for ( String s : constructor.getConstructorParameters() )
+                for ( InternalKvantumConstructorParameter parameter : constructor.getConstructorParameters() )
                 {
-                    constructorParameters[ index++ ] = parsed.get( s );
+                    Object value;
+                    if ( parsed.containsKey( parameter.getParameterName() ) &&
+                            ( value = parsed.get( parameter.getParameterName() ) ) != null )
+                    {
+                        constructorParameters[ index++ ] = value;
+                    } else
+                    {
+                        constructorParameters[ index++ ] = parameter.getDefaultValue();
+                    }
                 }
                 try
                 {
@@ -315,53 +418,19 @@ final public class KvantumObjectFactory<T>
                             .KvantumObjectParserInitializedFailed( e ) );
                 }
             }
+
+            if ( kvantumObjectDeclaration.checkValidity() )
+            {
+                final List<ConstraintViolation> violations = validator.validate( instance );
+                if ( !violations.isEmpty() )
+                {
+                    return new KvantumObjectParserResult<>( null, false, new KvantumObjectParserResult
+                            .KvantumObjectParserValidationFailed( violations ) );
+                }
+            }
+
             return new KvantumObjectParserResult<>( instance, true );
         }
-
-    }
-
-    @NoArgsConstructor( access = AccessLevel.PRIVATE )
-    public final class GetBuilderInstance extends BuilderInstance
-    {
-
-        @Override
-        protected Map<String, String> getParameters(final Request request)
-        {
-            return request.getQuery().getParameters();
-        }
-    }
-
-    @NoArgsConstructor( access = AccessLevel.PRIVATE )
-    public final class PostBuilderInstance extends BuilderInstance
-    {
-
-        @Override
-        protected Map<String, String> getParameters(final Request request)
-        {
-            return request.getPostRequest().get();
-        }
-    }
-
-    @Getter
-    @AllArgsConstructor
-    private static class InternalKvantumConstructor<T>
-    {
-
-        private final Constructor<T> javaConstructor;
-        private final Set<String> constructorParameters;
-
-    }
-
-    @Getter
-    @AllArgsConstructor
-    private static class InternalKvantumField
-    {
-
-        private final String kvantumName;
-        private final Object defaultValue;
-        private final Field javaField;
-        private final KvantumField kvantumField;
-        private final Parser<?> parser;
 
     }
 

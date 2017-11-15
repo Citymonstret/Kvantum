@@ -18,6 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.implementation;
 
+import com.github.intellectualsites.kvantum.api.util.KvantumJsonFactory;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -34,7 +35,7 @@ final public class AccountSerializer implements JsonSerializer<Account>, JsonDes
     {
         final JsonObject jsonObject = new JsonObject();
         jsonObject.add( "id", new JsonPrimitive( src.getId() ) );
-        jsonObject.add( "username", new JsonPrimitive( src.getUsername() ) );
+        jsonObject.add( "username", KvantumJsonFactory.stringToPrimitive( src.getUsername() ) );
         return jsonObject;
     }
 
