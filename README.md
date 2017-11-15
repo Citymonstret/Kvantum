@@ -60,7 +60,7 @@ We are using JitPack as our maven repo
 </repositories>
 
 <dependency>
-    <groupId>com.github.IntellectualSites.Kvantum</groupId>
+    <groupId>xyz.kvantum.Kvantum</groupId>
     <artifactId>Implementation</artifactId>
     <version>BETA-0.0.4</version>
 </dependency>
