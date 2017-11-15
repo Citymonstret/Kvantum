@@ -21,7 +21,7 @@ package com.github.intellectualsites.kvantum.api.views.requesthandler;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.matching.Router;
 import com.github.intellectualsites.kvantum.api.matching.ViewPattern;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 
@@ -35,17 +35,17 @@ public class SimpleRequestHandler extends RequestHandler
     private static AtomicInteger identifier = new AtomicInteger( 0 );
 
     private final String pattern;
-    private final BiConsumer<Request, Response> generator;
+    private final BiConsumer<AbstractRequest, Response> generator;
     private final boolean forceHTTPS;
     private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
     private ViewPattern compiledPattern;
 
-    protected SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator)
+    protected SimpleRequestHandler(String pattern, BiConsumer<AbstractRequest, Response> generator)
     {
         this( pattern, generator, false );
     }
 
-    protected SimpleRequestHandler(String pattern, BiConsumer<Request, Response> generator, boolean forceHTTPS)
+    protected SimpleRequestHandler(String pattern, BiConsumer<AbstractRequest, Response> generator, boolean forceHTTPS)
     {
         this.pattern = pattern;
         this.generator = generator;
@@ -83,7 +83,7 @@ public class SimpleRequestHandler extends RequestHandler
     }
 
     @Override
-    public boolean matches(final Request request)
+    public boolean matches(final AbstractRequest request)
     {
         final Map<String, String> map = getPattern().matches( request.getQuery().getFullRequest() );
         if ( map != null )
@@ -94,7 +94,7 @@ public class SimpleRequestHandler extends RequestHandler
     }
 
     @Override
-    public final Response generate(final Request r)
+    public final Response generate(final AbstractRequest r)
     {
         final Response response = new Response( this );
         generator.accept( r, response );
@@ -122,7 +122,7 @@ public class SimpleRequestHandler extends RequestHandler
     {
 
         private String pattern;
-        private BiConsumer<Request, Response> generator;
+        private BiConsumer<AbstractRequest, Response> generator;
 
         private Builder()
         {
@@ -134,7 +134,7 @@ public class SimpleRequestHandler extends RequestHandler
             return this;
         }
 
-        public Builder setGenerator(final BiConsumer<Request, Response> generator)
+        public Builder setGenerator(final BiConsumer<AbstractRequest, Response> generator)
         {
             this.generator = generator;
             return this;

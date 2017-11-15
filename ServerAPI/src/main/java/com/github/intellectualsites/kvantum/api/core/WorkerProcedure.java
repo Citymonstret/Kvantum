@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.core;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import lombok.EqualsAndHashCode;
@@ -142,7 +142,7 @@ public final class WorkerProcedure
     public interface Handler<T>
     {
 
-        T act(RequestHandler requestHandler, Request request, T in);
+        T act(RequestHandler requestHandler, AbstractRequest request, T in);
 
         Class<T> getType();
 

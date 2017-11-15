@@ -20,7 +20,7 @@ package com.github.intellectualsites.kvantum.api.views.errors;
 
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.FileUtils;
 import com.github.intellectualsites.kvantum.api.views.View;
@@ -96,13 +96,13 @@ public class Error extends View
     }
 
     @Override
-    public boolean passes(final Request request)
+    public boolean passes(final AbstractRequest request)
     {
         return true;
     }
 
     @Override
-    public Response generate(final Request r)
+    public Response generate(final AbstractRequest r)
     {
         return new Response().setContent( template.replace( "{{code}}", code + "" ).replace( "{{message}}", desc )
                 .replace( "{{path}}", r.getQuery().getFullRequest() ) );

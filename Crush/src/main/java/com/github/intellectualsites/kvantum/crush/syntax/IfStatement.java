@@ -37,7 +37,7 @@
 
 package com.github.intellectualsites.kvantum.crush.syntax;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
 
@@ -55,7 +55,7 @@ final public class IfStatement extends Syntax
     }
 
     @Override
-    public String process(final String in, final Matcher matcher, final Request r, final Map<String, ProviderFactory>
+    public String process(final String in, final Matcher matcher, final AbstractRequest r, final Map<String, ProviderFactory>
             factories)
     {
         String workingString = in;

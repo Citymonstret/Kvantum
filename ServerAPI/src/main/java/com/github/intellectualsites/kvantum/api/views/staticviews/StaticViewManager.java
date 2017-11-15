@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views.staticviews;
 
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.IConsumer;
 import com.github.intellectualsites.kvantum.api.util.ReflectionUtils;
@@ -33,8 +33,8 @@ import java.util.List;
 final public class StaticViewManager
 {
 
-    private static final Class<?>[] parameters = new Class<?>[]{ Request.class };
-    private static final Class<?>[] alternativeParameters = new Class<?>[]{ Request.class, Response.class };
+    private static final Class<?>[] parameters = new Class<?>[]{ AbstractRequest.class };
+    private static final Class<?>[] alternativeParameters = new Class<?>[]{ AbstractRequest.class, Response.class };
 
     public static void generate(final Object viewDeclaration) throws Exception
     {

@@ -20,7 +20,7 @@ package com.github.intellectualsites.kvantum.api.views;
 
 import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.matching.FilePattern;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Header;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.FileExtension;
@@ -42,7 +42,7 @@ public abstract class StaticFileView extends View
     }
 
     @Override
-    final public boolean passes(final Request request)
+    final public boolean passes(final AbstractRequest request)
     {
         final Map<String, String> variables = request.getVariables();
         FileExtension fileExtension;
@@ -83,7 +83,7 @@ public abstract class StaticFileView extends View
     }
 
     @Override
-    public void handle(final Request r, final Response response)
+    public void handle(final AbstractRequest r, final Response response)
     {
         final Path path = (Path) r.getMeta( "file" );
         final FileExtension extension = (FileExtension) r.getMeta( "extension" );

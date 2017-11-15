@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.matching;
 
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -37,7 +37,7 @@ public abstract class Router
      * @return Depends on implementation, but should return either the matched
      * {@link RequestHandler} or null, may also return a Status 404 View.
      */
-    public abstract RequestHandler match(Request request);
+    public abstract RequestHandler match(AbstractRequest request);
 
     /**
      * Add a new {@link RequestHandler} to the router

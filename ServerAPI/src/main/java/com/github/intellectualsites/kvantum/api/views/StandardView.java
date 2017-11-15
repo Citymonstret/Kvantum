@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views;
 
 import com.github.intellectualsites.kvantum.api.cache.CacheApplicable;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Header;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.FileExtension;
@@ -54,13 +54,13 @@ public class StandardView extends StaticFileView implements CacheApplicable
     }
 
     @Override
-    public boolean isApplicable(Request r)
+    public boolean isApplicable(AbstractRequest r)
     {
         return false;
     }
 
     @Override
-    public void handle(final Request r, final Response response)
+    public void handle(final AbstractRequest r, final Response response)
     {
         super.handle( r, response ); // SUPER IMPORTANT!!!!!
 

@@ -18,12 +18,12 @@
  */
 package com.github.intellectualsites.kvantum.api.exceptions;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 public class RequestException extends KvantumException
 {
 
-    public RequestException(final String message, final Request request)
+    public RequestException(final String message, final AbstractRequest request)
     {
         super( String.format( "Failed to handle request (%s): %s", request, message ) );
     }

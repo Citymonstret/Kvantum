@@ -23,11 +23,11 @@ public interface RequestChild
 {
 
     /**
-     * Get the parent {@link Request}
+     * Get the parent {@link AbstractRequest}
      *
      * @return Parent request, or if the request is not a child
      * it may return itself
      */
-    Request getParent();
+    AbstractRequest getParent();
 
 }

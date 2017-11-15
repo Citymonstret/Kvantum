@@ -21,7 +21,7 @@ package com.github.intellectualsites.kvantum.api.views;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.exceptions.KvantumException;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
@@ -46,7 +46,7 @@ import java.util.UUID;
 public abstract class RequestHandler
 {
 
-    private static final Class[] REQUIRED_PARAMETERS = new Class[]{ Request.class, Response.class };
+    private static final Class[] REQUIRED_PARAMETERS = new Class[]{ AbstractRequest.class, Response.class };
 
     protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
@@ -81,7 +81,7 @@ public abstract class RequestHandler
 
     /**
      * Register an alternate outcome, which can be triggered using Middleware
-     * @param identifier Identifier used in {@link Request#useAlternateOutcome(String)}
+     * @param identifier Identifier used in {@link AbstractRequest#useAlternateOutcome(String)}
      * @param methodName Name of the method ( in the class, or any parent super classes )
      * @throws Exception If anything goes wrong
      */
@@ -133,18 +133,18 @@ public abstract class RequestHandler
      * @return True if the request can be served by this handler
      * False if not
      */
-    abstract public boolean matches(Request request);
+    abstract public boolean matches(AbstractRequest request);
 
     /**
      * Simple alternate outcome for the {@link DebugMiddleware} middleware
      */
-    protected void handleDebug(final Request request, final Response response)
+    protected void handleDebug(final AbstractRequest request, final Response response)
     {
         ServerImplementation.getImplementation().log( "Using the handleDebug alternate outcome!" );
         response.copyFrom( generate( request ) );
     }
 
-    final public Response handle(final Request request)
+    final public Response handle(final AbstractRequest request)
     {
         Assert.isValid( request );
 
@@ -156,10 +156,10 @@ public abstract class RequestHandler
             return null;
         }
 
-        if ( request.hasMeta( Request.ALTERNATE_OUTCOME ) )
+        if ( request.hasMeta( AbstractRequest.ALTERNATE_OUTCOME ) )
         {
             //noinspection ConstantConditions
-            final Optional<Method> method = getAlternateOutcomeMethod( request.getMeta( Request.ALTERNATE_OUTCOME )
+            final Optional<Method> method = getAlternateOutcomeMethod( request.getMeta( AbstractRequest.ALTERNATE_OUTCOME )
                     .toString() );
             if ( method.isPresent() )
             {
@@ -176,7 +176,7 @@ public abstract class RequestHandler
             } else
             {
                 throw new KvantumException( "Trying to access an internal redirect which isn't registered for type "
-                        + this.getName() + ", identified by " + request.getMeta( Request.ALTERNATE_OUTCOME ) );
+                        + this.getName() + ", identified by " + request.getMeta( AbstractRequest.ALTERNATE_OUTCOME ) );
             }
         }
 
@@ -189,7 +189,7 @@ public abstract class RequestHandler
      * @param request The incoming request
      * @return The generated response
      */
-    abstract public Response generate(final Request request);
+    abstract public Response generate(final AbstractRequest request);
 
     /**
      * Get the view specific factory (if it exists)
@@ -197,7 +197,7 @@ public abstract class RequestHandler
      * @param r Request IN
      * @return Null by default, or the ProviderFactory (if set by the view)
      */
-    public ProviderFactory getFactory(final Request r)
+    public ProviderFactory getFactory(final AbstractRequest r)
     {
         return null;
     }

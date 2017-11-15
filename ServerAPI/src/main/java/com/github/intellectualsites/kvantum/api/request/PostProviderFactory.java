@@ -45,7 +45,7 @@ final public class PostProviderFactory implements ProviderFactory<PostProviderFa
     }
 
     @Override
-    public Optional<PostProviderFactory> get(final Request r)
+    public Optional<PostProviderFactory> get(final AbstractRequest r)
     {
         Assert.notNull( r );
 

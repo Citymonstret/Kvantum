@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views.staticviews;
 
 import com.github.intellectualsites.kvantum.api.cache.CacheApplicable;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.views.View;
 
@@ -36,19 +36,19 @@ class CachedStaticView extends View implements CacheApplicable
     }
 
     @Override
-    public boolean passes(final Request request)
+    public boolean passes(final AbstractRequest request)
     {
         return true;
     }
 
     @Override
-    public final Response generate(final Request r)
+    public final Response generate(final AbstractRequest r)
     {
         return method.handle( r );
     }
 
     @Override
-    public boolean isApplicable(final Request r)
+    public boolean isApplicable(final AbstractRequest r)
     {
         return true;
     }

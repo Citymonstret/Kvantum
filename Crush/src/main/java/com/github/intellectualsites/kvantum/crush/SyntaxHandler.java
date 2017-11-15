@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.crush;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.template.TemplateSyntaxHandler;
 import com.github.intellectualsites.kvantum.api.templates.TemplateManager;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
@@ -40,7 +40,7 @@ public class SyntaxHandler extends TemplateSyntaxHandler
     }
 
     @Override
-    public String handle(final RequestHandler requestHandler, final Request request, final String in)
+    public String handle(final RequestHandler requestHandler, final AbstractRequest request, final String in)
     {
         String out = in;
         final Map<String, ProviderFactory> factories = new HashMap<>();

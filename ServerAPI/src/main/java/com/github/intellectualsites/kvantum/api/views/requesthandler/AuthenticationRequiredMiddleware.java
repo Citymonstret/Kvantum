@@ -21,13 +21,13 @@ package com.github.intellectualsites.kvantum.api.views.requesthandler;
 import com.github.intellectualsites.kvantum.api.account.IAccountManager;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 public class AuthenticationRequiredMiddleware extends Middleware
 {
 
     @Override
-    public void handle(Request request, MiddlewareQueue queue)
+    public void handle(AbstractRequest request, MiddlewareQueue queue)
     {
         final IAccountManager accountManager = ServerImplementation.getImplementation()
                 .getApplicationStructure().getAccountManager();

@@ -18,13 +18,13 @@
  */
 package com.github.intellectualsites.kvantum.api.views;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 
 @FunctionalInterface
 public interface ViewReturn
 {
 
-    Response get(Request r);
+    Response get(AbstractRequest r);
 
 }

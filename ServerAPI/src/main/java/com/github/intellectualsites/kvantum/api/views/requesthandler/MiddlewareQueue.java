@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views.requesthandler;
 
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 
 import java.util.ArrayDeque;
@@ -37,7 +37,7 @@ public final class MiddlewareQueue
         this.queue.add( middleware );
     }
 
-    public void handle(final Request request)
+    public void handle(final AbstractRequest request)
     {
         Assert.isValid( request );
 

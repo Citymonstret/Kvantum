@@ -20,7 +20,7 @@ package com.github.intellectualsites.kvantum.api.views.errors;
 
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.FileUtils;
 import com.github.intellectualsites.kvantum.api.views.View;
@@ -86,7 +86,7 @@ public class ViewException extends View
     }
 
     @Override
-    public Response generate(Request request)
+    public Response generate(AbstractRequest request)
     {
         StringWriter sw = new StringWriter();
         in.printStackTrace( new PrintWriter( sw ) );

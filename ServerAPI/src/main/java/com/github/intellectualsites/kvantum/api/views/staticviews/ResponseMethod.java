@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.views.staticviews;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 
@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
-final public class ResponseMethod implements BiConsumer<Request, Response>
+final public class ResponseMethod implements BiConsumer<AbstractRequest, Response>
 {
 
     private final Method method;
@@ -43,7 +43,7 @@ final public class ResponseMethod implements BiConsumer<Request, Response>
         this.passResponse = method.getReturnType() == Void.TYPE;
     }
 
-    public Response handle(final Request r)
+    public Response handle(final AbstractRequest r)
     {
         Assert.notNull( r );
 
@@ -64,7 +64,7 @@ final public class ResponseMethod implements BiConsumer<Request, Response>
     }
 
     @Override
-    public void accept(Request request, Response response)
+    public void accept(AbstractRequest request, Response response)
     {
         response.copyFrom( handle( request ) );
     }

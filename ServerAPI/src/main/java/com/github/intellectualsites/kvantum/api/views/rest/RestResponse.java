@@ -19,8 +19,8 @@
 package com.github.intellectualsites.kvantum.api.views.rest;
 
 import com.github.intellectualsites.kvantum.api.matching.ViewPattern;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.json.simple.JSONObject;
@@ -57,12 +57,12 @@ public abstract class RestResponse
         this.requestRequirements = requestRequirements;
     }
 
-    public boolean methodMatches(final Request request)
+    public boolean methodMatches(final AbstractRequest request)
     {
         return request.getQuery().getMethod().equals( this.httpMethod );
     }
 
-    public boolean contentTypeMatches(final Request request)
+    public boolean contentTypeMatches(final AbstractRequest request)
     {
         if ( this.contentType.isEmpty() )
         {
@@ -85,7 +85,8 @@ public abstract class RestResponse
         }
         return false;
     }
-    protected final boolean matches(Request request)
+
+    protected final boolean matches(AbstractRequest request)
     {
         final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
         if ( map != null )
@@ -95,6 +96,6 @@ public abstract class RestResponse
         return map != null;
     }
 
-    public abstract JSONObject generate(Request request);
+    public abstract JSONObject generate(AbstractRequest request);
 
 }

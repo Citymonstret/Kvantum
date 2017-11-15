@@ -3,7 +3,7 @@ package com.github.intellectualsites.kvantum.api.request.post;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.fileupload.KvantumFileUploadContext;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import lombok.Getter;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -20,7 +20,7 @@ public class MultipartPostRequest extends PostRequest
     @Getter
     private KvantumFileUploadContext.KvantumFileUploadContextParsingResult parsingResult;
 
-    public MultipartPostRequest(final Request parent, final String rawRequest)
+    public MultipartPostRequest(final AbstractRequest parent, final String rawRequest)
     {
         super( parent, rawRequest, true );
     }

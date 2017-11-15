@@ -40,7 +40,7 @@ package com.github.intellectualsites.kvantum.crush.syntax;
 import com.github.intellectualsites.kvantum.api.cache.ICacheManager;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ final public class Include extends Syntax
     }
 
     @Override
-    public String process(final String in, final Matcher matcher, final Request r, final Map<String, ProviderFactory>
+    public String process(final String in, final Matcher matcher, final AbstractRequest r, final Map<String, ProviderFactory>
             factories)
     {
         String out = in;

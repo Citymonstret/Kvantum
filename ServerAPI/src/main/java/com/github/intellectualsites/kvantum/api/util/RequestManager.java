@@ -21,7 +21,7 @@ package com.github.intellectualsites.kvantum.api.util;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
 import com.github.intellectualsites.kvantum.api.matching.Router;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import com.github.intellectualsites.kvantum.api.views.errors.View404;
 import lombok.Builder;
@@ -38,7 +38,7 @@ import java.util.Optional;
 final public class RequestManager extends Router
 {
 
-    private static Generator<Request, RequestHandler> DEFAULT_404_GENERATOR =
+    private static Generator<AbstractRequest, RequestHandler> DEFAULT_404_GENERATOR =
             (request) -> View404.construct( request.getQuery().getFullRequest() );
 
     @Builder.Default
@@ -48,7 +48,7 @@ final public class RequestManager extends Router
     @Getter
     @NonNull
     @Builder.Default
-    private Generator<Request, RequestHandler> error404Generator = DEFAULT_404_GENERATOR;
+    private Generator<AbstractRequest, RequestHandler> error404Generator = DEFAULT_404_GENERATOR;
 
     /**
      * Register a view to the request manager
@@ -77,7 +77,7 @@ final public class RequestManager extends Router
      * @return Matching request handler, or {@link #getError404Generator()} if none was found
      */
     @Override
-    public RequestHandler match(final Request request)
+    public RequestHandler match(final AbstractRequest request)
     {
         Assert.isValid( request );
 

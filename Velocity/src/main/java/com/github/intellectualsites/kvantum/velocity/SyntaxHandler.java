@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.velocity;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.template.TemplateHandler;
 import com.github.intellectualsites.kvantum.api.template.TemplateSyntaxHandler;
 import com.github.intellectualsites.kvantum.api.templates.TemplateManager;
@@ -42,7 +42,7 @@ public class SyntaxHandler extends TemplateSyntaxHandler
     }
 
     @Override
-    protected String handle(RequestHandler requestHandler, Request request, String in)
+    protected String handle(RequestHandler requestHandler, AbstractRequest request, String in)
     {
         String out = in;
         final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();

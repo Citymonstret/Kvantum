@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.views.rest;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -72,7 +72,7 @@ public class RequestRequirements
         return this;
     }
 
-    public RequirementStatus testRequirements(final Request request)
+    public RequirementStatus testRequirements(final AbstractRequest request)
     {
         RequirementStatus status;
         for ( final RequestRequirement requirement : this.requirements )
@@ -94,7 +94,7 @@ public class RequestRequirements
         }
 
         @Override
-        protected Optional<String> getVariable(Request request, String key)
+        protected Optional<String> getVariable(AbstractRequest request, String key)
         {
             return mapOptional( request.getQuery().getParameters(), key );
         }
@@ -109,7 +109,7 @@ public class RequestRequirements
         }
 
         @Override
-        protected Optional<String> getVariable(Request request, String key)
+        protected Optional<String> getVariable(AbstractRequest request, String key)
         {
             return mapOptional( request.getPostRequest().get(), key );
         }
@@ -125,10 +125,10 @@ public class RequestRequirements
             this.key = key;
         }
 
-        protected abstract Optional<String> getVariable(Request request, String key);
+        protected abstract Optional<String> getVariable(AbstractRequest request, String key);
 
         @Override
-        final RequirementStatus test(Request request)
+        final RequirementStatus test(AbstractRequest request)
         {
             Optional<String> optional = getVariable( request, key );
             RequirementStatus.Builder builder = RequirementStatus.builder();
@@ -146,7 +146,7 @@ public class RequestRequirements
     public abstract static class RequestRequirement
     {
 
-        abstract RequirementStatus test(Request request);
+        abstract RequirementStatus test(AbstractRequest request);
 
     }
 

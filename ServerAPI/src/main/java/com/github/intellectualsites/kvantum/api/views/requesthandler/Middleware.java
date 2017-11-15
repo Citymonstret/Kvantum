@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.views.requesthandler;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.views.View;
 import com.github.intellectualsites.kvantum.api.views.staticviews.ViewMatcher;
 
@@ -112,6 +112,6 @@ import com.github.intellectualsites.kvantum.api.views.staticviews.ViewMatcher;
 public abstract class Middleware
 {
 
-    public abstract void handle(final Request request, final MiddlewareQueue queue);
+    public abstract void handle(final AbstractRequest request, final MiddlewareQueue queue);
 
 }

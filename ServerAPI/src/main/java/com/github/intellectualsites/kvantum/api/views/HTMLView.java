@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views;
 
 import com.github.intellectualsites.kvantum.api.cache.CacheApplicable;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.FileExtension;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
@@ -45,13 +45,13 @@ public class HTMLView extends StaticFileView implements CacheApplicable
     }
 
     @Override
-    public HTMLProvider getFactory(final Request r)
+    public HTMLProvider getFactory(final AbstractRequest r)
     {
         return new HTMLProvider( r );
     }
 
     @Override
-    public boolean isApplicable(Request r)
+    public boolean isApplicable(AbstractRequest r)
     {
         final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
         return cacheApplicableBoolean.orElse( true );
@@ -62,13 +62,13 @@ public class HTMLView extends StaticFileView implements CacheApplicable
 
         private final Map<String, String> storage = new HashMap<>();
 
-        public HTMLProvider(final Request r)
+        public HTMLProvider(final AbstractRequest r)
         {
             storage.put( "name", r.getMeta( "html_file" ) + ".html" );
         }
 
         @Override
-        public Optional<HTMLProvider> get(Request r)
+        public Optional<HTMLProvider> get(AbstractRequest r)
         {
             return Optional.of( this );
         }

@@ -22,8 +22,8 @@ import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.Cookie;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.response.HeaderProvider;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
@@ -52,7 +52,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     private static final String SESSION_KEY = "intellectual_session";
     private static final String SESSION_PASS = "intellectual_key";
 
-    private ISession createSession(final Request r, final BufferedOutputStream out)
+    private ISession createSession(final AbstractRequest r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
 
@@ -66,7 +66,7 @@ public final class SessionManager implements ProviderFactory<ISession>
         return session;
     }
 
-    private void saveCookies(final Request r, final ISession session, final String sessionID)
+    private void saveCookies(final AbstractRequest r, final ISession session, final String sessionID)
     {
         r.postponedCookies.put( SESSION_KEY, sessionID );
         r.postponedCookies.put( SESSION_PASS, session.getSessionKey() );
@@ -88,7 +88,7 @@ public final class SessionManager implements ProviderFactory<ISession>
         return session;
     }
 
-    public void deleteSession(final Request r, final HeaderProvider re)
+    public void deleteSession(final AbstractRequest r, final HeaderProvider re)
     {
         Assert.notNull( r, re );
 
@@ -96,7 +96,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     }
 
     @Synchronized
-    public Optional<ISession> getSession(final Request r, final BufferedOutputStream out)
+    public Optional<ISession> getSession(final AbstractRequest r, final BufferedOutputStream out)
     {
         Assert.isValid( r );
 
@@ -202,7 +202,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     }
 
     @Override
-    public Optional<ISession> get(final Request r)
+    public Optional<ISession> get(final AbstractRequest r)
     {
         return getSession( r, null );
     }

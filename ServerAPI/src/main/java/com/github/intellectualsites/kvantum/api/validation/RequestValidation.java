@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.validation;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.RequestChild;
 
 public abstract class RequestValidation<T>
@@ -48,7 +48,7 @@ public abstract class RequestValidation<T>
     public class ValidationResult
     {
 
-        private final Request request;
+        private final AbstractRequest request;
         private final boolean success;
         private final String message;
 
@@ -66,7 +66,7 @@ public abstract class RequestValidation<T>
             this.message = message;
         }
 
-        public Request getRequest()
+        public AbstractRequest getRequest()
         {
             return request;
         }

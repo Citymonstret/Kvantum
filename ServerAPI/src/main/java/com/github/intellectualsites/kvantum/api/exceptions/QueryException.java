@@ -18,12 +18,12 @@
  */
 package com.github.intellectualsites.kvantum.api.exceptions;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 final public class QueryException extends RequestException
 {
 
-    public QueryException(String message, Request request)
+    public QueryException(String message, AbstractRequest request)
     {
         super( "Failed to interpret query: " + message, request );
     }

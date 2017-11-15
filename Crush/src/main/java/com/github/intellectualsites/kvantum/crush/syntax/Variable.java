@@ -39,7 +39,7 @@ package com.github.intellectualsites.kvantum.crush.syntax;
 
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
 import com.github.intellectualsites.kvantum.crush.syntax.filter.Javascript;
@@ -72,7 +72,7 @@ final public class Variable extends Syntax
     }
 
     @Override
-    public String process(String content, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    public String process(String content, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories)
     {
         while ( matcher.find() )
         {

@@ -37,7 +37,7 @@
 
 package com.github.intellectualsites.kvantum.crush.syntax;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 
 import java.util.Map;
@@ -75,9 +75,9 @@ public abstract class Syntax
      * @param r         HTML Request
      * @param factories Provider Factories
      * @return Processed string
-     * @see #handle(String, Request, Map) Simple wrapper
+     * @see #handle(String, AbstractRequest, Map) Simple wrapper
      */
-    public abstract String process(String in, Matcher matcher, Request r, Map<String, ProviderFactory> factories);
+    public abstract String process(String in, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories);
 
     /**
      * A simple wrapper for the process method
@@ -86,9 +86,9 @@ public abstract class Syntax
      * @param r         HTML Request
      * @param factories Provider Factories
      * @return Processed Input
-     * @see #process(String, Matcher, Request, Map) Wraps around this
+     * @see #process(String, Matcher, AbstractRequest, Map) Wraps around this
      */
-    public final String handle(final String in, final Request r, final Map<String, ProviderFactory> factories)
+    public final String handle(final String in, final AbstractRequest r, final Map<String, ProviderFactory> factories)
     {
         return process( in, pattern.matcher( in ), r, factories );
     }

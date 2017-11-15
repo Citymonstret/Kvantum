@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.request.post;
 
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 final public class UrlEncodedPostRequest extends PostRequest
 {
 
-    public UrlEncodedPostRequest(final Request parent, final String request)
+    public UrlEncodedPostRequest(final AbstractRequest parent, final String request)
     {
         super( parent, request, false );
     }

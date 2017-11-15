@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.views;
 
 import com.github.intellectualsites.kvantum.api.cache.CacheApplicable;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.FileExtension;
 import com.github.intellectualsites.kvantum.api.util.IgnoreSyntax;
 
@@ -40,7 +40,7 @@ public class ImgView extends StaticFileView implements CacheApplicable, IgnoreSy
     }
 
     @Override
-    public boolean isApplicable(Request r)
+    public boolean isApplicable(AbstractRequest r)
     {
         return false;
     }

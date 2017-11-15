@@ -1,6 +1,6 @@
 package com.github.intellectualsites.kvantum.api.request.post;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.RequestChild;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import lombok.AccessLevel;
@@ -19,7 +19,7 @@ public abstract class PostRequest implements RequestChild
      */
 
     @Getter
-    private final Request parent;
+    private final AbstractRequest parent;
     @Getter(AccessLevel.PROTECTED)
     private final String rawRequest;
     @Getter
@@ -29,7 +29,7 @@ public abstract class PostRequest implements RequestChild
     private String request;
     private boolean loaded;
 
-    protected PostRequest(final Request parent, final String rawRequest, boolean lazyLoad)
+    protected PostRequest(final AbstractRequest parent, final String rawRequest, boolean lazyLoad)
     {
         Assert.notNull( parent );
         Assert.notNull( rawRequest );

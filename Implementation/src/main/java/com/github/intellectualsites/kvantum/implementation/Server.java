@@ -37,8 +37,8 @@ import com.github.intellectualsites.kvantum.api.logging.*;
 import com.github.intellectualsites.kvantum.api.matching.Router;
 import com.github.intellectualsites.kvantum.api.plugin.PluginLoader;
 import com.github.intellectualsites.kvantum.api.plugin.PluginManager;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.PostProviderFactory;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.session.ISessionCreator;
@@ -836,7 +836,7 @@ public final class Server implements Kvantum, ISessionCreator
     }
 
     @Override
-    public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<Request, Response> generator)
+    public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<AbstractRequest, Response> generator)
     {
         return SimpleRequestHandler.builder().setPattern( filter ).setGenerator( generator )
                 .build().addToRouter( router );

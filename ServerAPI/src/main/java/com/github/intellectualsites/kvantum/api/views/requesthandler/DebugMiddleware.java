@@ -18,13 +18,13 @@
  */
 package com.github.intellectualsites.kvantum.api.views.requesthandler;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 public final class DebugMiddleware extends Middleware
 {
 
     @Override
-    public void handle(final Request request, final MiddlewareQueue queue)
+    public void handle(final AbstractRequest request, final MiddlewareQueue queue)
     {
         request.useAlternateOutcome( "debug" );
         queue.handle( request );

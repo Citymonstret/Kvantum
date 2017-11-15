@@ -38,7 +38,7 @@
 package com.github.intellectualsites.kvantum.crush.syntax;
 
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
 
@@ -56,7 +56,7 @@ final public class ForEachBlock extends Syntax
         super( Pattern.compile( "\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([A-Za-z0-9<>\"'-_\\/\\\\ }{}\\n\\s]*)\\{\\/foreach\\}" ) );
     }
 
-    public String process(String content, Matcher matcher, Request r, Map<String, ProviderFactory> factories)
+    public String process(String content, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories)
     {
         while ( matcher.find() )
         {

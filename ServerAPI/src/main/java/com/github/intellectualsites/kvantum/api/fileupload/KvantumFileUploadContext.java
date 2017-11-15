@@ -20,8 +20,8 @@ package com.github.intellectualsites.kvantum.api.fileupload;
 
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -41,11 +41,11 @@ import java.nio.charset.StandardCharsets;
 final public class KvantumFileUploadContext implements UploadContext
 {
 
-    private final Request request;
+    private final AbstractRequest request;
     private final InputStream inputStream;
 
     /**
-     * Try to generate a new {@link KvantumFileUploadContext} for a {@link Request}.
+     * Try to generate a new {@link KvantumFileUploadContext} for a {@link AbstractRequest}.
      * This method will verify that the request has supplied a multipart/form-data body,
      * that the content lenght is supplied (and that it agrees with the data length) and that
      * the content length is within the limit specified by
@@ -56,7 +56,7 @@ final public class KvantumFileUploadContext implements UploadContext
      * @param request Incoming request
      * @return Parsing result
      */
-    public static KvantumFileUploadContextParsingResult from(final Request request)
+    public static KvantumFileUploadContextParsingResult from(final AbstractRequest request)
     {
         if ( request.getQuery().getMethod() == HttpMethod.POST && request.getHeader( "Content-Type" )
                 .startsWith( "multipart" ) )

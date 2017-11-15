@@ -18,8 +18,8 @@
  */
 package com.github.intellectualsites.kvantum.api.util;
 
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.Cookie;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
@@ -48,7 +48,7 @@ final public class CookieManager
      * @param r HTTP Request
      * @return an array containing the cookies
      */
-    public static ListMultimap<String, Cookie> getCookies(final Request r)
+    public static ListMultimap<String, Cookie> getCookies(final AbstractRequest r)
     {
         Assert.isValid( r );
 

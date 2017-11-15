@@ -73,6 +73,7 @@ final public class KvantumObjectParserResult<T>
     public static class KvantumObjectParserValidationFailed extends KvantumObjectParserError
     {
 
+        @Getter
         private final List<ConstraintViolation> violations;
 
         @Override

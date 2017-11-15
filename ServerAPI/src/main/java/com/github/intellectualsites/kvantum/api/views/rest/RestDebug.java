@@ -24,8 +24,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.matching.ViewPattern;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import org.json.simple.JSONObject;
 
 import java.util.Map;
@@ -54,7 +54,7 @@ public final class RestDebug extends RestHandler
         }
 
         @Override
-        public JSONObject generate(Request request)
+        public JSONObject generate(AbstractRequest request)
         {
             final JSONObject object = new JSONObject();
             final MetricRegistry registry = ServerImplementation.getImplementation().getMetrics().getRegistry();

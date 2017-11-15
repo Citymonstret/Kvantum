@@ -18,14 +18,14 @@
  */
 package com.github.intellectualsites.kvantum.api.util;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 import java.util.Optional;
 
 public interface ProviderFactory<T extends VariableProvider>
 {
 
-    Optional<T> get(final Request r);
+    Optional<T> get(final AbstractRequest r);
 
     String providerName();
 

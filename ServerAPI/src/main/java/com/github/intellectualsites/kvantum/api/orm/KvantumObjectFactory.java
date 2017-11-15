@@ -22,7 +22,7 @@ import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumConstruct
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumField;
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumInsert;
 import com.github.intellectualsites.kvantum.api.orm.annotations.KvantumObject;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ParameterScope;
 import com.github.intellectualsites.kvantum.api.util.Parsers;
 import com.github.intellectualsites.kvantum.api.views.rest.RequestRequirements;
@@ -304,7 +304,7 @@ final public class KvantumObjectFactory<T>
     {
 
         @Override
-        protected Map<String, String> getParameters(final Request request)
+        protected Map<String, String> getParameters(final AbstractRequest request)
         {
             return request.getQuery().getParameters();
         }
@@ -315,7 +315,7 @@ final public class KvantumObjectFactory<T>
     {
 
         @Override
-        protected Map<String, String> getParameters(final Request request)
+        protected Map<String, String> getParameters(final AbstractRequest request)
         {
             return request.getPostRequest().get();
         }
@@ -325,7 +325,7 @@ final public class KvantumObjectFactory<T>
     public abstract class BuilderInstance
     {
 
-        protected abstract Map<String, String> getParameters(final Request request);
+        protected abstract Map<String, String> getParameters(final AbstractRequest request);
 
         /**
          * Parse an incoming request and attempt to construct the object
@@ -337,7 +337,7 @@ final public class KvantumObjectFactory<T>
          * @param request Incoming request
          * @return Parsing result
          */
-        public KvantumObjectParserResult<T> parseRequest(final Request request)
+        public KvantumObjectParserResult<T> parseRequest(final AbstractRequest request)
         {
             final Map<String, String> parameters = getParameters( request );
             final Map<String, Object> parsed = new HashMap<>();

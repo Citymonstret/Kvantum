@@ -21,7 +21,7 @@ package com.github.intellectualsites.kvantum.api.template;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.WorkerProcedure;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.IgnoreSyntax;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public abstract class TemplateSyntaxHandler extends WorkerProcedure.StringHandle
     private final TemplateHandler templateHandler;
 
     @Override
-    public final String act(RequestHandler requestHandler, Request request, String in)
+    public final String act(RequestHandler requestHandler, AbstractRequest request, String in)
     {
         String out = in;
         if ( !( requestHandler instanceof IgnoreSyntax ) )
@@ -57,6 +57,6 @@ public abstract class TemplateSyntaxHandler extends WorkerProcedure.StringHandle
         return out;
     }
 
-    protected abstract String handle(RequestHandler requestHandler, Request request, String in);
+    protected abstract String handle(RequestHandler requestHandler, AbstractRequest request, String in);
 
 }

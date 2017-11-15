@@ -1,6 +1,6 @@
 package com.github.intellectualsites.kvantum.api.request.post;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.KvantumJsonFactory;
 import org.json.simple.JSONObject;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 public class JsonPostRequest extends PostRequest
 {
 
-    public JsonPostRequest(final Request parent, final String rawRequest)
+    public JsonPostRequest(final AbstractRequest parent, final String rawRequest)
     {
         super( parent, rawRequest, false );
     }

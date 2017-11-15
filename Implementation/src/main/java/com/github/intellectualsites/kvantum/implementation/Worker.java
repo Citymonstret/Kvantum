@@ -27,6 +27,7 @@ import com.github.intellectualsites.kvantum.api.core.WorkerProcedure;
 import com.github.intellectualsites.kvantum.api.exceptions.ProtocolNotSupportedException;
 import com.github.intellectualsites.kvantum.api.exceptions.QueryException;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
 import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.request.post.*;
@@ -211,7 +212,7 @@ final class Worker extends AutoCloseable
         //
         if ( workerContext.getRequest().getQuery().getMethod() == HttpMethod.POST )
         {
-            final Request request = workerContext.getRequest();
+            final AbstractRequest request = workerContext.getRequest();
             final String contentType = request.getHeader( "Content-Type" );
 
             boolean isFormURLEncoded = false;

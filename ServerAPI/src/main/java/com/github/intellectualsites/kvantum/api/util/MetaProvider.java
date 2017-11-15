@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.util;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 import java.util.Map;
 import java.util.Optional;
@@ -31,19 +31,19 @@ import java.util.Optional;
 public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider
 {
 
-    private Request r;
+    private AbstractRequest r;
 
     public MetaProvider()
     {
     }
 
-    private MetaProvider(final Request r)
+    private MetaProvider(final AbstractRequest r)
     {
         this.r = r;
     }
 
     @Override
-    public Optional<MetaProvider> get(final Request r)
+    public Optional<MetaProvider> get(final AbstractRequest r)
     {
         return Optional.of( new MetaProvider( r ) );
     }

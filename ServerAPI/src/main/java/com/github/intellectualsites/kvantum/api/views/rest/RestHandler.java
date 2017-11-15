@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.views.rest;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Header;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.Assert;
@@ -50,7 +50,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
     }
 
     @Override
-    public boolean matches(final Request request)
+    public boolean matches(final AbstractRequest request)
     {
         Assert.isValid( request );
 
@@ -66,7 +66,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
     }
 
     @Override
-    public Response generate(Request request)
+    public Response generate(AbstractRequest request)
     {
         final RestResponse restResponse = (RestResponse) request.getMeta( "restResponse" );
         if ( restResponse == null )

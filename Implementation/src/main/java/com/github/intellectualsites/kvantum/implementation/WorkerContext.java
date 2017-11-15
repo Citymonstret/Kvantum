@@ -26,7 +26,7 @@ import com.github.intellectualsites.kvantum.api.core.Kvantum;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.core.WorkerProcedure;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Header;
 import com.github.intellectualsites.kvantum.api.response.ResponseBody;
 import com.github.intellectualsites.kvantum.api.util.ProtocolType;
@@ -58,7 +58,7 @@ class WorkerContext
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
 
     private RequestHandler requestHandler;
-    private Request request;
+    private AbstractRequest request;
     private BufferedOutputStream output;
     private ResponseBody body;
     private boolean gzip;
@@ -226,9 +226,9 @@ class WorkerContext
             if ( this.body == null )
             {
                 final Object redirect = request.getMeta( "internalRedirect" );
-                if ( redirect != null && redirect instanceof Request )
+                if ( redirect != null && redirect instanceof AbstractRequest )
                 {
-                    this.request = (Request) redirect;
+                    this.request = (AbstractRequest) redirect;
                     this.request.removeMeta( "internalRedirect" );
                     handle( worker );
                 }

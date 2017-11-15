@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.crush.syntax;
 
 import com.github.intellectualsites.kvantum.api.logging.Logger;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 
 import java.util.*;
@@ -47,7 +47,7 @@ public class Macro extends Syntax
     }
 
     @Override
-    public String process(String in, final Matcher matcher, final Request r,
+    public String process(String in, final Matcher matcher, final AbstractRequest r,
                           final Map<String, ProviderFactory> factories)
     {
         final Map<String, DefinedMacro> macroMap = new HashMap<>();

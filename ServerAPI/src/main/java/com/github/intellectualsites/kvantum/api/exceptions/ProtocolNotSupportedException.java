@@ -18,12 +18,12 @@
  */
 package com.github.intellectualsites.kvantum.api.exceptions;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 public class ProtocolNotSupportedException extends RequestException
 {
 
-    public ProtocolNotSupportedException(String message, Request request)
+    public ProtocolNotSupportedException(String message, AbstractRequest request)
     {
         super( message, request );
     }

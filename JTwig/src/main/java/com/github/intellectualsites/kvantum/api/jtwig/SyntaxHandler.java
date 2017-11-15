@@ -19,7 +19,7 @@
 package com.github.intellectualsites.kvantum.api.jtwig;
 
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.template.TemplateHandler;
 import com.github.intellectualsites.kvantum.api.template.TemplateSyntaxHandler;
 import com.github.intellectualsites.kvantum.api.templates.TemplateManager;
@@ -47,7 +47,7 @@ public class SyntaxHandler extends TemplateSyntaxHandler
     }
 
     @Override
-    protected String handle(final RequestHandler requestHandler, final Request request, final String in)
+    protected String handle(final RequestHandler requestHandler, final AbstractRequest request, final String in)
     {
         String out = in;
         JtwigTemplate template = null;

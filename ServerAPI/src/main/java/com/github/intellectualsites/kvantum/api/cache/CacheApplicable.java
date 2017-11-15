@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.cache;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 
 /**
  * Marks something that is able to save an instance for re-use
@@ -32,6 +32,6 @@ public interface CacheApplicable
      * @param r Incoming request
      * @return True if cache can be saved, otherwise false
      */
-    boolean isApplicable(Request r);
+    boolean isApplicable(AbstractRequest r);
 
 }

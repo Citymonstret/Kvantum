@@ -28,7 +28,7 @@ import com.github.intellectualsites.kvantum.api.logging.LogModes;
 import com.github.intellectualsites.kvantum.api.logging.LogProvider;
 import com.github.intellectualsites.kvantum.api.logging.LogWrapper;
 import com.github.intellectualsites.kvantum.api.matching.Router;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.session.SessionManager;
 import com.github.intellectualsites.kvantum.api.socket.ISocketHandler;
@@ -133,7 +133,7 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @param generator Response generator
      * @return The created request handler
      */
-    RequestHandler createSimpleRequestHandler(String filter, BiConsumer<Request, Response> generator);
+    RequestHandler createSimpleRequestHandler(String filter, BiConsumer<AbstractRequest, Response> generator);
 
     /**
      * Get the metric manager

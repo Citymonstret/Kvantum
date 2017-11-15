@@ -18,8 +18,8 @@
  */
 package com.github.intellectualsites.kvantum.api.validation;
 
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.HttpMethod;
-import com.github.intellectualsites.kvantum.api.request.Request;
 import com.github.intellectualsites.kvantum.api.request.post.PostRequest;
 
 import java.util.*;
@@ -55,7 +55,7 @@ public class ValidationManager
         this.validators.get( validator.getStage() ).add( validator );
     }
 
-    public void validate(final Request request) throws ValidationException
+    public void validate(final AbstractRequest request) throws ValidationException
     {
         if ( request.getQuery().getMethod() == HttpMethod.POST )
         {
@@ -71,7 +71,7 @@ public class ValidationManager
             }
         } else
         {
-            for ( final RequestValidation<Request.Query> validator :
+            for ( final RequestValidation<AbstractRequest.Query> validator :
                     this.getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
             {
                 final RequestValidation.ValidationResult result = validator.validate( request.getQuery() );

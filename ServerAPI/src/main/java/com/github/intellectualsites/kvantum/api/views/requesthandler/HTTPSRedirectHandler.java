@@ -20,7 +20,7 @@ package com.github.intellectualsites.kvantum.api.views.requesthandler;
 
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.logging.Logger;
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.MapUtil;
 import com.github.intellectualsites.kvantum.api.util.ProtocolType;
@@ -37,9 +37,9 @@ import java.util.function.BiConsumer;
 final public class HTTPSRedirectHandler extends SimpleRequestHandler
 {
 
-    private static final BiConsumer<Request, Response> responseGenerator = (request, response) ->
+    private static final BiConsumer<AbstractRequest, Response> responseGenerator = (request, response) ->
     {
-        final Request.Query query = request.getQuery();
+        final AbstractRequest.Query query = request.getQuery();
         final StringBuilder urlBuilder = new StringBuilder( "https://" )
                 .append( CoreConfig.webAddress );
         if ( CoreConfig.SSL.port != 443 )

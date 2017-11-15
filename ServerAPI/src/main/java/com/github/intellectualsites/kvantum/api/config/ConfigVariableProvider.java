@@ -18,7 +18,7 @@
  */
 package com.github.intellectualsites.kvantum.api.config;
 
-import com.github.intellectualsites.kvantum.api.request.Request;
+import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
 
@@ -58,7 +58,7 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
     }
 
     @Override
-    public Optional<ConfigVariableProvider> get(Request r)
+    public Optional<ConfigVariableProvider> get(AbstractRequest r)
     {
         return Optional.of( this );
     }
