@@ -65,3 +65,20 @@ We are using JitPack as our maven repo
     <version>BETA-0.0.4</version>
 </dependency>
 ```
+
+### Building from scratch
+
+On *nix:
+```bash
+$ git clone git://github.com/IntellectualSites/Kvantum.git
+$ cd Kvantum
+$ chmod a+x ./gradlew
+$ ./gradlew :build
+```
+
+Windows:
+```batch
+$ git clone git://github.com/IntellectualSites/Kvantum.git
+$ cd Kvantum
+$ ./gradlew.bat :build
+```
