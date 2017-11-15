@@ -109,7 +109,7 @@ class ServerTest extends GenericServerTest
     @Test
     void getCoreFolder()
     {
-        assertEquals( new File( temporaryFolder, ".kvantum" ).getAbsolutePath(), serverInstance.getCoreFolder()
+        assertEquals( new File( temporaryFolder, "kvantum" ).getAbsolutePath(), serverInstance.getCoreFolder()
                 .getAbsolutePath() );
     }
 
