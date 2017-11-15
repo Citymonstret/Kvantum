@@ -20,16 +20,12 @@ package com.github.intellectualsites.kvantum.api.views.errors;
 
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
+import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.util.FileUtils;
 import com.github.intellectualsites.kvantum.api.views.View;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import com.github.intellectualsites.kvantum.files.Path;
 
 /**
  * Created 2015-04-19 for Kvantum
@@ -39,49 +35,41 @@ import java.net.URISyntaxException;
 public class Error extends View
 {
 
-    private static String template;
+    private static String template = "not loaded";
 
     static
     {
-        File file;
-        try
+        initTemplate();
+    }
+
+    private static void initTemplate()
+    {
+        final String resourcePath = "template/error.html";
+        final Path folder = ServerImplementation.getImplementation().getFileSystem().getPath( "templates" );
+        if ( !folder.exists() )
         {
-            file = new File( ServerImplementation.getImplementation().getCoreFolder(), "templates" );
-            if ( !file.exists() && !file.mkdir() )
+            if ( !folder.create() )
             {
-                Message.COULD_NOT_CREATE_FOLDER.log( file );
+                Message.COULD_NOT_CREATE_FOLDER.log( folder );
+                return;
             }
-            file = new File( file, "error.html" );
-            if ( !file.exists() )
-            {
-                try
-                {
-                    file.createNewFile();
-                } catch ( IOException e )
-                {
-                    e.printStackTrace();
-                }
-                File tempFile = new File( ViewException.class.getClassLoader().getResource( "template" + File.separator +
-                        "error.html" ).toURI() );
-                try ( FileInputStream in = new FileInputStream( tempFile ) )
-                {
-                    try ( FileOutputStream out = new FileOutputStream( file ) )
-                    {
-                        FileUtils.copyFile( in, out, 1024 * 1024 * 16 );
-                    } catch ( final java.lang.Exception e )
-                    {
-                        e.printStackTrace();
-                    }
-                } catch ( final java.lang.Exception e )
-                {
-                    e.printStackTrace();
-                }
-            }
-            template = FileUtils.getDocument( file, 1024 * 1024 );
-        } catch ( URISyntaxException e )
+        }
+        final Path path = folder.getPath( "error.html" );
+        if ( !path.exists() )
         {
-            e.printStackTrace();
-            template = "ERROR??";
+            if ( !path.create() )
+            {
+                Logger.error( "could not create file: '%s'", path );
+                return;
+            }
+            try
+            {
+                FileUtils.copyResource( resourcePath, path.getJavaPath() );
+                template = path.readFile();
+            } catch ( Exception e )
+            {
+                e.printStackTrace();
+            }
         }
     }
 

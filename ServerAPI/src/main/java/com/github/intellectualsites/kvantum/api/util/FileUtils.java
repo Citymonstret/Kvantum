@@ -21,6 +21,7 @@ package com.github.intellectualsites.kvantum.api.util;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.exceptions.KvantumException;
+import com.github.intellectualsites.kvantum.api.logging.Logger;
 import lombok.experimental.UtilityClass;
 
 import java.io.*;
@@ -37,6 +38,31 @@ import java.util.Optional;
 @UtilityClass
 public class FileUtils
 {
+
+    public static void copyResource(final String resourcePath, final Path path) throws Exception
+    {
+        if ( !Files.exists( path.getParent() ) )
+        {
+            Files.createDirectory( path.getParent() );
+        }
+        if ( !Files.exists( path ) )
+        {
+            Files.createFile( path );
+        }
+        try ( BufferedReader reader = new BufferedReader(
+                new InputStreamReader( ClassLoader.getSystemResourceAsStream( resourcePath ) ) ) )
+        {
+            String line;
+            try ( BufferedWriter writer = Files.newBufferedWriter( path ) )
+            {
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    writer.write( line + "\r\n" );
+                }
+            }
+        }
+        Logger.info( "Successfully copied '%s' to '%s'", resourcePath, path.getFileName() );
+    }
 
     /**
      * Add files to a zip file
