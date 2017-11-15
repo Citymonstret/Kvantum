@@ -21,6 +21,8 @@ package com.github.intellectualsites.kvantum.api.logging;
 public interface LogWrapper
 {
 
+    void setFormat(String format);
+
     void log(LogContext logContext);
 
     void log(String s);

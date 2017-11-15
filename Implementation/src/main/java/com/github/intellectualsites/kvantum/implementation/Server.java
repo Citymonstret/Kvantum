@@ -254,6 +254,14 @@ public final class Server implements Kvantum, ISessionCreator
             ConfigurationFactory.load( CoreConfig.class, new File( coreFolder, "config" ) ).get();
         }
 
+        this.logWrapper.setFormat( CoreConfig.Logging.logFormat );
+
+        //
+        // Check through the configuration file and make sure that the values
+        // are not weird
+        //
+        validateConfiguration();
+
         //
         // Enable the custom security manager
         //
@@ -414,6 +422,20 @@ public final class Server implements Kvantum, ISessionCreator
         // Setup the session manager implementation
         //
         this.sessionManager = new SessionManager( this, sessionDatabase );
+    }
+
+    private void validateConfiguration()
+    {
+        if ( CoreConfig.Buffer.in < 1000 || CoreConfig.Buffer.in > 100000 )
+        {
+            Logger.warn( "It is recommended to keep 'buffer.in' in server.yml between 0 and 100000" );
+            Logger.warn( "Any other values may cause the server to run slower than expected" );
+        }
+        if ( CoreConfig.Buffer.out < 1000 || CoreConfig.Buffer.out > 100000 )
+        {
+            Logger.warn( "It is recommended to keep 'buffer.out' in server.yml between 0 and 100000" );
+            Logger.warn( "Any other values may cause the server to run slower than expected" );
+        }
     }
 
     private void loadViewConfiguration() throws KvantumException
@@ -587,9 +609,11 @@ public final class Server implements Kvantum, ISessionCreator
         TemplateManager.get().addProviderFactory( new PostProviderFactory() );
         TemplateManager.get().addProviderFactory( new MetaProvider() );
 
+        Logger.info( "Checking templating engines:" );
         CrushEngine.getInstance().load();
         VelocityEngine.getInstance().load();
         JTwigEngine.getInstance().load();
+        Logger.info( "" );
 
         // Load Plugins
         this.loadPlugins();
@@ -605,6 +629,7 @@ public final class Server implements Kvantum, ISessionCreator
         if ( !CoreConfig.disableViews )
         {
             this.log( Message.LOADING_VIEWS );
+            this.log( "" );
             final Map<String, Map<String, Object>> views = configViews.get( "views" );
             Assert.notNull( views );
             views.entrySet().forEach( entry ->
@@ -657,6 +682,8 @@ public final class Server implements Kvantum, ISessionCreator
             log( Message.CACHING_ENABLED );
         }
 
+        log( "" );
+
         log( Message.STARTING_ON_PORT, CoreConfig.port );
 
         if ( standalone && CoreConfig.enableInputThread )
@@ -691,6 +718,8 @@ public final class Server implements Kvantum, ISessionCreator
                 }
             }
         }
+
+        log( "" );
 
         if ( CoreConfig.SSL.enable )
         {

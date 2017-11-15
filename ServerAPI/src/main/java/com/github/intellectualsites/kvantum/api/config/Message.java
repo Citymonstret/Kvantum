@@ -40,9 +40,9 @@ public enum Message
     INVALID_VIEW( "Invalid view ('%s') - - Constructor has to be #(String.class, Map.class)", LogModes.MODE_WARNING ),
     STANDALONE_NO_EVENT_CALLER( "STANDALONE = TRUE; but there is no alternate event caller set", LogModes.MODE_ERROR ),
     COULD_NOT_CREATE_PLUGIN_FOLDER( "Couldn't create %s - No plugins were loaded", LogModes.MODE_ERROR ),
-    CALLING_EVENT( "Calling <%s> event", LogModes.MODE_INFO ),
+    CALLING_EVENT( "Calling <%s> event", LogModes.MODE_DEBUG ),
     VALIDATING_VIEWS( "Validating Views...", LogModes.MODE_INFO ),
-    OUTPUT_BUFFER_INFO( "Output buffer size: %skb | Input buffer size: %skb", LogModes.MODE_INFO ),
+    OUTPUT_BUFFER_INFO( "Output buffer size: %skb | Input buffer size: %skb", LogModes.MODE_DEBUG ),
     ACCEPTING_CONNECTIONS_ON( "Accepting connections on 'http://%s", LogModes.MODE_INFO ),
     ACCEPTING_SSL_CONNECTIONS_ON( "Accepting SSL connections on 'https://%s'", LogModes.MODE_INFO ),
     SHUTTING_DOWN( "Shutting down", LogModes.MODE_INFO ),
@@ -51,7 +51,7 @@ public enum Message
     STARTING_SSL_ON_PORT( "Starting the HTTPS server on port %s", LogModes.MODE_INFO ),
     SERVER_STARTED( "The server is started", LogModes.MODE_INFO ),
     TICK_ERROR( "Error in server ticking...", LogModes.MODE_ERROR ),
-    REQUEST_LOG( "Request: [Address: %s | User Agent: %s | Request String: %s | Host: %s | Query: %s, Post: %s]" ),
+    REQUEST_LOG( "Request: [Address: %s | User Agent: %s | Request String: %s | Host: %s | Query: %s ]" ),
     REQUEST_SERVED( "Request was served by '%s', with the type '%s'. The total length of the content was '%skB'",
             LogModes.MODE_DEBUG ),
     REQUEST_SERVED_STATUS( "Request was served with HTTP status: %s", LogModes.MODE_DEBUG ),
@@ -83,8 +83,8 @@ public enum Message
     ACCOUNT_ADMIN_FAILED( "Failed to create admin account", LogModes.MODE_ERROR ),
     ACCOUNT_ADMIN_CREATED( "Created admin account with password: \"%s\"", LogModes.MODE_INFO ),
     WORKER_FAILED_HANDLING( "Error when handling request: %s", LogModes.MODE_ERROR ),
-    WORKER_AVAILABLE( "Available workers: %s", LogModes.MODE_INFO ),
-    REQUEST_HANDLER_DUMP( "> RequestHandler - Class '%s', Pattern: '%s'" );
+    WORKER_AVAILABLE( "Available workers: %s", LogModes.MODE_DEBUG ),
+    REQUEST_HANDLER_DUMP( "> RequestHandler - Class '%s', Pattern: '%s'", LogModes.MODE_DEBUG );
 
     private final String message;
     private final int mode;

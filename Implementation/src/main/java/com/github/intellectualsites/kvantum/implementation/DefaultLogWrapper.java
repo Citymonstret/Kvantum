@@ -18,11 +18,13 @@
  */
 package com.github.intellectualsites.kvantum.implementation;
 
+import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.logging.LogContext;
 import com.github.intellectualsites.kvantum.api.logging.LogWrapper;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.text.StrSubstitutor;
 
 /**
@@ -33,11 +35,12 @@ import org.apache.commons.text.StrSubstitutor;
 public class DefaultLogWrapper implements LogWrapper
 {
 
-    private final String format;
+    @Setter
+    private String format;
 
     public DefaultLogWrapper()
     {
-        this( "[${applicationPrefix}][${logPrefix}][${thread}][${timeStamp}] ${message}" );
+        this( CoreConfig.Logging.logFormat );
     }
 
     @Override

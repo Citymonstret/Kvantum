@@ -30,11 +30,13 @@ class UserSearchExample implements Example
     @Override
     public void initExample()
     {
+        Logger.info( "" );
         Logger.info( "INITIALIZING EXAMPLE: UserSearch" );
         Rest.createSearch( "/search", Account.class, ParameterScope.GET, ServerImplementation.getImplementation()
                 .getApplicationStructure().getAccountManager() );
         Logger.info( "ACCESS THE EXAMPLE AT: /search?username=<username>&id=<id>" );
         Logger.info( "EXAMPLE: /search?username=admin" );
+        Logger.info( "" );
     }
 
 }

@@ -51,6 +51,13 @@ public class CoreConfig
     public static boolean enableInputThread = true;
     public static boolean exitOnStop = true;
 
+    @ConfigSection(name = "logging")
+    public static class Logging
+    {
+
+        public static String logFormat = "[${applicationPrefix}][${logPrefix}][${thread}][${timeStamp}] ${message}";
+    }
+
     @ConfigSection(name = "sessions")
     public static class Sessions
     {
