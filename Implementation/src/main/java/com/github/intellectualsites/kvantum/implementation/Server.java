@@ -52,6 +52,7 @@ import com.github.intellectualsites.kvantum.files.Extension;
 import com.github.intellectualsites.kvantum.files.FileSystem;
 import com.github.intellectualsites.kvantum.files.Path;
 import com.github.intellectualsites.kvantum.implementation.commands.AccountCommand;
+import com.github.intellectualsites.kvantum.implementation.config.TranslationFile;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumInitializationException;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumStartException;
@@ -82,8 +83,8 @@ import java.util.function.BiConsumer;
 /**
  * Main {@link Kvantum} implementation.
  * <p>
- *     Use {@link ServerImplementation#getImplementation()} to get an instance, rather
- *     than {@link #getInstance()}.
+ * Use {@link ServerImplementation#getImplementation()} to get an instance, rather
+ * than {@link #getInstance()}.
  * </p>
  */
 public final class Server implements Kvantum, ISessionCreator
@@ -97,7 +98,7 @@ public final class Server implements Kvantum, ISessionCreator
     @Getter
     private final boolean standalone;
     @Getter
-    private final Map<String, Class<? extends View>> viewBindings;
+    private final Map<String, Class<? extends View>> viewBindings = new HashMap<>();
     @Getter
     private final WorkerProcedure procedure = new WorkerProcedure();
     @Getter
@@ -108,10 +109,10 @@ public final class Server implements Kvantum, ISessionCreator
     private final ITempFileManagerFactory tempFileManagerFactory = new TempFileManagerFactory();
     @Getter
     private final KvantumFileUpload globalFileUpload = new KvantumFileUpload();
-    PrintStream logStream;
     @Getter
     private final Gson gson = new GsonBuilder()
-        .registerTypeAdapter( Account.class, new AccountSerializer() ).create();
+            .registerTypeAdapter( Account.class, new AccountSerializer() ).create();
+    PrintStream logStream;
     @Getter
     private volatile ICacheManager cacheManager;
     @Getter
@@ -142,10 +143,6 @@ public final class Server implements Kvantum, ISessionCreator
     private CommandManager commandManager;
     @Getter
     private ApplicationStructure applicationStructure;
-
-    {
-        viewBindings = new HashMap<>();
-    }
 
     /**
      * @param serverContext ServerContext that will be used to initialize the server
@@ -211,33 +208,7 @@ public final class Server implements Kvantum, ISessionCreator
         //
         try
         {
-            translations = new YamlConfiguration( "translations",
-                    new File( new File( coreFolder, "config" ), "translations.yml" ) );
-            translations.loadFile();
-            for ( final Message message : Message.values() )
-            {
-                final String nameSpace;
-                switch ( message.getMode() )
-                {
-                    case LogModes.MODE_DEBUG:
-                        nameSpace = "debug";
-                        break;
-                    case LogModes.MODE_INFO:
-                        nameSpace = "info";
-                        break;
-                    case LogModes.MODE_ERROR:
-                        nameSpace = "error";
-                        break;
-                    case LogModes.MODE_WARNING:
-                        nameSpace = "warning";
-                        break;
-                    default:
-                        nameSpace = "info";
-                        break;
-                }
-                translations.setIfNotExists( nameSpace + "." + message.name().toLowerCase(), message.toString() );
-            }
-            translations.saveFile();
+            translations = new TranslationFile( new File( coreFolder, "config" ) );
         } catch ( final Exception e )
         {
             log( Message.CANNOT_LOAD_TRANSLATIONS );
@@ -440,53 +411,58 @@ public final class Server implements Kvantum, ISessionCreator
     {
         try
         {
-            configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ), "views.yml" ) );
+            configViews = new YamlConfiguration( "views", new File( new File( coreFolder, "config" ),
+                    "views.yml" ) );
             configViews.loadFile();
+
             // These are the default views
             Map<String, Object> views = new HashMap<>();
-            // HTML View
-            Map<String, Object> view = new HashMap<>();
-            view.put( "filter", "[file=index].[extension=html]" );
-            view.put( "type", "std" );
-            Map<String, Object> opts = new HashMap<>();
-            opts.put( "folder", "./public" );
-            opts.put( "excludeExtensions", Collections.singletonList( "txt" ) );
-            opts.put( "filePattern", "${file}.${extension}" );
-            view.put( "options", opts );
-            views.put( "std", view );
+            final Map<String, Object> defaultView = MapBuilder.<String, Object>newHashMap()
+                    .put( "filter", "[file=index].[extension=html]" )
+                    .put( "type", "std" )
+                    .put( "options", MapBuilder.<String, Object>newHashMap()
+                            .put( "folder", "./public" )
+                            .put( "excludeExtensions", Collections.singletonList( "txt" ) )
+                            .put( "filePattern", "${file}.${extension}" ).get()
+                    ).get();
+            views.put( "std", defaultView );
             configViews.setIfNotExists( "views", views );
+            configViews.saveFile();
+
             final Path path = getFileSystem().getPath( "public" );
             if ( !path.exists() )
             {
                 path.create();
-            }
-            if ( !path.getPath( "favicon.ico" ).exists() )
-            {
-                Message.CREATING.log( "public/favicon.ico" );
-                try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
-                        "favicon.ico" )
-                ) )
+                //
+                // Only create the default files if the /public folder doesn't exist
+                //
+                if ( !path.getPath( "favicon.ico" ).exists() )
                 {
-                    FileUtils.copyFile( getClass().getResourceAsStream( "/template/favicon.ico" ), out, 1024 * 16 );
-                } catch ( final Exception e )
-                {
-                    e.printStackTrace();
+                    Message.CREATING.log( "public/favicon.ico" );
+                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(),
+                            "favicon.ico" )
+                    ) )
+                    {
+                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/favicon.ico" ), out, 1024 * 16 );
+                    } catch ( final Exception e )
+                    {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            if ( !path.getPath( "index", Extension.HTML ).exists() )
-            {
-                Message.CREATING.log( "public/index.html" );
-                try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
-                ) )
+                if ( !path.getPath( "index", Extension.HTML ).exists() )
                 {
-                    FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
-                } catch ( final Exception e )
-                {
-                    e.printStackTrace();
+                    Message.CREATING.log( "public/index.html" );
+                    try ( OutputStream out = new FileOutputStream( new File( path.getJavaPath().toFile(), "index.html" )
+                    ) )
+                    {
+                        FileUtils.copyFile( getClass().getResourceAsStream( "/template/index.html" ), out, 1024 * 16 );
+                    } catch ( final Exception e )
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
-            configViews.saveFile();
         } catch ( final Exception e )
         {
             throw new KvantumInitializationException( "Couldn't load in views", e );
@@ -531,7 +507,7 @@ public final class Server implements Kvantum, ISessionCreator
         viewBindings.put( key, c );
     }
 
-    @SuppressWarnings( "ALL" )
+    @SuppressWarnings("ALL")
     @Override
     public void validateViews()
     {
@@ -654,7 +630,8 @@ public final class Server implements Kvantum, ISessionCreator
                     final Class<? extends View> vc = viewBindings.get( type.toLowerCase() );
                     try
                     {
-                        final View vv = vc.getDeclaredConstructor( String.class, Map.class ).newInstance( filter, options );
+                        final View vv = vc.getDeclaredConstructor( String.class, Map.class )
+                                .newInstance( filter, options );
                         router.add( vv );
                     } catch ( final Exception e )
                     {
@@ -735,8 +712,8 @@ public final class Server implements Kvantum, ISessionCreator
             }
         }
 
-        log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.hostname + ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) +
-                "/'" );
+        log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.hostname +
+                ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) + "/'" );
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
 
         this.handleEvent( new ServerReadyEvent( this ) );
@@ -801,7 +778,7 @@ public final class Server implements Kvantum, ISessionCreator
                 objectString = "null";
             } else if ( a instanceof LogFormatted )
             {
-                objectString = ( ( LogFormatted ) a ).getLogFormatted();
+                objectString = ( (LogFormatted) a ).getLogFormatted();
             } else
             {
                 objectString = a.toString();
