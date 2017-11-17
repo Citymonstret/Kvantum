@@ -67,6 +67,7 @@ public class Path
 
     /**
      * Calculate the size of the file (or files, if the current path is a directory)
+     *
      * @return file(s) size | -1L if anything goes wrong
      */
     public final long length()
@@ -83,8 +84,9 @@ public class Path
 
     /**
      * Attempt to read the file that the path is pointing to
+     *
      * @return if the file is readable; the file content |
-     *         if the file isn't readable; an empty byte array
+     * if the file isn't readable; an empty byte array
      */
     final public byte[] readBytes()
     {
@@ -109,8 +111,9 @@ public class Path
     /**
      * Attempt to read the file that the path is pointing to.
      * Will first check the file cache, then attempt to read the file
+     *
      * @return if the file is readable; the file content |
-     *         if the file isn't readable; an empty string
+     * if the file isn't readable; an empty string
      */
     final public String readFile()
     {
@@ -167,6 +170,7 @@ public class Path
 
     /**
      * Get a path relative to this
+     *
      * @param path Raw path
      * @return Relative path
      * @see FileSystem#getPath(Path, String)
@@ -202,6 +206,7 @@ public class Path
 
     /**
      * Check if the file exists
+     *
      * @return true if the file exists
      */
     public boolean exists()
@@ -219,6 +224,7 @@ public class Path
      * path
      * points to a directory
      * </p>
+     *
      * @return true if the file/directory was created
      */
     public boolean create()
@@ -243,8 +249,9 @@ public class Path
 
     /**
      * See if the file is stored in the file cache
+     *
      * @return true if the file is stored in the cache
-     *         | else false
+     * | else false
      */
     public boolean isCached()
     {
@@ -253,6 +260,7 @@ public class Path
 
     /**
      * Get the file extension
+     *
      * @return if a file; file extension | if a directory; an empty string
      */
     public String getExtension()
@@ -294,6 +302,7 @@ public class Path
 
     /**
      * Get all sub paths
+     *
      * @return Array containing the sub paths, will be empty if this isn't a directory
      * @see #isFolder() to check if this is a directory or not
      */
@@ -304,8 +313,9 @@ public class Path
 
     /**
      * Get all sub paths
-     * @return Array containing the sub paths, will be empty if this isn't a directory
+     *
      * @param includeFolders Whether or not (sub-)folders should be included
+     * @return Array containing the sub paths, will be empty if this isn't a directory
      * @see #isFolder() to check if this is a directory or not
      */
     public Collection<Path> getSubPaths(boolean includeFolders)
@@ -334,6 +344,13 @@ public class Path
         return path.hashCode();
     }
 
+    /**
+     * Get a collection containing all the sub paths that
+     * matches a given predicate
+     *
+     * @param filters Path filter
+     * @return Collection of all sub paths that match the filter
+     */
     @SafeVarargs
     public final Collection<Path> getSubPaths(final Predicate<Path>... filters)
     {

@@ -60,14 +60,29 @@ public class Assert
         return in;
     }
 
-    public static void notEmpty(final Object[] array)
+    /**
+     * Assertion that will pass if, and only if, the given array
+     * is neither null nor empty
+     *
+     * @param array Array to be tested
+     * @return The given array
+     */
+    public static <T> T[] notEmpty(final T[] array)
     {
         equals( array != null && array.length > 0, true );
+        return array;
     }
 
+    /**
+     * Assertion that will pass, and only if, the given number
+     * is neither null nor negative (can be 0)
+     *
+     * @param number Number to be tested
+     * @return the number
+     */
     public static Number isPositive(final Number number)
     {
-        equals( number.intValue() >= 0, true );
+        equals( notNull( number ).intValue() >= 0, true );
         return number;
     }
 
@@ -91,6 +106,14 @@ public class Assert
         return t;
     }
 
+    /**
+     * Assertion that will pass if a given {@link Validatable} is
+     * valid, as stated by: {@link Validatable#isValid()}
+     *
+     * @param t   {@link Validatable} object
+     * @param <T> Type
+     * @return The obhect
+     */
     public static <T extends Validatable> T isValid(final T t)
     {
         notNull( t );
@@ -122,11 +145,23 @@ public class Assert
         }
     }
 
+    /**
+     * Assertion that will pass if, and only if, the
+     * given boolean is false
+     *
+     * @param a Boolean to be tested
+     */
     public static void isFalse(final boolean a)
     {
         equals( a, false );
     }
 
+    /**
+     * Assertion that will pass if, and only if, the given
+     * boolean is true
+     *
+     * @param a Boolean to be tested
+     */
     public static void isTrue(final boolean a)
     {
         equals( a, true );
@@ -144,6 +179,13 @@ public class Assert
         equals( a, b, new AssertionError( a, "a != b" ) );
     }
 
+    /**
+     * Assertion that will pass if, and only if, the given
+     * integers A and B are equal
+     *
+     * @param a Integer A
+     * @param b Integer B
+     */
     public static void equals(final int a, final int b)
     {
         equals( a == b, true, new AssertionError( a, a + " != " + b ) );
@@ -162,11 +204,14 @@ public class Assert
         equals( a, b, new AssertionError( a, message ) );
     }
 
-    public static void notEmpty(final byte[] array)
-    {
-        equals( array != null && array.length > 0, true );
-    }
-
+    /**
+     * Assertion that will pass if, and only if, the
+     * given object is not null
+     *
+     * @param o   Object to be tested
+     * @param <T> Object type
+     * @return Object
+     */
     public static <T> T isNull(final T o)
     {
         try

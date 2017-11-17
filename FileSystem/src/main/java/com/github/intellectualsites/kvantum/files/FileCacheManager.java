@@ -18,6 +18,9 @@ package com.github.intellectualsites.kvantum.files;
 
 import java.util.Optional;
 
+/**
+ * High-level manager for file caching
+ */
 public interface FileCacheManager
 {
 
@@ -27,13 +30,13 @@ public interface FileCacheManager
      * @param string (Unique) File identifier
      * @return Optional file content
      */
-    Optional<String> readCachedFile(final String string);
+    Optional<String> readCachedFile(String string);
 
     /**
      * Write a file to the file cache
      * @param string (Unique) File identifier
      * @param content File content
      */
-    void writeCachedFile(final String string, final String content);
+    void writeCachedFile(String string, String content);
 
 }

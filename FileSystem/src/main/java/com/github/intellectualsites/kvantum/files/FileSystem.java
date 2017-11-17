@@ -127,6 +127,10 @@ public class FileSystem
         return new Path( this, parent.toString() + rawPath, lastPart.indexOf( '.' ) == -1 );
     }
 
+    /**
+     * Exception thrown when an attempt to access an illegal path in {@link FileSystem}
+     * or {@link Path} has been made
+     */
     public static final class IllegalPathException extends RuntimeException
     {
 

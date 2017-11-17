@@ -16,11 +16,20 @@
  */
 package com.github.intellectualsites.kvantum.api.util;
 
+/**
+ * Exception thrown when an assertion in {@link Assert} fails
+ */
 @SuppressWarnings("WeakerAccess")
 public class AssertionError extends RuntimeException
 {
 
-    public AssertionError(Object o, String s)
+    /**
+     * Constructor
+     *
+     * @param o Object that failed the assertion
+     * @param s Reason why the assertion failed
+     */
+    public AssertionError(final Object o, final String s)
     {
         super( "'" + o + "' didn't pass the assertion check; " + s );
     }
