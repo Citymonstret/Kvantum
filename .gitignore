@@ -141,3 +141,4 @@ nbdist/
 # Keyserver and certificates
 *.jks
 *.crt
+/kvantum/
