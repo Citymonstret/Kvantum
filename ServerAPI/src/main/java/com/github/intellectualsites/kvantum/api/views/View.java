@@ -363,7 +363,7 @@ public class View extends RequestHandler
     {
         Assert.isValid( request );
 
-        final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest().toLowerCase() );
+        final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
         if ( map != null )
         {
             request.addMeta( CONSTANT_VARIABLES, map );

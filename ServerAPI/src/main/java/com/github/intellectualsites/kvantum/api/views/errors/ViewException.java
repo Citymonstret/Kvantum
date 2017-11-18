@@ -61,12 +61,12 @@ public class ViewException extends View
             try
             {
                 FileUtils.copyResource( resourcePath, path.getJavaPath() );
-                template = path.readFile();
             } catch ( Exception e )
             {
                 e.printStackTrace();
             }
         }
+        template = path.readFile();
     }
 
     private final java.lang.Exception in;

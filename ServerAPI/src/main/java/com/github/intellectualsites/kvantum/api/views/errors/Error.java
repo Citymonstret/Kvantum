@@ -63,12 +63,12 @@ public class Error extends View
             try
             {
                 FileUtils.copyResource( resourcePath, path.getJavaPath() );
-                template = path.readFile();
             } catch ( Exception e )
             {
                 e.printStackTrace();
             }
         }
+        template = path.readFile();
     }
 
     private final int code;
