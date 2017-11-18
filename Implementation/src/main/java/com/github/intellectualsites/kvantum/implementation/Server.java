@@ -416,18 +416,35 @@ public final class Server implements Kvantum, ISessionCreator
             configViews.loadFile();
 
             // These are the default views
-            Map<String, Object> views = new HashMap<>();
-            final Map<String, Object> defaultView = MapBuilder.<String, Object>newHashMap()
-                    .put( "filter", "[file=index].[extension=html]" )
-                    .put( "type", "std" )
-                    .put( "options", MapBuilder.<String, Object>newHashMap()
-                            .put( "folder", "./public" )
-                            .put( "excludeExtensions", Collections.singletonList( "txt" ) )
-                            .put( "filePattern", "${file}.${extension}" ).get()
-                    ).get();
-            views.put( "std", defaultView );
-            configViews.setIfNotExists( "views", views );
-            configViews.saveFile();
+
+            if ( !configViews.contains( "views" ) )
+            {
+                final YamlConfiguration standardFile = new YamlConfiguration( "views",
+                        new File( new File( coreFolder, "config" ), "standardViews.yml" ) );
+                standardFile.loadFile();
+
+                {
+                    Map<String, Object> views = new HashMap<>();
+                    final Map<String, Object> defaultView = MapBuilder.<String, Object>newHashMap()
+                            .put( "filter", "[file=index].[extension=html]" )
+                            .put( "type", "std" )
+                            .put( "options", MapBuilder.<String, Object>newHashMap()
+                                    .put( "folder", "./public" )
+                                    .put( "excludeExtensions", Collections.singletonList( "txt" ) )
+                                    .put( "filePattern", "${file}.${extension}" ).get()
+                            ).get();
+                    views.put( "std", defaultView );
+                    standardFile.setIfNotExists( "views", views );
+                    standardFile.saveFile();
+                }
+
+                {
+                    Map<String, Object> views = new HashMap<>();
+                    views.put( "include", "standardViews.yml" );
+                    configViews.setIfNotExists( "views", views );
+                    configViews.saveFile();
+                }
+            }
 
             final Path path = getFileSystem().getPath( "public" );
             if ( !path.exists() )
@@ -604,41 +621,7 @@ public final class Server implements Kvantum, ISessionCreator
         {
             this.log( Message.LOADING_VIEWS );
             this.log( "" );
-            final Map<String, Map<String, Object>> views = configViews.get( "views" );
-            Assert.notNull( views );
-            views.entrySet().forEach( entry ->
-            {
-                final Map<String, Object> view = entry.getValue();
-                String type = "html";
-                String filter = view.get( "filter" ).toString();
-                if ( view.containsKey( "type" ) )
-                {
-                    type = view.get( "type" ).toString();
-                }
-                final Map<String, Object> options;
-                if ( view.containsKey( "options" ) )
-                {
-                    options = (HashMap<String, Object>) view.get( "options" );
-                } else
-                {
-                    options = new HashMap<>();
-                }
-                options.put( "internalName", entry.getKey() );
-
-                if ( viewBindings.containsKey( type.toLowerCase() ) )
-                {
-                    final Class<? extends View> vc = viewBindings.get( type.toLowerCase() );
-                    try
-                    {
-                        final View vv = vc.getDeclaredConstructor( String.class, Map.class )
-                                .newInstance( filter, options );
-                        router.add( vv );
-                    } catch ( final Exception e )
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            } );
+            new ViewLoader( configViews );
         } else
         {
             Message.VIEWS_DISABLED.log();

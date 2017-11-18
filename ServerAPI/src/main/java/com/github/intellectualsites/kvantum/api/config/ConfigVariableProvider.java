@@ -20,6 +20,7 @@ import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.github.intellectualsites.kvantum.api.util.VariableProvider;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
 {
 
     private static ConfigVariableProvider instance;
-    private final Map<String, ConfigProvider> configurations;
+    private final Map<String, WeakReference<ConfigProvider>> configurations;
 
     private ConfigVariableProvider()
     {
@@ -52,7 +53,7 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
 
     public void add(final ConfigProvider provider)
     {
-        configurations.put( provider.toString(), provider );
+        configurations.put( provider.toString(), new WeakReference<>( provider ) );
     }
 
     @Override
@@ -70,24 +71,50 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
     @Override
     public boolean contains(final String variable)
     {
-        String[] parts = variable.split( "@" );
-        return configurations.containsKey( parts[ 0 ] ) && configurations.get( parts[ 0 ] ).contains( parts[ 1 ] );
+        final String[] parts = variable.split( "@" );
+        if ( configurations.containsKey( parts[ 0 ] ) )
+        {
+            final WeakReference<ConfigProvider> reference = configurations.get( parts[ 0 ] );
+            final ConfigProvider provider = reference.get();
+            if ( provider != null )
+            {
+                return provider.contains( parts[ 1 ] );
+            } else
+            {
+                this.configurations.remove( parts[ 0 ] );
+            }
+        }
+        return false;
     }
 
     @Override
     public Object get(final String variable)
     {
         String[] parts = variable.split( "@" );
-        return configurations.get( parts[ 0 ] ).get( parts[ 1 ] );
+        final WeakReference<ConfigProvider> reference = configurations.get( parts[ 0 ] );
+        final ConfigProvider provider = reference.get();
+        if ( provider != null )
+        {
+            return provider.get( parts[ 1 ] );
+        } else
+        {
+            this.configurations.remove( parts[ 0 ] );
+        }
+        return null;
     }
 
     @Override
     public Map<String, Object> getAll()
     {
         final Map<String, Object> all = new HashMap<>();
-        for ( final Map.Entry<String, ConfigProvider> entry1 : configurations.entrySet() )
+        for ( final Map.Entry<String, WeakReference<ConfigProvider>> entry1 : configurations.entrySet() )
         {
-            for ( Map.Entry<String, Object> entry2 : entry1.getValue().getAll().entrySet() )
+            final ConfigProvider provider = entry1.getValue().get();
+            if ( provider == null )
+            {
+                continue;
+            }
+            for ( Map.Entry<String, Object> entry2 : provider.getAll().entrySet() )
             {
                 all.put( entry1.getKey() + "@" + entry2.getKey(), entry2.getValue() );
             }

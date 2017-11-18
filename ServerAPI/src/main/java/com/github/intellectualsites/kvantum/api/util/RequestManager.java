@@ -92,8 +92,8 @@ final public class RequestManager extends Router
     {
         Assert.notNull( server );
 
-        ( (IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP.log( view.getClass().getSimpleName(), view
-                .toString() ) ).foreach( views );
+        ( (IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP.log( view.getClass().getSimpleName(),
+                view.toString() ) ).foreach( views );
     }
 
     @Override

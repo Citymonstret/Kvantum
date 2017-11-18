@@ -394,7 +394,8 @@ public class View extends RequestHandler
     @Override
     public String toString()
     {
-        return internalName + "@" + uuid.toString();
+        return String.format( "{name:%s,uuid:%s,pattern:%s}",
+                internalName, uuid.toString(), viewPattern.toString() );
     }
 
     /**
