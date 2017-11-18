@@ -444,6 +444,9 @@ public final class Server implements Kvantum, ISessionCreator
                     configViews.setIfNotExists( "views", views );
                     configViews.saveFile();
                 }
+
+                Logger.info( "If you want to import a folder structure, see /generate" );
+                Logger.info( "Instructions for /generate: https://github.com/IntellectualSites/Kvantum/wiki/generate" );
             }
 
             final Path path = getFileSystem().getPath( "public" );

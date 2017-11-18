@@ -49,6 +49,7 @@ public final class InputThread extends Thread
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Dump() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Metrics() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Show() );
+        ServerImplementation.getImplementation().getCommandManager().createCommand( new Generate() );
         ServerImplementation.getImplementation().getCommandManager().addCommand( new Help( ServerImplementation
                 .getImplementation().getCommandManager() ) );
 
@@ -72,6 +73,7 @@ public final class InputThread extends Thread
             try
             {
                 line = InternalJlineManager.getInstance().getLineReader().readLine( "> " );
+                ServerImplementation.getImplementation().getLogWrapper().breakLine();
                 if ( shouldStop || ServerImplementation.getImplementation().isStopping() )
                 {
                     break;

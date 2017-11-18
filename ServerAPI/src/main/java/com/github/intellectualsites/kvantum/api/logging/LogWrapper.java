@@ -25,6 +25,8 @@ public interface LogWrapper
 
     void log(String s);
 
+    void breakLine();
+
     default void log()
     {
         log( "" );

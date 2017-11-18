@@ -61,4 +61,10 @@ public class DefaultLogWrapper implements LogWrapper
         ( (Server) ServerImplementation.getImplementation() ).logStream.println( s );
     }
 
+    @Override
+    public void breakLine()
+    {
+        System.out.print( "\n" );
+    }
+
 }
