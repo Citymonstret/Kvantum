@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link Kvantum#getApplicationStructure()} then {@link ApplicationStructure#getAccountManager()}
  * </p>
  */
-public interface IAccountManager extends SearchResultProvider<IAccount>
+public interface IAccountManager extends SearchResultProvider<IAccount, IAccount>
 {
 
     String SESSION_ACCOUNT_CONSTANT = "__user_id__";

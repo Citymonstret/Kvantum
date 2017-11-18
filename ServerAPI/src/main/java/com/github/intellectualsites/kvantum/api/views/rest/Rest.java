@@ -57,13 +57,16 @@ public class Rest
      * @param <T> Lowest class type
      * @return The created request handler
      */
-    public static <T> RequestHandler createSearch(final String filter, final Class<? extends T> clazz,
-                                                  final ParameterScope scope, final SearchResultProvider<T> resultProvider)
+    public static <QueryType, ObjectType> RequestHandler createSearch(
+            final String filter,
+            final Class<? extends QueryType> clazz,
+            final ParameterScope scope,
+            final SearchResultProvider<QueryType, ObjectType> resultProvider)
     {
-        return SearchService.<T>builder()
+        return SearchService.<QueryType, ObjectType>builder()
                 .filter( filter )
                 .resultProvider( resultProvider )
-                .objectType( clazz )
+                .queryObjectType( clazz )
                 .parameterScope( scope )
                 .build().registerHandler();
     }

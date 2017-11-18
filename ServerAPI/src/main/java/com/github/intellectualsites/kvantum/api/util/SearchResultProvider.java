@@ -20,11 +20,9 @@ import java.util.Collection;
 
 /**
  * An interface for objects that perform a query and returns a collection of results
- *
- * @param <T> Type
  */
 @FunctionalInterface
-public interface SearchResultProvider<T>
+public interface SearchResultProvider<QueryType, ObjectType>
 {
 
     /**
@@ -33,6 +31,6 @@ public interface SearchResultProvider<T>
      * @param query Query
      * @return Collection containing all the matching results
      */
-    Collection<? extends T> getResults(T query);
+    Collection<? extends ObjectType> getResults(QueryType query);
 
 }

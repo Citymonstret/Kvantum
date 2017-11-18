@@ -51,11 +51,12 @@ import java.util.Optional;
  * (See {@link RequestHandler#getMiddlewareQueuePopulator()} and
  * {@link com.github.intellectualsites.kvantum.api.views.requesthandler.Middleware}
  * </p>
- * @param <T> Lowest class type
+ * @param <QueryType> Type used to query objects
+ * @param <ObjectType> Object type
  */
 @Getter
 @Builder
-final public class SearchService<T>
+final public class SearchService<QueryType, ObjectType>
 {
 
     /**
@@ -66,12 +67,12 @@ final public class SearchService<T>
     /**
      * Class, must comply to KvantumObject specifications (see {@link KvantumObjectFactory})
      */
-    private final Class<? extends T> objectType;
+    private final Class<? extends QueryType> queryObjectType;
 
     /**
      * Provider of search results, i.e {@link com.github.intellectualsites.kvantum.api.account.IAccountManager}
      */
-    private final SearchResultProvider<T> resultProvider;
+    private final SearchResultProvider<QueryType, ObjectType> resultProvider;
 
     /**
      * Whether GET or POST parameters will be used to read the object
@@ -120,7 +121,7 @@ final public class SearchService<T>
                 }
             }
 
-            final val factory = KvantumObjectFactory.from( objectType ).build( parameterScope );
+            final val factory = KvantumObjectFactory.from( queryObjectType ).build( parameterScope );
             final val result = factory.parseRequest( request );
             response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
             if ( !result.isSuccess() )
@@ -130,8 +131,8 @@ final public class SearchService<T>
                 response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
                 return;
             }
-            final T query = result.getParsedObject();
-            final Collection<? extends T> queryResult = resultProvider.getResults( query );
+            final QueryType query = result.getParsedObject();
+            final Collection<? extends ObjectType> queryResult = resultProvider.getResults( query );
             if ( queryResult.isEmpty() )
             {
                 final JsonObject requestStatus = new JsonObject();
@@ -147,7 +148,7 @@ final public class SearchService<T>
                 requestStatus.add( "query", ServerImplementation.getImplementation()
                         .getGson().toJsonTree( query ) );
                 final JsonArray resultArray = new JsonArray();
-                for ( final T t : queryResult )
+                for ( final ObjectType t : queryResult )
                 {
                     resultArray.add( ServerImplementation.getImplementation()
                             .getGson().toJsonTree( t ) );

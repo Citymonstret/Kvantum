@@ -18,6 +18,7 @@ package com.github.intellectualsites.kvantum.files;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.function.Predicate;
@@ -35,6 +36,7 @@ public class Path
     Map<String, Path> subPaths;
     private String path;
     private boolean exists;
+    private BasicFileAttributes basicFileAttributes;
 
     Path(final FileSystem fileSystem, final String path, boolean isFolder)
     {
@@ -80,6 +82,41 @@ public class Path
             e.printStackTrace();
         }
         return -1L;
+    }
+
+    private void loadAttributes() throws Exception
+    {
+        if ( this.basicFileAttributes != null )
+        {
+            return;
+        }
+        this.basicFileAttributes = Files.readAttributes( javaPath, BasicFileAttributes.class );
+    }
+
+    /**
+     * Get the file creation time in milliseconds
+     *
+     * @return file creation time
+     */
+    public long getCreationTime()
+    {
+        try
+        {
+            this.loadAttributes();
+            return this.basicFileAttributes.creationTime().toMillis();
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    /**
+     * Removes the stored sub paths
+     */
+    public void invalidateSubPaths()
+    {
+        this.subPaths = null;
     }
 
     /**
