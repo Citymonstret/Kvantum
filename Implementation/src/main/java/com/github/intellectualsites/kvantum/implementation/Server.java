@@ -440,7 +440,7 @@ public final class Server implements Kvantum, ISessionCreator
 
                 {
                     Map<String, Object> views = new HashMap<>();
-                    views.put( "include", "standardViews.yml" );
+                    views.put( "standard", "standardViews.yml" );
                     configViews.setIfNotExists( "views", views );
                     configViews.saveFile();
                 }

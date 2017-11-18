@@ -27,7 +27,7 @@ public class ViewLoader
     {
         for ( final Map.Entry<String, Object> viewEntry : views.entrySet() )
         {
-            if ( viewEntry.getKey().equalsIgnoreCase( "include" ) )
+            if ( viewEntry.getValue() instanceof String )
             {
                 final String object = viewEntry.getValue().toString();
                 final ConfigurationFile includeFile;
