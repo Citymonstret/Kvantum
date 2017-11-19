@@ -37,7 +37,6 @@ public class CoreConfig
     public static int port = 80;
     public static String webAddress = "localhost";
     public static String logPrefix = "Web";
-    public static String hostname = "localhost";
     public static boolean verbose = false;
     public static int workers = 1;
     public static boolean disableViews = false;

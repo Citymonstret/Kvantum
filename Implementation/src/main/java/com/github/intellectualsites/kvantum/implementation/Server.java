@@ -38,8 +38,6 @@ import com.github.intellectualsites.kvantum.api.plugin.PluginManager;
 import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.PostProviderFactory;
 import com.github.intellectualsites.kvantum.api.response.Response;
-import com.github.intellectualsites.kvantum.api.session.ISession;
-import com.github.intellectualsites.kvantum.api.session.ISessionCreator;
 import com.github.intellectualsites.kvantum.api.session.ISessionDatabase;
 import com.github.intellectualsites.kvantum.api.session.SessionManager;
 import com.github.intellectualsites.kvantum.api.templates.TemplateManager;
@@ -87,7 +85,7 @@ import java.util.function.BiConsumer;
  * than {@link #getInstance()}.
  * </p>
  */
-public final class Server implements Kvantum, ISessionCreator
+public final class Server implements Kvantum
 {
 
     @SuppressWarnings("ALL")
@@ -390,7 +388,7 @@ public final class Server implements Kvantum, ISessionCreator
         //
         // Setup the session manager implementation
         //
-        this.sessionManager = new SessionManager( this, sessionDatabase );
+        this.sessionManager = new SessionManager( new SessionFactory(), sessionDatabase );
     }
 
     private void validateConfiguration()
@@ -698,7 +696,7 @@ public final class Server implements Kvantum, ISessionCreator
             }
         }
 
-        log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.hostname +
+        log( Message.ACCEPTING_CONNECTIONS_ON, CoreConfig.webAddress +
                 ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) + "/'" );
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
 
@@ -830,12 +828,6 @@ public final class Server implements Kvantum, ISessionCreator
     {
         return SimpleRequestHandler.builder().setPattern( filter ).setGenerator( generator )
                 .build().addToRouter( router );
-    }
-
-    @Override
-    public ISession createSession()
-    {
-        return new Session();
     }
 
 }
