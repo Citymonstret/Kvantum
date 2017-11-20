@@ -16,11 +16,15 @@
  */
 package com.github.intellectualsites.kvantum.implementation;
 
+import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.Assert;
+import com.github.intellectualsites.kvantum.implementation.error.KvantumInitializationException;
 
 import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import java.io.IOException;
 
 /**
  * SSL implementation of the ordinary runner
@@ -31,12 +35,31 @@ final class HTTPSThread extends Thread
     private final SocketHandler socketHandler;
     private final SSLServerSocket sslSocket;
 
-    HTTPSThread(final SSLServerSocket sslSocket, final SocketHandler socketHandler)
+    HTTPSThread(final SocketHandler socketHandler)
+            throws KvantumInitializationException
     {
         super( "https" );
         this.setPriority( Thread.MAX_PRIORITY );
         this.socketHandler = Assert.notNull( socketHandler );
-        this.sslSocket = Assert.notNull( sslSocket );
+        try
+        {
+            final SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            this.sslSocket = Assert.notNull( (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port ) );
+        } catch ( IOException e )
+        {
+            throw new KvantumInitializationException( "Failed to create SSL socket", e );
+        }
+    }
+
+    void close()
+    {
+        try
+        {
+            this.sslSocket.close();
+        } catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -19,7 +19,9 @@ package com.github.intellectualsites.kvantum.implementation;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.Assert;
+import com.github.intellectualsites.kvantum.implementation.error.KvantumInitializationException;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 
 final class HTTPThread extends Thread
@@ -28,12 +30,30 @@ final class HTTPThread extends Thread
     private final ServerSocket serverSocket;
     private final SocketHandler socketHandler;
 
-    HTTPThread(final ServerSocket serverSocket, final SocketHandler socketHandler)
+    HTTPThread(final ServerSocketFactory serverSocketFactory, final SocketHandler socketHandler)
+            throws KvantumInitializationException
     {
         super( "http" );
         this.setPriority( Thread.MAX_PRIORITY );
-        this.serverSocket = Assert.notNull( serverSocket );
+
+        if ( !serverSocketFactory.createServerSocket() )
+        {
+            throw new KvantumInitializationException( "Failed to start server..." );
+        }
+
+        this.serverSocket = Assert.notNull( serverSocketFactory.getServerSocket() );
         this.socketHandler = Assert.notNull( socketHandler );
+    }
+
+    void close()
+    {
+        try
+        {
+            this.serverSocket.close();
+        } catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

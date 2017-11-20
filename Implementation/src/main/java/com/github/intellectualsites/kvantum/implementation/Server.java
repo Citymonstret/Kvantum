@@ -18,7 +18,11 @@ package com.github.intellectualsites.kvantum.implementation;
 
 import com.github.intellectualsites.kvantum.api.account.IAccountManager;
 import com.github.intellectualsites.kvantum.api.cache.ICacheManager;
-import com.github.intellectualsites.kvantum.api.config.*;
+import com.github.intellectualsites.kvantum.api.config.ConfigVariableProvider;
+import com.github.intellectualsites.kvantum.api.config.ConfigurationFile;
+import com.github.intellectualsites.kvantum.api.config.CoreConfig;
+import com.github.intellectualsites.kvantum.api.config.Message;
+import com.github.intellectualsites.kvantum.api.config.YamlConfiguration;
 import com.github.intellectualsites.kvantum.api.core.Kvantum;
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.core.WorkerProcedure;
@@ -31,7 +35,12 @@ import com.github.intellectualsites.kvantum.api.events.defaultevents.StartupEven
 import com.github.intellectualsites.kvantum.api.events.defaultevents.ViewsInitializedEvent;
 import com.github.intellectualsites.kvantum.api.fileupload.KvantumFileUpload;
 import com.github.intellectualsites.kvantum.api.jtwig.JTwigEngine;
-import com.github.intellectualsites.kvantum.api.logging.*;
+import com.github.intellectualsites.kvantum.api.logging.LogContext;
+import com.github.intellectualsites.kvantum.api.logging.LogFormatted;
+import com.github.intellectualsites.kvantum.api.logging.LogModes;
+import com.github.intellectualsites.kvantum.api.logging.LogProvider;
+import com.github.intellectualsites.kvantum.api.logging.LogWrapper;
+import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.matching.Router;
 import com.github.intellectualsites.kvantum.api.plugin.PluginLoader;
 import com.github.intellectualsites.kvantum.api.plugin.PluginManager;
@@ -41,9 +50,27 @@ import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.session.ISessionDatabase;
 import com.github.intellectualsites.kvantum.api.session.SessionManager;
 import com.github.intellectualsites.kvantum.api.templates.TemplateManager;
-import com.github.intellectualsites.kvantum.api.util.*;
+import com.github.intellectualsites.kvantum.api.util.ApplicationStructure;
+import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.AutoCloseable;
-import com.github.intellectualsites.kvantum.api.views.*;
+import com.github.intellectualsites.kvantum.api.util.ErrorOutputStream;
+import com.github.intellectualsites.kvantum.api.util.FileUtils;
+import com.github.intellectualsites.kvantum.api.util.ITempFileManagerFactory;
+import com.github.intellectualsites.kvantum.api.util.InstanceFactory;
+import com.github.intellectualsites.kvantum.api.util.LambdaUtil;
+import com.github.intellectualsites.kvantum.api.util.MapBuilder;
+import com.github.intellectualsites.kvantum.api.util.MetaProvider;
+import com.github.intellectualsites.kvantum.api.util.Metrics;
+import com.github.intellectualsites.kvantum.api.util.TimeUtil;
+import com.github.intellectualsites.kvantum.api.views.CSSView;
+import com.github.intellectualsites.kvantum.api.views.DownloadView;
+import com.github.intellectualsites.kvantum.api.views.HTMLView;
+import com.github.intellectualsites.kvantum.api.views.ImgView;
+import com.github.intellectualsites.kvantum.api.views.JSView;
+import com.github.intellectualsites.kvantum.api.views.LessView;
+import com.github.intellectualsites.kvantum.api.views.RequestHandler;
+import com.github.intellectualsites.kvantum.api.views.StandardView;
+import com.github.intellectualsites.kvantum.api.views.View;
 import com.github.intellectualsites.kvantum.api.views.requesthandler.SimpleRequestHandler;
 import com.github.intellectualsites.kvantum.crush.CrushEngine;
 import com.github.intellectualsites.kvantum.files.Extension;
@@ -70,11 +97,16 @@ import lombok.Setter;
 import lombok.Synchronized;
 import sun.misc.Signal;
 
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import java.io.*;
-import java.net.ServerSocket;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -128,8 +160,8 @@ public final class Server implements Kvantum
     private boolean stopping;
     @Getter
     private boolean started;
-    private ServerSocket serverSocket;
-    private SSLServerSocket sslServerSocket;
+    private HTTPThread httpThread;
+    private HTTPSThread httpsThread;
     private ConfigurationFile configViews;
     @Setter
     @Getter
@@ -658,17 +690,6 @@ public final class Server implements Kvantum
 
         this.started = true;
 
-        final ServerSocketFactory serverSocketFactory = new ServerSocketFactory();
-
-        if ( !serverSocketFactory.createServerSocket() )
-        {
-            Logger.error( "Failed to start server..." );
-            this.stopServer();
-            return;
-        }
-
-        this.serverSocket = serverSocketFactory.getServerSocket();
-
         log( "" );
 
         if ( CoreConfig.SSL.enable )
@@ -679,8 +700,8 @@ public final class Server implements Kvantum
                 System.setProperty( "javax.net.ssl.keyStore", CoreConfig.SSL.keyStore );
                 System.setProperty( "javax.net.ssl.keyStorePassword", CoreConfig.SSL.keyStorePassword );
 
-                final SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-                sslServerSocket = (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port );
+                this.httpsThread = new HTTPSThread( socketHandler );
+                this.httpsThread.start();
             } catch ( final Exception e )
             {
                 new KvantumException( "Failed to start HTTPS server", e ).printStackTrace();
@@ -691,14 +712,18 @@ public final class Server implements Kvantum
                 ( CoreConfig.port == 80 ? "" : ":" + CoreConfig.port ) + "/'" );
         log( Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024 );
 
-        this.handleEvent( new ServerReadyEvent( this ) );
-
-        if ( CoreConfig.SSL.enable && sslServerSocket != null )
+        try
         {
-            new HTTPSThread( sslServerSocket, socketHandler ).start();
+            this.httpThread = new HTTPThread( new ServerSocketFactory(), socketHandler );
+        } catch ( KvantumInitializationException e )
+        {
+            Logger.error( "Failed to start server..." );
+            ServerImplementation.getImplementation().stopServer();
+            return;
         }
+        this.httpThread.start();
 
-        new HTTPThread( serverSocket, socketHandler ).start();
+        this.handleEvent( new ServerReadyEvent( this ) );
     }
 
     @Override
@@ -786,10 +811,10 @@ public final class Server implements Kvantum
 
         try
         {
-            serverSocket.close();
+            httpThread.close();
             if ( CoreConfig.SSL.enable )
             {
-                sslServerSocket.close();
+                httpsThread.close();
             }
         } catch ( final Exception e )
         {

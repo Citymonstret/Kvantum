@@ -172,9 +172,6 @@ class WorkerContext
                 worker.handleSendStatusOnly( this, Header.STATUS_INTERNAL_ERROR );
                 return;
             }
-            //
-            // TODO: Consider moving this to its own class...
-            //
             this.requestHandler = HTTPSRedirectHandler.getInstance();
         }
 
