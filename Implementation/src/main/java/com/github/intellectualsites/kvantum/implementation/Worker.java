@@ -38,12 +38,8 @@ import com.github.intellectualsites.kvantum.api.util.AutoCloseable;
 import com.github.intellectualsites.kvantum.api.util.Provider;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.io.*;
+import java.util.Collection;
 
 /**
  * This is the worker that is responsible for nearly everything.
@@ -148,7 +144,7 @@ final class Worker extends AutoCloseable
 
         final Timer.Context readInput = ServerImplementation.getImplementation().getMetrics().registerReadInput();
 
-        final BufferedReader input = new BufferedReader( new InputStreamReader( remote.getSocket().getInputStream() ),
+        final BufferedInputStream input = new BufferedInputStream( remote.getSocket().getInputStream(),
                 CoreConfig.Buffer.in );
         this.workerContext.setOutput( new BufferedOutputStream( remote.getSocket()
                 .getOutputStream(), CoreConfig.Buffer.out ) );
@@ -156,24 +152,14 @@ final class Worker extends AutoCloseable
         //
         // Read the request
         //
-        final Deque<String> lines = new ArrayDeque<>( CoreConfig.Buffer.lineQueInitialization );
-        String str;
-        while ( ( str = input.readLine() ) != null && !str.isEmpty() )
-        {
-            //
-            // Make sure that a request line (in case of headers: both the key and the value
-            // doesn't exceed the limit. This is to prevent the client from sending enormous requests
-            //
-            // The string length is multiplied by two, to get the number of bytes in the string
-            //
-            if ( ( str.length() * 2 ) > CoreConfig.Limits.limitRequestLineSize )
-            {
-                return handleSendStatusOnly( Header.STATUS_PAYLOAD_TOO_LARGE );
-            }
+        final RequestReader requestReader = new RequestReader();
 
-            lines.add( str );
+        while ( !requestReader.isDone() )
+        {
+            requestReader.readByte( input.read() );
         }
 
+        final Collection<String> lines = requestReader.getLines();
 
         readInput.stop();
 
@@ -208,7 +194,7 @@ final class Worker extends AutoCloseable
             return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
         }
 
-        this.workerContext.getRequest().setInputReader( input );
+        this.workerContext.getRequest().setInputReader( new BufferedReader( new InputStreamReader( input ) ) );
 
         //
         // If the client sent a post request, then make sure to the read the request field
@@ -244,7 +230,7 @@ final class Worker extends AutoCloseable
                 try
                 {
                     final char[] characters = new char[ contentLength ];
-                    Assert.equals( input.read( characters ), contentLength );
+                    Assert.equals( request.getInputReader().read( characters ), contentLength );
                     if ( isFormURLEncoded )
                     {
                         request.setPostRequest( new UrlEncodedPostRequest( request, new String( characters ) ) );
@@ -266,6 +252,8 @@ final class Worker extends AutoCloseable
                         contentType );
                 request.setPostRequest( new DummyPostRequest( request, "" ) );
             }
+
+            request.getPostRequest().get().forEach( (k, v) -> Logger.debug( "Key: %s | Value: %s", k, v ) );
         }
 
         //
