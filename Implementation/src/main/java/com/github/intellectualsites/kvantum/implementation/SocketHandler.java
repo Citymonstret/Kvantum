@@ -53,12 +53,14 @@ final class SocketHandler implements ISocketHandler
     private final ExecutorService executorService;
     private final List<SocketFilter> socketFilters;
     private final Collection<SocketContext> socketContexts;
+    private final Worker worker;
 
     SocketHandler()
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.Pools.workers );
         this.socketFilters = new ArrayList<>();
         this.socketContexts = new HashSet<>();
+        this.worker = new Worker( this );
 
         try
         {
@@ -108,7 +110,7 @@ final class SocketHandler implements ISocketHandler
         {
             Logger.debug( "Accepting Socket: " + s.toString() );
         }
-        this.executorService.execute( () -> new Worker( this ).run( s ) );
+        this.executorService.execute( () -> worker.run( s ) );
     }
 
     @Override
