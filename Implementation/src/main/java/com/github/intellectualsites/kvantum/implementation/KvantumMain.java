@@ -120,7 +120,7 @@ final public class KvantumMain
                 }
                 if ( options.workers != -1 )
                 {
-                    CoreConfig.workers = options.workers;
+                    CoreConfig.Pools.workers = options.workers;
                 }
                 if ( !options.example.isEmpty() )
                 {

@@ -18,33 +18,33 @@ package com.github.intellectualsites.kvantum.api.socket;
 
 import com.github.intellectualsites.kvantum.api.core.ServerImplementation;
 import com.github.intellectualsites.kvantum.api.util.ITempFileManager;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import javax.net.ssl.SSLSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Socket context used to make sure that sockets are handled
  * the same way, across implementations
  */
+@EqualsAndHashCode(of = "socketId")
+@RequiredArgsConstructor
 final public class SocketContext
 {
+
+    private static final AtomicLong socketIdPoll = new AtomicLong( Long.MIN_VALUE );
+
+    @Getter
+    final long socketId = socketIdPoll.getAndIncrement();
 
     @Getter
     private final Socket socket;
 
     private ITempFileManager tempFileManager;
-
-    /**
-     * Construct a new socket context from a socket
-     *
-     * @param socket Incoming socket
-     */
-    public SocketContext(final Socket socket)
-    {
-        this.socket = socket;
-    }
 
     /**
      * Get a {@link ITempFileManager} for this socket instance.
@@ -71,33 +71,6 @@ final public class SocketContext
     public boolean isSSL()
     {
         return this.socket instanceof SSLSocket;
-    }
-
-    /**
-     * Close the socket and its resources
-     */
-    public void close()
-    {
-        if ( this.isActive() )
-        {
-            try
-            {
-                this.socket.close();
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
-        try
-        {
-            if ( this.tempFileManager != null )
-            {
-                this.tempFileManager.clearTempFiles();
-            }
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
     }
 
     /**

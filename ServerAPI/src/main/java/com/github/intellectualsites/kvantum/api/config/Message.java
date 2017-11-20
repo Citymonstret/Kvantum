@@ -46,6 +46,7 @@ public enum Message
     SHUTTING_DOWN( "Shutting down", LogModes.MODE_INFO ),
     STARTING_ON_PORT( "Starting the HTTP server on port %s", LogModes.MODE_INFO ),
     PORT_OCCUPIED( "Specified port was occupied, running on %s instead!", LogModes.MODE_INFO ),
+    PORT_SWITCHED( "Specified port (%s) was not available, using %s instead", LogModes.MODE_WARNING ),
     STARTING_SSL_ON_PORT( "Starting the HTTPS server on port %s", LogModes.MODE_INFO ),
     SERVER_STARTED( "The server is started", LogModes.MODE_INFO ),
     TICK_ERROR( "Error in server ticking...", LogModes.MODE_ERROR ),

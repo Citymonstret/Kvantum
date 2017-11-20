@@ -73,7 +73,6 @@ import sun.misc.Signal;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
-import java.net.BindException;
 import java.net.ServerSocket;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -255,7 +254,14 @@ public final class Server implements Kvantum
         // Setup the internal engine
         //
         this.socketHandler = new SocketHandler();
-        WorkerPool.setupPool( CoreConfig.workers );
+        if ( CoreConfig.gzip )
+        {
+            Worker.gzipHandlerPool = new AbstractPool<>( CoreConfig.Pools.gzipHandlers, GzipHandler::new );
+        }
+        if ( CoreConfig.contentMd5 )
+        {
+            Worker.md5HandlerPool = new AbstractPool<>( CoreConfig.Pools.md5Handlers, Md5Handler::new );
+        }
 
         //
         // Setup default flags
@@ -651,32 +657,17 @@ public final class Server implements Kvantum
         }
 
         this.started = true;
-        try
-        {
-            serverSocket = new ServerSocket( CoreConfig.port );
-            log( Message.SERVER_STARTED );
-        } catch ( final Exception e )
-        {
-            boolean run = true;
 
-            int port = CoreConfig.port;
-            while ( run )
-            {
-                try
-                {
-                    serverSocket = new ServerSocket( ++port );
-                    run = false;
-                    Message.PORT_OCCUPIED.log( port );
-                    CoreConfig.port = port;
-                } catch ( final BindException ex )
-                {
-                    continue;
-                } catch ( final Exception ex )
-                {
-                    ex.printStackTrace();
-                }
-            }
+        final ServerSocketFactory serverSocketFactory = new ServerSocketFactory();
+
+        if ( !serverSocketFactory.createServerSocket() )
+        {
+            Logger.error( "Failed to start server..." );
+            this.stopServer();
+            return;
         }
+
+        this.serverSocket = serverSocketFactory.getServerSocket();
 
         log( "" );
 

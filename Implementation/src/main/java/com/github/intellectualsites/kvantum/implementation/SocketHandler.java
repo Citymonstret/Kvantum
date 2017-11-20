@@ -25,15 +25,11 @@ import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.socket.ISocketHandler;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.socket.SocketFilter;
-import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -56,11 +52,13 @@ final class SocketHandler implements ISocketHandler
 
     private final ExecutorService executorService;
     private final List<SocketFilter> socketFilters;
+    private final Collection<SocketContext> socketContexts;
 
     SocketHandler()
     {
-        this.executorService = Executors.newFixedThreadPool( CoreConfig.workers );
+        this.executorService = Executors.newFixedThreadPool( CoreConfig.Pools.workers );
         this.socketFilters = new ArrayList<>();
+        this.socketContexts = new HashSet<>();
 
         try
         {
@@ -105,30 +103,50 @@ final class SocketHandler implements ISocketHandler
                 return;
             }
         }
+        this.socketContexts.add( s );
         if ( CoreConfig.debug )
         {
             Logger.debug( "Accepting Socket: " + s.toString() );
         }
-        this.executorService.execute( () -> {
-            try
-            {
-                WorkerPool.getAvailableWorker().run( s );
-            } catch ( InterruptedException e )
-            {
-                new KvantumException( "Failed to retrieve worker", e ).printStackTrace();
-            }
-        } );
+        this.executorService.execute( () -> new Worker( this ).run( s ) );
     }
 
     @Override
     public void breakSocketConnection(final SocketContext s)
     {
-        s.close();
+        if ( s.isActive() )
+        {
+            try
+            {
+                s.getSocket().close();
+            } catch ( final Exception e )
+            {
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            if ( s.getTempFileManager() != null )
+            {
+                s.getTempFileManager().clearTempFiles();
+            }
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        this.socketContexts.remove( s );
     }
 
     @Override
     public void handleShutdown()
     {
+        //
+        // Make sure connections are closed
+        //
+        socketContexts.forEach( this::breakSocketConnection );
+        //
+        // Close worker threads
+        //
         Message.WAITING_FOR_EXECUTOR_SERVICE.log();
         try
         {

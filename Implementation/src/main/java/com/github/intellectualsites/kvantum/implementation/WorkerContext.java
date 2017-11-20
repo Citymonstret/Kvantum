@@ -156,7 +156,7 @@ class WorkerContext
 
         if ( this.requestHandler == null )
         {
-            worker.handleSendStatusOnly( Header.STATUS_NOT_FOUND );
+            worker.handleSendStatusOnly( this, Header.STATUS_NOT_FOUND );
             return;
         }
 
@@ -169,7 +169,7 @@ class WorkerContext
             if ( !CoreConfig.SSL.enable )
             {
                 Logger.error( "RequestHandler (%s) forces HTTPS but SSL runner not enabled!" );
-                worker.handleSendStatusOnly( Header.STATUS_INTERNAL_ERROR );
+                worker.handleSendStatusOnly( this, Header.STATUS_INTERNAL_ERROR );
                 return;
             }
             //
@@ -297,7 +297,7 @@ class WorkerContext
                 bytes = body.getContent().getBytes();
             } else
             {
-                worker.handleSendStatusOnly( Header.STATUS_INTERNAL_ERROR );
+                worker.handleSendStatusOnly( this, Header.STATUS_INTERNAL_ERROR );
                 return;
             }
         }
@@ -305,7 +305,7 @@ class WorkerContext
         //
         // Send the response to the client
         //
-        worker.sendToClient( body, bytes );
+        worker.sendToClient( this, body, bytes );
 
         if ( CoreConfig.debug )
         {

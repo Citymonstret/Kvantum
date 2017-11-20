@@ -38,7 +38,6 @@ public class CoreConfig
     public static String webAddress = "localhost";
     public static String logPrefix = "Web";
     public static boolean verbose = false;
-    public static int workers = 1;
     public static boolean disableViews = false;
     public static boolean debug = false;
     public static boolean gzip = true;
@@ -47,6 +46,15 @@ public class CoreConfig
     public static boolean enableSecurityManager = true;
     public static boolean enableInputThread = true;
     public static boolean exitOnStop = true;
+
+    @ConfigSection(name = "Pools")
+    public static class Pools
+    {
+
+        public static int workers = 1;
+        public static int gzipHandlers = 2;
+        public static int md5Handlers = 2;
+    }
 
     @ConfigSection(name = "logging")
     public static class Logging

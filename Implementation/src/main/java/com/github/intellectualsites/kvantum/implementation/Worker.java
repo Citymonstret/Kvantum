@@ -34,58 +34,45 @@ import com.github.intellectualsites.kvantum.api.response.Response;
 import com.github.intellectualsites.kvantum.api.response.ResponseBody;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
 import com.github.intellectualsites.kvantum.api.util.Assert;
-import com.github.intellectualsites.kvantum.api.util.AutoCloseable;
-import com.github.intellectualsites.kvantum.api.util.Provider;
 import com.github.intellectualsites.kvantum.implementation.error.KvantumException;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 
 /**
  * This is the worker that is responsible for nearly everything.
  * Feel no pressure, buddy.
  */
-final class Worker extends AutoCloseable
+final class Worker
 {
 
+    static AbstractPool<GzipHandler> gzipHandlerPool;
+    static AbstractPool<Md5Handler> md5HandlerPool;
+
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
-    private final GzipHandler gzipHandler;
-    private final Md5Handler md5Handler;
     private final Kvantum server;
+    private final SocketHandler socketHandler;
 
-    private WorkerContext workerContext;
-
-    Worker()
+    Worker(final SocketHandler socketHandler)
     {
-        this.md5Handler = createIf( Md5Handler::new, CoreConfig.contentMd5 );
-        this.gzipHandler = createIf( GzipHandler::new, CoreConfig.gzip );
-
         this.workerProcedureInstance = ServerImplementation.getImplementation()
                 .getProcedure().getInstance();
         this.server = ServerImplementation.getImplementation();
+        this.socketHandler = socketHandler;
     }
 
-    private <T> T createIf(final Provider<T> provider, final boolean condition)
-    {
-        if ( condition )
-        {
-            return provider.provide();
-        }
-        return null;
-    }
-
-    @Override
-    protected void handleClose()
-    {
-    }
-
-    void sendToClient(final ResponseBody body, byte[] bytes)
+    void sendToClient(final WorkerContext workerContext, final ResponseBody body, byte[] bytes)
     {
         workerContext.determineGzipStatus();
 
         if ( CoreConfig.contentMd5 )
         {
+            final Md5Handler md5Handler = md5HandlerPool.getNullable();
             body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Handler.generateChecksum( bytes ) );
+            md5HandlerPool.add( md5Handler );
         }
 
         if ( workerContext.isGzip() )
@@ -93,11 +80,13 @@ final class Worker extends AutoCloseable
             final Timer.Context context = ServerImplementation.getImplementation().getMetrics().registerCompression();
             try
             {
+                final GzipHandler gzipHandler = gzipHandlerPool.getNullable();
                 bytes = gzipHandler.compress( bytes );
                 if ( body.getHeader().hasHeader( Header.HEADER_CONTENT_LENGTH ) )
                 {
                     body.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + bytes.length );
                 }
+                gzipHandlerPool.add( gzipHandler );
             } catch ( final IOException e )
             {
                 new KvantumException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
@@ -135,7 +124,7 @@ final class Worker extends AutoCloseable
      * @param remote Client
      * @return boolean success status
      */
-    private boolean prepare(final SocketContext remote) throws Exception
+    private boolean prepare(final WorkerContext workerContext, final SocketContext remote) throws Exception
     {
         if ( CoreConfig.verbose )
         {
@@ -144,22 +133,19 @@ final class Worker extends AutoCloseable
 
         final Timer.Context readInput = ServerImplementation.getImplementation().getMetrics().registerReadInput();
 
-        final BufferedInputStream input = new BufferedInputStream( remote.getSocket().getInputStream(),
-                CoreConfig.Buffer.in );
-        this.workerContext.setOutput( new BufferedOutputStream( remote.getSocket()
+        final BlockingSocketReader socketReader = new BlockingSocketReader( remote, new RequestReader() );
+        workerContext.setOutput( new BufferedOutputStream( remote.getSocket()
                 .getOutputStream(), CoreConfig.Buffer.out ) );
 
         //
         // Read the request
         //
-        final RequestReader requestReader = new RequestReader();
-
-        while ( !requestReader.isDone() )
+        while ( !socketReader.isDone() )
         {
-            requestReader.readByte( input.read() );
+            socketReader.tick();
         }
 
-        final Collection<String> lines = requestReader.getLines();
+        final Collection<String> lines = socketReader.getLines();
 
         readInput.stop();
 
@@ -169,7 +155,7 @@ final class Worker extends AutoCloseable
         //
         if ( lines.size() > CoreConfig.Limits.limitRequestLines )
         {
-            return handleSendStatusOnly( Header.STATUS_PAYLOAD_TOO_LARGE );
+            return handleSendStatusOnly( workerContext, Header.STATUS_PAYLOAD_TOO_LARGE );
         }
 
         //
@@ -183,18 +169,19 @@ final class Worker extends AutoCloseable
             metricContext.stop();
         } catch ( final ProtocolNotSupportedException ex )
         {
-            return handleSendStatusOnly( Header.STATUS_HTTP_VERSION_NOT_SUPPORTED );
+            return handleSendStatusOnly( workerContext, Header.STATUS_HTTP_VERSION_NOT_SUPPORTED );
         } catch ( final QueryException ex )
         {
             Logger.error( "Failed to read query (%s)", ex.getMessage() );
-            return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
+            return handleSendStatusOnly( workerContext, Header.STATUS_BAD_REQUEST );
         } catch ( final Exception ex )
         {
             ex.printStackTrace();
-            return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
+            return handleSendStatusOnly( workerContext, Header.STATUS_BAD_REQUEST );
         }
 
-        this.workerContext.getRequest().setInputReader( new BufferedReader( new InputStreamReader( input ) ) );
+        workerContext.getRequest().setInputReader( new BufferedReader(
+                new InputStreamReader( socketReader.getInputStream() ) ) );
 
         //
         // If the client sent a post request, then make sure to the read the request field
@@ -204,7 +191,7 @@ final class Worker extends AutoCloseable
             final AbstractRequest request = workerContext.getRequest();
             final String contentType = request.getHeader( "Content-Type" );
 
-            boolean isFormURLEncoded = false;
+            boolean isFormURLEncoded;
             boolean isJSON = false;
 
             if ( ( isFormURLEncoded = contentType.equalsIgnoreCase( "application/x-www-form-urlencoded" ) ) ||
@@ -216,7 +203,7 @@ final class Worker extends AutoCloseable
                     contentLength = Integer.parseInt( request.getHeader( "Content-Length" ) );
                 } catch ( final Exception ignored )
                 {
-                    return handleSendStatusOnly( Header.STATUS_BAD_REQUEST );
+                    return handleSendStatusOnly( workerContext, Header.STATUS_BAD_REQUEST );
                 }
                 if ( contentLength >= CoreConfig.Limits.limitPostBasicSize )
                 {
@@ -225,7 +212,7 @@ final class Worker extends AutoCloseable
                         Logger.debug( "Supplied post body size too large (%s > %s)", contentLength,
                                 CoreConfig.Limits.limitPostBasicSize );
                     }
-                    return handleSendStatusOnly( Header.STATUS_ENTITY_TOO_LARGE );
+                    return handleSendStatusOnly( workerContext, Header.STATUS_ENTITY_TOO_LARGE );
                 }
                 try
                 {
@@ -276,7 +263,7 @@ final class Worker extends AutoCloseable
      * @param status Status code
      * @return false
      */
-    boolean handleSendStatusOnly(final String status)
+    boolean handleSendStatusOnly(final WorkerContext workerContext, final String status)
     {
         Response response = new Response();
         response.getHeader().clear();
@@ -297,7 +284,7 @@ final class Worker extends AutoCloseable
      * Accepts a remote socket and handles the incoming request,
      * also makes sure its handled and closed down successfully.
      *
-     * This method passes the request to {@link #prepare(SocketContext)}
+     * This method passes the request to {@link #prepare(WorkerContext, SocketContext)}
      *
      * @param remote socket to accept
      */
@@ -309,7 +296,7 @@ final class Worker extends AutoCloseable
         final Timer.Context timerContext = ServerImplementation.getImplementation()
                 .getMetrics().registerRequestHandling();
 
-        this.workerContext = new WorkerContext( server, workerProcedureInstance );
+        final WorkerContext workerContext = new WorkerContext( server, workerProcedureInstance );
 
         //
         // Handle the remote socket
@@ -320,13 +307,13 @@ final class Worker extends AutoCloseable
             {
                 final Timer.Context workerPrepare = ServerImplementation.getImplementation().getMetrics()
                         .registerWorkerPrepare();
-                final boolean prepared = this.prepare( remote );
+                final boolean prepared = this.prepare( workerContext, remote );
                 workerPrepare.stop();
                 if ( prepared )
                 {
                     final Timer.Context contextTimerContext = ServerImplementation.getImplementation().getMetrics()
                             .registerWorkerContextHandling();
-                    this.workerContext.handle( this );
+                    workerContext.handle( this );
                     contextTimerContext.stop();
                 }
             } catch ( final Exception e )
@@ -338,16 +325,11 @@ final class Worker extends AutoCloseable
         //
         // Close the remote socket
         //
-        remote.close();
+        this.socketHandler.breakSocketConnection( remote );
 
         //
         // Make sure the metric is logged
         //
         timerContext.stop();
-
-        //
-        // Add the worker back to the pool
-        //
-        WorkerPool.addWorker( this );
     }
 }
