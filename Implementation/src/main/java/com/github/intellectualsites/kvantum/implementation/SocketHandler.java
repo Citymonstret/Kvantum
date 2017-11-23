@@ -29,7 +29,12 @@ import com.github.intellectualsites.kvantum.api.socket.SocketFilter;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -53,14 +58,14 @@ final class SocketHandler implements ISocketHandler
     private final ExecutorService executorService;
     private final List<SocketFilter> socketFilters;
     private final Collection<SocketContext> socketContexts;
-    private final Worker worker;
+    private final KvantumPipeline kvantumPipeline;
 
     SocketHandler()
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.Pools.workers );
         this.socketFilters = new ArrayList<>();
         this.socketContexts = new HashSet<>();
-        this.worker = new Worker( this );
+        this.kvantumPipeline = new KvantumPipeline();
 
         try
         {
@@ -110,7 +115,7 @@ final class SocketHandler implements ISocketHandler
         {
             Logger.debug( "Accepting Socket: " + s.toString() );
         }
-        this.executorService.execute( () -> worker.run( s ) );
+        this.executorService.execute( () -> kvantumPipeline.accept( this, s ) );
     }
 
     @Override

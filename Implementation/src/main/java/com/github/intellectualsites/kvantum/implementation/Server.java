@@ -119,6 +119,9 @@ import java.util.function.BiConsumer;
 public final class Server implements Kvantum
 {
 
+    static AbstractPool<GzipHandler> gzipHandlerPool;
+    static AbstractPool<Md5Handler> md5HandlerPool;
+
     @SuppressWarnings("ALL")
     @Getter(AccessLevel.PACKAGE)
     private static Server instance;
@@ -288,11 +291,11 @@ public final class Server implements Kvantum
         this.socketHandler = new SocketHandler();
         if ( CoreConfig.gzip )
         {
-            Worker.gzipHandlerPool = new AbstractPool<>( CoreConfig.Pools.gzipHandlers, GzipHandler::new );
+            gzipHandlerPool = new AbstractPool<>( CoreConfig.Pools.gzipHandlers, GzipHandler::new );
         }
         if ( CoreConfig.contentMd5 )
         {
-            Worker.md5HandlerPool = new AbstractPool<>( CoreConfig.Pools.md5Handlers, Md5Handler::new );
+            md5HandlerPool = new AbstractPool<>( CoreConfig.Pools.md5Handlers, Md5Handler::new );
         }
 
         //
