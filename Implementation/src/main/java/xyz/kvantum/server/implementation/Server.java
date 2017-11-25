@@ -55,6 +55,7 @@ import xyz.kvantum.server.api.logging.LogProvider;
 import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.Router;
+import xyz.kvantum.server.api.memguard.MemoryGuard;
 import xyz.kvantum.server.api.plugin.PluginLoader;
 import xyz.kvantum.server.api.plugin.PluginManager;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -309,6 +310,12 @@ public final class Server implements Kvantum
         //
         this.started = false;
         this.stopping = false;
+
+        //
+        // Setup memory guard
+        //
+        Logger.info( "Starting memory guard!" );
+        MemoryGuard.getInstance().start();
 
         //
         // Setup the cache manager

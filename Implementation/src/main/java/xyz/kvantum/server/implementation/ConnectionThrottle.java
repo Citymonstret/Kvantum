@@ -18,16 +18,21 @@ package xyz.kvantum.server.implementation;
 import lombok.Data;
 import xyz.kvantum.nanotube.ConditionalTransformer;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.memguard.LeakageProne;
+import xyz.kvantum.server.api.memguard.MemoryGuard;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.util.Assert;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
-final class ConnectionThrottle extends ConditionalTransformer<WorkerContext>
+final class ConnectionThrottle extends ConditionalTransformer<WorkerContext> implements LeakageProne
 {
 
     private static ConnectionThrottle instance;
@@ -45,6 +50,10 @@ final class ConnectionThrottle extends ConditionalTransformer<WorkerContext>
         // Initialize the map
         //
         attemptMapping = new ConcurrentHashMap<>();
+        //
+        // Register in the memory guard
+        //
+        MemoryGuard.getInstance().register( this );
     }
 
     private static void setInstance(final ConnectionThrottle instance) throws IllegalAccessException
@@ -87,20 +96,36 @@ final class ConnectionThrottle extends ConditionalTransformer<WorkerContext>
         {
             attemptMapping = instance.attemptMapping.get( address );
         }
-        final long timeDifference = System.currentTimeMillis() - attemptMapping.getFirstAttempt().get();
-        if ( getTimeLimit() <= timeDifference )
+
+        if ( instance.shouldReset( attemptMapping ) )
         {
             attemptMapping.getTotalAttempts().set( 0 );
             attemptMapping.getFirstAttempt().set( System.currentTimeMillis() );
         }
+
         final int totalAttempts = attemptMapping.getTotalAttempts().incrementAndGet();
         return totalAttempts > CoreConfig.Throttle.limit;
+    }
+
+    private boolean shouldReset(final AttemptMapping attemptMapping)
+    {
+        final long timeDifference = System.currentTimeMillis() - attemptMapping.getFirstAttempt().get();
+        return getTimeLimit() <= timeDifference;
     }
 
     @Override
     protected WorkerContext handle(final WorkerContext workerContext) throws Throwable
     {
         throw new ReturnStatus( Header.STATUS_TOO_MANY_REQUESTS, workerContext );
+    }
+
+    @Override
+    public void cleanUp()
+    {
+        final List<AttemptMapping> shouldReset = this.attemptMapping.values().stream().filter( this::shouldReset )
+                .collect( Collectors.toList() );
+        shouldReset.forEach( a -> attemptMapping.remove( a.getIp() ) );
+        Logger.info( "Cleaned up %s stored connection attempts!", shouldReset.size() );
     }
 
     @Data

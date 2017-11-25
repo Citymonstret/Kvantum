@@ -72,6 +72,13 @@ public class CoreConfig
         public static String logFormat = "[${applicationPrefix}][${logPrefix}][${thread}][${timeStamp}] ${message}";
     }
 
+    @ConfigSection(name = "MemoryGuard")
+    public static class MemoryGuard
+    {
+
+        public static long runEveryMillis = 600000; // Every 10 minutes
+    }
+
     @ConfigSection(name = "sessions")
     public static class Sessions
     {
