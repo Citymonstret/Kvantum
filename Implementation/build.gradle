@@ -14,13 +14,29 @@ group 'xyz.kvantum'
 version = '1.0'
 
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+
+mainClassName = 'xyz.kvantum.implementation.KvantumMain'
+
+shadowJar {
+    classifier = ''
+}
+
+build.dependsOn shadowJar
 
 jar {
+    enabled false
     manifest {
         attributes 'Implementation-Title': 'Kvantum',
                 'Implementation-Version': version,
-                'Main-Class': 'com.github.intellectualsites.kvantum.implementation.KvantumMain'
+                'Main-Class': 'xyz.kvantum.implementation.KvantumMain'
     }
+}
+
+artifacts {
+    shadowJar
+    sourcesJar
+    javadocJar
 }
 
 dependencies {
