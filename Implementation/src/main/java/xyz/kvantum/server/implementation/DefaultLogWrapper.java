@@ -24,6 +24,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogContext;
 import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.ColorUtil;
 
 /**
  * The default log handler. UsesAnsi.FColor for colored output
@@ -50,7 +51,7 @@ public class DefaultLogWrapper implements LogWrapper
         {
             ( (Server) ServerImplementation.getImplementation() ).logStream.println( replacedMessage );
         }
-        System.out.println( replacedMessage );
+        System.out.println( ColorUtil.getReplaced( replacedMessage ) );
     }
 
     @Override

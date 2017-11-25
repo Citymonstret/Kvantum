@@ -69,7 +69,11 @@ public class CoreConfig
     public static class Logging
     {
 
-        public static String logFormat = "[${applicationPrefix}][${logPrefix}][${thread}][${timeStamp}] ${message}";
+        public static String logFormat = "&0[&c${applicationPrefix}&0]" +
+                "&0[&c${logPrefix}&0]" +
+                "&0[&c${thread}&0]" +
+                "&0[&c${timeStamp}&0] " +
+                "&r${message}";
     }
 
     @ConfigSection(name = "MemoryGuard")
