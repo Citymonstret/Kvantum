@@ -27,15 +27,6 @@ call:DoReplace "%oldVersion%" "%newVersion%" start.bat start.bat
 call:DoReplace "%oldVersion%" "%newVersion%" start.sh start.sh
 
 echo.
-echo Copying built jar to .\bin\
-
-copy /Y .\Implementation\build\libs\Implementation-%newVersion%-all.jar .\bin\
-
-echo.
-echo Adding jar to git changelog
-git add .\bin\Implementation-%newVersion%-all.jar
-
-echo.
 echo Done!
 
 exit /b

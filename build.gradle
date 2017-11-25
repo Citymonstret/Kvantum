@@ -43,8 +43,8 @@ allprojects {
     }
 }
 
-group 'com.github.intellectualsites'
-version = 'BETA-0.0.4'
+group 'xyz.kvantum'
+version = '1.0'
 
 subprojects {
     apply plugin: 'java'

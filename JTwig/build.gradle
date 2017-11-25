@@ -10,8 +10,8 @@ buildscript {
     }
 }
 
-group 'com.github.intellectualsites'
-version = 'BETA-0.0.3'
+group 'xyz.kvantum'
+version = '1.0'
 
 repositories {
     jcenter()

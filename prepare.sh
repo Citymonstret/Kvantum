@@ -29,13 +29,4 @@ sed -i 's/'"${oldVersion}"'/'"${newVersion}"'/g' start.bat
 sed -i 's/'"${oldVersion}"'/'"${newVersion}"'/g' start.sh
 
 echo
-echo Copying built jar to ./bin/
-
-cp -fr ./Implementation/build/libs/Implementation-${newVersion}-all.jar ./bin/
-
-echo
-echo Adding jar to git changelog
-git add ./bin/Implementation-${newVersion}-all.jar -f
-
-echo
 echo Done!
