@@ -41,6 +41,39 @@ allprojects {
                 'org.junit.platform:junit-platform-runner:1.0.1'
         )
     }
+
+    task createPom << {
+        pom {
+            project {
+                inceptionYear '2017'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    connection 'scm:git:https://github.com/IntellectualSites/Kvantum.git'
+                    developerConnection 'scm:git:git@github.com:IntellectualSites/Kvantum.git'
+                    url 'https://github.com/IntellectualSites/Kvantum'
+                }
+                developers {
+                    developer {
+                        id 'Sauilitired'
+                        name 'Alexander Söderberg'
+                        email 'sauilitired@gmail.com'
+                        roles {
+                            role 'owner'
+                        }
+                        timezone '+1'
+                    }
+                }
+            }
+        }.writeTo('pom.xml')
+    }
+
+    build.dependsOn createPom
 }
 
 group 'xyz.kvantum'
