@@ -19,6 +19,7 @@ package xyz.kvantum.server.api.util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Cookie;
 
@@ -29,11 +30,12 @@ import java.util.regex.Pattern;
 /**
  * This is an utility class
  * created to handle all
- * cookie related actions
+ * request cookie related actions
  *
  * @author Citymonstret
  */
-final public class CookieManager
+@UtilityClass
+public final class CookieManager
 {
 
     private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" +

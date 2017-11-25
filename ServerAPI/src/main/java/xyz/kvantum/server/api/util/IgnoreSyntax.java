@@ -22,5 +22,4 @@ package xyz.kvantum.server.api.util;
  */
 public interface IgnoreSyntax
 {
-
 }

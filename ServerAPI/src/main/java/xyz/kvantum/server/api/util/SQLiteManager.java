@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.EqualsAndHashCode;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 
@@ -30,23 +31,30 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Utility class for dealing with common SQLite operations
+ */
+@SuppressWarnings({ "unused", "WeakerAccess" })
+@EqualsAndHashCode(of = "name", callSuper = false)
 public class SQLiteManager extends AutoCloseable
 {
 
-    public static Set<SQLiteManager> sessions = new HashSet<>();
+    private static Set<SQLiteManager> sessions = new HashSet<>();
 
     private final Connection connection;
+    private final String name;
 
     public SQLiteManager(final String name) throws IOException, SQLException
     {
         sessions.add( this );
 
-        String name1 = name + ".db";
-        File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "storage" ), name1 );
+        this.name = name + ".db";
+        File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "storage" ),
+                this.name );
         if ( !file.exists() && ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file
                 .createNewFile() ) )
         {
-            throw new KvantumException( "Couldn't create: " + name );
+            throw new KvantumException( "Couldn't create: " + this.name );
         }
         this.connection = DriverManager.getConnection( "jdbc:sqlite:" + file.getAbsolutePath() );
     }

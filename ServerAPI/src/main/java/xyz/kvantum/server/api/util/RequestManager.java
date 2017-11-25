@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A simple {@link Router} implementation,
+ */
 @SuppressWarnings("unused")
 @Builder
 final public class RequestManager extends Router

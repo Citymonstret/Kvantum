@@ -14,4 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Classes related to the internal Kvantum stdout and file logging
+ * and stdin reading
+ */
 package xyz.kvantum.server.api.logging;

@@ -14,4 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Everything related to URI matching and request routing
+ */
 package xyz.kvantum.server.api.matching;

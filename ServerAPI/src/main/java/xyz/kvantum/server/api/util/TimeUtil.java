@@ -27,7 +27,7 @@ import java.util.Locale;
  */
 @SuppressWarnings( "WeakerAccess" )
 @UtilityClass
-public class TimeUtil
+public final class TimeUtil
 {
 
     public final static SimpleDateFormat logFileFormat;

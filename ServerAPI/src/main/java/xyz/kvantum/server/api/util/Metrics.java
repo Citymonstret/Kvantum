@@ -49,7 +49,7 @@ import java.util.function.Consumer;
  * </p>
  */
 @SuppressWarnings("ALL")
-public class Metrics
+public final class Metrics
 {
 
     @Getter

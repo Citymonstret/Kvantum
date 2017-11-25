@@ -22,18 +22,12 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Created 2015-04-25 for Kvantum
- *
- * @author Citymonstret
+ * A {@link VariableProvider} implementation for meta variables
  */
-public class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider
+public final class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider
 {
 
     private AbstractRequest r;
-
-    public MetaProvider()
-    {
-    }
 
     private MetaProvider(final AbstractRequest r)
     {

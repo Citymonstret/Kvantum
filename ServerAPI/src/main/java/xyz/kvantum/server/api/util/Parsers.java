@@ -43,7 +43,6 @@ import java.util.Optional;
 @UtilityClass
 final public class Parsers
 {
-
     private static final Map<Type, Parser<?>> primitiveParserMap = MapBuilder.<Type, Parser<?>>newHashMap()
             .put( int.class, new IntegerParser() )
             .put( String.class, new StringParser() )

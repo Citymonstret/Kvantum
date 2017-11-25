@@ -40,7 +40,7 @@ public interface VariableProvider
      * @param variable Variable Key
      * @return True if the variable exists
      */
-    boolean contains(final String variable);
+    boolean contains(String variable);
 
     /**
      * Get the variable
@@ -49,7 +49,7 @@ public interface VariableProvider
      * @return The object (or null)
      * @see #contains(String) Use this to check if it exists
      */
-    Object get(final String variable);
+    Object get(String variable);
 
     /**
      * Get all variables stored in the provider

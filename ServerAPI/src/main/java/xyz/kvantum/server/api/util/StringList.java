@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
  * Represents a list of strings, that is stored inside of a string,
  * with the format: string1,string2,string3,string4...
  */
-final public class StringList implements Iterable<String>
+public final class StringList implements Iterable<String>
 {
 
     private final Collection<String> content;

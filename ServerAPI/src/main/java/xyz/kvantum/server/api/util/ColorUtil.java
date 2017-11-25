@@ -19,6 +19,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Map;
 
+/**
+ * Utility class for dealing with (ANSI) log colours
+ */
 @UtilityClass
 public class ColorUtil
 {
@@ -27,7 +30,12 @@ public class ColorUtil
             .put( '0', 30 ).put( '9', 34 ).put( 'c', 31 ).put( '2', 32 )
             .put( 'e', 78 ).put( '5', 35 ).put( 'f', 37 ).put( 'r', 0 ).get();
 
-
+    /**
+     * Replace all &[color] codes in the given string
+     *
+     * @param in String to be replaced
+     * @return Colored formatted string
+     */
     public static String getReplaced(String in)
     {
         for ( final Map.Entry<Character, Integer> entry : coloredMapping.entrySet() )

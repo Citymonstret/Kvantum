@@ -14,4 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Event related classes. Used to react to server
+ * events in external applications and plugins.
+ */
 package xyz.kvantum.server.api.events;
