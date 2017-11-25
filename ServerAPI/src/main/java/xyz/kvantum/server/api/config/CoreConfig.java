@@ -47,6 +47,15 @@ public class CoreConfig
     public static boolean enableInputThread = true;
     public static boolean exitOnStop = true;
 
+    @ConfigSection(name = "Throttling")
+    public static class Throttle
+    {
+
+        public static String timeUnit = "MINUTES";
+        public static int limit = 1000;
+        public static long timeSpan = 1;
+    }
+
     @ConfigSection(name = "Pools")
     public static class Pools
     {

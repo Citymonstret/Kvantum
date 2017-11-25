@@ -37,7 +37,7 @@ final class KvantumPipeline
 
     private final NanoTube<SocketContext, WorkerContext> nanoTube;
 
-    KvantumPipeline()
+    KvantumPipeline() throws Throwable
     {
         WorkerContextGenerator workerContextGenerator = new WorkerContextGenerator( Server.getInstance(),
                 Server.getInstance().getProcedure().getInstance() );
@@ -51,6 +51,7 @@ final class KvantumPipeline
                 .setLast( new RequestLineValidator() )
                 .setLast( new RequestGenerator() )
                 .setLast( new PostRequestGenerator() )
+                .setLast( new ConnectionThrottle() )
                 .setLast( new SessionLoader() )
                 .setLast( new RouteMatcher() )
                 .setLast( new HTTPSRedirecter() )

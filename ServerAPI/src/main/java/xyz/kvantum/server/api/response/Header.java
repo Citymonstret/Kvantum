@@ -80,6 +80,7 @@ final public class Header
     public static final String STATUS_PAYLOAD_TOO_LARGE = "413 Payload Too Large";
     public static final String STATUS_ENTITY_TOO_LARGE = "413 Entity Too Large";
     public static final String STATUS_REQUEST_TIMEOUT = "408 Request Timeout";
+    public static final String STATUS_TOO_MANY_REQUESTS = "429 Too Many Requests";
 
     //
     // 5xx Server errors

@@ -60,7 +60,7 @@ final class SocketHandler implements ISocketHandler
     private final Collection<SocketContext> socketContexts;
     private final KvantumPipeline kvantumPipeline;
 
-    SocketHandler()
+    SocketHandler() throws Throwable
     {
         this.executorService = Executors.newFixedThreadPool( CoreConfig.Pools.workers );
         this.socketFilters = new ArrayList<>();

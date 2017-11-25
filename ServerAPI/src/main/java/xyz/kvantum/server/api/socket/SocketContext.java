@@ -23,7 +23,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
 
 import javax.net.ssl.SSLSocket;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -78,9 +78,19 @@ final public class SocketContext
      *
      * @return socket address
      */
-    public InetAddress getAddress()
+    public InetSocketAddress getAddress()
     {
-        return this.socket.getInetAddress();
+        return (InetSocketAddress) this.socket.getRemoteSocketAddress();
+    }
+
+    /**
+     * Get the remote IP
+     *
+     * @return remote IP
+     */
+    public String getIP()
+    {
+        return getAddress().getAddress().getHostAddress();
     }
 
     /**

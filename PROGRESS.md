@@ -28,6 +28,9 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 * Kvantum has a built in SSL handler that is able to read local certificates through java keyservers. 
 * Requests may be forced through HTTPS, which allows for *secure* applications.
 
+#### 1.3 Misc
+* Connection Throttling
+
 ## 2 View/Request Handling
 #### 2.1 All views
 * ViewPatterns - URL request mapping with variables (with optional default values)

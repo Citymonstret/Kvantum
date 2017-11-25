@@ -288,7 +288,13 @@ public final class Server implements Kvantum
         //
         // Setup the internal engine
         //
-        this.socketHandler = new SocketHandler();
+        try
+        {
+            this.socketHandler = new SocketHandler();
+        } catch ( final Throwable throwable )
+        {
+            throw new KvantumException( "Failed to create socket handler!", throwable );
+        }
         if ( CoreConfig.gzip )
         {
             gzipHandlerPool = new AbstractPool<>( CoreConfig.Pools.gzipHandlers, GzipHandler::new );
