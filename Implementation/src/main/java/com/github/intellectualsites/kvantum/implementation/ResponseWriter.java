@@ -15,7 +15,6 @@ import com.github.intellectualsites.kvantum.api.views.errors.ViewException;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.kvantum.nanotube.Transformer;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -111,10 +110,7 @@ final class ResponseWriter extends Transformer<WorkerContext>
             //
             // Post-generation procedures
             //
-            for ( final Map.Entry<String, String> postponedCookie : request.postponedCookies.entries() )
-            {
-                body.getHeader().setCookie( postponedCookie.getKey(), postponedCookie.getValue() );
-            }
+            request.postponedCookies.forEach( body.getHeader()::setCookie );
 
             //
             // Add the content type meta to the request, can then be used by worker processes

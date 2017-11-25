@@ -23,6 +23,7 @@ import com.github.intellectualsites.kvantum.api.logging.Logger;
 import com.github.intellectualsites.kvantum.api.request.AbstractRequest;
 import com.github.intellectualsites.kvantum.api.request.Cookie;
 import com.github.intellectualsites.kvantum.api.response.HeaderProvider;
+import com.github.intellectualsites.kvantum.api.response.ResponseCookie;
 import com.github.intellectualsites.kvantum.api.util.Assert;
 import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
 import com.google.common.cache.Cache;
@@ -66,8 +67,10 @@ public final class SessionManager implements ProviderFactory<ISession>
 
     private void saveCookies(final AbstractRequest r, final ISession session, final String sessionID)
     {
-        r.postponedCookies.put( SESSION_KEY, sessionID );
-        r.postponedCookies.put( SESSION_PASS, session.getSessionKey() );
+        r.postponedCookies.add( ResponseCookie.builder()
+                .cookie( SESSION_KEY ).value( sessionID ).httpOnly( true ).build() );
+        r.postponedCookies.add( ResponseCookie.builder().cookie( SESSION_PASS )
+                .value( session.getSessionKey() ).httpOnly( true ).build() );
         // Make sure that the cookies aren't duplicated
         r.getCookies().removeAll( SESSION_KEY );
         r.getCookies().removeAll( SESSION_PASS );
@@ -90,7 +93,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     {
         Assert.notNull( r, re );
 
-        re.getHeader().setCookie( SESSION_KEY, "deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT" );
+        re.getHeader().removeCookie( SESSION_KEY );
     }
 
     @Synchronized

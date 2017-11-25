@@ -54,8 +54,7 @@ public class Response implements ResponseBody
                 .set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML )
                 .set( Header.HEADER_SERVER, Header.POWERED_BY )
                 .set( Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp() )
-                .set( Header.HEADER_STATUS, Header.STATUS_OK )
-                .set( Header.HEADER_X_POWERED_BY, Header.X_POWERED_BY );
+                .set( Header.HEADER_STATUS, Header.STATUS_OK );
         this.content = "";
         this.bytes = new byte[ 0 ];
     }

@@ -23,7 +23,11 @@ import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
 
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings({ "unused" })
 final public class Header
@@ -39,7 +43,6 @@ final public class Header
     public static final String CACHE_NO_CACHE = "no-cache";
 
     public static final String POWERED_BY = "Kvantum";
-    public static final String X_POWERED_BY = "Java/Kvantum 1.0";
 
     //
     // 1xx Informational
@@ -85,7 +88,6 @@ final public class Header
     public static final String STATUS_INTERNAL_ERROR = "500 Internal Server Error";
 
     public static final String ALLOW_ALL = "*";
-    public static final String COOKIE_DELETED = "deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
     public static final HeaderOption X_CONTENT_TYPE_OPTIONS = HeaderOption.create( "X-Content-Type-Options" );
     public static final HeaderOption X_FRAME_OPTIONS = HeaderOption.create( "X-Frame-Options" );
@@ -315,12 +317,6 @@ final public class Header
         return this;
     }
 
-    private static String getCookieString(final String cookie, final String value, final Date expires)
-    {
-        return cookie + "=" + value + "; Expires=" + TimeUtil
-                .getHTTPTimeStamp( expires );
-    }
-
     public Collection<String> getMultiple(final HeaderOption key)
     {
         Assert.notNull( key );
@@ -406,31 +402,24 @@ final public class Header
         return dump;
     }
 
-    public Header setCookie(final String cookie, final String value, final Date expires)
+    public Header setCookie(final ResponseCookie cookie)
     {
-        Assert.notNull( cookie, value, expires );
-        this.headers.put( HEADER_SET_COOKIE, getCookieString( cookie, value, expires ) );
+        Assert.notNull( cookie );
+
+        if ( this.headers.containsEntry( HEADER_SET_COOKIE, cookie.toString() ) )
+        {
+            this.headers.remove( HEADER_SET_COOKIE, cookie.toString() );
+        }
+        this.headers.put( HEADER_SET_COOKIE, cookie.toString() );
+
         return this;
     }
 
     public Header removeCookie(final String cookie)
     {
-        return setCookie( Assert.notNull( cookie ), Header.COOKIE_DELETED );
-    }
-
-    public Header setCookie(final String cookie, final String value)
-    {
-        Assert.notNull( cookie, value );
-
-        final String cookieString = cookie + "=" + value;
-
-        if ( this.headers.containsEntry( HEADER_SET_COOKIE, cookieString ) )
-        {
-            this.headers.remove( HEADER_SET_COOKIE, cookieString );
-        }
-        this.headers.put( HEADER_SET_COOKIE, cookieString );
-
-        return this;
+        final ResponseCookie responseCookie = ResponseCookie.builder().cookie( cookie )
+                .value( "deleted" ).expires( new Date( 0 ) ).build();
+        return setCookie( responseCookie );
     }
 
     public Header clear()

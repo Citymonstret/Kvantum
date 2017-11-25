@@ -19,13 +19,25 @@ package com.github.intellectualsites.kvantum.api.request;
 import com.github.intellectualsites.kvantum.api.config.CoreConfig;
 import com.github.intellectualsites.kvantum.api.config.Message;
 import com.github.intellectualsites.kvantum.api.request.post.PostRequest;
+import com.github.intellectualsites.kvantum.api.response.ResponseCookie;
 import com.github.intellectualsites.kvantum.api.session.ISession;
 import com.github.intellectualsites.kvantum.api.socket.SocketContext;
-import com.github.intellectualsites.kvantum.api.util.*;
+import com.github.intellectualsites.kvantum.api.util.Assert;
+import com.github.intellectualsites.kvantum.api.util.ITempFileManager;
+import com.github.intellectualsites.kvantum.api.util.MapUtil;
+import com.github.intellectualsites.kvantum.api.util.ProtocolType;
+import com.github.intellectualsites.kvantum.api.util.ProviderFactory;
+import com.github.intellectualsites.kvantum.api.util.Validatable;
+import com.github.intellectualsites.kvantum.api.util.VariableHolder;
+import com.github.intellectualsites.kvantum.api.util.VariableProvider;
 import com.github.intellectualsites.kvantum.api.views.RequestHandler;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -34,8 +46,10 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -65,7 +79,7 @@ public abstract class AbstractRequest implements
     public static final String ALTERNATE_OUTCOME = "alternateOutcome";
 
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
-    public ListMultimap<String, String> postponedCookies = ArrayListMultimap.create();
+    public Set<ResponseCookie> postponedCookies = new HashSet<>();
     @Getter
     @Setter
     protected BufferedOutputStream outputStream;
