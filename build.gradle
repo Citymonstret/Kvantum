@@ -21,6 +21,7 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
     apply plugin: 'org.junit.platform.gradle.plugin'
+    apply plugin: 'signing'
 
     license {
         header rootProject.file('HEADER')
@@ -46,6 +47,10 @@ allprojects {
         pom {
             project {
                 inceptionYear '2017'
+                packaging 'jar'
+                name 'Kvantum'
+                description 'Java HTTP(S) server'
+                url 'http://kvantum.xyz'
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
@@ -80,6 +85,10 @@ allprojects {
     }
 
     build.dependsOn createPom
+
+    signing {
+        sign configurations.archives
+    }
 }
 
 group 'xyz.kvantum'
