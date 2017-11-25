@@ -58,6 +58,12 @@ allprojects {
                     developerConnection 'scm:git:git@github.com:IntellectualSites/Kvantum.git'
                     url 'https://github.com/IntellectualSites/Kvantum'
                 }
+                repositories {
+                    repository {
+                        id 'jitpack'
+                        url 'https://jitpack.io'
+                    }
+                }
                 developers {
                     developer {
                         id 'Sauilitired'
