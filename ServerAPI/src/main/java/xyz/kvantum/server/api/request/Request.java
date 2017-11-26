@@ -112,11 +112,12 @@ final public class Request extends AbstractRequest
     }
 
     @Override
-    protected AbstractRequest newRequest(String query)
+    protected AbstractRequest newRequest(final String query)
     {
-        Assert.notEmpty( query );
+        Assert.notNull( query );
 
         AbstractRequest request = new Request();
+        request.setPostRequest( this.getPostRequest() );
         request.getHeaders().putAll( this.getHeaders() );
         request.setSocket( this.getSocket() );
         request.setQuery( new Query( HttpMethod.GET, query ) );

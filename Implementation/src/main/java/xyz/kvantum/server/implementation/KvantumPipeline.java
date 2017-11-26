@@ -16,6 +16,8 @@
 package xyz.kvantum.server.implementation;
 
 import com.codahale.metrics.Timer;
+import lombok.AccessLevel;
+import lombok.Getter;
 import xyz.kvantum.nanotube.NanoTube;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -36,12 +38,23 @@ final class KvantumPipeline
 {
 
     private final NanoTube<SocketContext, WorkerContext> nanoTube;
+    @Getter(AccessLevel.PACKAGE)
+    private final NanoTube<WorkerContext, WorkerContext> minimalNanoTube;
 
     KvantumPipeline() throws Throwable
     {
         WorkerContextGenerator workerContextGenerator = new WorkerContextGenerator( Server.getInstance(),
                 Server.getInstance().getProcedure().getInstance() );
         this.nanoTube = NanoTube.construct( workerContextGenerator );
+
+        final RouteMatcher routeMatcher = new RouteMatcher();
+        final HTTPSRedirecter redirecter = new HTTPSRedirecter();
+        final ResponseWriter responseWriter = new ResponseWriter( this );
+        final ResponseSender responseSender = new ResponseSender();
+        routeMatcher.next( redirecter ).next( responseWriter ).next( responseSender );
+
+        this.minimalNanoTube = NanoTube.construct( routeMatcher );
+
         //
         // ORDERING IS VERY IMPORTANT
         //
@@ -53,10 +66,7 @@ final class KvantumPipeline
                 .setLast( new PostRequestGenerator() )
                 .setLast( new ConnectionThrottle() )
                 .setLast( new SessionLoader() )
-                .setLast( new RouteMatcher() )
-                .setLast( new HTTPSRedirecter() )
-                .setLast( new ResponseWriter() )
-                .setLast( new ResponseSender() );
+                .setLast( routeMatcher );
         this.nanoTube.setExceptionHandler( throwable ->
         {
             if ( throwable instanceof ReturnStatus )

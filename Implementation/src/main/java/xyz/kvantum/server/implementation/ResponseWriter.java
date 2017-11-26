@@ -24,6 +24,7 @@ import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.ResponseBody;
@@ -44,6 +45,13 @@ final class ResponseWriter extends Transformer<WorkerContext>
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance = Server.getInstance()
             .getProcedure().getInstance();
     private final Kvantum server = Server.getInstance();
+
+    final KvantumPipeline pipeline;
+
+    ResponseWriter(final KvantumPipeline pipeline)
+    {
+        this.pipeline = pipeline;
+    }
 
     @Override
     protected WorkerContext handle(final WorkerContext workerContext) throws Throwable
@@ -99,10 +107,14 @@ final class ResponseWriter extends Transformer<WorkerContext>
                 final Object redirect = request.getMeta( "internalRedirect" );
                 if ( redirect != null && redirect instanceof AbstractRequest )
                 {
-                    request = (AbstractRequest) redirect;
-                    request.removeMeta( "internalRedirect" );
-                    workerContext.setRequest( request );
-                    return this.handle( workerContext );
+                    if ( CoreConfig.debug )
+                    {
+                        Logger.debug( "Found internal redirect..." );
+                    }
+                    final AbstractRequest redirectRequest = (AbstractRequest) redirect;
+                    redirectRequest.removeMeta( "internalRedirect" );
+                    workerContext.setRequest( redirectRequest );
+                    pipeline.getMinimalNanoTube().initiate( workerContext );
                 }
                 return null;
             }

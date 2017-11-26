@@ -31,6 +31,10 @@ final class SocketRequestReader extends Transformer<WorkerContext>
     @Override
     protected WorkerContext handle(final WorkerContext workerContext) throws Throwable
     {
+        if ( workerContext.getLines() != null && workerContext.getInputStream() != null )
+        {
+            return workerContext;
+        }
         final Timer.Context readInput = ServerImplementation.getImplementation().getMetrics().registerReadInput();
         final BlockingSocketReader socketReader = new BlockingSocketReader( workerContext.getSocketContext(), new RequestReader() );
         workerContext.setOutput( new BufferedOutputStream( workerContext.getSocketContext().getSocket()

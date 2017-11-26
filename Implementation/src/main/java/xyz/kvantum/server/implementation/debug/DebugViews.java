@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation;
+package xyz.kvantum.server.implementation.debug;
 
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
@@ -23,7 +23,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
 
-final class DebugViews
+public final class DebugViews
 {
 
     private static final DebugViews instance = new DebugViews();
@@ -32,7 +32,7 @@ final class DebugViews
     {
     }
 
-    static void registerDebugViews()
+    public static void registerDebugViews()
     {
         if ( !CoreConfig.debug )
         {
@@ -42,7 +42,7 @@ final class DebugViews
         {
             StaticViewManager.generate( instance );
             Logger.debug( "Registered debug views: " );
-            Logger.debug( "- debug/session : See your session ID" );
+            Logger.debug( "- debug/session?debug=true : See your session ID" );
         } catch ( final Exception e )
         {
             Logger.error( "Failed to generate debug views!" );
@@ -50,7 +50,8 @@ final class DebugViews
         }
     }
 
-    @ViewMatcher(filter = "debug/session", name = "debugSession", httpMethod = HttpMethod.GET)
+    @ViewMatcher(filter = "debug/session", name = "debugSession", httpMethod = HttpMethod.GET,
+            middlewares = { DebugRedirectMiddleware.class })
     public final void debugSession(final AbstractRequest request, final Response response)
     {
         request.requestSession();

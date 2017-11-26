@@ -88,6 +88,7 @@ import xyz.kvantum.server.api.views.View;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 import xyz.kvantum.server.implementation.commands.AccountCommand;
 import xyz.kvantum.server.implementation.config.TranslationFile;
+import xyz.kvantum.server.implementation.debug.DebugViews;
 import xyz.kvantum.server.implementation.error.KvantumException;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 import xyz.kvantum.server.implementation.error.KvantumStartException;

@@ -38,6 +38,10 @@ final class RequestGenerator extends Transformer<WorkerContext>
     @Override
     protected WorkerContext handle(final WorkerContext workerContext) throws Throwable
     {
+        if ( workerContext.getRequest() != null && workerContext.getRequest().getOutputStream() != null )
+        {
+            return workerContext;
+        }
         try
         {
             final Timer.Context metricContext = ServerImplementation.getImplementation().getMetrics()

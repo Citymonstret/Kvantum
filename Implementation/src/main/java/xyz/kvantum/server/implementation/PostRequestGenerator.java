@@ -44,6 +44,11 @@ final class PostRequestGenerator extends ConditionalTransformer<WorkerContext>
     @Override
     protected WorkerContext handle(WorkerContext workerContext) throws Throwable
     {
+        if ( workerContext.getRequest().getPostRequest() != null )
+        {
+            return workerContext;
+        }
+        
         final AbstractRequest request = workerContext.getRequest();
         final String contentType = request.getHeader( "Content-Type" );
 
