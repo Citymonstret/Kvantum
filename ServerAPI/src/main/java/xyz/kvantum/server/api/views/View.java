@@ -27,6 +27,7 @@ import xyz.kvantum.server.api.matching.FilePattern;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.matching.ViewPattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
@@ -81,6 +82,7 @@ public class View extends RequestHandler
     private final String internalName;
     private final UUID uuid;
     private final ViewPattern viewPattern;
+    private final HttpMethod httpMethod;
     public String relatedFolderPath;
     protected boolean forceHTTPS;
     protected String defaultFilePattern = "${file}.${extension}";
@@ -89,30 +91,43 @@ public class View extends RequestHandler
     private ViewReturn viewReturn;
     private FilePattern filePattern;
 
+    public View(final String pattern, final String internalName)
+    {
+        this( pattern, internalName, HttpMethod.ALL );
+    }
+
     /**
      * The constructor (Without prestored options)
      *
      * @param pattern used to decide whether or not to use this view
      * @see View(String, Map) - This is an alternate constructor
      */
-    public View(final String pattern, final String internalName)
+    public View(final String pattern, final String internalName, final HttpMethod httpMethod)
     {
-        this( pattern, internalName, null );
+        this( pattern, internalName, null, httpMethod );
     }
 
     /**
      * Constructor with prestored options
      *
-     * @param pattern Regex pattern that will decide whether or not to use this view
-     * @param options Pre Stored options
+     * @param pattern      Regex pattern that will decide whether or not to use this view
+     * @param internalName The internal (unqiue) view name
+     * @param options      Pre Stored options
+     * @param httpMethod   The http method that this view will serve
      */
-    public View(final String pattern, final String internalName, final Map<String, Object> options)
+    public View(final String pattern,
+                final String internalName,
+                final Map<String, Object> options,
+                final HttpMethod httpMethod)
     {
-        this( pattern, internalName, options, null );
+        this( pattern, internalName, options, null, httpMethod );
     }
 
-    public View(final String pattern, final String internalName, final Map<String, Object> options,
-                final ViewReturn viewReturn)
+    public View(final String pattern,
+                final String internalName,
+                final Map<String, Object> options,
+                final ViewReturn viewReturn,
+                final HttpMethod httpMethod)
     {
         if ( options == null )
         {
@@ -131,6 +146,19 @@ public class View extends RequestHandler
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;
         this.uuid = UUID.randomUUID();
+        if ( httpMethod == null )
+        {
+            if ( options.containsKey( "method" ) )
+            {
+                this.httpMethod = HttpMethod.valueOf( options.get( "method" ).toString() );
+            } else
+            {
+                this.httpMethod = HttpMethod.ALL;
+            }
+        } else
+        {
+            this.httpMethod = httpMethod;
+        }
     }
 
     protected FilePattern getFilePattern()
@@ -362,6 +390,12 @@ public class View extends RequestHandler
     final public boolean matches(final AbstractRequest request)
     {
         Assert.isValid( request );
+
+        final HttpMethod requestMethod = request.getQuery().getMethod();
+        if ( this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod )
+        {
+            return false;
+        }
 
         final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
         if ( map != null )

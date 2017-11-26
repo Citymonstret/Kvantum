@@ -18,31 +18,23 @@ package xyz.kvantum.server.api.views.staticviews;
 
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.View;
 
-class CachedStaticView extends View implements CacheApplicable
+final class CachedStaticView extends View implements CacheApplicable
 {
 
-    private final ResponseMethod method;
-
-    CachedStaticView(final ViewMatcher matcher, final ResponseMethod method)
+    CachedStaticView(final ViewDeclaration viewDeclaration,
+                     final ResponseMethod method)
     {
-        super( matcher.filter(), matcher.name() );
-        this.method = method;
-        this.forceHTTPS = matcher.forceHTTPS();
+        super( viewDeclaration.getFilter(), viewDeclaration.getName(),
+                null, method, viewDeclaration.getHttpMethod() );
+        this.forceHTTPS = viewDeclaration.isForceHttps();
     }
 
     @Override
     public boolean passes(final AbstractRequest request)
     {
         return true;
-    }
-
-    @Override
-    public final Response generate(final AbstractRequest r)
-    {
-        return method.handle( r );
     }
 
     @Override

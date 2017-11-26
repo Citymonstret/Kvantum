@@ -54,7 +54,13 @@ public enum HttpMethod
     /**
      *
      */
-    DELETE;
+    DELETE,
+
+    /**
+     * Used to indicate that ALL methods
+     * are applicable
+     */
+    ALL;
 
     private final boolean hasBody;
 

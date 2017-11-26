@@ -16,10 +16,13 @@
  */
 package xyz.kvantum.server.api.views.requesthandler;
 
-import xyz.kvantum.server.api.core.ServerImplementation;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Setter;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.matching.ViewPattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.RequestHandler;
 
@@ -27,42 +30,70 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public class SimpleRequestHandler extends RequestHandler
 {
 
     private static AtomicInteger identifier = new AtomicInteger( 0 );
 
+    /**
+     * An un-compiled {@link ViewPattern}
+     */
+    @NonNull
     private final String pattern;
+
+    /**
+     * The generator that will be used to serve
+     * the response
+     */
+    @NonNull
     private final BiConsumer<AbstractRequest, Response> generator;
-    private final boolean forceHTTPS;
+
+    /**
+     * Whether or not the request should be forced over HTTPS
+     */
+    private boolean forceHTTPS = false;
+
+    /**
+     * The internal (unique) identifier for this request handler
+     */
+    @Setter
     private String internalName = "simpleRequestHandler::" + identifier.getAndIncrement();
+
+    /**
+     * The HTTP method that this request handler will accept
+     */
+    @NonNull
+    private HttpMethod httpMethod = HttpMethod.ALL;
+
     private ViewPattern compiledPattern;
 
-    protected SimpleRequestHandler(String pattern, BiConsumer<AbstractRequest, Response> generator)
+    protected SimpleRequestHandler(final String pattern, final BiConsumer<AbstractRequest, Response> generator)
     {
-        this( pattern, generator, false );
+        this( pattern, generator, false, HttpMethod.ALL );
     }
 
-    protected SimpleRequestHandler(String pattern, BiConsumer<AbstractRequest, Response> generator, boolean forceHTTPS)
+    @Builder
+    protected SimpleRequestHandler(final String pattern,
+                                   final BiConsumer<AbstractRequest, Response> generator,
+                                   final boolean forceHTTPS,
+                                   final HttpMethod httpMethod)
     {
         this.pattern = pattern;
         this.generator = generator;
         this.forceHTTPS = forceHTTPS;
+        if ( httpMethod == null )
+        {
+            this.httpMethod = HttpMethod.ALL;
+        } else
+        {
+            this.httpMethod = httpMethod;
+        }
     }
 
-    public static Builder builder()
-    {
-        return new Builder();
-    }
-
-    public SimpleRequestHandler addToRouter(final Router router)
+    public final SimpleRequestHandler addToRouter(final Router router)
     {
         return (SimpleRequestHandler) router.add( this );
-    }
-
-    public void setInternalName(String internalName)
-    {
-        this.internalName = internalName;
     }
 
     protected ViewPattern getPattern()
@@ -83,6 +114,11 @@ public class SimpleRequestHandler extends RequestHandler
     @Override
     public boolean matches(final AbstractRequest request)
     {
+        final HttpMethod requestMethod = request.getQuery().getMethod();
+        if ( this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod )
+        {
+            return false;
+        }
         final Map<String, String> map = getPattern().matches( request.getQuery().getFullRequest() );
         if ( map != null )
         {
@@ -106,42 +142,8 @@ public class SimpleRequestHandler extends RequestHandler
     }
 
     @Override
-    public boolean forceHTTPS()
+    public final boolean forceHTTPS()
     {
         return this.forceHTTPS;
     }
-
-    final public void register()
-    {
-        ServerImplementation.getImplementation().getRouter().add( this );
-    }
-
-    public static final class Builder
-    {
-
-        private String pattern;
-        private BiConsumer<AbstractRequest, Response> generator;
-
-        private Builder()
-        {
-        }
-
-        public Builder setPattern(final String pattern)
-        {
-            this.pattern = pattern;
-            return this;
-        }
-
-        public Builder setGenerator(final BiConsumer<AbstractRequest, Response> generator)
-        {
-            this.generator = generator;
-            return this;
-        }
-
-        public SimpleRequestHandler build()
-        {
-            return new SimpleRequestHandler( pattern, generator );
-        }
-    }
-
 }

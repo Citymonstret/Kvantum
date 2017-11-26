@@ -46,7 +46,7 @@ final public class StaticViewManager
 
             if ( !usesAlternate && !Response.class.equals( m.getReturnType() ) )
             {
-                new IllegalArgumentException( "M doesn't return response" ).printStackTrace();
+                new IllegalArgumentException( m.getName() + " doesn't return response" ).printStackTrace();
             } else
             {
                 if ( !usesAlternate && !Arrays.equals( m.getParameterTypes(), parameters ) )
@@ -55,13 +55,28 @@ final public class StaticViewManager
                 } else
                 {
                     final ViewMatcher matcher = annotatedMethod.getAnnotation();
+
+                    final ViewDeclaration declaration = new ViewDeclaration();
+                    declaration.setCache( matcher.cache() );
+                    declaration.setFilter( matcher.filter() );
+                    declaration.setMiddlewares( matcher.middlewares() );
+                    declaration.setForceHttps( matcher.forceHTTPS() );
+                    declaration.setHttpMethod( matcher.httpMethod() );
+                    if ( matcher.name().isEmpty() )
+                    {
+                        declaration.setName( m.getName() );
+                    } else
+                    {
+                        declaration.setName( matcher.name() );
+                    }
+
                     final RequestHandler view;
                     if ( matcher.cache() )
                     {
-                        view = new CachedStaticView( matcher, new ResponseMethod( m, viewDeclaration ) );
+                        view = new CachedStaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
                     } else
                     {
-                        view = new StaticView( matcher, new ResponseMethod( m, viewDeclaration ) );
+                        view = new StaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
                     }
 
                     for ( final Class<? extends Middleware> middleware : matcher.middlewares() )

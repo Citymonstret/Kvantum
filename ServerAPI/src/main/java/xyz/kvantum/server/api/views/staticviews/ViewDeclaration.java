@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,29 +15,19 @@
  */
 package xyz.kvantum.server.api.views.staticviews;
 
+import lombok.Data;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ViewMatcher
+@Data
+final class ViewDeclaration
 {
 
-    String filter();
-
-    String name() default "";
-
-    Class<? extends Middleware>[] middlewares() default Middleware.class;
-
-    boolean cache() default false;
-
-    boolean forceHTTPS() default false;
-
-    HttpMethod httpMethod() default HttpMethod.ALL;
+    private String filter;
+    private String name;
+    private Class<? extends Middleware>[] middlewares;
+    private boolean cache = true;
+    private boolean forceHttps = true;
+    private HttpMethod httpMethod = HttpMethod.ALL;
 
 }

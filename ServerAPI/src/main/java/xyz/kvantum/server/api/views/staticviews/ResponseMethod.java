@@ -19,12 +19,13 @@ package xyz.kvantum.server.api.views.staticviews;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.views.ViewReturn;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
-final public class ResponseMethod implements BiConsumer<AbstractRequest, Response>
+final public class ResponseMethod implements BiConsumer<AbstractRequest, Response>, ViewReturn
 {
 
     private final Method method;
@@ -65,5 +66,11 @@ final public class ResponseMethod implements BiConsumer<AbstractRequest, Respons
     public void accept(AbstractRequest request, Response response)
     {
         response.copyFrom( handle( request ) );
+    }
+
+    @Override
+    public final Response get(AbstractRequest r)
+    {
+        return this.handle( r );
     }
 }

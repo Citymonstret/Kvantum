@@ -18,17 +18,13 @@ package xyz.kvantum.server.api.views.staticviews;
 
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 
-
-class StaticView extends SimpleRequestHandler
+final class StaticView extends SimpleRequestHandler
 {
 
-    private final ResponseMethod method;
-
-    StaticView(final ViewMatcher matcher, final ResponseMethod method)
+    StaticView(final ViewDeclaration declaration,
+               final ResponseMethod method)
     {
-        super( matcher.filter(), method, matcher.forceHTTPS() );
-        this.method = method;
+        super( declaration.getFilter(), method, declaration.isForceHttps(), declaration.getHttpMethod() );
     }
-
 
 }

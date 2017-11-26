@@ -683,6 +683,7 @@ public final class Server implements Kvantum
         }
 
         this.applicationStructure.registerViews( this );
+        DebugViews.registerDebugViews();
         this.handleEvent( new ViewsInitializedEvent( this ) );
 
         router.dump( this );
@@ -858,8 +859,7 @@ public final class Server implements Kvantum
     @Override
     public RequestHandler createSimpleRequestHandler(final String filter, final BiConsumer<AbstractRequest, Response> generator)
     {
-        return SimpleRequestHandler.builder().setPattern( filter ).setGenerator( generator )
-                .build().addToRouter( router );
+        return SimpleRequestHandler.builder().pattern( filter ).generator( generator ).build().addToRouter( router );
     }
 
 }

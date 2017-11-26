@@ -20,6 +20,7 @@ import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.FilePattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileExtension;
@@ -35,7 +36,7 @@ public abstract class StaticFileView extends View
 
     public StaticFileView(String filter, Map<String, Object> options, String name, Collection<FileExtension> extensions)
     {
-        super( filter, name, options );
+        super( filter, name, options, HttpMethod.ALL );
         this.extensionList = extensions;
     }
 
