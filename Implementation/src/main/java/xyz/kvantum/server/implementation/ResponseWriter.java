@@ -101,6 +101,7 @@ final class ResponseWriter extends Transformer<WorkerContext>
                 {
                     request = (AbstractRequest) redirect;
                     request.removeMeta( "internalRedirect" );
+                    workerContext.setRequest( request );
                     return this.handle( workerContext );
                 }
                 return null;
