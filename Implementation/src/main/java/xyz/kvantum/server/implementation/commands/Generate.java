@@ -24,13 +24,10 @@ import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.util.MapBuilder;
+import xyz.kvantum.server.api.views.ViewDetector;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collections;
 import java.util.UUID;
 
 @CommandDeclaration(
@@ -59,20 +56,19 @@ public class Generate extends Command
         {
             basePath = instance.getString( "basePath" );
         }
-
         final Path path = ServerImplementation.getImplementation().getFileSystem().getPath( folderName );
         if ( !path.exists() )
         {
             Logger.error( "No such folder: %s", path.toString() );
             return true;
         }
-        final Set<Path> paths = new HashSet<>();
-        paths.add( path );
-        addSubPaths( paths, path );
-        Logger.info( "Found %s folder inside of %s", paths.size(), path );
-        paths.forEach( p -> Logger.info( "- %s", p.toString() ) );
-        final Map<String, Map<String, Object>> viewEntries = new HashMap<>();
-        paths.forEach( p -> loadSubPath( viewEntries, basePath, path.toString(), p ) );
+
+        final ViewDetector viewDetector = new ViewDetector( basePath, path, Collections.emptyList() );
+        final int loaded = viewDetector.loadPaths();
+        Logger.info( "Found %s folders inside of %s", loaded, path );
+        viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+        viewDetector.generateViewEntries();
+
         final String fileName = UUID.randomUUID().toString();
         final ConfigurationFile configurationFile;
         try
@@ -87,123 +83,11 @@ public class Generate extends Command
             e.printStackTrace();
             return true;
         }
-        configurationFile.set( "views", viewEntries );
+        configurationFile.set( "views", viewDetector.getViewEntries() );
         configurationFile.saveFile();
         Logger.info( "Generated views can be found in 'config/%s.yml'", fileName );
         Logger.info( "Add '%s: %s.yml' to views.yml to load the file", fileName, fileName );
         return true;
     }
 
-    private void loadSubPath(final Map<String, Map<String, Object>> viewEntries, final String basePath,
-                             final String toRemeove, final Path path)
-    {
-        String extension = null;
-        boolean moreThanOneType = false;
-        boolean hasIndex = false;
-        String indexExtension = "";
-
-        for ( final Path subPath : path.getSubPaths( false ) )
-        {
-            if ( extension == null )
-            {
-                extension = subPath.getExtension();
-            } else if ( !extension.equalsIgnoreCase( subPath.getExtension() ) )
-            {
-                moreThanOneType = true;
-            }
-            if ( !hasIndex )
-            {
-                hasIndex = subPath.getEntityName().equals( "index" );
-                indexExtension = subPath.getExtension();
-            }
-        }
-
-        if ( extension == null )
-        {
-            return;
-        }
-
-        final String type;
-        if ( moreThanOneType )
-        {
-            type = "std";
-        } else
-        {
-            switch ( extension )
-            {
-                case "html":
-                    type = "html";
-                    break;
-                case "js":
-                    type = "javascript";
-                    break;
-                case "css":
-                    type = "css";
-                    break;
-                case "less":
-                    type = "less";
-                    break;
-                case "png":
-                case "jpg":
-                case "jpeg":
-                case "ico":
-                    type = "img";
-                    break;
-                case "zip":
-                case "txt":
-                case "pdf":
-                    type = "download";
-                    break;
-                default:
-                    type = "std";
-                    break;
-            }
-        }
-
-        final String folder = "./" + path.toString();
-        final String viewPattern;
-        if ( moreThanOneType )
-        {
-            if ( hasIndex )
-            {
-                viewPattern = ( path.toString().replace( toRemeove, basePath ) ) +
-                        "[file=index].[extension=" + indexExtension + "]";
-            } else
-            {
-                viewPattern = ( path.toString().replace( toRemeove, basePath ) ) + "<file>.<extension>";
-            }
-        } else
-        {
-            if ( hasIndex )
-            {
-                viewPattern = ( path.toString().replace( toRemeove, basePath ) ) +
-                        "[file=index].[extension=" + indexExtension + "]";
-            } else
-            {
-                viewPattern = ( path.toString().replace( toRemeove, basePath ) ) + "<file>." + extension;
-            }
-        }
-
-        final Map<String, Object> info = MapBuilder.<String, Object>newHashMap()
-                .put( "filter", viewPattern )
-                .put( "options", MapBuilder.newHashMap()
-                        .put( "folder", folder )
-                        .get() )
-                .put( "type", type ).get();
-
-        viewEntries.put( UUID.randomUUID().toString(), info );
-    }
-
-    private void addSubPaths(final Set<Path> set, final Path path)
-    {
-        for ( final Path subPath : path.getSubPaths() )
-        {
-            if ( !subPath.isFolder() )
-            {
-                continue;
-            }
-            set.add( subPath );
-            addSubPaths( set, subPath );
-        }
-    }
 }

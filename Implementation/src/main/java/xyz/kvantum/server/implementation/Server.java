@@ -85,6 +85,7 @@ import xyz.kvantum.server.api.views.LessView;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.StandardView;
 import xyz.kvantum.server.api.views.View;
+import xyz.kvantum.server.api.views.ViewDetector;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 import xyz.kvantum.server.implementation.commands.AccountCommand;
 import xyz.kvantum.server.implementation.config.TranslationFile;
@@ -105,6 +106,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -676,7 +679,23 @@ public final class Server implements Kvantum
         this.log( Message.VALIDATING_VIEWS );
         this.validateViews();
 
-        if ( !CoreConfig.disableViews )
+        if ( CoreConfig.autoDetectViews )
+        {
+            Logger.info( "Auto-Detecting views..." );
+            final Collection<String> ignore = Arrays.asList(
+                    "config",
+                    "log",
+                    "plugins",
+                    "storage",
+                    "templates" );
+            final ViewDetector viewDetector = new ViewDetector( "",
+                    getFileSystem().getPath( "" ), ignore );
+            final int loaded = viewDetector.loadPaths();
+            Logger.info( "Found %s folders", loaded );
+            viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+            viewDetector.generateViewEntries();
+            new ViewLoader( viewDetector.getViewEntries() );
+        } else if ( !CoreConfig.disableViews )
         {
             this.log( Message.LOADING_VIEWS );
             this.log( "" );

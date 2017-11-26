@@ -38,6 +38,12 @@ public class ViewLoader
         this.views.entrySet().forEach( this::loadView );
     }
 
+    ViewLoader(final Map<String, Map<String, Object>> views)
+    {
+        this.views = views;
+        this.views.entrySet().forEach( this::loadView );
+    }
+
     private void visitMembers(final Map<String, Object> views)
     {
         for ( final Map.Entry<String, Object> viewEntry : views.entrySet() )
