@@ -112,13 +112,14 @@ subprojects {
         from javadoc.destinationDir
     }
 
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
+    if (project.hasProperty('full')) {
+        artifacts {
+            archives sourcesJar
+            archives javadocJar
+        }
+        build.dependsOn sourcesJar
+        build.dependsOn javadocJar
     }
-
-    build.dependsOn sourcesJar
-    build.dependsOn javadocJar
 }
 
 description = """"""

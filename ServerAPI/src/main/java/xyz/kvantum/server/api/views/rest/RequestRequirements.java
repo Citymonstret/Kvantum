@@ -30,11 +30,9 @@ import java.util.Optional;
 /**
  * A simple framework which allows for validation of requests by providing
  * some static conditions that must be met.
- * <p>
  * This is especially useful when using {@link KvantumObjectFactory}
- * parsing
- * </p>
- * <p>
+ * parsing.
+ *
  * Example:
  * <pre>{@code
  * final RequestRequirements requestRequirements = new RequestRequirements()
@@ -45,7 +43,6 @@ import java.util.Optional;
  *      Logger.debug( "Request failed checks: %s", requirementStatus.getMessage() );
  * }
  * }</pre>
- * </p>
  */
 @SuppressWarnings( { "unused", "WeakerAccess" } )
 @NoArgsConstructor

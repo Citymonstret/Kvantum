@@ -46,8 +46,8 @@ final public class KvantumFileUploadContext implements UploadContext
      * Try to generate a new {@link KvantumFileUploadContext} for a {@link AbstractRequest}.
      * This method will verify that the request has supplied a multipart/form-data body,
      * that the content lenght is supplied (and that it agrees with the data length) and that
-     * the content length is within the limit specified by
-     * {@link CoreConfig.Limits#limitMultibodySize}.
+     * the content length is within the limit specified in server.yml
+     *
      * It will also provide a wrapping inputstream that prevents any reading implementations from
      * attempting to read beyond the request.
      *

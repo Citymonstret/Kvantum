@@ -38,8 +38,7 @@ public class Rest
      * <p>
      * Create a REST search gateway that will search within a specified datastore for Kvantum
      * objects and automatically serve them via JSON.
-     * </p>
-     * <p>
+
      * Example: <pre>{@code
      * Rest.createSearch(
      *    "/search",
@@ -47,11 +46,10 @@ public class Rest
      *    ParameterScope.GET,
      *    ServerImplementation.getImplementation().getApplicationStructure().getAccountManager()
      * );}</pre>
-     * </p>
-     * <p>
+
      * To limit the request to certain roles, you should instead use {@link SearchService#builder()} and
      * then {@link SearchService.SearchServiceBuilder#permissionRequirement(String)}
-     * </p>
+     *
      * @param filter URL Filter ({@link ViewPattern})
      * @param clazz Class, must comply to KvantumObject specifications (see {@link KvantumObjectFactory})
      * @param scope  Whether GET or POST parameters will be used to read the object

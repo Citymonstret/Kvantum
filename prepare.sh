@@ -8,8 +8,8 @@ echo Exectuing gradlew build tasks!
 ./gradlew clean
 ./gradlew writeVersionToFile
 ./gradlew licenseFormat
-./gradlew -Dorg.gradle.project.sign=true build
-./gradlew -Dorg.gradle.project.sign=true signArchives
+./gradlew -Dorg.gradle.project.sign=true -Dorg.gradle.project.full=true build
+./gradlew -Dorg.gradle.project.sign=true -Dorg.gradle.project.full=true signArchives
 
 echo
 echo Replacing version variables
