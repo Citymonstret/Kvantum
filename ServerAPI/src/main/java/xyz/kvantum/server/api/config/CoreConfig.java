@@ -46,6 +46,7 @@ public class CoreConfig
     public static boolean enableSecurityManager = true;
     public static boolean enableInputThread = true;
     public static boolean exitOnStop = true;
+    public static boolean enablePlugins = true;
 
     @ConfigSection(name = "Throttling")
     public static class Throttle
@@ -114,13 +115,13 @@ public class CoreConfig
     public static class Templates
     {
 
-        public static TemplatingEngine engine = TemplatingEngine.CRUSH;
+        public static String engine = TemplatingEngine.CRUSH.name();
 
         public static List<String> applyTemplates = Arrays.asList( "ALL" );
 
         public static boolean status(final TemplatingEngine engine)
         {
-            return Templates.engine.equals( engine );
+            return CoreConfig.TemplatingEngine.valueOf( Templates.engine ).equals( engine );
         }
     }
 

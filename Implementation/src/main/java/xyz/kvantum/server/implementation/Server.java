@@ -663,7 +663,10 @@ public final class Server implements Kvantum
         Logger.info( "" );
 
         // Load Plugins
-        this.loadPlugins();
+        if ( CoreConfig.enablePlugins )
+        {
+            this.loadPlugins();
+        }
         EventManager.getInstance().bake();
 
         this.log( Message.CALLING_EVENT, "startup" );

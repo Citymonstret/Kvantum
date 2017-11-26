@@ -105,7 +105,7 @@ public class PluginLoader extends AutoCloseable
     {
         if ( !folder.exists() || !folder.isDirectory() )
             throw new IllegalArgumentException( folder.toString() + ", doesn't exist!" );
-        final File[] files = folder.listFiles( new JarFilter() );
+        final File[] files = folder.listFiles( file -> file.getName().endsWith( ".jar" ) );
         for ( final File file : files )
         {
             PluginClassLoader loader;
