@@ -29,6 +29,10 @@ public final class MetaProvider implements ProviderFactory<MetaProvider>, Variab
 
     private AbstractRequest r;
 
+    public MetaProvider()
+    {
+    }
+
     private MetaProvider(final AbstractRequest r)
     {
         this.r = r;

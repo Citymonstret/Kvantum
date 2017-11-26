@@ -18,14 +18,9 @@ apply plugin: 'application'
 
 mainClassName = 'xyz.kvantum.implementation.KvantumMain'
 
-shadowJar {
-    classifier = ''
-}
-
 build.dependsOn shadowJar
 
 jar {
-    enabled false
     manifest {
         attributes 'Implementation-Title': 'Kvantum',
                 'Implementation-Version': version,
@@ -34,6 +29,7 @@ jar {
 }
 
 artifacts {
+    jar
     shadowJar
     sourcesJar
     javadocJar
