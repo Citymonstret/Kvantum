@@ -260,9 +260,8 @@ public class Path
      * Create the file/directory, if it doesn't exist
      * <p>
      * Invokes {@link Files#createFile(java.nio.file.Path, FileAttribute[]) Files.createFile} if this path points to a
-     * file
-     * </br>
-     * Invokes {@link Files#createDirectories(java.nio.file.Path, FileAttribute[]) Files.createDirectories} if this
+     * file; Invokes {@link Files#createDirectories(java.nio.file.Path, FileAttribute[]) Files.createDirectories} if
+     * this
      * path
      * points to a directory
      * </p>
