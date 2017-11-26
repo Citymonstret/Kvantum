@@ -16,7 +16,7 @@ version = '1.0'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'application'
 
-mainClassName = 'xyz.kvantum.implementation.KvantumMain'
+mainClassName = 'xyz.kvantum.server.implementation.KvantumMain'
 
 build.dependsOn shadowJar
 
@@ -24,7 +24,7 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'Kvantum',
                 'Implementation-Version': version,
-                'Main-Class': 'xyz.kvantum.implementation.KvantumMain'
+                'Main-Class': 'xyz.kvantum.server.implementation.KvantumMain'
     }
 }
 
