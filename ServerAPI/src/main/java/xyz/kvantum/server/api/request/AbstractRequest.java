@@ -103,7 +103,6 @@ public abstract class AbstractRequest implements
     private SocketContext socket;
     @NonNull
     @Setter
-    @Getter
     private ISession session;
     @Setter
     @Getter
@@ -289,6 +288,15 @@ public abstract class AbstractRequest implements
     public <T> T getMetaUnsafe(final String key)
     {
         return (T) this.getMeta( key );
+    }
+
+    public ISession getSession()
+    {
+        if ( this.session == null )
+        {
+            this.requestSession();
+        }
+        return this.session;
     }
 
     /**

@@ -15,23 +15,32 @@
  */
 package xyz.kvantum.server.implementation.debug;
 
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.views.requesthandler.Middleware;
-import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueue;
+import lombok.Getter;
+import net.sf.oval.constraint.NotEmpty;
+import net.sf.oval.constraint.NotNull;
+import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
+import xyz.kvantum.server.api.orm.annotations.KvantumField;
+import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 
-public final class DebugRedirectMiddleware extends Middleware
+@KvantumObject(checkValidity = true)
+public class DebugLoginAttempt
 {
 
-    @Override
-    public void handle(final AbstractRequest request, final MiddlewareQueue queue)
+    @NotNull
+    @NotEmpty
+    @Getter
+    @KvantumField
+    private String username;
+
+    @NotNull
+    @NotEmpty
+    @Getter
+    @KvantumField
+    private String password;
+
+    @KvantumConstructor
+    private DebugLoginAttempt()
     {
-        if ( !request.getQuery().getParameters().containsKey( "debug" ) )
-        {
-            request.internalRedirect( "" );
-        } else
-        {
-            queue.handle( request );
-        }
     }
 
 }

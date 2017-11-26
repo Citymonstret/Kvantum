@@ -44,6 +44,7 @@ final public class Request extends AbstractRequest
                     "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?"
     );
     private static final Pattern PATTERN_HEADER = Pattern.compile( "(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)" );
+    private boolean hasBeenRequested = false;
 
     public Request(final Collection<String> request, final SocketContext socket)
     {
@@ -124,6 +125,7 @@ final public class Request extends AbstractRequest
         request.getMeta().putAll( this.getMeta() );
         request.setCookies( this.getCookies() );
         request.setProtocolType( this.getProtocolType() );
+        request.setSession( this.getSession() );
 
         return request;
     }
@@ -131,10 +133,11 @@ final public class Request extends AbstractRequest
     @Override
     public void requestSession()
     {
-        if ( this.getSession() != null )
+        if ( hasBeenRequested )
         {
             return;
         }
+        hasBeenRequested = true;
         final Optional<ISession> session = ServerImplementation.getImplementation().getSessionManager()
                 .getSession( this, this.outputStream );
         if ( session.isPresent() )

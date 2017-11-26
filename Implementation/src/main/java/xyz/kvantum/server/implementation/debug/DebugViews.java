@@ -15,13 +15,21 @@
  */
 package xyz.kvantum.server.implementation.debug;
 
+import lombok.val;
+import xyz.kvantum.server.api.account.IAccount;
+import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.orm.KvantumObjectFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
+
+import java.util.Optional;
 
 public final class DebugViews
 {
@@ -43,10 +51,49 @@ public final class DebugViews
             StaticViewManager.generate( instance );
             Logger.debug( "Registered debug views: " );
             Logger.debug( "- debug/session?debug=true : See your session ID" );
+            Logger.debug( "- debug/accounts?username=<username>&password=<password> : Test accounts" );
         } catch ( final Exception e )
         {
             Logger.error( "Failed to generate debug views!" );
             e.printStackTrace();
+        }
+    }
+
+    @ViewMatcher(filter = "debug/accounts", httpMethod = HttpMethod.GET)
+    public final void debugAccounts(final AbstractRequest request, final Response response)
+    {
+        final IAccountManager accountManager = ServerImplementation.getImplementation().getApplicationStructure()
+                .getAccountManager();
+        Optional<IAccount> accountOptional;
+        if ( ( accountOptional = accountManager.getAccount( request.getSession() ) ).isPresent() )
+        {
+            response.setContent( "You are already logged in..." );
+        } else
+        {
+            final KvantumObjectFactory<DebugLoginAttempt> factory = KvantumObjectFactory.from( DebugLoginAttempt
+                    .class );
+            final val result = factory.build( ParameterScope.GET ).parseRequest( request );
+            if ( result.isSuccess() )
+            {
+                accountOptional = accountManager.getAccount( result.getParsedObject().getUsername() );
+                if ( accountOptional.isPresent() )
+                {
+                    if ( accountOptional.get().passwordMatches( result.getParsedObject().getPassword() ) )
+                    {
+                        accountManager.bindAccount( accountOptional.get(), request.getSession() );
+                        response.setContent( "Success!" );
+                    } else
+                    {
+                        response.setContent( "Password is wrong!" );
+                    }
+                } else
+                {
+                    response.setContent( "No such account..." );
+                }
+            } else
+            {
+                response.setContent( "ERROR: " + result.getError().getCause() );
+            }
         }
     }
 
