@@ -86,8 +86,10 @@ allprojects {
 
     build.dependsOn createPom
 
-    signing {
-        sign configurations.archives
+    if (project.hasProperty('sign')) {
+        signing {
+            sign configurations.archives
+        }
     }
 }
 

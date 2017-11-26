@@ -49,12 +49,12 @@ class AbstractPool<T>
      * @return The next available object
      * @throws InterruptedException If the polling of the queue is interrupted
      */
-    T getAvailable() throws InterruptedException
+    final T getAvailable() throws InterruptedException
     {
         return this.availableObjects.takeFirst();
     }
 
-    T getNullable()
+    final T getNullable()
     {
         try
         {
@@ -70,7 +70,7 @@ class AbstractPool<T>
      *
      * @param t object
      */
-    void add(final T t)
+    final void add(final T t)
     {
         this.availableObjects.add( t );
     }
