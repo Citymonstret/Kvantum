@@ -50,8 +50,8 @@ final class PostRequestGenerator extends ConditionalTransformer<WorkerContext>
         boolean isFormURLEncoded;
         boolean isJSON = false;
 
-        if ( ( isFormURLEncoded = contentType.equalsIgnoreCase( "application/x-www-form-urlencoded" ) ) ||
-                ( isJSON = EntityType.JSON.getContentType().equals( contentType ) ) )
+        if ( ( isFormURLEncoded = contentType.startsWith( "application/x-www-form-urlencoded" ) ) ||
+                ( isJSON = EntityType.JSON.getContentType().startsWith( contentType ) ) )
         {
             final int contentLength;
             try
