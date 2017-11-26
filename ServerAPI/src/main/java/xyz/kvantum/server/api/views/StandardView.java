@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StandardView extends StaticFileView implements CacheApplicable
@@ -54,7 +55,8 @@ public class StandardView extends StaticFileView implements CacheApplicable
     @Override
     public boolean isApplicable(AbstractRequest r)
     {
-        return false;
+        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
+        return cacheApplicableBoolean.orElse( false );
     }
 
     @Override

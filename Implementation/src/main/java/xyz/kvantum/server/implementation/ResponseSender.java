@@ -48,7 +48,11 @@ final class ResponseSender extends Transformer<WorkerContext>
             Assert.notNull( body );
             Assert.notNull( body.getHeader() );
 
-            body.getHeader().set( Header.HEADER_CONTENT_MD5, md5Handler.generateChecksum( bytes ) );
+            final String checksum = md5Handler.generateChecksum( bytes );
+
+            body.getHeader().set( Header.HEADER_CONTENT_MD5, checksum );
+            body.getHeader().set( Header.HEADER_ETAG, checksum );
+
             Server.md5HandlerPool.add( md5Handler );
         }
 
