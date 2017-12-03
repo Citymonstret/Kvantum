@@ -27,6 +27,11 @@ public class MockRequest extends AbstractRequest
     }
 
     @Override
+    public void onCompileFinish()
+    {
+    }
+
+    @Override
     protected AbstractRequest newRequest(String query)
     {
         return null;

@@ -169,6 +169,8 @@ public abstract class AbstractRequest implements
         this.addMeta( ALTERNATE_OUTCOME, Assert.notNull( identifier ) );
     }
 
+    public abstract void onCompileFinish();
+
     /**
      * Get the PostRequest
      *

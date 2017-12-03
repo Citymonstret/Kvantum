@@ -17,10 +17,12 @@ package xyz.kvantum.server.implementation;
 
 import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.RequestCompiler;
 
 import java.io.InputStream;
-import java.util.ArrayDeque;
-import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Read a HTTP request until the first clear line. Does
@@ -32,16 +34,17 @@ final class RequestReader
 {
 
     @Getter
-    private final Collection<String> lines;
     private final StringBuilder builder;
+    private final AbstractRequest abstractRequest;
     private char lastCharacter = ' ';
     private boolean done = false;
     private boolean begunLastLine = false;
+    private boolean hasQuery = false;
 
-    RequestReader()
+    RequestReader(final AbstractRequest abstractRequest)
     {
-        lines = new ArrayDeque<>( CoreConfig.Buffer.lineQueInitialization );
-        builder = new StringBuilder( CoreConfig.Limits.limitRequestLineSize );
+        this.abstractRequest = abstractRequest;
+        this.builder = new StringBuilder( CoreConfig.Limits.limitRequestLineSize );
     }
 
     /**
@@ -96,7 +99,23 @@ final class RequestReader
             {
                 if ( builder.length() != 0 )
                 {
-                    lines.add( builder.toString() );
+                    final String line = builder.toString();
+                    if ( !hasQuery )
+                    {
+                        RequestCompiler.compileQuery( this.abstractRequest, line );
+                        hasQuery = true;
+                    } else
+                    {
+                        final Optional<RequestCompiler.HeaderPair> headerPair = RequestCompiler.compileHeader( line );
+                        if ( headerPair.isPresent() )
+                        {
+                            final RequestCompiler.HeaderPair pair = headerPair.get();
+                            this.abstractRequest.getHeaders().put( pair.getKey(), pair.getValue() );
+                        } else
+                        {
+                            Logger.warn( "Failed to read request line: '%s'", line );
+                        }
+                    }
                 }
                 builder.setLength( 0 );
             }
@@ -171,7 +190,6 @@ final class RequestReader
      */
     public void clear()
     {
-        this.lines.clear();
         this.builder.setLength( 0 );
         this.lastCharacter = ' ';
     }

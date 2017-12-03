@@ -18,8 +18,6 @@ package xyz.kvantum.server.implementation;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.socket.SocketContext;
 
-import java.util.Collection;
-
 @RequiredArgsConstructor
 abstract class SocketReader
 {
@@ -34,8 +32,4 @@ abstract class SocketReader
 
     abstract void tick() throws Exception;
 
-    Collection<String> getLines()
-    {
-        return this.requestReader.getLines();
-    }
 }

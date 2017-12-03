@@ -18,10 +18,8 @@ package xyz.kvantum.server.api.request;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.QueryException;
-import xyz.kvantum.server.api.exceptions.RequestException;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
@@ -29,83 +27,36 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CookieManager;
 import xyz.kvantum.server.api.util.ProtocolType;
 
-import java.util.Collection;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final public class Request extends AbstractRequest
 {
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
-    private static final Pattern PATTERN_QUERY = Pattern.compile(
-            "(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!%]*) " +
-                    "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?"
-    );
-    private static final Pattern PATTERN_HEADER = Pattern.compile( "(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)" );
     private boolean hasBeenRequested = false;
 
-    public Request(final Collection<String> request, final SocketContext socket)
+    public Request(final SocketContext socket)
     {
-        Assert.notNull( request, socket );
-
+        Assert.notNull( socket );
         this.setSocket( socket );
-
-        boolean hasQuery = false;
-        if ( !request.isEmpty() )
+        if ( socket.isSSL() )
         {
-            Matcher matcher;
-            for ( final String part : request )
-            {
-                if ( !hasQuery )
-                {
-                    matcher = PATTERN_QUERY.matcher( part );
-                    if ( matcher.matches() )
-                    {
-                        if ( CoreConfig.verbose )
-                        {
-                            ServerImplementation.getImplementation().log( "Query: " + matcher.group() );
-                        }
-
-                        this.getHeaders().put( "query", matcher.group() );
-
-                        final Optional<HttpMethod> methodOptional = HttpMethod.getByName( matcher.group( "method" ) );
-                        if ( !methodOptional.isPresent() )
-                        {
-                            throw new RequestException( "Unknown request method: " + matcher.group( "method" ),
-                                    this );
-                        }
-
-                        if ( socket.isSSL() )
-                        {
-                            this.setProtocolType( ProtocolType.HTTPS );
-                        } else
-                        {
-                            this.setProtocolType( ProtocolType.HTTP );
-                        }
-
-                        this.setQuery( new Query( methodOptional.get(), matcher.group( "resource" ) ) );
-                        hasQuery = true;
-                    }
-                } else
-                {
-                    matcher = PATTERN_HEADER.matcher( part );
-                    if ( matcher.matches() )
-                    {
-                        this.getHeaders().put( matcher.group( "key" ).toLowerCase(), matcher.group( "value" ) );
-                    }
-                }
-            }
+            this.setProtocolType( ProtocolType.HTTPS );
+        } else
+        {
+            this.setProtocolType( ProtocolType.HTTP );
         }
+    }
 
-        if ( !hasQuery )
+    @Override
+    public void onCompileFinish()
+    {
+        if ( this.getQuery() == null )
         {
             throw new QueryException( "Couldn't find query header...", this );
         }
-
         this.setCookies( CookieManager.getCookies( this ) );
-
         if ( this.getHeaders().containsKey( HEADER_AUTHORIZATION ) )
         {
             this.setAuthorization( new Authorization( this.getHeader( HEADER_AUTHORIZATION ) ) );

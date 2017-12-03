@@ -32,9 +32,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.implementation.error.KvantumException;
 
 import java.io.BufferedOutputStream;
-import java.io.InputStream;
 import java.net.SocketException;
-import java.util.Collection;
 
 @Getter
 @Setter
@@ -54,8 +52,6 @@ public class WorkerContext
     private ResponseBody body;
     private boolean gzip;
     private SocketContext socketContext;
-    private Collection<String> lines;
-    private InputStream inputStream;
     private byte[] bytes;
 
     /**

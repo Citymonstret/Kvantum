@@ -61,8 +61,6 @@ final class KvantumPipeline
         this.nanoTube
                 .setLast( new ConnectionLogger() )
                 .setLast( new SocketRequestReader() )
-                .setLast( new RequestLineValidator() )
-                .setLast( new RequestGenerator() )
                 .setLast( new PostRequestGenerator() )
                 .setLast( new ConnectionThrottle() )
                 .setLast( new SessionLoader() )
