@@ -503,6 +503,8 @@ public final class Server implements Kvantum
 
                 Logger.info( "If you want to import a folder structure, see /generate" );
                 Logger.info( "Instructions for /generate: https://github.com/IntellectualSites/Kvantum/wiki/generate" );
+                Logger.info( "If you'd rather have the views detected automatically, " +
+                        "set `autoDetect: true` in `server.yml`!" );
             }
 
             final Path path = getFileSystem().getPath( "public" );
