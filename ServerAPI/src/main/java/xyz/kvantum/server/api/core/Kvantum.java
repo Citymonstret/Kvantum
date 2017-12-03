@@ -34,6 +34,7 @@ import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.scripts.ScriptManager;
 import xyz.kvantum.server.api.session.SessionManager;
 import xyz.kvantum.server.api.socket.ISocketHandler;
 import xyz.kvantum.server.api.util.ApplicationStructure;
@@ -128,6 +129,13 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return File system (defaults to .kvantum)
      */
     FileSystem getFileSystem();
+
+    /**
+     * Get the implementation specific script manager
+     *
+     * @return Script manager
+     */
+    ScriptManager getScriptManager();
 
     /**
      * Create a simple request handler

@@ -61,6 +61,8 @@ import xyz.kvantum.server.api.plugin.PluginManager;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.PostProviderFactory;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.scripts.ScriptManager;
+import xyz.kvantum.server.api.scripts.ScriptView;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionManager;
 import xyz.kvantum.server.api.templates.TemplateManager;
@@ -180,6 +182,8 @@ public final class Server implements Kvantum
     private CommandManager commandManager;
     @Getter
     private ApplicationStructure applicationStructure;
+    @Getter
+    private ScriptManager scriptManager;
 
     /**
      * @param serverContext ServerContext that will be used to initialize the server
@@ -234,6 +238,11 @@ public final class Server implements Kvantum
         // Print license information
         //
         this.printLicenseInfo();
+
+        //
+        // Create script manager
+        //
+        this.scriptManager = new ScriptManager( this );
 
         //
         // Add default view bindings
@@ -556,6 +565,7 @@ public final class Server implements Kvantum
         addViewBinding( "img", ImgView.class );
         addViewBinding( "download", DownloadView.class );
         addViewBinding( "std", StandardView.class );
+        addViewBinding( "script", ScriptView.class );
     }
 
     private void printLicenseInfo()

@@ -78,7 +78,7 @@ public class View extends RequestHandler
     public static final String CONSTANT_VARIABLES = "variables";
     private static final String DEFAULT_RESPONSE = "<h1>Hello World!</h1>";
     protected final Map<HeaderOption, String> headers = new HashMap<>();
-    private final Map<String, Object> options;
+    protected final Map<String, Object> options;
     private final String internalName;
     private final UUID uuid;
     private final ViewPattern viewPattern;

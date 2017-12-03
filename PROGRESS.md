@@ -35,6 +35,7 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 #### 2.1 All views
 * ViewPatterns - URL request mapping with variables (with optional default values)
 * Server-side response caching
+* Scriptable views (JavaScript, through Nashorn)
 
 #### 2.2 Static Resources
 Kvantum comes with default views for serving of static files (or pseudo-dynamic through static template rendering). These views makes sure that the appropritate headers are sent alongside with the response, according to the HTTP/1.1 specifications.
