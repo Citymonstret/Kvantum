@@ -20,18 +20,17 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
+import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
-@SuppressWarnings({ "unused" })
+@SuppressWarnings({ "unused", "WeakerAccess" })
 final public class Header
 {
 
@@ -266,7 +265,7 @@ final public class Header
     public static final HeaderOption HEADER_SET_COOKIE = HeaderOption.create( "Set-Cookie" );
 
     /**
-     * If an enttity is temporarily
+     * If an entity is temporarily
      * unavailable, this instructs
      * the client to try again later.
      * Value could be a specified
@@ -282,36 +281,64 @@ final public class Header
     @Getter
     private String format;
 
+    /**
+     * Construct a new header instance
+     *
+     * @param status HTTP status
+     * @param format HTTP version
+     */
     public Header(final String status, final String format)
     {
         this.status = status;
         this.format = format;
     }
 
+    /**
+     * Construct a new header instance with a specified status,
+     * specifying HTTP version HTTP/1.1
+     *
+     * @param status Status
+     */
     public Header(final String status)
     {
         this( status, "HTTP/1.1" );
     }
 
-    public Header setStatus(final String status)
+    /**
+     * Set the HTTP response status
+     *
+     * @param status Response status
+     * @return Instance
+     */
+    public Header setStatus(@NonNull final String status)
     {
-        Assert.notNull( status );
-
         this.status = status;
         this.set( HEADER_STATUS, status );
-
         return this;
     }
 
+    /**
+     * Store a header and overwrite previous entries
+     *
+     * @param key   Header key
+     * @param value Header value
+     * @return Instance
+     */
     public Header set(final HeaderOption key, final String value)
     {
         return set( key, value, false );
     }
 
-    public Header set(final HeaderOption key, final String value, final boolean allowDuplicates)
+    /**
+     * Store a header
+     *
+     * @param key             Header key
+     * @param value           Header value
+     * @param allowDuplicates If this is set to false, then previous entries will be overwritten
+     * @return Instance
+     */
+    public Header set(@NonNull final HeaderOption key, @NonNull final String value, final boolean allowDuplicates)
     {
-        Assert.notNull( key, value );
-
         if ( !allowDuplicates )
         {
             this.headers.removeAll( key );
@@ -320,24 +347,30 @@ final public class Header
         return this;
     }
 
-    public Collection<String> getMultiple(final HeaderOption key)
+    /**
+     * Get all stored values for a header key
+     *
+     * @param key Header eky
+     * @return Collection with all stored values
+     */
+    public Collection<String> getMultiple(@NonNull final HeaderOption key)
     {
-        Assert.notNull( key );
-
         final Collection<String> values = new ArrayList<>();
-
         if ( this.headers.containsKey( key ) )
         {
             values.addAll( this.headers.get( key ) );
         }
-
         return values;
     }
 
-    public Optional<String> get(final HeaderOption key)
+    /**
+     * Get a stored header value, if it exists
+     *
+     * @param key Header key
+     * @return Optional
+     */
+    public Optional<String> get(@NonNull final HeaderOption key)
     {
-        Assert.notNull( key );
-
         if ( this.headers.containsKey( key ) )
         {
             return Optional.of( this.headers.get( key ).get( 0 ) );
@@ -345,84 +378,93 @@ final public class Header
         return Optional.empty();
     }
 
-    public byte[] getBytes()
-    {
-        final StringBuilder temporary = new StringBuilder();
-        temporary.append( this.format ).append( " " ).append( this.status ).append( "\n" );
-        for ( final Map.Entry<HeaderOption, String> entry : this.headers.entries() )
-        {
-            temporary.append( entry.getKey() ).append( ": " ).append( entry.getValue() ).append( "\n" );
-        }
-        temporary.append( "\n" );
-        return temporary.toString().getBytes();
-    }
 
+    /**
+     * Redirect to another URL using status 307 Temporary Redirect
+     *
+     * @see #redirect(String, String) to specify redirect header
+     */
     public void redirect(final String newURL)
     {
         redirect( newURL, Header.STATUS_TEMPORARY_REDIRECT );
     }
 
-    public void redirect(final String newURL, final String redirectHeader)
+    /**
+     * Used to redirect a request to another url
+     *
+     * @param newURL         New URL
+     * @param redirectHeader Status code
+     */
+    public void redirect(@NonNull final String newURL, @NonNull final String redirectHeader)
     {
-        Assert.notNull( newURL );
-        Assert.notNull( redirectHeader );
-
         set( Header.HEADER_LOCATION, newURL );
         set( Header.HEADER_STATUS, redirectHeader );
         setStatus( redirectHeader );
     }
 
-    public String[] dump()
+    /**
+     * Set a cookie and return this instance
+     *
+     * @param cookie Cookie
+     * @return Instance
+     */
+    public Header setCookie(@NonNull final ResponseCookie cookie)
     {
-        final String[] dump = new String[ this.headers.size() + 1 ];
-        dump[ 0 ] = "HTTP/1.1 " + this.status;
-        int index = 1;
-        for ( final Map.Entry<HeaderOption, String> entry : this.headers.entries() )
-        {
-            dump[ index++ ] = entry.getKey() + ": " + entry.getValue();
-        }
-        return dump;
-    }
-
-    public Header setCookie(final ResponseCookie cookie)
-    {
-        Assert.notNull( cookie );
-
         if ( CoreConfig.debug )
         {
             Logger.debug( "Cookie set! Key: %s, Value: %s, Full: %s", cookie.getCookie(), cookie.getValue(),
                     cookie.toString() );
         }
-
         if ( this.headers.containsEntry( HEADER_SET_COOKIE, cookie.toString() ) )
         {
             this.headers.remove( HEADER_SET_COOKIE, cookie.toString() );
         }
         this.headers.put( HEADER_SET_COOKIE, cookie.toString() );
-
         return this;
     }
 
-    public Header removeCookie(final String cookie)
+    /**
+     * Remove a specified cookie and return this instance
+     *
+     * @param cookie Cookie key
+     * @return Instance
+     */
+    public Header removeCookie(@NonNull final String cookie)
     {
         final ResponseCookie responseCookie = ResponseCookie.builder().cookie( cookie )
                 .value( "deleted" ).expires( new Date( 0 ) ).build();
         return setCookie( responseCookie );
     }
 
+    /**
+     * Clear all stored headers and return this instance
+     *
+     * @return Instance
+     */
     public Header clear()
     {
         this.headers.clear();
         return this;
     }
 
-    public boolean hasHeader(final HeaderOption headerOption)
+    /**
+     * Check if a header value is stored
+     *
+     * @param headerOption Key
+     * @return True if it is stored
+     */
+    public boolean hasHeader(@NonNull final HeaderOption headerOption)
     {
         return this.headers.containsKey( headerOption );
     }
 
+    /**
+     * Get a copy of the stored header pairs
+     *
+     * @return Copy of the internal map
+     */
     public Multimap<HeaderOption, String> getHeaders()
     {
-        return headers;
+        return MultimapBuilder.ListMultimapBuilder.hashKeys( headers.size() ).arrayListValues().build( headers );
     }
 }
