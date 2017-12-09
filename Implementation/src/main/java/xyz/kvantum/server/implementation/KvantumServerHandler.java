@@ -55,7 +55,7 @@ import java.util.function.Supplier;
 final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 {
 
-    private static final byte[] EMPTY = "NULL".getBytes();
+    private static final byte[] EMPTY = "NULL".getBytes( StandardCharsets.UTF_8 );
     private static final String CONTENT_TYPE = "content_type";
     private static final byte[] NEW_LINE = "\n".getBytes( StandardCharsets.UTF_8 );
 
@@ -85,14 +85,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         this.requestReader = new RequestReader( request );
 
         Message.CONNECTION_ACCEPTED.log( workerContext.getSocketContext().getAddress() );
-
-        //
-        // Throttle requests
-        //
-        if ( ConnectionThrottle.shouldThrottle( workerContext ) )
-        {
-            context.close();
-        }
     }
 
     @Override
@@ -100,6 +92,19 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     {
         this.byteBuf.release();
         this.byteBuf = null;
+    }
+
+    @Override
+    public void channelActive(final ChannelHandlerContext ctx) throws Exception
+    {
+        //
+        // Throttle requests
+        //
+        if ( ConnectionThrottle.shouldThrottle( workerContext ) )
+        {
+            ctx.close();
+        }
+        super.channelActive( ctx );
     }
 
     @Override
@@ -154,6 +159,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             response.getHeader().set( Header.HEADER_CONNECTION, "close" );
 
             this.workerContext.setBody( response );
+            this.workerContext.setBytes( response.getBytes() );
             this.sendResponse( context );
         } else
         {
