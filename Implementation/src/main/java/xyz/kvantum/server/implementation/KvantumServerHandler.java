@@ -36,6 +36,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.DebugTree;
 import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.ViewException;
@@ -45,8 +46,6 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -387,13 +386,10 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 
         if ( CoreConfig.debug )
         {
-            final List<String> dump = new ArrayList<>();
-            dump.add( "# Response Information " );
-            dump.add( "├── Address: " + workerContext.getSocketContext().getAddress() );
-            dump.add( "├── Headers: " );
-            body.getHeader().getHeaders().forEach( (k, v) -> dump.add( "|\t├── Key: " + k + ", Value: " + v ) );
-            dump.add( "└── End" );
-            dump.forEach( Logger::debug );
+            DebugTree.builder().name( "Response Information" )
+                    .entry( "Address", workerContext.getSocketContext().getAddress() )
+                    .entry( "Headers", body.getHeader().getHeaders() ).build().collect()
+                    .forEach( Logger::debug );
         }
 
         final ByteBuf buf = context.alloc().buffer();
