@@ -49,6 +49,8 @@ dependencies {
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // NanoTub
     compile group: 'xyz.kvantum', name: 'NanoTube', version: '280214c246'
+    // Lambda-factory
+    compile group: 'xyz.kvantum', name: 'lambda-factory', version: '2.0.2-SNAPSHOT'
     //
     // Modules
     //

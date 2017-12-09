@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.views.staticviews;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
@@ -34,7 +35,7 @@ final public class StaticViewManager
     private static final Class<?>[] parameters = new Class<?>[]{ AbstractRequest.class };
     private static final Class<?>[] alternativeParameters = new Class<?>[]{ AbstractRequest.class, Response.class };
 
-    public static void generate(final Object viewDeclaration) throws Exception
+    public static void generate(@NonNull final Object viewDeclaration) throws Exception
     {
         final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
@@ -70,13 +71,30 @@ final public class StaticViewManager
                         declaration.setName( matcher.name() );
                     }
 
-                    final RequestHandler view;
+                    RequestHandler view = null;
                     if ( matcher.cache() )
                     {
-                        view = new CachedStaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
+                        try
+                        {
+                            view = new CachedStaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
+                        } catch ( Throwable throwable )
+                        {
+                            throwable.printStackTrace();
+                        }
                     } else
                     {
-                        view = new StaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
+                        try
+                        {
+                            view = new StaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
+                        } catch ( Throwable throwable )
+                        {
+                            throwable.printStackTrace();
+                        }
+                    }
+
+                    if ( view == null )
+                    {
+                        return;
                     }
 
                     for ( final Class<? extends Middleware> middleware : matcher.middlewares() )

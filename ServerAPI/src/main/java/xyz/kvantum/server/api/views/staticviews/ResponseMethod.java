@@ -16,28 +16,29 @@
  */
 package xyz.kvantum.server.api.views.staticviews;
 
+import com.hervian.lambda.Lambda;
+import com.hervian.lambda.LambdaFactory;
+import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.ViewReturn;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
 final public class ResponseMethod implements BiConsumer<AbstractRequest, Response>, ViewReturn
 {
 
-    private final Method method;
+    private final Lambda lambda;
     private final Object instance;
     private final boolean passResponse;
 
-    public ResponseMethod(final Method method, final Object instance)
+    ResponseMethod(@NonNull final Method method, @NonNull final Object instance) throws Throwable
     {
         Assert.notNull( method, instance );
 
-        this.method = method;
-        this.method.setAccessible( true );
+        this.lambda = LambdaFactory.create( method );
         this.instance = instance;
         this.passResponse = method.getReturnType() == Void.TYPE;
     }
@@ -46,30 +47,23 @@ final public class ResponseMethod implements BiConsumer<AbstractRequest, Respons
     {
         Assert.notNull( r );
 
-        try
+        if ( passResponse )
         {
-            if ( passResponse )
-            {
-                final Response response = new Response();
-                this.method.invoke( instance, r, response );
-                return response;
-            }
-            return (Response) this.method.invoke( instance, r );
-        } catch ( IllegalAccessException | InvocationTargetException e )
-        {
-            e.printStackTrace();
+            final Response response = new Response();
+            this.lambda.invoke_for_void( instance, r, response );
+            return response;
         }
-        return null;
+        return (Response) this.lambda.invoke_for_Object( instance, r );
     }
 
     @Override
-    public void accept(AbstractRequest request, Response response)
+    public void accept(final AbstractRequest request, final Response response)
     {
         response.copyFrom( handle( request ) );
     }
 
     @Override
-    public final Response get(AbstractRequest r)
+    public final Response get(final AbstractRequest r)
     {
         return this.handle( r );
     }
