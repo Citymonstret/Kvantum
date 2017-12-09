@@ -18,6 +18,7 @@ package xyz.kvantum.server.api.views.staticviews;
 
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
@@ -33,14 +34,17 @@ final public class ResponseMethod implements BiConsumer<AbstractRequest, Respons
     private final Lambda lambda;
     private final Object instance;
     private final boolean passResponse;
+    private final OutputConverter outputConverter;
 
-    ResponseMethod(@NonNull final Method method, @NonNull final Object instance) throws Throwable
+    ResponseMethod(@NonNull final Method method, @NonNull final Object instance,
+                   @Nullable final OutputConverter<?> outputConverter) throws Throwable
     {
         Assert.notNull( method, instance );
 
         this.lambda = LambdaFactory.create( method );
         this.instance = instance;
         this.passResponse = method.getReturnType() == Void.TYPE;
+        this.outputConverter = outputConverter;
     }
 
     public Response handle(final AbstractRequest r)
@@ -53,7 +57,12 @@ final public class ResponseMethod implements BiConsumer<AbstractRequest, Respons
             this.lambda.invoke_for_void( instance, r, response );
             return response;
         }
-        return (Response) this.lambda.invoke_for_Object( instance, r );
+        final Object output = this.lambda.invoke_for_Object( instance, r );
+        if ( outputConverter != null )
+        {
+            return outputConverter.generateResponse( output );
+        }
+        return (Response) output;
     }
 
     @Override

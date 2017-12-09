@@ -24,16 +24,25 @@ import xyz.kvantum.server.api.util.IConsumer;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
+import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 final public class StaticViewManager
 {
 
     private static final Class<?>[] parameters = new Class<?>[]{ AbstractRequest.class };
     private static final Class<?>[] alternativeParameters = new Class<?>[]{ AbstractRequest.class, Response.class };
+    private static final Map<String, OutputConverter<?>> converters = new HashMap<>();
+
+    static
+    {
+        StandardConverters.registerStandardConverters();
+    }
 
     public static void generate(@NonNull final Object viewDeclaration) throws Exception
     {
@@ -44,8 +53,10 @@ final public class StaticViewManager
         {
             final Method m = annotatedMethod.getMethod();
             final boolean usesAlternate = Arrays.equals( m.getParameterTypes(), alternativeParameters );
+            final ViewMatcher matcher = annotatedMethod.getAnnotation();
+            final ViewDeclaration declaration = new ViewDeclaration();
 
-            if ( !usesAlternate && !Response.class.equals( m.getReturnType() ) )
+            if ( !usesAlternate && !Response.class.equals( m.getReturnType() ) && matcher.outputType().isEmpty() )
             {
                 new IllegalArgumentException( m.getName() + " doesn't return response" ).printStackTrace();
             } else
@@ -55,14 +66,24 @@ final public class StaticViewManager
                     new IllegalArgumentException( "M has wrong parameter types" ).printStackTrace();
                 } else
                 {
-                    final ViewMatcher matcher = annotatedMethod.getAnnotation();
-
-                    final ViewDeclaration declaration = new ViewDeclaration();
                     declaration.setCache( matcher.cache() );
                     declaration.setFilter( matcher.filter() );
                     declaration.setMiddlewares( matcher.middlewares() );
                     declaration.setForceHttps( matcher.forceHTTPS() );
                     declaration.setHttpMethod( matcher.httpMethod() );
+                    if ( !matcher.outputType().isEmpty() && converters.containsKey( matcher.outputType()
+                            .toLowerCase() ) )
+                    {
+                        final OutputConverter<?> outputConverter = converters.get( matcher.outputType().toLowerCase() );
+                        if ( !outputConverter.getClazz().equals( m.getReturnType() ) )
+                        {
+                            new IllegalArgumentException( m.getName() + " should return " + outputConverter.getClazz
+                                    ().getSimpleName() ).printStackTrace();
+                        } else
+                        {
+                            declaration.setOutputConverter( converters.get( matcher.outputType().toLowerCase() ) );
+                        }
+                    }
                     if ( matcher.name().isEmpty() )
                     {
                         declaration.setName( m.getName() );
@@ -76,7 +97,8 @@ final public class StaticViewManager
                     {
                         try
                         {
-                            view = new CachedStaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
+                            view = new CachedStaticView( declaration, new ResponseMethod( m, viewDeclaration,
+                                    declaration.getOutputConverter() ) );
                         } catch ( Throwable throwable )
                         {
                             throwable.printStackTrace();
@@ -85,7 +107,8 @@ final public class StaticViewManager
                     {
                         try
                         {
-                            view = new StaticView( declaration, new ResponseMethod( m, viewDeclaration ) );
+                            view = new StaticView( declaration, new ResponseMethod( m, viewDeclaration,
+                                    declaration.getOutputConverter() ) );
                         } catch ( Throwable throwable )
                         {
                             throwable.printStackTrace();
@@ -106,6 +129,11 @@ final public class StaticViewManager
                 }
             }
         } ).foreach( annotatedMethods );
+    }
+
+    public static void registerConverter(final OutputConverter<?> converter)
+    {
+        converters.put( converter.getKey().toLowerCase(), converter );
     }
 
 }

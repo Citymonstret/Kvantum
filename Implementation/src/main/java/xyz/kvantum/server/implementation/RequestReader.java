@@ -284,7 +284,11 @@ final class RequestReader
     {
         this.builder.setLength( 0 );
         this.lastCharacter = ' ';
-        this.overloadBuffer.release();
+        if ( overloadBuffer != null )
+        {
+            this.overloadBuffer.release();
+            this.overloadBuffer = null;
+        }
         this.contentLength = -1;
     }
 

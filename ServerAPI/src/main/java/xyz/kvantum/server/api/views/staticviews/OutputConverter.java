@@ -15,20 +15,25 @@
  */
 package xyz.kvantum.server.api.views.staticviews;
 
-import lombok.Data;
-import xyz.kvantum.server.api.request.HttpMethod;
-import xyz.kvantum.server.api.views.requesthandler.Middleware;
+import lombok.Getter;
+import lombok.NonNull;
+import xyz.kvantum.server.api.response.Response;
 
-@Data
-final class ViewDeclaration
+public abstract class OutputConverter<T>
 {
 
-    private String filter;
-    private String name;
-    private Class<? extends Middleware>[] middlewares;
-    private boolean cache = true;
-    private boolean forceHttps = true;
-    private HttpMethod httpMethod = HttpMethod.ALL;
-    private OutputConverter<?> outputConverter = null;
+    @Getter
+    private final String key;
+    @Getter
+    private final Class<?> clazz;
+
+    protected OutputConverter(@NonNull final String key, @NonNull final Class<?> clazz)
+    {
+        this.key = key;
+        this.clazz = clazz;
+        StaticViewManager.registerConverter( this );
+    }
+
+    protected abstract Response generateResponse(final T input);
 
 }

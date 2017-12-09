@@ -41,4 +41,6 @@ public @interface ViewMatcher
 
     HttpMethod httpMethod() default HttpMethod.ALL;
 
+    String outputType() default "";
+
 }

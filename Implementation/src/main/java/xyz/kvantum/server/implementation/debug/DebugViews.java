@@ -16,6 +16,7 @@
 package xyz.kvantum.server.implementation.debug;
 
 import lombok.val;
+import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -28,6 +29,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
+import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
 
 import java.util.Optional;
 
@@ -57,6 +59,20 @@ public final class DebugViews
             Logger.error( "Failed to generate debug views!" );
             e.printStackTrace();
         }
+    }
+
+    @ViewMatcher(filter = "debug/string", outputType = StandardConverters.HTML)
+    public final String testString(final AbstractRequest request)
+    {
+        return "<h1>Hello World!</h1>";
+    }
+
+    @ViewMatcher(filter = "debug/json", outputType = StandardConverters.JSON)
+    public final JSONObject testJson(final AbstractRequest request)
+    {
+        final JSONObject object = new JSONObject();
+        object.put( "Hello", "World" );
+        return object;
     }
 
     @ViewMatcher(filter = "debug/accounts", httpMethod = HttpMethod.GET)

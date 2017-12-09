@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -446,11 +445,6 @@ public class ViewPattern
                 @Override
                 public Character next()
                 {
-                    index += 1;
-                    if ( index >= chars.length )
-                    {
-                        throw new NoSuchElementException();
-                    }
                     return chars[ index++ ];
                 }
             };
