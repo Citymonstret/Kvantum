@@ -23,16 +23,11 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.WorkerProcedure;
-import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.views.RequestHandler;
-import xyz.kvantum.server.implementation.error.KvantumException;
-
-import java.io.BufferedOutputStream;
-import java.net.SocketException;
 
 @Getter
 @Setter
@@ -46,34 +41,14 @@ public class WorkerContext
     private final Kvantum server;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
 
+    private final KvantumServerHandler kvantumServerHandler;
+
     private RequestHandler requestHandler;
     private AbstractRequest request;
-    private BufferedOutputStream output;
     private ResponseBody body;
     private boolean gzip;
     private SocketContext socketContext;
     private byte[] bytes;
-
-    /**
-     * Flush the output stream (I.e. send the stored bytes to the client)
-     */
-    void flushOutput()
-    {
-        try
-        {
-            output.flush();
-        } catch ( final SocketException e )
-        {
-            if ( e.getMessage().equalsIgnoreCase( "Connection closed by remote host" ) && CoreConfig.debug )
-            {
-                Logger.warn( "Failed to serve request [%s]: Remote connection closed.", request );
-            }
-        } catch ( final Exception e )
-        {
-            new KvantumException( "Failed to flush to the client", e )
-                    .printStackTrace();
-        }
-    }
 
     /**
      * <p>

@@ -20,9 +20,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.Synchronized;
 import sun.misc.Signal;
 import xyz.kvantum.crush.CrushEngine;
@@ -39,13 +39,6 @@ import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
-import xyz.kvantum.server.api.events.Event;
-import xyz.kvantum.server.api.events.EventCaller;
-import xyz.kvantum.server.api.events.EventManager;
-import xyz.kvantum.server.api.events.defaultevents.ServerReadyEvent;
-import xyz.kvantum.server.api.events.defaultevents.ShutdownEvent;
-import xyz.kvantum.server.api.events.defaultevents.StartupEvent;
-import xyz.kvantum.server.api.events.defaultevents.ViewsInitializedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
 import xyz.kvantum.server.api.jtwig.JTwigEngine;
 import xyz.kvantum.server.api.logging.LogContext;
@@ -97,6 +90,7 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 import xyz.kvantum.server.implementation.error.KvantumStartException;
 import xyz.kvantum.server.implementation.mongo.MongoAccountManager;
 import xyz.kvantum.server.implementation.mongo.MongoSessionDatabase;
+import xyz.kvantum.server.implementation.netty.NettyLoggerFactory;
 import xyz.kvantum.server.implementation.sqlite.SQLiteAccountManager;
 import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
 import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
@@ -141,8 +135,6 @@ public final class Server implements Kvantum
     @Getter
     private final WorkerProcedure procedure = new WorkerProcedure();
     @Getter
-    private final SocketHandler socketHandler;
-    @Getter
     private final Metrics metrics = new Metrics();
     @Getter
     private final ITempFileManagerFactory tempFileManagerFactory = new TempFileManagerFactory();
@@ -173,9 +165,6 @@ public final class Server implements Kvantum
     private HTTPThread httpThread;
     private HTTPSThread httpsThread;
     private ConfigurationFile configViews;
-    @Setter
-    @Getter
-    private EventCaller eventCaller;
     @Getter
     private FileSystem fileSystem;
     @Getter
@@ -261,6 +250,8 @@ public final class Server implements Kvantum
             e.printStackTrace();
         }
 
+        InternalLoggerFactory.setDefaultFactory( new NettyLoggerFactory() );
+
         //
         // Load the configuration file
         //
@@ -302,13 +293,6 @@ public final class Server implements Kvantum
         //
         // Setup the internal engine
         //
-        try
-        {
-            this.socketHandler = new SocketHandler();
-        } catch ( final Throwable throwable )
-        {
-            throw new KvantumException( "Failed to create socket handler!", throwable );
-        }
         if ( CoreConfig.gzip )
         {
             gzipHandlerPool = new AbstractPool<>( CoreConfig.Pools.gzipHandlers, GzipHandler::new );
@@ -615,21 +599,6 @@ public final class Server implements Kvantum
         toRemove.forEach( viewBindings::remove );
     }
 
-    @Synchronized
-    @Override
-    public void handleEvent(final Event event)
-    {
-        Assert.notNull( event );
-
-        if ( standalone || eventCaller == null )
-        {
-            EventManager.getInstance().handle( event );
-        } else
-        {
-            eventCaller.callEvent( event );
-        }
-    }
-
     @Override
     public void loadPlugins()
     {
@@ -682,10 +651,6 @@ public final class Server implements Kvantum
         {
             this.loadPlugins();
         }
-        EventManager.getInstance().bake();
-
-        this.log( Message.CALLING_EVENT, "startup" );
-        this.handleEvent( new StartupEvent( this ) );
 
         // Validating views
         this.log( Message.VALIDATING_VIEWS );
@@ -719,7 +684,6 @@ public final class Server implements Kvantum
 
         this.applicationStructure.registerViews( this );
         DebugViews.registerDebugViews();
-        this.handleEvent( new ViewsInitializedEvent( this ) );
 
         router.dump( this );
 
@@ -752,7 +716,7 @@ public final class Server implements Kvantum
                 System.setProperty( "javax.net.ssl.keyStore", CoreConfig.SSL.keyStore );
                 System.setProperty( "javax.net.ssl.keyStorePassword", CoreConfig.SSL.keyStorePassword );
 
-                this.httpsThread = new HTTPSThread( socketHandler );
+                this.httpsThread = new HTTPSThread();
                 this.httpsThread.start();
             } catch ( final Exception e )
             {
@@ -766,7 +730,7 @@ public final class Server implements Kvantum
 
         try
         {
-            this.httpThread = new HTTPThread( new ServerSocketFactory(), socketHandler );
+            this.httpThread = new HTTPThread( new ServerSocketFactory() );
         } catch ( KvantumInitializationException e )
         {
             Logger.error( "Failed to start server..." );
@@ -774,8 +738,6 @@ public final class Server implements Kvantum
             return;
         }
         this.httpThread.start();
-
-        this.handleEvent( new ServerReadyEvent( this ) );
     }
 
     @Override
@@ -835,7 +797,7 @@ public final class Server implements Kvantum
             {
                 objectString = a.toString();
             }
-            msg = msg.replaceFirst( "%s", objectString );
+            msg = msg.replaceFirst( "%s", objectString ).replaceFirst( "\\{}", objectString );
         }
 
         logWrapper.log( LogContext.builder().applicationPrefix( CoreConfig.logPrefix ).logPrefix( prefix ).timeStamp(
@@ -859,7 +821,6 @@ public final class Server implements Kvantum
     public void stopServer()
     {
         Message.SHUTTING_DOWN.log();
-        EventManager.getInstance().handle( new ShutdownEvent( this ) );
 
         try
         {
@@ -872,8 +833,6 @@ public final class Server implements Kvantum
         {
             e.printStackTrace();
         }
-
-        socketHandler.handleShutdown();
 
         AutoCloseable.closeAll();
 

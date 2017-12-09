@@ -27,6 +27,8 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CookieManager;
 import xyz.kvantum.server.api.util.ProtocolType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -90,7 +92,7 @@ final public class Request extends AbstractRequest
         }
         hasBeenRequested = true;
         final Optional<ISession> session = ServerImplementation.getImplementation().getSessionManager()
-                .getSession( this, this.outputStream );
+                .getSession( this );
         if ( session.isPresent() )
         {
             setSession( session.get() );
@@ -100,5 +102,25 @@ final public class Request extends AbstractRequest
         {
             Logger.warn( "Could not initialize session!" );
         }
+    }
+
+    @Override
+    public void dumpRequest()
+    {
+        final List<String> dump = new ArrayList<>();
+        dump.add( "# Request Information " );
+        dump.add( "├── Query: " + getQuery().getFullRequest() );
+        dump.add( "├── POST Request: " );
+        if ( getPostRequest() != null )
+        {
+            this.getPostRequest().get().forEach( (k, v) -> dump.add( "|\t├── Key: " + k + ", Value: " + v ) );
+        } else
+        {
+            dump.add( "| None..." );
+        }
+        dump.add( "├── Headers: " );
+        this.getHeaders().forEach( (k, v) -> dump.add( "|\t├── Key: " + k + ", Value: " + v ) );
+        dump.add( "└── End" );
+        dump.forEach( Logger::debug );
     }
 }

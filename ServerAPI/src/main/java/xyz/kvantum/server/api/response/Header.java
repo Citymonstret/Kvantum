@@ -17,12 +17,14 @@
 package xyz.kvantum.server.api.response;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.TimeUtil;
 
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -355,27 +357,6 @@ final public class Header
         return temporary.toString().getBytes();
     }
 
-    public Header apply(final OutputStream out)
-    {
-        Assert.notNull( out );
-
-        try
-        {
-            out.write( ( this.format + " " + this.status + "\n" ).getBytes() );
-            for ( final Map.Entry<HeaderOption, String> entry : this.headers.entries() )
-            {
-                out.write( ( entry.getKey() + ": " + entry.getValue() + "\n" ).getBytes() );
-            }
-            // Print one empty line to indicate that the header sending is finished, this is important as the content
-            // would otherwise be classed as headers, which really isn't optimal <3
-            out.write( "\n".getBytes() );
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-        return this;
-    }
-
     public void redirect(final String newURL)
     {
         redirect( newURL, Header.STATUS_TEMPORARY_REDIRECT );
@@ -407,6 +388,12 @@ final public class Header
     {
         Assert.notNull( cookie );
 
+        if ( CoreConfig.debug )
+        {
+            Logger.debug( "Cookie set! Key: %s, Value: %s, Full: %s", cookie.getCookie(), cookie.getValue(),
+                    cookie.toString() );
+        }
+
         if ( this.headers.containsEntry( HEADER_SET_COOKIE, cookie.toString() ) )
         {
             this.headers.remove( HEADER_SET_COOKIE, cookie.toString() );
@@ -434,4 +421,8 @@ final public class Header
         return this.headers.containsKey( headerOption );
     }
 
+    public Multimap<HeaderOption, String> getHeaders()
+    {
+        return headers;
+    }
 }

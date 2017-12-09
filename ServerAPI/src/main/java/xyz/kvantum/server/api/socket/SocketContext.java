@@ -21,11 +21,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
+import xyz.kvantum.server.api.util.ProtocolType;
 
 import javax.net.ssl.SSLSocket;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
+
+import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
 
 /**
  * Socket context used to make sure that sockets are handled
@@ -41,8 +45,9 @@ final public class SocketContext
     @Getter
     final long socketId = socketIdPoll.getAndIncrement();
 
-    @Getter
-    private final Socket socket;
+    final ProtocolType protocolType;
+    final SocketAddress socketAddress;
+    final Supplier<Boolean> activeCheck;
 
     private ITempFileManager tempFileManager;
 
@@ -70,7 +75,7 @@ final public class SocketContext
      */
     public boolean isSSL()
     {
-        return this.socket instanceof SSLSocket;
+        return this.protocolType == HTTPS;
     }
 
     /**
@@ -80,7 +85,7 @@ final public class SocketContext
      */
     public InetSocketAddress getAddress()
     {
-        return (InetSocketAddress) this.socket.getRemoteSocketAddress();
+        return (InetSocketAddress) this.socketAddress;
     }
 
     /**
@@ -100,9 +105,7 @@ final public class SocketContext
      */
     public boolean isActive()
     {
-        return this.socket != null &&
-                !this.socket.isClosed() &&
-                this.socket.isConnected();
+        return this.activeCheck.get();
     }
 
 }

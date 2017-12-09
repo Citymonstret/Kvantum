@@ -25,8 +25,6 @@ import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.Message;
-import xyz.kvantum.server.api.events.Event;
-import xyz.kvantum.server.api.events.EventCaller;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
 import xyz.kvantum.server.api.logging.LogModes;
 import xyz.kvantum.server.api.logging.LogProvider;
@@ -36,7 +34,6 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.scripts.ScriptManager;
 import xyz.kvantum.server.api.session.SessionManager;
-import xyz.kvantum.server.api.socket.ISocketHandler;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CollectionUtil;
@@ -117,13 +114,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
     void validateViews();
 
     /**
-     * Handle an event
-     *
-     * @param event Event to handle
-     */
-    void handleEvent(Event event);
-
-    /**
      * Get the file system used in the server implementation
      *
      * @return File system (defaults to .kvantum)
@@ -152,13 +142,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return Metric manager
      */
     Metrics getMetrics();
-
-    /**
-     * Set the engine event caller
-     *
-     * @param caller New Event Caller
-     */
-    void setEventCaller(EventCaller caller);
 
     /**
      * Load all plugins
@@ -232,12 +215,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return map containing all view bindings
      */
     Map<String, Class<? extends View>> getViewBindings();
-
-    /**
-     * Get the socket handler
-     * @return socket handler
-     */
-    ISocketHandler getSocketHandler();
 
     /**
      * Check to see if the server is in silent mode

@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Event related classes. Used to react to server
- * events in external applications and plugins.
- */
-package xyz.kvantum.server.api.events;
+package xyz.kvantum.server.implementation.netty;
+
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+
+public class NettyLoggerFactory extends InternalLoggerFactory
+{
+
+    @Override
+    protected InternalLogger newInstance(final String name)
+    {
+        return NettyLogger.instance;
+    }
+}

@@ -51,7 +51,8 @@ Kvantum comes with default views for serving of static files (or pseudo-dynamic 
 * **[TODO]** Precompiled Responses - Allow responses (including headers) to be compiled into raw bytes, which can then be sent to the client (Benefit: Fast!)
 
 ###### 2.2.2 Configuration
-The default views provide differenet configuration options to make sure that the content is served according to the requirements of the users:
+The default views provide different configuration options to make sure that the content is served according to the 
+requirements of the users:
 * forceHTTPS - Force content through the HTTPS handler (redirects requests)
 * extensionRewrite - Rewrite the requested file extension.
 * filter - URL request mapping with variables (with optional default values)
@@ -115,9 +116,6 @@ Middleware can be injected into request handlers to filter out unwanted requests
 
 ### 4.5 Byte/String handlers
 Byte and String handlers can be added to the worker, to change generated requests after they have been generated. (Used for the tempalte engine support).
-
-### 4.6 Event System
-The server implementation can publish events, and plugins/applications may opt to subscribe to these events (and act accordingly).
 
 ### 4.7 Socket Filters
 The socket handler can be extended to include filters, that can filter out requests before they are even read by the server.

@@ -118,10 +118,6 @@ final public class KvantumMain
                 {
                     CoreConfig.port = options.port;
                 }
-                if ( options.workers != -1 )
-                {
-                    CoreConfig.Pools.workers = options.workers;
-                }
                 if ( !options.example.isEmpty() )
                 {
                     Examples.loadExample( options.example );
@@ -192,9 +188,6 @@ final public class KvantumMain
 
         @Parameter(names = "-debug", description = "Enable debugging")
         private String debug = "";
-
-        @Parameter(names = "-workers", description = "Number of workers")
-        private int workers = -1;
 
         @Parameter(names = "-example", description = "Run an example view. Current examples: usersearch")
         private String example = "";

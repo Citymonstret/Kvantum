@@ -19,6 +19,7 @@ package xyz.kvantum.server.api.session;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.Synchronized;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -31,12 +32,11 @@ import xyz.kvantum.server.api.response.ResponseCookie;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ProviderFactory;
 
-import java.io.BufferedOutputStream;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings({ "unused", "WeakerAccess" })
+@SuppressWarnings({ "WeakerAccess", "unused" })
 @AllArgsConstructor
 public final class SessionManager implements ProviderFactory<ISession>
 {
@@ -51,7 +51,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     private static final String SESSION_KEY = "intellectual_session";
     private static final String SESSION_PASS = "intellectual_key";
 
-    private ISession createSession(final AbstractRequest r, final BufferedOutputStream out)
+    private ISession createSession(@NonNull final AbstractRequest r)
     {
         Assert.isValid( r );
 
@@ -65,7 +65,9 @@ public final class SessionManager implements ProviderFactory<ISession>
         return session;
     }
 
-    private void saveCookies(final AbstractRequest r, final ISession session, final String sessionID)
+    private void saveCookies(@NonNull final AbstractRequest r,
+                             @NonNull final ISession session,
+                             @NonNull final String sessionID)
     {
         r.postponedCookies.add( ResponseCookie.builder()
                 .cookie( SESSION_KEY ).value( sessionID ).httpOnly( true ).build() );
@@ -79,7 +81,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     }
 
     @Synchronized
-    private ISession createSession(final String sessionID)
+    private ISession createSession(@NonNull final String sessionID)
     {
         Assert.notEmpty( sessionID );
 
@@ -89,7 +91,7 @@ public final class SessionManager implements ProviderFactory<ISession>
         return session;
     }
 
-    public void deleteSession(final AbstractRequest r, final HeaderProvider re)
+    public void deleteSession(@NonNull final AbstractRequest r, @NonNull final HeaderProvider re)
     {
         Assert.notNull( r, re );
 
@@ -97,7 +99,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     }
 
     @Synchronized
-    public Optional<ISession> getSession(final AbstractRequest r, final BufferedOutputStream out)
+    public Optional<ISession> getSession(@NonNull final AbstractRequest r)
     {
         Assert.isValid( r );
 
@@ -179,9 +181,9 @@ public final class SessionManager implements ProviderFactory<ISession>
         //
         // STEP 2 (2): Create a new session
         //
-        if ( session == null && out != null )
+        if ( session == null )
         {
-            session = createSession( r, out );
+            session = createSession( r );
         }
 
         return Optional.ofNullable( session );
@@ -205,7 +207,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     @Override
     public Optional<ISession> get(final AbstractRequest r)
     {
-        return getSession( r, null );
+        return getSession( r );
     }
 
     public String providerName()

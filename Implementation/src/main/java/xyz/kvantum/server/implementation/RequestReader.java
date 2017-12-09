@@ -15,17 +15,26 @@
  */
 package xyz.kvantum.server.implementation;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestCompiler;
+import xyz.kvantum.server.api.request.post.DummyPostRequest;
+import xyz.kvantum.server.api.request.post.EntityType;
+import xyz.kvantum.server.api.request.post.JsonPostRequest;
+import xyz.kvantum.server.api.request.post.MultipartPostRequest;
+import xyz.kvantum.server.api.request.post.UrlEncodedPostRequest;
+import xyz.kvantum.server.api.response.Header;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
- * Read a HTTP request until the first clear line. Does
+ * Read a HTTPabstractRequest until the first clear line. Does
  * not read the HTTP message. The reader uses {@link java.nio.charset.StandardCharsets#US_ASCII}
  * as the charset, as defined by the HTTP protocol.
  */
@@ -40,6 +49,8 @@ final class RequestReader
     private boolean done = false;
     private boolean begunLastLine = false;
     private boolean hasQuery = false;
+    private ByteBuf overloadBuffer;
+    private int contentLength = -1;
 
     RequestReader(final AbstractRequest abstractRequest)
     {
@@ -48,9 +59,9 @@ final class RequestReader
     }
 
     /**
-     * Check whether the reader is done reading the request
+     * Check whether the reader is done reading theabstractRequest
      *
-     * @return true if the request is read, false if not
+     * @return true if theabstractRequest is read, false if not
      */
     boolean isDone()
     {
@@ -73,11 +84,62 @@ final class RequestReader
      * @param b Byte
      * @return True if the byte was read, False if not
      */
-    boolean readByte(final byte b)
+    boolean readByte(final byte b) throws Throwable
     {
         if ( done )
         {
             return false;
+        }
+
+        if ( contentLength != -1 )
+        {
+            if ( overloadBuffer.readableBytes() >= contentLength )
+            {
+                return false;
+            }
+            this.overloadBuffer.writeByte( b );
+            if ( overloadBuffer.readableBytes() == contentLength )
+            {
+                final String contentType = abstractRequest.getHeader( "Content-Type" );
+                boolean isFormURLEncoded;
+                boolean isJSON = false;
+
+                if ( ( isFormURLEncoded = contentType.startsWith( "application/x-www-form-urlencoded" ) ) ||
+                        ( isJSON = EntityType.JSON.getContentType().startsWith( contentType ) ) )
+                {
+                    try
+                    {
+                        final String content = overloadBuffer.readCharSequence( contentLength,
+                                StandardCharsets.UTF_8 ).toString();
+
+                        if ( isFormURLEncoded )
+                        {
+                            abstractRequest.setPostRequest( new UrlEncodedPostRequest( abstractRequest, content ) );
+                        } else
+                        {
+                            abstractRequest.setPostRequest( new JsonPostRequest( abstractRequest, content ) );
+                        }
+                    } catch ( final Exception e )
+                    {
+                        Logger.warn( "Failed to read url encoded postAbstractRequest (Request: %s): %s",
+                                abstractRequest, e.getMessage() );
+                    }
+                } else if ( contentType.startsWith( "multipart" ) )
+                {
+                    byte[] bytes = new byte[ contentLength ];
+                    overloadBuffer.readBytes( bytes );
+                    abstractRequest.setOverloadBytes( bytes );
+                    abstractRequest.setPostRequest( new MultipartPostRequest( abstractRequest, "" ) );
+                } else
+                {
+                    Logger.warn( "Request provided unknown postabstractRequest type (Request: %s): %s", abstractRequest,
+                            contentType );
+                    abstractRequest.setPostRequest( new DummyPostRequest( abstractRequest, "" ) );
+                }
+
+                this.done = true;
+            }
+            return true;
         }
 
         final char character = (char) b;
@@ -86,7 +148,28 @@ final class RequestReader
         {
             if ( character == '\n' )
             {
-                return ( done = true );
+                final String contentLength = abstractRequest.getHeader( "content-length" );
+                if ( contentLength.isEmpty() )
+                {
+                    return ( done = true );
+                }
+                try
+                {
+                    this.contentLength = Integer.parseInt( contentLength );
+                } catch ( final Exception e )
+                {
+                    throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null );
+                }
+                this.overloadBuffer = ByteBufAllocator.DEFAULT.buffer( this.contentLength );
+                if ( this.contentLength >= CoreConfig.Limits.limitPostBasicSize )
+                {
+                    if ( CoreConfig.debug )
+                    {
+                        Logger.debug( "Supplied post body size too large (%s > %s)", contentLength,
+                                CoreConfig.Limits.limitPostBasicSize );
+                    }
+                    throw new ReturnStatus( Header.STATUS_ENTITY_TOO_LARGE, null );
+                }
             } else
             {
                 begunLastLine = false;
@@ -113,7 +196,7 @@ final class RequestReader
                             this.abstractRequest.getHeaders().put( pair.getKey(), pair.getValue() );
                         } else
                         {
-                            Logger.warn( "Failed to read request line: '%s'", line );
+                            Logger.warn( "Failed to readabstractRequest line: '%s'", line );
                         }
                     }
                 }
@@ -140,7 +223,7 @@ final class RequestReader
      * @param val Integer (byte)
      * @return true if the byte was read, false if not
      */
-    boolean readByte(final int val)
+    boolean readByte(final int val) throws Throwable
     {
         if ( val == -1 )
         {
@@ -156,9 +239,19 @@ final class RequestReader
      * @param bytes Byte array
      * @return Number of read bytes
      */
-    int readBytes(final byte[] bytes)
+    int readBytes(final byte[] bytes) throws Throwable
     {
         return this.readBytes( bytes, bytes.length );
+    }
+
+    int readBytes(final ByteBuf byteBuf) throws Throwable
+    {
+        final int length = byteBuf.readableBytes();
+
+        final byte[] bytes = new byte[ length ];
+        byteBuf.readBytes( bytes, 0, length );
+
+        return this.readBytes( bytes, length );
     }
 
     /**
@@ -168,7 +261,7 @@ final class RequestReader
      * @param length Length to be read
      * @return Number of read bytes
      */
-    int readBytes(final byte[] bytes, final int length)
+    int readBytes(final byte[] bytes, final int length) throws Throwable
     {
         int read = 0;
         for ( int i = 0; i < length && i < bytes.length; i++ )
@@ -186,12 +279,14 @@ final class RequestReader
     }
 
     /**
-     * Clear the request reader
+     * Clear theabstractRequest reader
      */
     public void clear()
     {
         this.builder.setLength( 0 );
         this.lastCharacter = ' ';
+        this.overloadBuffer.release();
+        this.contentLength = -1;
     }
 
 }

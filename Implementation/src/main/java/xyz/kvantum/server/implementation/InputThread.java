@@ -18,12 +18,10 @@ package xyz.kvantum.server.implementation;
 
 import com.intellectualsites.commands.CommandHandlingOutput;
 import com.intellectualsites.commands.CommandResult;
-import lombok.Getter;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.UserInterruptException;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
-import xyz.kvantum.server.api.events.Event;
 import xyz.kvantum.server.api.logging.InternalJlineManager;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.implementation.commands.Dump;
@@ -126,7 +124,6 @@ public final class InputThread extends Thread
                 } else
                 {
                     currentString = line;
-                    ServerImplementation.getImplementation().handleEvent( new TextEvent( line ) );
                 }
             } catch ( UserInterruptException e )
             {
@@ -138,22 +135,4 @@ public final class InputThread extends Thread
         }
     }
 
-    public static final class TextEvent extends Event
-    {
-
-        @Getter
-        private final String text;
-
-        /**
-         * The name which will be used
-         * to identity this event
-         *
-         * @param text Event Name
-         */
-        TextEvent(String text)
-        {
-            super( "inputtextevent" );
-            this.text = text;
-        }
-    }
 }

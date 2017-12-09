@@ -16,12 +16,10 @@
 package xyz.kvantum.server.implementation;
 
 import lombok.Data;
-import xyz.kvantum.nanotube.ConditionalTransformer;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.memguard.LeakageProne;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
-import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.util.Assert;
 
 import java.util.List;
@@ -32,16 +30,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-final class ConnectionThrottle extends ConditionalTransformer<WorkerContext> implements LeakageProne
+final class ConnectionThrottle implements LeakageProne
 {
 
-    private static ConnectionThrottle instance;
+    private static ConnectionThrottle instance = new ConnectionThrottle();
     private static long timeLimit = -1;
     private final Map<String, AttemptMapping> attemptMapping;
 
-    public ConnectionThrottle() throws Throwable
+    private ConnectionThrottle()
     {
-        super( ConnectionThrottle::shouldThrottle );
         //
         // Make sure that the instance is set!
         //
@@ -56,12 +53,8 @@ final class ConnectionThrottle extends ConditionalTransformer<WorkerContext> imp
         MemoryGuard.getInstance().register( this );
     }
 
-    private static void setInstance(final ConnectionThrottle instance) throws IllegalAccessException
+    private static void setInstance(final ConnectionThrottle instance)
     {
-        if ( ConnectionThrottle.instance != null )
-        {
-            throw new IllegalAccessException( "Cannot set ConnectionThrottle instance when it is already set" );
-        }
         ConnectionThrottle.instance = instance;
     }
 
@@ -74,7 +67,7 @@ final class ConnectionThrottle extends ConditionalTransformer<WorkerContext> imp
         return timeLimit;
     }
 
-    private static boolean shouldThrottle(final WorkerContext workerContext)
+    public static boolean shouldThrottle(final WorkerContext workerContext)
     {
         Assert.notNull( instance );
         //
@@ -111,12 +104,6 @@ final class ConnectionThrottle extends ConditionalTransformer<WorkerContext> imp
     {
         final long timeDifference = System.currentTimeMillis() - attemptMapping.getFirstAttempt().get();
         return getTimeLimit() <= timeDifference;
-    }
-
-    @Override
-    protected WorkerContext handle(final WorkerContext workerContext) throws Throwable
-    {
-        throw new ReturnStatus( Header.STATUS_TOO_MANY_REQUESTS, workerContext );
     }
 
     @Override

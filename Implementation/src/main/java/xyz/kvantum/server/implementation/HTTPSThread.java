@@ -16,15 +16,31 @@
  */
 package xyz.kvantum.server.implementation;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslHandler;
 import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.config.Message;
-import xyz.kvantum.server.api.socket.SocketContext;
-import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 /**
  * SSL implementation of the ordinary runner
@@ -32,20 +48,52 @@ import java.io.IOException;
 final class HTTPSThread extends Thread
 {
 
-    private final SocketHandler socketHandler;
-    private final SSLServerSocket sslSocket;
+    //
+    // Netty
+    //
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
+    private final ServerBootstrap serverBootstrap;
 
-    HTTPSThread(final SocketHandler socketHandler)
+    private ChannelFuture future;
+
+    HTTPSThread()
             throws KvantumInitializationException
     {
         super( "https" );
         this.setPriority( Thread.MAX_PRIORITY );
-        this.socketHandler = Assert.notNull( socketHandler );
+
+        this.workerGroup = new NioEventLoopGroup( CoreConfig.Pools.httpsWorkerGroupThreads );
+        this.bossGroup = new NioEventLoopGroup( CoreConfig.Pools.httpsBossGroupThreads );
+
         try
         {
-            final SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-            this.sslSocket = Assert.notNull( (SSLServerSocket) factory.createServerSocket( CoreConfig.SSL.port ) );
-        } catch ( IOException e )
+            final KeyStore keyStore = KeyStore.getInstance( "JKS" );
+            keyStore.load( new FileInputStream( new File( CoreConfig.SSL.keyStore ) ), CoreConfig.SSL
+                    .keyStorePassword.toCharArray() );
+            final KeyManagerFactory keyManagerFactory = KeyManagerFactory
+                    .getInstance( "SunX509" );
+            keyManagerFactory.init( keyStore, CoreConfig.SSL.keyStorePassword.toCharArray() );
+            final SSLContext sslContext = SSLContext.getInstance( "TLS" );
+            sslContext.init( keyManagerFactory.getKeyManagers(), null, null );
+
+            this.serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group( bossGroup, workerGroup )
+                    .channel( NioServerSocketChannel.class )
+                    .childHandler( new ChannelInitializer<SocketChannel>()
+                    {
+                        @Override
+                        protected void initChannel(final SocketChannel ch) throws Exception
+                        {
+                            final SSLEngine sslEngine = sslContext.createSSLEngine();
+                            sslEngine.setUseClientMode( false );
+                            sslEngine.setNeedClientAuth( false );
+                            ch.pipeline().addLast( new SslHandler( sslEngine ) );
+                            ch.pipeline().addLast( new KvantumServerHandler( ProtocolType.HTTPS ) );
+                        }
+                    } );
+        } catch ( final NoSuchAlgorithmException | KeyStoreException | IOException | CertificateException |
+                UnrecoverableKeyException | KeyManagementException e )
         {
             throw new KvantumInitializationException( "Failed to create SSL socket", e );
         }
@@ -55,8 +103,15 @@ final class HTTPSThread extends Thread
     {
         try
         {
-            this.sslSocket.close();
-        } catch ( IOException e )
+            if ( this.future != null )
+            {
+                Logger.info( "Closing ssl boss group..." );
+                this.bossGroup.shutdownGracefully().sync();
+                Logger.info( "Closing ssl worker group..." );
+                this.workerGroup.shutdownGracefully().sync();
+                Logger.info( "Closed ssl!" );
+            }
+        } catch ( final InterruptedException e )
         {
             e.printStackTrace();
         }
@@ -65,24 +120,12 @@ final class HTTPSThread extends Thread
     @Override
     public void run()
     {
-        for ( ; ; )
+        try
         {
-            if ( Server.getInstance().isStopping() )
-            {
-                break;
-            }
-            if ( Server.getInstance().isPaused() )
-            {
-                continue;
-            }
-            try
-            {
-                this.socketHandler.acceptSocket( new SocketContext( sslSocket.accept() ) );
-            } catch ( final Exception e )
-            {
-                Message.TICK_ERROR.log();
-                e.printStackTrace();
-            }
+            this.future = serverBootstrap.bind( CoreConfig.SSL.port ).sync();
+        } catch ( final InterruptedException e )
+        {
+            e.printStackTrace();
         }
     }
 }

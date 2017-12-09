@@ -20,7 +20,7 @@ import com.intellectualsites.configurable.ConfigurationImplementation;
 import com.intellectualsites.configurable.annotations.ConfigSection;
 import com.intellectualsites.configurable.annotations.Configuration;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ import java.util.List;
  * for the web server. This is generated into
  * ".kvantum\config\server.yml" and is loaded on runtime
  */
-@SuppressWarnings("all")
+@SuppressWarnings("WeakerAccess")
 @Configuration(implementation = ConfigurationImplementation.YAML, name = "server")
 public class CoreConfig
 {
@@ -42,7 +42,6 @@ public class CoreConfig
     public static boolean autoDetectViews = false;
     public static boolean debug = false;
     public static boolean gzip = true;
-    public static boolean enableSyntax = true;
     public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
     public static boolean enableInputThread = true;
@@ -58,13 +57,9 @@ public class CoreConfig
         public static long timeSpan = 1;
     }
 
-    @ConfigSection(name = "Pools")
-    public static class Pools
+    public enum TemplatingEngine
     {
-
-        public static int workers = 1;
-        public static int gzipHandlers = 2;
-        public static int md5Handlers = 2;
+        CRUSH, VELOCITY, JTWIG, NONE
     }
 
     @ConfigSection(name = "logging")
@@ -107,9 +102,18 @@ public class CoreConfig
         CoreConfig.preConfigured = preConfigured;
     }
 
-    public static enum TemplatingEngine
+    @ConfigSection(name = "Pools")
+    public static class Pools
     {
-        CRUSH, VELOCITY, JTWIG, NONE
+
+        public static int httpBossGroupThreads = 0;
+        public static int httpWorkerGroupThreads = 0;
+
+        public static int httpsBossGroupThreads = 0;
+        public static int httpsWorkerGroupThreads = 0;
+
+        public static int gzipHandlers = 2;
+        public static int md5Handlers = 2;
     }
 
     @ConfigSection(name = "templates")
@@ -118,7 +122,7 @@ public class CoreConfig
 
         public static String engine = TemplatingEngine.CRUSH.name();
 
-        public static List<String> applyTemplates = Arrays.asList( "ALL" );
+        public static List<String> applyTemplates = Collections.singletonList( "ALL" );
 
         public static boolean status(final TemplatingEngine engine)
         {
@@ -143,15 +147,12 @@ public class CoreConfig
 
         public static int in = 100_000;
         public static int out = 100_000;
-
-        public static int lineQueInitialization = 20;
     }
 
     @ConfigSection(name = "limits")
     public static class Limits
     {
 
-        public static int limitRequestLines = 100;
         public static int limitRequestLineSize = 8190;
         public static int limitPostMultipartSize = 8190;
         public static int limitPostBasicSize = 8190;

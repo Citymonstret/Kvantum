@@ -65,12 +65,6 @@ class ServerTest extends GenericServerTest
     }
 
     @Test
-    void getSocketHandler()
-    {
-        assertNotNull( serverInstance.getSocketHandler() );
-    }
-
-    @Test
     void getMetrics()
     {
         assertNotNull( serverInstance.getMetrics() );

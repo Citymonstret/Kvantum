@@ -16,41 +16,76 @@
  */
 package xyz.kvantum.server.implementation;
 
-import xyz.kvantum.server.api.config.Message;
-import xyz.kvantum.server.api.socket.SocketContext;
-import xyz.kvantum.server.api.util.Assert;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
+@SuppressWarnings({ "WeakerAccess", "unused" })
 final class HTTPThread extends Thread
 {
 
-    private final ServerSocket serverSocket;
-    private final SocketHandler socketHandler;
+    //
+    // Netty
+    //
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
+    private final ServerBootstrap serverBootstrap;
+    //
+    // Kvantum
+    //
+    private final int port;
+    private ChannelFuture future;
 
-    HTTPThread(final ServerSocketFactory serverSocketFactory, final SocketHandler socketHandler)
+    HTTPThread(final ServerSocketFactory serverSocketFactory)
             throws KvantumInitializationException
     {
         super( "http" );
         this.setPriority( Thread.MAX_PRIORITY );
+
+        this.workerGroup = new NioEventLoopGroup( CoreConfig.Pools.httpWorkerGroupThreads );
+        this.bossGroup = new NioEventLoopGroup( CoreConfig.Pools.httpBossGroupThreads );
 
         if ( !serverSocketFactory.createServerSocket() )
         {
             throw new KvantumInitializationException( "Failed to start server..." );
         }
 
-        this.serverSocket = Assert.notNull( serverSocketFactory.getServerSocket() );
-        this.socketHandler = Assert.notNull( socketHandler );
+        this.port = serverSocketFactory.getServerSocketPort();
+
+        this.serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group( bossGroup, workerGroup )
+                .channel( NioServerSocketChannel.class )
+                .childHandler( new ChannelInitializer<SocketChannel>()
+                {
+                    @Override
+                    protected void initChannel(final SocketChannel ch) throws Exception
+                    {
+                        ch.pipeline().addLast( new KvantumServerHandler( ProtocolType.HTTP ) );
+                    }
+                } );
     }
 
     void close()
     {
         try
         {
-            this.serverSocket.close();
-        } catch ( IOException e )
+            if ( this.future != null )
+            {
+                Logger.info( "Closing boss group..." );
+                this.bossGroup.shutdownGracefully().sync();
+                Logger.info( "Closing worker group..." );
+                this.workerGroup.shutdownGracefully().sync();
+                Logger.info( "Closed!" );
+            }
+        } catch ( final InterruptedException e )
         {
             e.printStackTrace();
         }
@@ -59,30 +94,12 @@ final class HTTPThread extends Thread
     @Override
     public void run()
     {
-        for ( ; ; )
+        try
         {
-            if ( Server.getInstance().isStopping() )
-            {
-                break;
-            }
-            if ( Server.getInstance().isPaused() )
-            {
-                continue;
-            }
-            try
-            {
-                socketHandler.acceptSocket( new SocketContext( serverSocket.accept() ) );
-            } catch ( final Exception e )
-            {
-                if ( !serverSocket.isClosed() )
-                {
-                    Server.getInstance().log( Message.TICK_ERROR );
-                    e.printStackTrace();
-                } else
-                {
-                    break;
-                }
-            }
+            this.future = serverBootstrap.bind( this.port ).sync();
+        } catch ( final InterruptedException e )
+        {
+            e.printStackTrace();
         }
     }
 

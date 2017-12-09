@@ -15,17 +15,19 @@
  */
 package xyz.kvantum.server.implementation;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 final class ReturnStatus extends Throwable
 {
 
     @Getter
-    private final String status;
+    private String status;
 
+    @Setter
     @Getter
-    private final WorkerContext applicableContext;
+    private WorkerContext applicableContext;
 
 }

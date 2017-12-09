@@ -39,8 +39,6 @@ import xyz.kvantum.server.api.util.VariableHolder;
 import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -80,9 +78,6 @@ public abstract class AbstractRequest implements
 
     final public Predicate<RequestHandler> matches = view -> view.matches( this );
     public Set<ResponseCookie> postponedCookies = new HashSet<>();
-    @Getter
-    @Setter
-    protected BufferedOutputStream outputStream;
     @Setter(AccessLevel.PROTECTED)
     @Getter
     private ProtocolType protocolType;
@@ -111,7 +106,7 @@ public abstract class AbstractRequest implements
     private Authorization authorization;
     @Getter
     @Setter
-    private BufferedReader inputReader;
+    private byte[] overloadBytes;
 
     public ITempFileManager getTempFileManager()
     {
@@ -212,7 +207,7 @@ public abstract class AbstractRequest implements
     public String buildLog()
     {
         String msg = Message.REQUEST_LOG.toString();
-        for ( final Object a : new String[]{ socket.getSocket().getRemoteSocketAddress().toString(), getHeader(
+        for ( final Object a : new String[]{ socket.getAddress().toString(), getHeader(
                 "User-Agent" ),
                 getHeader( "query" ), getHeader( "Host" ), this.query.buildLog() } )
         {
@@ -300,6 +295,8 @@ public abstract class AbstractRequest implements
         }
         return this.session;
     }
+
+    public abstract void dumpRequest();
 
     /**
      * The query, for example:

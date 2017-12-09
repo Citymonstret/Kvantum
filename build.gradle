@@ -120,6 +120,11 @@ subprojects {
         build.dependsOn sourcesJar
         build.dependsOn javadocJar
     }
+
+    configurations.all {
+        exclude group: 'io.netty', module: 'netty'
+        exclude group: 'org.jboss.netty', module: 'netty'
+    }
 }
 
 description = """"""

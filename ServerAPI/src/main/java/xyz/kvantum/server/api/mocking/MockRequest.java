@@ -41,4 +41,9 @@ public class MockRequest extends AbstractRequest
     public void requestSession()
     {
     }
+
+    @Override
+    public void dumpRequest()
+    {
+    }
 }

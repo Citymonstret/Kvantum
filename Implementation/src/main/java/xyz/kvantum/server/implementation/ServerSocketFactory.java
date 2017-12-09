@@ -25,13 +25,13 @@ import java.net.BindException;
 import java.net.ServerSocket;
 
 /**
- * Class responsible for creating {@link ServerSocket} instances
+ * Class responsible for finding appropriate ports
  */
 class ServerSocketFactory
 {
 
     @Getter
-    private ServerSocket serverSocket;
+    private int serverSocketPort;
 
     /**
      * Attempt to create a new server socket
@@ -47,7 +47,8 @@ class ServerSocketFactory
         {
             try
             {
-                serverSocket = new ServerSocket( port );
+                ServerSocket serverSocket = new ServerSocket( port );
+                serverSocket.close();
                 bound = true;
             } catch ( final BindException e )
             {
@@ -76,6 +77,7 @@ class ServerSocketFactory
             CoreConfig.port = port;
         }
 
+        this.serverSocketPort = port;
         return true;
     }
 

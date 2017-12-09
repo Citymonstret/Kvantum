@@ -20,16 +20,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.fileupload.UploadContext;
-import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper for {@link UploadContext}
@@ -59,60 +55,8 @@ final public class KvantumFileUploadContext implements UploadContext
         if ( request.getQuery().getMethod() == HttpMethod.POST && request.getHeader( "Content-Type" )
                 .startsWith( "multipart" ) )
         {
-            int suppliedContentLength;
-            try
-            {
-                suppliedContentLength = Integer
-                        .parseInt( request.getHeader( "content-length" ) );
-            } catch ( final Exception e )
-            {
-                return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus
-                        .BAD_CONTENT_LENGTH_HEADER, null );
-            }
-
-            final BufferedReader input = request.getInputReader();
-            final StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            int read = 0;
-            try
-            {
-                while ( ( line = input.readLine() ) != null )
-                {
-                    final String lineWithNewline = line + "\r\n";
-                    read += ( lineWithNewline ).getBytes().length;
-                    if ( read >= CoreConfig.Limits.limitPostMultipartSize )
-                    {
-                        return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus
-                                .ENTITY_TOO_LARGE, null );
-                    }
-                    stringBuilder.append( lineWithNewline );
-                    if ( line.endsWith( "--" ) )
-                    {
-                        break;
-                    }
-                }
-            } catch ( final IOException e )
-            {
-                if ( CoreConfig.debug )
-                {
-                    e.printStackTrace();
-                }
-                return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus.ERROR,
-                        null );
-            }
-            if ( read != suppliedContentLength )
-            {
-                if ( CoreConfig.debug )
-                {
-                    Logger.debug( "Client supplied content length '%s', but actual content length was: '%s'",
-                            suppliedContentLength, read );
-                }
-                return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus
-                        .CONTENT_LENGTH_MISMATCH, null );
-            }
-
             final KvantumFileUploadContext context = new KvantumFileUploadContext( request,
-                    new ByteArrayInputStream( stringBuilder.toString().getBytes( StandardCharsets.UTF_8 ) ) );
+                    new ByteArrayInputStream( request.getOverloadBytes() ) );
             return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus.SUCCESS, context );
         }
         return new KvantumFileUploadContextParsingResult( KvantumFileUploadContextParsingStatus
