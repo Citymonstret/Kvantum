@@ -16,6 +16,8 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.logging.LogWrapper;
 
 import java.io.ByteArrayOutputStream;
@@ -27,15 +29,12 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Citymonstret
  */
+@RequiredArgsConstructor
 public final class ErrorOutputStream extends ByteArrayOutputStream
 {
 
+    @NonNull
     private final LogWrapper logWrapper;
-
-    public ErrorOutputStream(final LogWrapper logWrapper)
-    {
-        this.logWrapper = Assert.notNull( logWrapper );
-    }
 
     @Override
     public void flush() throws IOException

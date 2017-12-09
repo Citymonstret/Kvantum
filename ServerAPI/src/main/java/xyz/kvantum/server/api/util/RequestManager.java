@@ -57,10 +57,8 @@ final public class RequestManager extends Router
      * @param view The view to register
      */
     @Override
-    public RequestHandler add(final RequestHandler view)
+    public RequestHandler add(@NonNull final RequestHandler view)
     {
-        Assert.notNull( view );
-
         final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst( views, v -> v.toString()
                 .equalsIgnoreCase( view.toString() ) );
         if ( illegalRequestHandler.isPresent() )
@@ -81,32 +79,23 @@ final public class RequestManager extends Router
     public RequestHandler match(final AbstractRequest request)
     {
         Assert.isValid( request );
-
         final Optional<RequestHandler> view = LambdaUtil.getFirst( views, request.matches );
-        if ( view.isPresent() )
-        {
-            return view.get();
-        }
-        return error404Generator.generate( request );
+        return view.orElseGet( () -> error404Generator.generate( request ) );
     }
 
     @Override
-    public void dump(final Kvantum server)
+    public void dump(@NonNull final Kvantum server)
     {
-        Assert.notNull( server );
-
         ( (IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP.log( view.getClass().getSimpleName(),
                 view.toString() ) ).foreach( views );
     }
 
     @Override
-    public void remove(final RequestHandler view)
+    public void remove(@NonNull final RequestHandler view)
     {
-        Assert.notNull( view );
-
-        if ( views.contains( view ) )
+        if ( this.views.contains( view ) )
         {
-            views.remove( view );
+            this.views.remove( view );
         }
     }
 

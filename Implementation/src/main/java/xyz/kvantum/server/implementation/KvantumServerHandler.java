@@ -15,7 +15,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -263,8 +262,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             //
             // Turn response into a byte array
             //
-            final Timer.Context metricContext = ServerImplementation.getImplementation().getMetrics()
-                    .registerContentHandling();
             if ( request.getQuery().getMethod().hasBody() )
             {
                 if ( body.isText() )
@@ -274,7 +271,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                     {
                         textContent = handler.act( requestHandler, request, textContent );
                     }
-                    bytes = textContent.getBytes();
+                    bytes = textContent.getBytes( StandardCharsets.UTF_8 );
                 }
 
                 if ( !workerContext.getWorkerProcedureInstance().getByteHandlers().isEmpty() )
@@ -288,7 +285,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                     bytes = ArrayUtils.toPrimitive( wrapper );
                 }
             }
-            metricContext.stop();
         } catch ( final Exception e )
         {
             Message.WORKER_FAILED_HANDLING.log( e.getMessage() );

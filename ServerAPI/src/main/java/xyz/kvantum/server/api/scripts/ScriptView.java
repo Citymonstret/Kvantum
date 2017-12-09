@@ -33,7 +33,7 @@ public class ScriptView extends View
     private final Path script;
     private final ViewScriptEngine viewScriptEngine;
 
-    public ScriptView(String filter, Map<String, Object> options)
+    public ScriptView(final String filter, final Map<String, Object> options)
     {
         super( filter, "script", options, HttpMethod.ALL );
         if ( !options.containsKey( "script" ) )
@@ -50,7 +50,7 @@ public class ScriptView extends View
     }
 
     @Override
-    protected void handle(AbstractRequest request, Response response)
+    protected void handle(final AbstractRequest request, final Response response)
     {
         final Bindings bindings = this.viewScriptEngine.getBindings();
         bindings.put( "Kvantum", ServerImplementation.getImplementation() );

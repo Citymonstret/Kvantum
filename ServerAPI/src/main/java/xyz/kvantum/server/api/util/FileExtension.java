@@ -38,8 +38,8 @@ public enum FileExtension
     JAVASCRIPT( new String[]{ "js", }, Header.CONTENT_TYPE_JAVASCRIPT, "/* {cmt} */");
 
     public static final List<FileExtension> IMAGE = Collections.unmodifiableList( Arrays.asList( PNG, ICO, GIF, JPEG ) );
-    public static final List<FileExtension> DOWNLOADABLE = Collections.unmodifiableList( Arrays.asList( PDF, TXT, ZIP
-    ) );
+    public static final List<FileExtension> DOWNLOADABLE = Collections
+            .unmodifiableList( Arrays.asList( PDF, TXT, ZIP ) );
     private final String option;
     private final String[] extensions;
     private final String contentType;

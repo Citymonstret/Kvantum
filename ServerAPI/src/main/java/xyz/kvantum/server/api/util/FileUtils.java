@@ -124,7 +124,7 @@ public class FileUtils
      * @param size Byte Buffer Size (in bytes)
      */
     public static void copyFile(@NonNull final InputStream in, @NonNull final OutputStream out,
-                                @NonNull final int size)
+                                final int size)
     {
         Assert.notNull( in );
         Assert.notNull( out );
@@ -159,12 +159,12 @@ public class FileUtils
      * @param buffer File buffer
      * @return String
      */
-    public static String getDocument(@NonNull final File file, @NonNull int buffer)
+    public static String getDocument(@NonNull final File file, int buffer)
     {
         return getDocument( file, buffer, false );
     }
 
-    public static String getDocument(@NonNull final File file, @NonNull final int buffer, @NonNull final boolean create)
+    public static String getDocument(@NonNull final File file, final int buffer, final boolean create)
     {
         Optional<String> cacheEntry = Optional.empty();
 

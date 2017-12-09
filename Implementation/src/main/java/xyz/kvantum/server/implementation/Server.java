@@ -69,7 +69,6 @@ import xyz.kvantum.server.api.util.InstanceFactory;
 import xyz.kvantum.server.api.util.LambdaUtil;
 import xyz.kvantum.server.api.util.MapBuilder;
 import xyz.kvantum.server.api.util.MetaProvider;
-import xyz.kvantum.server.api.util.Metrics;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.CSSView;
 import xyz.kvantum.server.api.views.DownloadView;
@@ -134,8 +133,6 @@ public final class Server implements Kvantum
     private final Map<String, Class<? extends View>> viewBindings = new HashMap<>();
     @Getter
     private final WorkerProcedure procedure = new WorkerProcedure();
-    @Getter
-    private final Metrics metrics = new Metrics();
     @Getter
     private final ITempFileManagerFactory tempFileManagerFactory = new TempFileManagerFactory();
     @Getter

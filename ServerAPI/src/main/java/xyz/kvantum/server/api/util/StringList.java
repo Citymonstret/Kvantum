@@ -16,6 +16,9 @@
  */
 package xyz.kvantum.server.api.util;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+import lombok.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,13 +38,16 @@ public final class StringList implements Iterable<String>
      *
      * @param string Initial content
      */
-    public StringList(final String string)
+    public StringList(@Nullable final String string)
     {
         this.content = new ArrayList<>();
-        final StringTokenizer tokenizer = new StringTokenizer( string, "," );
-        while ( tokenizer.hasMoreTokens() )
+        if ( string != null && !string.isEmpty() )
         {
-            this.content.add( tokenizer.nextToken() );
+            final StringTokenizer tokenizer = new StringTokenizer( string, "," );
+            while ( tokenizer.hasMoreTokens() )
+            {
+                this.content.add( tokenizer.nextToken() );
+            }
         }
     }
 
@@ -51,7 +57,7 @@ public final class StringList implements Iterable<String>
      * @param string Item to be removed
      * @return True if the item was removed, else false
      */
-    public boolean remove(final String string)
+    public boolean remove(@NonNull final String string)
     {
         return this.content.remove( string );
     }
@@ -62,7 +68,7 @@ public final class StringList implements Iterable<String>
      * @param string Item to be added
      * @return True if the item was added, else false
      */
-    public boolean add(final String string)
+    public boolean add(@NonNull final String string)
     {
         return this.content.add( string );
     }
@@ -73,7 +79,7 @@ public final class StringList implements Iterable<String>
      * @param string Item
      * @return True if the list contains the item, else false
      */
-    public boolean contains(final String string)
+    public boolean contains(@NonNull final String string)
     {
         return this.content.contains( string );
     }

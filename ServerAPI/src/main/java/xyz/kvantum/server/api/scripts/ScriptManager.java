@@ -16,6 +16,7 @@
 package xyz.kvantum.server.api.scripts;
 
 import lombok.Getter;
+import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.logging.Logger;
@@ -23,7 +24,7 @@ import xyz.kvantum.server.api.logging.Logger;
 import javax.script.ScriptEngineManager;
 import java.util.Arrays;
 
-public class ScriptManager
+public final class ScriptManager
 {
 
     private final Path corePath;
@@ -31,7 +32,7 @@ public class ScriptManager
     @Getter
     private final ViewScriptEngine viewScriptEngine;
 
-    public ScriptManager(final Kvantum server)
+    public ScriptManager(@NonNull final Kvantum server)
     {
         this.corePath = server.getFileSystem().getPath( "scripts" );
         if ( !corePath.exists() && !corePath.create() )

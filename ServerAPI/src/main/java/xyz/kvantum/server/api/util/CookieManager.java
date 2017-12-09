@@ -19,6 +19,7 @@ package xyz.kvantum.server.api.util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Cookie;
@@ -48,7 +49,7 @@ public final class CookieManager
      * @param r HTTP Request
      * @return an array containing the cookies
      */
-    public static ListMultimap<String, Cookie> getCookies(final AbstractRequest r)
+    public static ListMultimap<String, Cookie> getCookies(@NonNull final AbstractRequest r)
     {
         Assert.isValid( r );
 

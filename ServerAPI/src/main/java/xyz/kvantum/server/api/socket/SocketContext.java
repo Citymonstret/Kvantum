@@ -18,6 +18,7 @@ package xyz.kvantum.server.api.socket;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
@@ -45,8 +46,11 @@ final public class SocketContext
     @Getter
     final long socketId = socketIdPoll.getAndIncrement();
 
+    @NonNull
     final ProtocolType protocolType;
+    @NonNull
     final SocketAddress socketAddress;
+    @NonNull
     final Supplier<Boolean> activeCheck;
 
     private ITempFileManager tempFileManager;
@@ -96,16 +100,6 @@ final public class SocketContext
     public String getIP()
     {
         return getAddress().getAddress().getHostAddress();
-    }
-
-    /**
-     * Check if the socket is active
-     *
-     * @return true if the socket ias not closed and is connected
-     */
-    public boolean isActive()
-    {
-        return this.activeCheck.get();
     }
 
 }

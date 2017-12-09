@@ -19,7 +19,7 @@ package xyz.kvantum.server.api.templates;
 import com.google.common.collect.ImmutableList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import xyz.kvantum.server.api.util.Assert;
+import lombok.NonNull;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
@@ -42,9 +42,8 @@ final public class TemplateManager
         return instance;
     }
 
-    public void addProviderFactory(final ProviderFactory<? extends VariableProvider> factory)
+    public void addProviderFactory(@NonNull final ProviderFactory<? extends VariableProvider> factory)
     {
-        Assert.notNull( factory );
         this.providers.add( factory );
     }
 

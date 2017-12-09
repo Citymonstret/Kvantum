@@ -31,7 +31,8 @@ public class KvantumJsonFactory
 {
 
     @Getter
-    private static final JSONParser parser = new JSONParser();
+    private static final JSONParser PARSER = new JSONParser();
+    private static final JSONObject EMPTY_OBJECT = new JSONObject();
 
     /**
      * Attempt to parse a string into a json object,
@@ -43,9 +44,13 @@ public class KvantumJsonFactory
      */
     public static JSONObject parseJSONObject(final String in)
     {
+        if ( null == in || in.isEmpty() )
+        {
+            return EMPTY_OBJECT;
+        }
         try
         {
-            final Object object = parser.parse( in );
+            final Object object = PARSER.parse( in );
             if ( object instanceof JSONObject )
             {
                 return (JSONObject) object;

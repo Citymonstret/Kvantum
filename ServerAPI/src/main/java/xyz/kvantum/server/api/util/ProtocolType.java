@@ -16,6 +16,8 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
+
 import java.util.Locale;
 import java.util.Optional;
 
@@ -33,7 +35,7 @@ public enum ProtocolType
      * @param string String to match, may not be null
      * @return matched protocol type if found
      */
-    public static Optional<ProtocolType> getByName(final String string)
+    public static Optional<ProtocolType> getByName(@NonNull final String string)
     {
         Assert.notEmpty( string );
 

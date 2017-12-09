@@ -16,6 +16,9 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,6 +26,7 @@ import java.util.Map;
 /**
  * Utility class for dealing with common {@link Map} operations
  */
+@UtilityClass
 public final class MapUtil
 {
 
@@ -36,7 +40,8 @@ public final class MapUtil
      * @param <O>       Output type
      * @return Converted map
      */
-    public static <I, O> Map<String, O> convertMap(final Map<String, I> input, final Converter<I, O>
+    public static <I, O> Map<String, O> convertMap(@NonNull final Map<String, I> input,
+                                                   @NonNull final Converter<I, O>
             converter)
     {
         final Map<String, O> output = new HashMap<>();
@@ -61,10 +66,14 @@ public final class MapUtil
      * @param <V>       Value type
      * @return joined string
      */
-    public static <K, V> String join(final Map<K, V> map, final String combiner, final String separator)
+    public static <K, V> String join(@NonNull final Map<K, V> map,
+                                     @NonNull final String combiner,
+                                     @NonNull final String separator)
     {
-        Assert.notNull( map, combiner, separator );
-
+        if ( map.isEmpty() )
+        {
+            return "";
+        }
         final StringBuilder builder = new StringBuilder();
         final Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
         while ( iterator.hasNext() )

@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Field;
@@ -29,7 +30,7 @@ import java.lang.reflect.Modifier;
 public class InstanceFactory
 {
 
-    public static <T> void setupInstance(final T t, final String fieldName)
+    public static <T> void setupInstance(@NonNull final T t, @NonNull final String fieldName)
     {
         try
         {
@@ -47,12 +48,12 @@ public class InstanceFactory
         }
     }
 
-    public static <T> void setupInstance(final T t)
+    public static <T> void setupInstance(@NonNull final T t)
     {
         setupInstance( t, "instance" );
     }
 
-    public static <T> void setupInstanceAutomagic(final T t)
+    public static <T> void setupInstanceAutomagic(@NonNull final T t)
     {
         for ( final Field field : t.getClass().getDeclaredFields() )
         {

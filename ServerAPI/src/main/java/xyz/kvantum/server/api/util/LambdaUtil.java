@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.Arrays;
@@ -40,10 +41,8 @@ public final class LambdaUtil
      * @param <T>        Object type
      * @return Either the found object, or null
      */
-    public static <T> Optional<T> getFirst(final Collection<T> collection, final Predicate<T> predicate)
+    public static <T> Optional<T> getFirst(@NonNull final Collection<T> collection, @NonNull final Predicate<T> predicate)
     {
-        Assert.notNull( collection, predicate );
-
         return collection.stream().filter( predicate ).findFirst();
     }
 
@@ -55,10 +54,8 @@ public final class LambdaUtil
      * @param <T>       Object type
      * @return Either the found object, or null
      */
-    public static <T> Optional<T> getFirst(final T[] array, final Predicate<T> predicate)
+    public static <T> Optional<T> getFirst(@NonNull final T[] array, @NonNull final Predicate<T> predicate)
     {
-        Assert.notNull( array, predicate );
-
         return Arrays.stream( array ).filter( predicate ).findFirst();
     }
 
@@ -71,11 +68,9 @@ public final class LambdaUtil
      * @param <T>                Type
      * @return assigned collection
      */
-    public static <T> Collection<T> collectionAssign(final Provider<Collection<T>> collectionProvider,
-                                                     final Provider<T>
-                                                             valueProvider, final int number)
+    public static <T> Collection<T> collectionAssign(@NonNull final Provider<Collection<T>> collectionProvider,
+                                                     @NonNull final Provider<T> valueProvider, final int number)
     {
-        Assert.notNull( collectionProvider, valueProvider );
         Assert.isPositive( number );
 
         final Collection<T> list = collectionProvider.provide();
@@ -94,10 +89,8 @@ public final class LambdaUtil
      * @param <T>      Type
      * @return assigned array
      */
-    public static <T> T[] arrayAssign(final T[] array, final Provider<T> provider)
+    public static <T> T[] arrayAssign(@NonNull final T[] array, @NonNull final Provider<T> provider)
     {
-        Assert.notNull( array, provider );
-
         for ( int i = 0; i < array.length; i++ )
         {
             array[ i ] = provider.provide();
@@ -112,10 +105,8 @@ public final class LambdaUtil
      * @param consumer Action
      * @param <T>      Type
      */
-    public static <T> void arrayForeach(final T[] array, final Consumer<T> consumer)
+    public static <T> void arrayForeach(@NonNull final T[] array, @NonNull final Consumer<T> consumer)
     {
-        Assert.notNull( array, consumer );
-
         Arrays.stream( array ).forEach( consumer );
 
     }
@@ -128,21 +119,21 @@ public final class LambdaUtil
      * @param <T>      Type
      */
     @SafeVarargs
-    public static <T> void arrayForeach(final Consumer<T> consumer, final T... array)
+    public static <T> void arrayForeach(@NonNull final Consumer<T> consumer, final T... array)
     {
-        Assert.notNull( array, consumer );
-
         Arrays.stream( array ).forEach( consumer );
     }
 
     /**
      * Perform an action for every item in array, given that the item matches a predicate
-     * @param array Array
-     * @param filter Predicate
+     *
+     * @param array    Array
+     * @param filter   Predicate
      * @param consumer Consumer
-     * @param <T> Type
+     * @param <T>      Type
      */
-    public static <T> void arrayForeach(final T[] array, final Predicate<T> filter, final Consumer<T> consumer)
+    public static <T> void arrayForeach(@NonNull final T[] array, @NonNull final Predicate<T> filter,
+                                        @NonNull final Consumer<T> consumer)
     {
         Assert.notNull( array, filter, consumer );
 

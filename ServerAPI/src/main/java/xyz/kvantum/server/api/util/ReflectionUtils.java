@@ -16,7 +16,10 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
 import java.lang.annotation.Annotation;
@@ -34,12 +37,13 @@ final public class ReflectionUtils
 
     /**
      * Generate a list of {@code @Annotated} methods from a class
-     * @param a Annotation to search for
+     *
+     * @param a     Annotation to search for
      * @param clazz Class in which the annotations are to be searched for
      * @return List containing the found annotations
      */
-    public static <A extends Annotation>  List<AnnotatedMethod<A>> getAnnotatedMethods(final Class<A> a,
-                                                            final Class<?> clazz)
+    public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(
+            @NonNull final Class<A> a, @NonNull final Class<?> clazz)
     {
         Assert.notNull( a, clazz );
 
@@ -64,19 +68,14 @@ final public class ReflectionUtils
      * Value class for {@code @Annotated} methods
      */
     @Getter
-    public static class AnnotatedMethod<A extends Annotation>
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class AnnotatedMethod<A extends Annotation>
     {
 
+        @NonNull
         private final A annotation;
+        @NonNull
         private final Method method;
-
-        private AnnotatedMethod(final A annotation, final Method method)
-        {
-            Assert.notNull( annotation, method );
-
-            this.annotation = annotation;
-            this.method = method;
-        }
 
     }
 

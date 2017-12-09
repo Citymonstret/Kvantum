@@ -65,12 +65,6 @@ class ServerTest extends GenericServerTest
     }
 
     @Test
-    void getMetrics()
-    {
-        assertNotNull( serverInstance.getMetrics() );
-    }
-
-    @Test
     void getCacheManager()
     {
         assertNotNull( serverInstance.getCacheManager() );

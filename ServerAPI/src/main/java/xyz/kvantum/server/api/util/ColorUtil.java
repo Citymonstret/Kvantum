@@ -15,6 +15,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.Map;
@@ -36,7 +37,7 @@ public class ColorUtil
      * @param in String to be replaced
      * @return Colored formatted string
      */
-    public static String getReplaced(String in)
+    public static String getReplaced(@NonNull String in)
     {
         for ( final Map.Entry<Character, Integer> entry : coloredMapping.entrySet() )
         {

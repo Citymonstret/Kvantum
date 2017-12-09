@@ -39,7 +39,6 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CollectionUtil;
 import xyz.kvantum.server.api.util.Generator;
 import xyz.kvantum.server.api.util.ITempFileManagerFactory;
-import xyz.kvantum.server.api.util.Metrics;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.View;
 
@@ -135,13 +134,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return The created request handler
      */
     RequestHandler createSimpleRequestHandler(String filter, BiConsumer<AbstractRequest, Response> generator);
-
-    /**
-     * Get the metric manager
-     *
-     * @return Metric manager
-     */
-    Metrics getMetrics();
 
     /**
      * Load all plugins

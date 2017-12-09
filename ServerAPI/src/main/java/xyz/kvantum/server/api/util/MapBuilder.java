@@ -17,6 +17,7 @@
 package xyz.kvantum.server.api.util;
 
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
@@ -74,19 +75,20 @@ final public class MapBuilder<K, V>
         return create( map -> new TreeMap<>( map ), TreeMap::new );
     }
 
-    private static <K, V> MapBuilder<K, V> create(final Generator<Map<K, V>,
-            Map<K, V>> generator, final Provider<Map<K, V>> provider)
+    private static <K, V> MapBuilder<K, V> create(@NonNull final Generator<Map<K, V>, Map<K, V>> generator,
+                                                  @NonNull final Provider<Map<K, V>> provider)
     {
         return new MapBuilder<>( provider.provide(), generator );
     }
 
     /**
      * Delegate for {@link Map#put(Object, Object)}
-     * @param key Key
+     *
+     * @param key   Key
      * @param value Value
      * @return {@code this} builder
      */
-    public MapBuilder<K, V> put(final K key, final V value)
+    public MapBuilder<K, V> put(@NonNull final K key, @NonNull final V value)
     {
         this.internalMap.put( key, value );
         return this;
@@ -98,7 +100,7 @@ final public class MapBuilder<K, V>
      * @param map Other map
      * @return {@code this} builder
      */
-    public MapBuilder<K, V> putAll(final Map<K, V> map)
+    public MapBuilder<K, V> putAll(@NonNull final Map<K, V> map)
     {
         this.internalMap.putAll( map );
         return this;
@@ -106,10 +108,11 @@ final public class MapBuilder<K, V>
 
     /**
      * Delegate for {@link Map#remove(Object)}
+     *
      * @param key Key
      * @return {@code this} builder
      */
-    public MapBuilder<K, V> remove(final K key)
+    public MapBuilder<K, V> remove(@NonNull final K key)
     {
         this.internalMap.remove( key );
         return this;
@@ -121,7 +124,7 @@ final public class MapBuilder<K, V>
      * @param k Key
      * @return true if the object exists in the map; else false
      */
-    public boolean containsKey(final K k)
+    public boolean containsKey(@NonNull final K k)
     {
         return this.internalMap.containsKey( k );
     }
@@ -129,6 +132,7 @@ final public class MapBuilder<K, V>
     /**
      * Get a new copy of the map that the builder has created.
      * This can method be reused as it will return a unique instance.
+     *
      * @return new copy
      */
     public Map<K, V> get()

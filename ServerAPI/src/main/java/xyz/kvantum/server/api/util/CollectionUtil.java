@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public final class CollectionUtil
      * @param collection Collection to be cleared
      * @return Size of collection before clearing
      */
-    public static int clear(final Collection collection)
+    public static int clear(@NonNull final Collection collection)
     {
         final int size = collection.size();
         collection.clear();
@@ -51,7 +52,7 @@ public final class CollectionUtil
      * @param <T>        Type
      * @return list of strings
      */
-    public static <T> List<String> toStringList(final Collection<T> collection)
+    public static <T> List<String> toStringList(@NonNull final Collection<T> collection)
     {
         final List<String> returnList = new ArrayList<>( collection.size() );
         collection.forEach( o -> returnList.add( o.toString() ) );
@@ -68,9 +69,14 @@ public final class CollectionUtil
      * @return Joined string
      * @see #join(Collection, String) for an {@link Object#toString()} implementation
      */
-    public static <T> String smartJoin(final Collection<T> collection, final Generator<T, String> stringGenerator,
-                                       final String joiner)
+    public static <T> String smartJoin(@NonNull final Collection<T> collection,
+                                       @NonNull final Generator<T, String> stringGenerator,
+                                       @NonNull final String joiner)
     {
+        if ( collection.isEmpty() )
+        {
+            return "";
+        }
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<T> iterator = collection.iterator();
         while ( iterator.hasNext() )
@@ -94,7 +100,7 @@ public final class CollectionUtil
      * @return Joined string
      * @see #smartJoin(Collection, Generator, String) to customize the string generation behavior
      */
-    public static <T> String join(final Collection<T> collection, String joiner)
+    public static <T> String join(@NonNull final Collection<T> collection, @NonNull String joiner)
     {
         return smartJoin( collection, Object::toString, joiner );
     }
@@ -105,11 +111,9 @@ public final class CollectionUtil
      * @param string String
      * @return true if the collection contains the string, regardless of casing
      */
-    public static boolean containsIgnoreCase(final Collection<? extends String> collection, final String string)
+    public static boolean containsIgnoreCase(@NonNull final Collection<? extends String> collection,
+                                             @NonNull final String string)
     {
-        Assert.notNull( collection );
-        Assert.notNull( string );
-
         if ( collection.isEmpty() )
         {
             return false;

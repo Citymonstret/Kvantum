@@ -27,7 +27,6 @@ import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.implementation.commands.Dump;
 import xyz.kvantum.server.implementation.commands.Generate;
 import xyz.kvantum.server.implementation.commands.Help;
-import xyz.kvantum.server.implementation.commands.Metrics;
 import xyz.kvantum.server.implementation.commands.Show;
 import xyz.kvantum.server.implementation.commands.Stop;
 
@@ -47,7 +46,6 @@ public final class InputThread extends Thread
     {
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Stop() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Dump() );
-        ServerImplementation.getImplementation().getCommandManager().createCommand( new Metrics() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Show() );
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Generate() );
         ServerImplementation.getImplementation().getCommandManager().addCommand( new Help( ServerImplementation
