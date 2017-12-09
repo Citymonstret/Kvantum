@@ -55,7 +55,7 @@ public class HTMLView extends StaticFileView implements CacheApplicable
         return cacheApplicableBoolean.orElse( true );
     }
 
-    public class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider
+    public static class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider
     {
 
         private final Map<String, String> storage = new HashMap<>();

@@ -98,7 +98,7 @@ final public class FilePattern
     }
 
     @SuppressWarnings("WeakerAccess")
-    final public class FilePatternException extends KvantumException
+    final public static class FilePatternException extends KvantumException
     {
 
         private FilePatternException(final String message)

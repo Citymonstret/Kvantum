@@ -13,7 +13,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
+    gradleVersion = '4.3.1'
 }
 
 allprojects {
@@ -119,6 +119,10 @@ subprojects {
         }
         build.dependsOn sourcesJar
         build.dependsOn javadocJar
+    }
+
+    dependencies {
+        compile group: 'net.sourceforge.findbugs', name: 'annotations', version: '1.3.2'
     }
 
     configurations.all {

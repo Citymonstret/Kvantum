@@ -29,6 +29,8 @@ import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+import java.nio.charset.StandardCharsets;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class WorkerContext
 {
 
     private static final String CONTENT_TYPE = "content_type";
-    private static byte[] EMPTY = "NULL".getBytes();
+    private static final byte[] EMPTY = "NULL".getBytes( StandardCharsets.UTF_8 );
 
     private final Kvantum server;
     private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;

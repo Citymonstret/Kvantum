@@ -102,10 +102,9 @@ final class RequestReader
             {
                 final String contentType = abstractRequest.getHeader( "Content-Type" );
                 boolean isFormURLEncoded;
-                boolean isJSON = false;
 
                 if ( ( isFormURLEncoded = contentType.startsWith( "application/x-www-form-urlencoded" ) ) ||
-                        ( isJSON = EntityType.JSON.getContentType().startsWith( contentType ) ) )
+                        ( EntityType.JSON.getContentType().startsWith( contentType ) ) )
                 {
                     try
                     {

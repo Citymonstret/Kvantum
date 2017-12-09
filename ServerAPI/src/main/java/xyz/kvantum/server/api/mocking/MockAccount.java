@@ -26,14 +26,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Data
 public class MockAccount implements IAccount
 {
 
+    private static final Random random = new Random();
+
     private Map<String, String> rawData = new HashMap<>();
-    private int id = (int) ( Math.random() * 10_000 );
+    private int id = random.nextInt( 10000 );
     private String username = UUID.randomUUID().toString();
     private IAccountManager manager;
     private Collection<AccountRole> accountRoles = new HashSet<>();

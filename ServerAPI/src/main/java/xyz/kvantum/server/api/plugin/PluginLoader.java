@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.jar.JarEntry;
@@ -200,9 +201,9 @@ public class PluginLoader extends AutoCloseable
             return classes.get( name );
         Class clazz;
         PluginClassLoader loader;
-        for ( final String current : loaders.keySet() )
+        for ( final Map.Entry<String, PluginClassLoader> currentEntry : loaders.entrySet() )
         {
-            loader = loaders.get( current );
+            loader = currentEntry.getValue();
             try
             {
                 if ( ( clazz = loader.findClass( name, false ) ) != null )

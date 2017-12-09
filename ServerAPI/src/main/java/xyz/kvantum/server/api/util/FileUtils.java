@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -46,7 +47,14 @@ import java.util.Optional;
 public class FileUtils
 {
 
-    public static void copyResource(final String resourcePath, final Path path) throws Exception
+    /**
+     * Copy a resource into a specified path, will use the system resource loader
+     *
+     * @param resourcePath Resource Path
+     * @param path         Path where the resource should be pasted
+     * @throws Exception All exceptions are thrown
+     */
+    public static void copyResource(@NonNull final String resourcePath, @NonNull final Path path) throws Exception
     {
         if ( !Files.exists( path.getParent() ) )
         {
@@ -78,7 +86,7 @@ public class FileUtils
      * @param files   Files to add to the zip
      * @throws Exception If anything goes wrong
      */
-    public static void addToZip(final File zipFile, final File[] files) throws Exception
+    public static void addToZip(@NonNull final File zipFile, @NonNull final File[] files) throws Exception
     {
         Assert.notNull( zipFile, files );
 
@@ -99,7 +107,7 @@ public class FileUtils
         }
     }
 
-    public static File attemptFolderCreation(final File folder)
+    public static File attemptFolderCreation(@NonNull final File folder)
     {
         if ( !folder.exists() && !folder.mkdirs() )
         {
@@ -115,8 +123,8 @@ public class FileUtils
      * @param out  Outgoing File
      * @param size Byte Buffer Size (in bytes)
      */
-    public static void copyFile(final InputStream in, final OutputStream out,
-                                final int size)
+    public static void copyFile(@NonNull final InputStream in, @NonNull final OutputStream out,
+                                @NonNull final int size)
     {
         Assert.notNull( in );
         Assert.notNull( out );
@@ -151,12 +159,12 @@ public class FileUtils
      * @param buffer File buffer
      * @return String
      */
-    public static String getDocument(final File file, int buffer)
+    public static String getDocument(@NonNull final File file, @NonNull int buffer)
     {
         return getDocument( file, buffer, false );
     }
 
-    public static String getDocument(final File file, final int buffer, final boolean create)
+    public static String getDocument(@NonNull final File file, @NonNull final int buffer, @NonNull final boolean create)
     {
         Optional<String> cacheEntry = Optional.empty();
 

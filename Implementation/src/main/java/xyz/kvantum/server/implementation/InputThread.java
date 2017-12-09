@@ -43,9 +43,6 @@ public final class InputThread extends Thread
 
     private volatile boolean shouldStop = false;
 
-    @SuppressWarnings("ALL")
-    public String currentString = "";
-
     InputThread()
     {
         ServerImplementation.getImplementation().getCommandManager().createCommand( new Stop() );
@@ -121,9 +118,6 @@ public final class InputThread extends Thread
                                     result.getCommandResult() ) );
                             break;
                     }
-                } else
-                {
-                    currentString = line;
                 }
             } catch ( UserInterruptException e )
             {

@@ -378,7 +378,7 @@ public abstract class AbstractRequest implements
      * Used to handle HTTP authentication
      */
     @SuppressWarnings("unused")
-    final public class Authorization
+    final public static class Authorization
     {
 
         @Getter
