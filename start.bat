@@ -1,7 +1,7 @@
 @ECHO OFF
 
 :: Configuration
-SET version=1.1-SNAPSHOT
+SET version=1.1
 SET minRam=256
 SET maxRam=1024
 :: End of configuration

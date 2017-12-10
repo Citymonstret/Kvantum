@@ -142,3 +142,5 @@ nbdist/
 *.jks
 *.crt
 /kvantum/
+
+gradle.properties
