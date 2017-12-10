@@ -10,9 +10,6 @@ buildscript {
     }
 }
 
-group 'xyz.kvantum'
-version = '1.0'
-
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'application'
 
@@ -23,7 +20,7 @@ build.dependsOn shadowJar
 jar {
     manifest {
         attributes 'Implementation-Title': 'Kvantum',
-                'Implementation-Version': version,
+                'Implementation-Version': rootProject.version,
                 'Main-Class': 'xyz.kvantum.server.implementation.KvantumMain'
     }
 }

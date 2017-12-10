@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>xyz.kvantum</groupId>
+    <groupId>Kvantum</groupId>
     <artifactId>Crush</artifactId>
-    <version>1.0</version>
+    <version>unspecified</version>
     <name>Kvantum</name>
     <description>Java HTTP(S) server</description>
     <url>http://kvantum.xyz</url>
@@ -35,14 +35,34 @@
     </scm>
     <dependencies>
         <dependency>
-            <groupId>xyz.kvantum</groupId>
-            <artifactId>ServerAPI</artifactId>
-            <version>1.0</version>
+            <groupId>net.sourceforge.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.3.2</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>Kvantum</groupId>
+            <artifactId>ServerAPI</artifactId>
+            <version>unspecified</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -56,6 +76,10 @@
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -67,6 +91,10 @@
                 <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -80,6 +108,10 @@
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -92,6 +124,10 @@
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -103,6 +139,10 @@
                 <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>org.jboss.netty</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
