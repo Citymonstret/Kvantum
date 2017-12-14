@@ -1,4 +1,4 @@
-package xyz.kvantum.server.implementation.pojo;
+package xyz.kvantum.server.api.pojo;
 
 import com.hervian.lambda.Lambda;
 import lombok.RequiredArgsConstructor;

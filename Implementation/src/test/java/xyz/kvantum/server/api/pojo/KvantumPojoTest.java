@@ -1,4 +1,4 @@
-package xyz.kvantum.server.implementation.pojo;
+package xyz.kvantum.server.api.pojo;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -23,6 +23,7 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
+import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
@@ -31,7 +32,6 @@ import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
 import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
 import xyz.kvantum.server.implementation.Session;
-import xyz.kvantum.server.implementation.pojo.KvantumPojoFactory;
 
 import java.util.Optional;
 
