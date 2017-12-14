@@ -30,6 +30,8 @@ import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
 import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
+import xyz.kvantum.server.implementation.Session;
+import xyz.kvantum.server.implementation.pojo.KvantumPojoFactory;
 
 import java.util.Optional;
 
@@ -37,6 +39,7 @@ public final class DebugViews
 {
 
     private static final DebugViews instance = new DebugViews();
+    private static final KvantumPojoFactory<Session> sessionPojoFactory = KvantumPojoFactory.forClass( Session.class );
 
     private DebugViews()
     {
@@ -111,6 +114,12 @@ public final class DebugViews
                 response.setContent( "ERROR: " + result.getError().getCause() );
             }
         }
+    }
+
+    @ViewMatcher(filter = "debug/session/json", outputType = "json")
+    public final JSONObject debugSessionJson(final AbstractRequest request)
+    {
+        return sessionPojoFactory.of( (Session) request.getSession() ).toJson();
     }
 
     @ViewMatcher(filter = "debug/session", name = "debugSession", httpMethod = HttpMethod.GET,
