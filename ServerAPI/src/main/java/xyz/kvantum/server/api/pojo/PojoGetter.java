@@ -1,6 +1,7 @@
 package xyz.kvantum.server.api.pojo;
 
 import com.hervian.lambda.Lambda;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -10,7 +11,7 @@ final class PojoGetter<Pojo>
     private final Lambda lambda;
     private final Class<?> returnType;
 
-    public Object get(final Pojo instance)
+    public Object get(@NonNull final Pojo instance)
     {
         if ( returnType.isPrimitive() )
         {
