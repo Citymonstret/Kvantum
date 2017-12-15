@@ -124,5 +124,10 @@ public interface IAccount extends LogFormatted
     }
 
     KvantumPojo<IAccount> toKvantumPojo();
-    
+
+    default AccountDO toDataObject()
+    {
+        return new AccountDO( this );
+    }
+
 }

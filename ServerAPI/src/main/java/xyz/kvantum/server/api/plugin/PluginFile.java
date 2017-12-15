@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author Citymonstret
  */
-public class PluginFile
+public final class PluginFile
 {
 
     public final String name;
@@ -41,7 +41,7 @@ public class PluginFile
      * @param stream Stream with desc.json incoming
      * @throws Exception If anything bad happens
      */
-    public PluginFile(final InputStream stream, Yaml yaml) throws Exception
+    PluginFile(final InputStream stream, final Yaml yaml) throws Exception
     {
         Map info;
         Object temp = yaml.load( stream );

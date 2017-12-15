@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.plugin;
 
+import lombok.Synchronized;
 import xyz.kvantum.server.api.exceptions.PluginException;
 
 import java.io.File;
@@ -31,13 +32,13 @@ import java.util.Set;
  *
  * @author Citymonstret
  */
-public class PluginClassLoader extends URLClassLoader
+public final class PluginClassLoader extends URLClassLoader
 {
 
     private final PluginLoader loader;
     private final PluginFile desc;
     private final File data;
-    private final Map<String, Class> classes;
+    private final Map<String, Class> classes = new HashMap<>();
     Plugin plugin;
     private Plugin init;
 
@@ -49,15 +50,15 @@ public class PluginClassLoader extends URLClassLoader
      * @param file   Plugin Jar
      * @throws MalformedURLException If the jar location is invalid
      */
-    public PluginClassLoader(final PluginLoader loader, final PluginFile desc,
-                             final File file) throws MalformedURLException
+    PluginClassLoader(final PluginLoader loader, final PluginFile desc,
+                      final File file) throws MalformedURLException
     {
         super( new URL[]{ file.toURI().toURL() }, loader.getClass()
                 .getClassLoader() );
         this.loader = loader;
         this.desc = desc;
-        data = new File( file.getParent(), desc.name );
-        classes = new HashMap<>();
+        this.data = new File( file.getParent(), desc.name );
+
         Class jar;
         Class plg;
         try
@@ -86,7 +87,7 @@ public class PluginClassLoader extends URLClassLoader
 
     public File getData()
     {
-        return data;
+        return this.data;
     }
 
     /**
@@ -94,11 +95,13 @@ public class PluginClassLoader extends URLClassLoader
      *
      * @param file Jar file
      */
-    public void loadJar(final File file) throws MalformedURLException
+    void loadJar(final File file) throws MalformedURLException
     {
         if ( !file.getName().endsWith( ".jar" ) )
+        {
             throw new IllegalArgumentException(
                     file.getName() + " is of wrong type" );
+        }
         super.addURL( file.toURI().toURL() );
     }
 
@@ -114,16 +117,22 @@ public class PluginClassLoader extends URLClassLoader
     {
         Class<?> clazz = null;
         if ( classes.containsKey( name ) )
+        {
             clazz = classes.get( name );
+        }
         else
         {
             if ( global )
+            {
                 clazz = loader.getClassByName( name );
+            }
             if ( clazz == null )
             {
                 clazz = super.findClass( name );
                 if ( clazz != null )
+                {
                     loader.setClass( name, clazz );
+                }
             }
             classes.put( name, clazz );
         }
@@ -135,15 +144,18 @@ public class PluginClassLoader extends URLClassLoader
         return classes.keySet();
     }
 
-    synchronized void create(final Plugin plugin)
+    @Synchronized
+    void create(final Plugin plugin)
     {
         if ( init != null )
+        {
             throw new PluginException( plugin.getName() + " is already created" );
+        }
         init = plugin;
         plugin.create( desc, data, this );
     }
 
-    public PluginFile getDesc()
+    PluginFile getDesc()
     {
         return desc;
     }

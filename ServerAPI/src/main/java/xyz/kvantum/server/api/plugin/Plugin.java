@@ -16,6 +16,10 @@
  */
 package xyz.kvantum.server.api.plugin;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import net.sf.oval.constraint.NotNull;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.PluginException;
@@ -34,30 +38,27 @@ import java.util.UUID;
  *
  * @author Citymonstret
  */
+@EqualsAndHashCode(of = "uuid")
+@SuppressWarnings({ "WeakerAccess", "unused" })
+@NoArgsConstructor
 public class Plugin implements LogProvider
 {
 
-    private final UUID uuid;
+    private final UUID uuid = UUID.randomUUID();
     protected String name, version, author, provider;
-    protected PluginClassLoader classLoader;
-    private boolean enabled;
+    @Getter
+    private PluginClassLoader classLoader;
+    private boolean enabled = false;
     private File data;
     private PluginFile desc;
-
-    /**
-     * Constructor
-     */
-    public Plugin()
-    {
-        uuid = UUID.randomUUID();
-        enabled = false;
-    }
 
     final public void create(final PluginFile desc, final File data,
                              final PluginClassLoader classLoader)
     {
         if ( this.desc != null )
+        {
             throw new PluginException( "Plugin already created: " + desc.name );
+        }
         Assert.notNull( desc, data, classLoader );
         this.desc = desc;
         this.classLoader = classLoader;
@@ -68,21 +69,11 @@ public class Plugin implements LogProvider
     }
 
     /**
-     * Get the plugin class loader
-     *
-     * @return Plugin class loader
-     */
-    final public PluginClassLoader getClassLoader()
-    {
-        return classLoader;
-    }
-
-    /**
      * Used to enable the plugin
      *
      * @throws PluginException If the plugin is already enabled, or if couldn't be enabled
      */
-    final public void enable()
+    final void enable()
     {
         Assert.equals( enabled, false );
         try
@@ -99,7 +90,7 @@ public class Plugin implements LogProvider
     /**
      * Used to disable the plugin
      */
-    final public void disable()
+    final void disable()
     {
         Assert.equals( enabled, true );
 
@@ -110,6 +101,7 @@ public class Plugin implements LogProvider
     /**
      * Listen to enable
      */
+    @SuppressWarnings("ALL")
     protected void onEnable()
     {
         // Override!
@@ -118,6 +110,7 @@ public class Plugin implements LogProvider
     /**
      * Listen to disable
      */
+    @SuppressWarnings("ALL")
     protected void onDisable()
     {
         // Override!
@@ -130,7 +123,7 @@ public class Plugin implements LogProvider
      */
     final public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -140,7 +133,7 @@ public class Plugin implements LogProvider
      */
     public String getVersion()
     {
-        return version;
+        return this.version;
     }
 
     /**
@@ -150,7 +143,7 @@ public class Plugin implements LogProvider
      */
     public String getAuthor()
     {
-        return author;
+        return this.author;
     }
 
     /**
@@ -160,7 +153,7 @@ public class Plugin implements LogProvider
      */
     public boolean isEnabled()
     {
-        return enabled;
+        return this.enabled;
     }
 
     /**
@@ -168,9 +161,9 @@ public class Plugin implements LogProvider
      *
      * @return UUID
      */
-    final public UUID getUUID()
+    private UUID getUUID()
     {
-        return uuid;
+        return this.uuid;
     }
 
     /**
@@ -180,7 +173,7 @@ public class Plugin implements LogProvider
      */
     public File getDataFolder()
     {
-        return data;
+        return this.data;
     }
 
     /**
@@ -190,26 +183,13 @@ public class Plugin implements LogProvider
      */
     public PluginFile getDesc()
     {
-        return desc;
-    }
-
-    @Override
-    public boolean equals(final Object object)
-    {
-        return object instanceof Plugin
-                && ( (Plugin) object ).getUUID().equals( getUUID() );
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return 3 * uuid.hashCode() + 37 * getName().toLowerCase().hashCode();
+        return this.desc;
     }
 
     @Override
     public String toString()
     {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -224,7 +204,7 @@ public class Plugin implements LogProvider
      * @param message Message to be logged
      * @see Kvantum#log(String, Object...)
      */
-    public void log(String message)
+    public void log(@NotNull final String message)
     {
         ServerImplementation.getImplementation().log( this, message );
     }

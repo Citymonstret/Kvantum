@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
  *
  * @author Citymonstret
  */
-public class PluginManager
+@SuppressWarnings("unused")
+public final class PluginManager
 {
 
     private final Map<String, Plugin> plugins;
@@ -51,7 +52,7 @@ public class PluginManager
      *
      * @param plugin Plugin to add
      */
-    public void addPlugin(final Plugin plugin)
+    void addPlugin(final Plugin plugin)
     {
         Assert.notNull( plugin );
         plugins.put( plugin.toString(), plugin );
@@ -81,12 +82,14 @@ public class PluginManager
      * @throws PluginException if the plugin is not added to the plugin list {@see
      *                                    #addPlugin(com.marine.Plugin)}
      */
-    protected void enablePlugin(final Plugin plugin)
+    void enablePlugin(final Plugin plugin)
     {
         Assert.notNull( plugin );
         if ( !plugins.containsKey( plugin.toString() ) )
+        {
             throw new PluginException( "Plugin: " + plugin.getName()
                     + " is not added to the plugin list, can't enable" );
+        }
         plugin.enable();
     }
 
@@ -97,12 +100,14 @@ public class PluginManager
      * @throws PluginException if the plugin is not added to the plugin list {@see
      *                                    #addPlugin(com.marine.Plugin)}
      */
-    protected void disablePlugin(final Plugin plugin)
+    void disablePlugin(final Plugin plugin)
     {
         Assert.notNull( plugin );
         if ( !plugins.containsKey( plugin.toString() ) )
+        {
             throw new PluginException( "Plugin: " + plugin.getName()
                     + " is not added to the plugin list, can't disable" );
+        }
         plugin.disable();
     }
 
@@ -111,7 +116,7 @@ public class PluginManager
      *
      * @return all plugins
      */
-    public Collection<Plugin> getPlugins()
+    Collection<Plugin> getPlugins()
     {
         return plugins.values();
     }
