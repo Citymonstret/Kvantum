@@ -66,7 +66,7 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>xyz.kvantum.Kvantum</groupId>
     <artifactId>Implementation</artifactId>
-    <version>1.1</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 

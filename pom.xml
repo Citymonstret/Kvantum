@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>xyz.kvantum</groupId>
   <artifactId>Kvantum</artifactId>
-  <version>1.1</version>
+    <version>1.1-SNAPSHOT</version>
   <name>Kvantum</name>
   <description>Java HTTP(S) server</description>
   <url>http://kvantum.xyz</url>
