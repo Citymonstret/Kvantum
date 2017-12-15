@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.session;
 
+import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.util.VariableProvider;
 
 public interface ISession extends VariableProvider
@@ -28,5 +29,7 @@ public interface ISession extends VariableProvider
     long getSessionId();
 
     ISession set(final String s, final Object o);
+
+    KvantumPojo<ISession> toKvantumPojo();
 
 }

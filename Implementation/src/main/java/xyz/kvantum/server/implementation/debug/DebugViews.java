@@ -23,7 +23,6 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
-import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
@@ -31,7 +30,6 @@ import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
 import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
-import xyz.kvantum.server.implementation.Session;
 
 import java.util.Optional;
 
@@ -39,7 +37,6 @@ public final class DebugViews
 {
 
     private static final DebugViews instance = new DebugViews();
-    private static final KvantumPojoFactory<Session> sessionPojoFactory = KvantumPojoFactory.forClass( Session.class );
 
     private DebugViews()
     {
@@ -119,7 +116,13 @@ public final class DebugViews
     @ViewMatcher(filter = "debug/session/json", outputType = "json")
     public final JSONObject debugSessionJson(final AbstractRequest request)
     {
-        return sessionPojoFactory.of( (Session) request.getSession() ).toJson();
+        return request.getSession().toKvantumPojo().toJson();
+    }
+
+    @ViewMatcher(filter = "debug/session/xml", outputType = "xml")
+    public final String debugSessionXml(final AbstractRequest request)
+    {
+        return request.getSession().toKvantumPojo().toXml();
     }
 
     @ViewMatcher(filter = "debug/session", name = "debugSession", httpMethod = HttpMethod.GET,

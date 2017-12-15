@@ -3,6 +3,7 @@ package xyz.kvantum.server.api.pojo;
 import com.google.common.collect.ImmutableMap;
 import com.hervian.lambda.LambdaFactory;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +29,12 @@ public final class KvantumPojoFactory<Object>
     private final Map<String, PojoGetter<Object>> getters;
     private final Map<String, PojoSetter<Object>> setters;
 
-    public final Function<Object, KvantumPojo<Object>> mapper = this::of;
+    @Getter
+    private final PojoXmlFactory<Object> xmlFactory = new PojoXmlFactory<>( this );
+    @Getter
+    private final PojoJsonFactory<Object> jsonFactory = new PojoJsonFactory<>( this );
+    @Getter
+    private final Function<Object, KvantumPojo<? extends Object>> mapper = this::of;
 
     /**
      * Construct a new {@link KvantumPojoFactory} for a given POJO class
@@ -65,6 +71,18 @@ public final class KvantumPojoFactory<Object>
                 prefix = "set";
             } else
             {
+                continue;
+            }
+
+            if ( getter && method.getParameterCount() > 0 )
+            {
+                // make sure that we only include pure getters
+                continue;
+            }
+
+            if ( !getter && method.getParameterCount() != 1 )
+            {
+                // make sure we only include pure setters
                 continue;
             }
 
@@ -108,7 +126,7 @@ public final class KvantumPojoFactory<Object>
      */
     public KvantumPojo<Object> of(@NonNull final Object instance)
     {
-        return new KvantumPojo<>( instance, getters, setters );
+        return new KvantumPojo<>( this, instance, getters, setters );
     }
 
     /**
@@ -118,7 +136,7 @@ public final class KvantumPojoFactory<Object>
      * @param collection Collection
      * @return Stream of {@link KvantumPojo} objects
      */
-    public Collection<KvantumPojo> getPojoStream(@NonNull final Collection<Object> collection)
+    public Collection<KvantumPojo> getPojoCollection(@NonNull final Collection<Object> collection)
     {
         if ( collection.isEmpty() )
         {

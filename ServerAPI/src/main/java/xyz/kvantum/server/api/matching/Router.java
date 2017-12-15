@@ -21,6 +21,8 @@ import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+import java.util.Collection;
+
 /**
  * Router that is responsible for {@link RequestHandler} matching
  */
@@ -65,4 +67,5 @@ public abstract class Router
         throw new NotImplementedException( "Dump has not been overridden by the Router implementation" );
     }
 
+    public abstract Collection<RequestHandler> getAll();
 }

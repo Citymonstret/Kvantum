@@ -17,9 +17,12 @@
 package xyz.kvantum.server.api.mocking;
 
 import lombok.Data;
+import lombok.Getter;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.account.roles.AccountRole;
+import xyz.kvantum.server.api.pojo.KvantumPojo;
+import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +35,10 @@ import java.util.UUID;
 @Data
 public class MockAccount implements IAccount
 {
+
+    @Getter
+    private static final KvantumPojoFactory<IAccount> kvantumPojoFactory =
+            KvantumPojoFactory.forClass( IAccount.class );
 
     private static final Random random = new Random();
 
@@ -87,5 +94,11 @@ public class MockAccount implements IAccount
     public boolean isPermitted(final String permissionKey)
     {
         return true;
+    }
+
+    @Override
+    public KvantumPojo<IAccount> toKvantumPojo()
+    {
+        return kvantumPojoFactory.of( this );
     }
 }

@@ -40,6 +40,7 @@ final public class Header
     public static final String CONTENT_TYPE_JAVASCRIPT = "text/javascript; charset=utf-8";
     public static final String CONTENT_TYPE_TEXT_EXAMPLE = "text/example; charset=utf-8";
     public static final String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
+    public static final String CONTENT_TYPE_XML = "text/xml; charset=utf-8";
 
     public static final String CACHE_NO_CACHE = "no-cache";
 

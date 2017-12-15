@@ -35,6 +35,8 @@ import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumInsert;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
+import xyz.kvantum.server.api.pojo.KvantumPojo;
+import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.StringList;
 
@@ -55,6 +57,9 @@ public class Account implements IAccount
     @Getter
     private static final KvantumObjectFactory<Account> kvantumAccountFactory =
             KvantumObjectFactory.from( Account.class );
+    @Getter
+    private static final KvantumPojoFactory<IAccount> kvantumPojoFactory =
+            KvantumPojoFactory.forClass( IAccount.class );
 
     private static final String KEY_ROLE_LIST = "internalRoleList";
 
@@ -227,4 +232,9 @@ public class Account implements IAccount
         return false;
     }
 
+    @Override
+    public KvantumPojo<IAccount> toKvantumPojo()
+    {
+        return kvantumPojoFactory.of( this );
+    }
 }

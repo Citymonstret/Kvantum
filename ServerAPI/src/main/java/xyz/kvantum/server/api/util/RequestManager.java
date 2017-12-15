@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -28,6 +29,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.View404;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,6 +90,12 @@ final public class RequestManager extends Router
     {
         ( (IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP.log( view.getClass().getSimpleName(),
                 view.toString() ) ).foreach( views );
+    }
+
+    @Override
+    public Collection<RequestHandler> getAll()
+    {
+        return ImmutableList.copyOf( this.views );
     }
 
     @Override

@@ -19,6 +19,8 @@ package xyz.kvantum.server.implementation;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.kvantum.server.api.pojo.KvantumPojo;
+import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.VariableProvider;
@@ -32,6 +34,9 @@ import java.util.UUID;
 public final class Session implements ISession, VariableProvider
 {
 
+    @Getter
+    private static final KvantumPojoFactory<ISession> kvantumPojoFactory = KvantumPojoFactory
+            .forClass( ISession.class );
     private static long id = 0L;
     private final Map<String, Object> sessionStorage;
     @Getter
@@ -81,6 +86,12 @@ public final class Session implements ISession, VariableProvider
         }
 
         return this;
+    }
+
+    @Override
+    public KvantumPojo<ISession> toKvantumPojo()
+    {
+        return kvantumPojoFactory.of( this );
     }
 
 }

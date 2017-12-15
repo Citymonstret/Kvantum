@@ -19,9 +19,13 @@ package xyz.kvantum.server.api.util;
 import com.google.gson.JsonPrimitive;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import xyz.kvantum.server.api.pojo.KvantumPojo;
+
+import java.util.Collection;
 
 /**
  * Utilities for common JSON procedures
@@ -60,6 +64,22 @@ public class KvantumJsonFactory
             e.printStackTrace();
         }
         return new JSONObject();
+    }
+
+    public JSONArray toJsonArray(final Collection<?> collection)
+    {
+        final JSONArray array = new JSONArray();
+        for ( final Object o : collection )
+        {
+            if ( o instanceof KvantumPojo )
+            {
+                array.add( ( (KvantumPojo) o ).toJson() );
+            } else
+            {
+                array.add( o );
+            }
+        }
+        return array;
     }
 
     /**

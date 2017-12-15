@@ -23,6 +23,8 @@ public final class KvantumPojo<Pojo>
 {
 
     @NonNull
+    private final KvantumPojoFactory<Pojo> factory;
+    @NonNull
     private final Pojo instance;
     @NonNull
     private final Map<String, PojoGetter<Pojo>> fieldValues;
@@ -111,7 +113,12 @@ public final class KvantumPojo<Pojo>
      */
     public JSONObject toJson()
     {
-        return new JSONObject( this.getAll() );
+        return this.factory.getJsonFactory().toJson( this );
+    }
+
+    public String toXml()
+    {
+        return this.factory.getXmlFactory().toXml( this );
     }
 
     /**
