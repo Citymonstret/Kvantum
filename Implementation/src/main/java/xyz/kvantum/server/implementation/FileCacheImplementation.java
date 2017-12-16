@@ -17,6 +17,7 @@
 package xyz.kvantum.server.implementation;
 
 import xyz.kvantum.files.FileCacheManager;
+import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.CoreConfig;
 
 import java.util.Optional;
@@ -25,22 +26,22 @@ public final class FileCacheImplementation implements FileCacheManager
 {
 
     @Override
-    public Optional<String> readCachedFile(final String string)
+    public Optional<String> readCachedFile(final Path path)
     {
         if ( !CoreConfig.Cache.enabled )
         {
             return Optional.empty();
         }
-        return Server.getInstance().getCacheManager().getCachedFile( string );
+        return Server.getInstance().getCacheManager().getCachedFile( path );
     }
 
     @Override
-    public void writeCachedFile(final String string, final String content)
+    public void writeCachedFile(final Path path, final String content)
     {
         if ( !CoreConfig.Cache.enabled )
         {
             return;
         }
-        Server.getInstance().getCacheManager().setCachedFile( string, content );
+        Server.getInstance().getCacheManager().setCachedFile( path, content );
     }
 }

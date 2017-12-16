@@ -19,14 +19,11 @@ package xyz.kvantum.server.api.util;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.Message;
-import xyz.kvantum.server.api.core.ServerImplementation;
-import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -38,7 +35,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Utility class for common File operations (both NIO and IO types)
@@ -150,70 +146,6 @@ public class FileUtils
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Get file contents as a string
-     *
-     * @param file   File to read
-     * @param buffer File buffer
-     * @return String
-     */
-    public static String getDocument(@NonNull final File file, int buffer)
-    {
-        return getDocument( file, buffer, false );
-    }
-
-    public static String getDocument(@NonNull final File file, final int buffer, final boolean create)
-    {
-        Optional<String> cacheEntry = Optional.empty();
-
-        try
-        {
-            cacheEntry = ServerImplementation.getImplementation().getCacheManager().getCachedFile(
-                    file.toString() );
-        } catch ( final Throwable e )
-        {
-            new KvantumException( "Failed to read file (" + file + ") from cache", e ).printStackTrace();
-        }
-
-        if ( cacheEntry.isPresent() )
-        {
-            return cacheEntry.get();
-        }
-
-        final StringBuilder document = new StringBuilder();
-        try
-        {
-            if ( !file.exists() )
-            {
-                if ( !file.getParentFile().exists() )
-                {
-                    file.getParentFile().mkdirs();
-                }
-                if ( create )
-                {
-                    file.createNewFile();
-                    return "";
-                }
-            }
-
-            try ( BufferedReader reader = new BufferedReader( new FileReader( file ), buffer ) )
-            {
-                String line;
-                while ( ( line = reader.readLine() ) != null )
-                {
-                    document.append( line ).append( "\n" );
-                }
-            }
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-
-        final String content = document.toString();
-        ServerImplementation.getImplementation().getCacheManager().setCachedFile( file.toString(), content );
-        return content;
     }
 
 }

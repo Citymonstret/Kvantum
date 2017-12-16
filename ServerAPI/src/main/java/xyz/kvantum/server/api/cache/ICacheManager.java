@@ -16,6 +16,7 @@
  */
 package xyz.kvantum.server.api.cache;
 
+import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -64,14 +65,14 @@ public interface ICacheManager
      * @param file File name
      * @return File, if it stored
      */
-    Optional<String> getCachedFile(String file);
+    Optional<String> getCachedFile(Path file);
 
     /**
      * Save an account to the cache
      * @param file File name
      * @param content File content
      */
-    void setCachedFile(String file, String content);
+    void setCachedFile(Path file, String content);
 
     /**
      * Set a cached include block
@@ -106,5 +107,7 @@ public interface ICacheManager
      * @see #hasCache(RequestHandler) To check if the view has a cache
      */
     CachedResponse getCache(RequestHandler view);
+
+    void removeFileCache(Path path);
 
 }

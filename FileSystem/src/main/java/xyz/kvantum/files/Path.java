@@ -18,6 +18,7 @@ package xyz.kvantum.files;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.WatchEvent;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,6 +44,7 @@ public class Path
     private String path;
     private boolean exists;
     private BasicFileAttributes basicFileAttributes;
+    private FileWatcher.FileWatchingContext fileWatchingContext;
 
     Path(final FileSystem fileSystem, final String path, boolean isFolder)
     {
@@ -96,6 +99,22 @@ public class Path
             return;
         }
         this.basicFileAttributes = Files.readAttributes( javaPath, BasicFileAttributes.class );
+    }
+
+    public FileWatcher.FileWatchingContext getFileWatchingContext()
+    {
+        return this.fileWatchingContext;
+    }
+
+    public void registerWatcher(final FileWatcher fileWatcher,
+                                final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
+            throws IOException
+    {
+        if ( !this.isFolder() )
+        {
+            throw new UnsupportedOperationException( "Cannot register a watcher for a file" );
+        }
+        this.fileWatchingContext = fileWatcher.registerPath( this, reaction );
     }
 
     /**
@@ -159,7 +178,7 @@ public class Path
      */
     final public String readFile()
     {
-        final Optional<String> cacheEntry = fileSystem.getFileCacheManager().readCachedFile( toString() );
+        final Optional<String> cacheEntry = fileSystem.getFileCacheManager().readCachedFile( this );
         if ( cacheEntry.isPresent() )
         {
             return cacheEntry.get();
@@ -180,7 +199,7 @@ public class Path
             }
         }
         final String content = document.toString();
-        fileSystem.getFileCacheManager().writeCachedFile( toString(), content );
+        fileSystem.getFileCacheManager().writeCachedFile( this, content );
         return content;
     }
 
@@ -296,7 +315,7 @@ public class Path
      */
     public boolean isCached()
     {
-        return fileSystem.getFileCacheManager().readCachedFile( toString() ).isPresent();
+        return fileSystem.getFileCacheManager().readCachedFile( this ).isPresent();
     }
 
     /**

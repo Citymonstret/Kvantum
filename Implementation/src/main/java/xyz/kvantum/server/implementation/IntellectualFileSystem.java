@@ -17,15 +17,69 @@
 package xyz.kvantum.server.implementation;
 
 import xyz.kvantum.files.FileSystem;
+import xyz.kvantum.files.FileWatcher;
+import xyz.kvantum.files.Path;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.logging.Logger;
 
-import java.nio.file.Path;
+import java.io.IOException;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 final class IntellectualFileSystem extends FileSystem
 {
 
-    IntellectualFileSystem(final Path coreFolder)
+    IntellectualFileSystem(final java.nio.file.Path coreFolder)
     {
         super( coreFolder, new FileCacheImplementation() );
     }
 
+    void registerFileWatcher()
+    {
+        this.actOnSubPaths( this.getPath( "" ) );
+    }
+
+    private void actOnSubPaths(final Path path)
+    {
+        final Collection<Path> subPaths = path.getSubPaths().stream()
+                .filter( Path::isFolder )
+                .filter( p -> !Arrays.asList( "log", "config", "storage" ).contains( p.getEntityName() ) )
+                .collect( Collectors.toList() );
+        subPaths.forEach( this::registerCacheWatcher );
+        subPaths.forEach( this::actOnSubPaths );
+    }
+
+    private void registerCacheWatcher(final Path path)
+    {
+        if ( CoreConfig.debug )
+        {
+            Logger.debug( "Registering cache invalidation watcher for: %s", path.getEntityName() );
+        }
+        final FileWatcher fileWatcher = ServerImplementation.getImplementation().getFileWatcher();
+        try
+        {
+            path.registerWatcher( fileWatcher, this::eventListener );
+        } catch ( final IOException e )
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void eventListener(final Path path, final WatchEvent.Kind<?> eventKind)
+    {
+        //
+        // Ignore file creation and temporary job files
+        //
+        if ( StandardWatchEventKinds.ENTRY_CREATE.equals( eventKind ) || path.toString().contains( "___jb_" ) )
+        {
+            return;
+        }
+        Logger.info( "Removing cache entry for: %s", path );
+        ServerImplementation.getImplementation().getCacheManager().removeFileCache( path );
+    }
 }

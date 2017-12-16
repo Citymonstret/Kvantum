@@ -18,6 +18,8 @@ package xyz.kvantum.server.implementation;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.NonNull;
+import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.cache.CachedResponse;
 import xyz.kvantum.server.api.cache.ICacheManager;
@@ -86,9 +88,9 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
-    public Optional<String> getCachedFile(final String file)
+    public Optional<String> getCachedFile(final Path file)
     {
-        Assert.notEmpty( file );
+        Assert.notNull( file );
 
         if ( CoreConfig.debug )
         {
@@ -100,16 +102,13 @@ public final class CacheManager implements ICacheManager
             return Optional.empty();
         }
 
-        return Optional.ofNullable( cachedFiles.getIfPresent( file ) );
+        return Optional.ofNullable( cachedFiles.getIfPresent( file.toString() ) );
     }
 
     @Override
-    public void setCachedFile(final String file, final String content)
+    public void setCachedFile(@NonNull final Path file, @NonNull final String content)
     {
-        Assert.notEmpty( file );
-        Assert.notNull( content );
-
-        cachedFiles.put( file, content );
+        cachedFiles.put( file.toString(), content );
     }
 
     @Override
@@ -147,5 +146,11 @@ public final class CacheManager implements ICacheManager
         }
 
         return this.cachedBodies.getIfPresent( view.toString() );
+    }
+
+    @Override
+    public void removeFileCache(final Path path)
+    {
+        this.cachedFiles.invalidate( path.toString() );
     }
 }

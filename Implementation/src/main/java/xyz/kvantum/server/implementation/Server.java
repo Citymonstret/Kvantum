@@ -28,6 +28,7 @@ import sun.misc.Signal;
 import xyz.kvantum.crush.CrushEngine;
 import xyz.kvantum.files.Extension;
 import xyz.kvantum.files.FileSystem;
+import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.cache.ICacheManager;
@@ -165,6 +166,8 @@ public final class Server implements Kvantum
     @Getter
     private FileSystem fileSystem;
     @Getter
+    private FileWatcher fileWatcher;
+    @Getter
     private CommandManager commandManager;
     @Getter
     private ApplicationStructure applicationStructure;
@@ -197,6 +200,7 @@ public final class Server implements Kvantum
         {
             throw new KvantumInitializationException( "Failed to create the core folder: " + coreFolder );
         }
+        this.fileWatcher = new FileWatcher();
         this.fileSystem = new IntellectualFileSystem( coreFolder.toPath() );
         final File logFolder = FileUtils.attemptFolderCreation( new File( coreFolder, "log" ) );
         try
@@ -264,6 +268,14 @@ public final class Server implements Kvantum
         // are not weird
         //
         validateConfiguration();
+
+        //
+        // File Watcher that will invalidate cache entries if files are updated
+        //
+        if ( CoreConfig.Cache.enabled )
+        {
+            ( (IntellectualFileSystem) this.fileSystem ).registerFileWatcher();
+        }
 
         //
         // Enable the custom security manager
@@ -819,6 +831,14 @@ public final class Server implements Kvantum
     {
         Message.SHUTTING_DOWN.log();
 
+        //
+        // Gracefully shutdown the file watcher
+        //
+        this.fileWatcher.getStopSignal().stop();
+
+        //
+        // Shutdown the netty servers
+        //
         try
         {
             httpThread.close();
@@ -831,8 +851,14 @@ public final class Server implements Kvantum
             e.printStackTrace();
         }
 
+        //
+        // Shutdown utilities
+        //
         AutoCloseable.closeAll();
 
+        //
+        // Close the log stream
+        //
         try
         {
             this.logStream.close();

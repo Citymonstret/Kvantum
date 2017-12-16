@@ -22,6 +22,7 @@ import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.callers.CommandCaller;
 import com.intellectualsites.commands.parser.Parserable;
 import xyz.kvantum.files.FileSystem;
+import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.Message;
@@ -118,6 +119,13 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return File system (defaults to .kvantum)
      */
     FileSystem getFileSystem();
+
+    /**
+     * Get the file watcher used in the server implementation
+     *
+     * @return Implementation specific file watcher
+     */
+    FileWatcher getFileWatcher();
 
     /**
      * Get the implementation specific script manager
