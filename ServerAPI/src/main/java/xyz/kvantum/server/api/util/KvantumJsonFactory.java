@@ -26,6 +26,7 @@ import org.json.simple.parser.ParseException;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Utilities for common JSON procedures
@@ -64,6 +65,11 @@ public class KvantumJsonFactory
             e.printStackTrace();
         }
         return new JSONObject();
+    }
+
+    public <T> JSONObject toJSONObject(final Map<String, T> map)
+    {
+        return new JSONObject( MapUtil.convertMap( map, Object::toString ) );
     }
 
     public JSONArray toJsonArray(final Collection<?> collection)

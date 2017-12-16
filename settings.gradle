@@ -6,4 +6,5 @@ include 'Assert'
 include 'Implementation'
 include 'Velocity'
 include 'JTwig'
+include 'Examples'
 
