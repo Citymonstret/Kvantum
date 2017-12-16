@@ -15,6 +15,8 @@
  */
 package xyz.kvantum.server.implementation.debug;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.account.IAccount;
@@ -23,9 +25,12 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
+import xyz.kvantum.server.api.pojo.KvantumPojo;
+import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
 import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
@@ -119,18 +124,33 @@ public final class DebugViews
         return request.getSession().toKvantumPojo().toJson();
     }
 
-    @ViewMatcher(filter = "debug/session/xml", outputType = "xml")
-    public final String debugSessionXml(final AbstractRequest request)
-    {
-        return request.getSession().toKvantumPojo().toXml();
-    }
+    private static final KvantumPojoFactory<SessionPojo> pojoFactory = KvantumPojoFactory
+            .forClass( SessionPojo.class );
 
-    @ViewMatcher(filter = "debug/session", name = "debugSession", httpMethod = HttpMethod.GET,
-            middlewares = { DebugRedirectMiddleware.class })
+    @ViewMatcher(filter = "debug/session", name = "debugSession", httpMethod = HttpMethod.GET)
     public final void debugSession(final AbstractRequest request, final Response response)
     {
-        request.requestSession();
-        response.setContent( "<h1><b>Session:</b> " + request.getSession().get( "id" ) + "</h1>" );
+        final KvantumPojo<SessionPojo> pojo = pojoFactory.of( new SessionPojo( request.getSession() ) );
+        pojo.set( "message", "Hello beauty!" );
+        request.addModel( "pojo", pojo );
+        response.setContent( "<h1><b>Session: {{pojo.id}}</b></h1><br/>Message: {{pojo.message}}" );
+    }
+
+    private static final class SessionPojo
+    {
+
+        @Getter
+        @Setter
+        private String id;
+
+        @Getter
+        @Setter
+        private String message;
+
+        private SessionPojo(final ISession iSession)
+        {
+            this.id = iSession.get( "id" ).toString();
+        }
     }
 
 }

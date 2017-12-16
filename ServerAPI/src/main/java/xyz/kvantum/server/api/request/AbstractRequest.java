@@ -107,6 +107,8 @@ public abstract class AbstractRequest implements
     @Getter
     @Setter
     private byte[] overloadBytes;
+    @Getter
+    private final Map<String, ProviderFactory<? extends VariableProvider>> models = new HashMap<>();
 
     public ITempFileManager getTempFileManager()
     {
@@ -162,6 +164,25 @@ public abstract class AbstractRequest implements
     public void useAlternateOutcome(final String identifier)
     {
         this.addMeta( ALTERNATE_OUTCOME, Assert.notNull( identifier ) );
+    }
+
+    public void addModel(final String name, final VariableProvider provider)
+    {
+        final ProviderFactory<VariableProvider> providerFactory = new ProviderFactory<VariableProvider>()
+        {
+            @Override
+            public Optional<VariableProvider> get(AbstractRequest r)
+            {
+                return Optional.of( provider );
+            }
+
+            @Override
+            public String providerName()
+            {
+                return name;
+            }
+        };
+        this.models.put( name, providerFactory );
     }
 
     public abstract void onCompileFinish();

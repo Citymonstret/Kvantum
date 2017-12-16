@@ -82,6 +82,7 @@ public class SyntaxHandler extends TemplateSyntaxHandler
         {
             factories.put( z.providerName().toLowerCase(), z );
         }
+        factories.putAll( request.getModels() );
         factories.put( "request", request );
 
         for ( final Map.Entry<String, ProviderFactory<? extends VariableProvider>> entry : factories.entrySet() )

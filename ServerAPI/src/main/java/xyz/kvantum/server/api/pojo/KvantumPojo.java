@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
+import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.Collection;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.Map;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @SuppressWarnings({ "unused", "WeakerAccess" })
-public final class KvantumPojo<Pojo>
+public final class KvantumPojo<Pojo> implements VariableProvider
 {
 
     @NonNull
@@ -45,6 +46,12 @@ public final class KvantumPojo<Pojo>
     private final Map<String, PojoGetter<Pojo>> fieldValues;
     @NonNull
     private final Map<String, PojoSetter<Pojo>> fieldSetters;
+
+    @Override
+    public boolean contains(final String variable)
+    {
+        return this.containsGetter( variable );
+    }
 
     /**
      * Get a specified value. Will throw exceptions

@@ -52,6 +52,7 @@ public final class SyntaxHandler extends TemplateSyntaxHandler
             factories.put( z.providerName().toLowerCase(), z );
         }
         factories.put( "request", request );
+        factories.putAll( request.getModels() );
         // This is how the crush engine works.
         // Quite simple, yet powerful!
         for ( final Syntax syntax : crushEngine.syntaxCollection )
