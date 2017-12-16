@@ -65,6 +65,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -107,6 +119,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -153,6 +177,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -195,6 +231,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -241,6 +289,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -283,6 +343,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -329,6 +401,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -373,48 +457,16 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-common</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>org.jboss.netty</groupId>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>3.1.0</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>hadoop-auth</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-mapreduce-client-core</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-hdfs</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-annotations</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-mapreduce-client-common</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -461,6 +513,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -503,6 +567,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -549,6 +625,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -591,6 +679,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -637,6 +737,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -679,6 +791,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -725,6 +849,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -767,6 +903,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -813,6 +961,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -855,6 +1015,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -901,6 +1073,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -943,6 +1127,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>
@@ -989,6 +1185,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -1033,6 +1241,18 @@
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>hadoop-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
@@ -1075,6 +1295,18 @@
                 <exclusion>
                     <artifactId>hadoop-mapreduce-client-common</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>net.sf.cglib</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rhino</artifactId>
+                    <groupId>org.mozilla</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>hadoop-common</artifactId>

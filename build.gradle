@@ -3,12 +3,14 @@ buildscript {
         jcenter()
         maven {
             url "https://plugins.gradle.org/m2/"
+            jcenter()
         }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
         classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
         classpath ("org.junit.platform:junit-platform-gradle-plugin:1.0.1")
+        classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
     }
 }
 
@@ -22,6 +24,9 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'org.junit.platform.gradle.plugin'
     apply plugin: 'signing'
+    apply plugin: 'nebula.lint'
+
+    gradleLint.rules = ['all-dependency']
 
     license {
         header rootProject.file('HEADER')
@@ -136,6 +141,9 @@ subprojects {
         exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-core'
         exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-jobclient'
         exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs'
+        exclude group: 'tomcat', module: 'servlet-api'
+        exclude group: 'org.mozilla', module: 'rhino'
+        exclude group: 'net.sf.cglib', module: 'cglib-nodep'
     }
 }
 
