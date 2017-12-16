@@ -79,7 +79,7 @@ public class HelloWorld
         return "Hello World!";
     }
 
-    @ViewMatcher(filter = "hello3", outputType = StandardConverters.JSON)
+    @ViewMatcher(filter = "hello4", outputType = StandardConverters.JSON)
     public JSONObject helloWorld4(final AbstractRequest request)
     {
         return new JSONObject( MapBuilder.<String, Object>newHashMap()
@@ -106,7 +106,7 @@ public class HelloWorld
 
         HelloHandler()
         {
-            super( "hello9", "hello7handler" );
+            super( "hello7", "hello7handler" );
         }
 
         @Override
@@ -135,9 +135,9 @@ public class HelloWorld
             this.hello = string;
         }
 
-        public void getHello(final String string)
+        public String getHello()
         {
-            this.hello = string;
+            return this.hello;
         }
     }
 
