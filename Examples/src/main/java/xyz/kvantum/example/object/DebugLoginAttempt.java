@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation.debug;
+package xyz.kvantum.example.object;
 
-import lombok.Getter;
 import net.sf.oval.constraint.NotEmpty;
 import net.sf.oval.constraint.NotNull;
 import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
@@ -23,24 +22,32 @@ import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 
 @KvantumObject(checkValidity = true)
-public class DebugLoginAttempt
+public final class DebugLoginAttempt
 {
 
     @NotNull
     @NotEmpty
-    @Getter
     @KvantumField
     private String username;
 
     @NotNull
     @NotEmpty
-    @Getter
     @KvantumField
     private String password;
 
     @KvantumConstructor
     private DebugLoginAttempt()
     {
+    }
+
+    public String getUsername()
+    {
+        return this.username;
+    }
+
+    public String getPassword()
+    {
+        return this.password;
     }
 
 }

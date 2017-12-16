@@ -28,7 +28,8 @@ import java.util.Optional;
  * Example that will started a {@link Kvantum} instance,
  * implemented by {@link xyz.kvantum.server.implementation.Server}.
  * <p>
- * This example will also load {@link HelloWorld}!
+ * This example will also load {@link HelloWorld}, {@link ExampleLogin}
+ * &amp; {@link ExampleSession}
  */
 public final class ExampleServer
 {
@@ -45,6 +46,8 @@ public final class ExampleServer
         if ( serverOptional.isPresent() )
         {
             new HelloWorld(); // Initialize Hello World examples
+            new ExampleLogin(); // Initialize the login example
+            new ExampleSession();
             serverOptional.get().start();
             Logger.info( "Server started successfully!" );
         } else

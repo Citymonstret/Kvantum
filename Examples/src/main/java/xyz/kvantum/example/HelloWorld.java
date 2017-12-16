@@ -32,7 +32,7 @@ import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
  * example in Kvantum
  */
 @SuppressWarnings("unused")
-public class HelloWorld
+public final class HelloWorld
 {
 
     private static final KvantumPojoFactory<HelloDO> factory = KvantumPojoFactory.forClass( HelloDO.class );
