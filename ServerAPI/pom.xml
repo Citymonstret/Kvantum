@@ -41,12 +41,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -57,12 +85,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -73,12 +129,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -89,12 +173,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -105,12 +217,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -121,12 +261,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -137,12 +305,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -153,12 +349,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -169,12 +393,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -185,12 +437,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -201,12 +481,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -217,12 +525,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -233,12 +569,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -249,12 +613,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -265,12 +657,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -281,12 +701,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -297,12 +745,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -313,12 +789,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -329,12 +833,40 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -345,12 +877,40 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -361,12 +921,40 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -377,12 +965,40 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -393,12 +1009,40 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -409,12 +1053,40 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>org.jboss.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
