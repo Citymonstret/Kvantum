@@ -58,8 +58,8 @@ final public class MongoSessionDatabase implements ISessionDatabase
         {
             final DBObject session = cursor.next();
 
-            return new SessionLoad( Integer.parseInt( session.get( FIELD_SESSION_ID ).toString() ),
-                    session.get( FIELD_SESSION_KEY ).toString(), (long) session.get( FIELD_LAST_ACTIVE ) );
+            return new SessionLoad( session.get( FIELD_SESSION_KEY ).toString(),
+                    (long) session.get( FIELD_LAST_ACTIVE ) );
         }
 
         return null;

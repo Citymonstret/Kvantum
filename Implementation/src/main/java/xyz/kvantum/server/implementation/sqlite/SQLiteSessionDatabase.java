@@ -55,8 +55,8 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
             {
                 if ( resultSet.next() )
                 {
-                    sessionLoad = new SessionLoad( resultSet.getInt( "session_id" ),
-                            resultSet.getString( "session_key" ), resultSet.getLong( "last_active" ) );
+                    sessionLoad = new SessionLoad( resultSet.getString( "session_key" ),
+                            resultSet.getLong( "last_active" ) );
                 }
             }
         } catch ( final Exception e )

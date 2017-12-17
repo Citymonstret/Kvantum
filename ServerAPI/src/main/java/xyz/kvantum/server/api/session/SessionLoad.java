@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class SessionLoad
 {
 
-    private final int sessionId;
     private final String sessionKey;
     private final long lastActive;
 
