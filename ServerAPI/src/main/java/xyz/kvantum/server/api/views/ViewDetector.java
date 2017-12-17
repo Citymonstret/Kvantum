@@ -111,9 +111,6 @@ public final class ViewDetector
                 case "css":
                     type = "css";
                     break;
-                case "less":
-                    type = "less";
-                    break;
                 case "png":
                 case "jpg":
                 case "jpeg":

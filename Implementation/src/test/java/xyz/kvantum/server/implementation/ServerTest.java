@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-import java.io.File;
 import java.time.Duration;
 
 import static org.junit.Assert.assertEquals;
@@ -93,13 +92,6 @@ class ServerTest extends GenericServerTest
     void getTranslations()
     {
         assertNotNull( serverInstance.getTranslations() );
-    }
-
-    @Test
-    void getCoreFolder()
-    {
-        assertEquals( new File( temporaryFolder, "kvantum" ).getAbsolutePath(), serverInstance.getCoreFolder()
-                .getAbsolutePath() );
     }
 
     @Test

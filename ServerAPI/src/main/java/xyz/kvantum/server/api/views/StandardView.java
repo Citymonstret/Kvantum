@@ -80,11 +80,6 @@ public class StandardView extends StaticFileView implements CacheApplicable
                 response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
             }
             break;
-            case LESS:
-            {
-                response.setContent( LessView.getLess( response.getContent() ) );
-            }
-            break;
             default:
                 break;
         }

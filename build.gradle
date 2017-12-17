@@ -142,7 +142,6 @@ subprojects {
         exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-jobclient'
         exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs'
         exclude group: 'tomcat', module: 'servlet-api'
-        exclude group: 'org.mozilla', module: 'rhino'
         exclude group: 'net.sf.cglib', module: 'cglib-nodep'
     }
 }

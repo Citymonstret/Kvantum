@@ -138,11 +138,6 @@ public final class KvantumPojo<Pojo> implements VariableProvider
         return this.factory.getJsonFactory().toJson( this );
     }
 
-    public String toXml()
-    {
-        return this.factory.getXmlFactory().toXml( this );
-    }
-
     /**
      * Update a field by accessing a setter in the POJO instance. Following the name
      * pattern "setField"

@@ -49,7 +49,7 @@ dependencies {
     // Apache commons, self-explanatory
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
     // Netty
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.17.Final'
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.18.Final'
     //
     // Modules
     //

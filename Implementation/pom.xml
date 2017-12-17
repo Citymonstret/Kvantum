@@ -69,10 +69,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -123,10 +119,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -181,10 +173,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -235,10 +223,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -293,10 +277,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -347,10 +327,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -405,10 +381,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -429,7 +401,7 @@
     <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-all</artifactId>
-        <version>4.1.17.Final</version>
+        <version>4.1.18.Final</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -459,10 +431,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -517,10 +485,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -571,10 +535,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -629,10 +589,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -683,10 +639,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -741,10 +693,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -795,10 +743,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -853,10 +797,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -907,10 +847,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -965,10 +901,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -1019,10 +951,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>

@@ -69,10 +69,6 @@
                 <groupId>net.sf.cglib</groupId>
             </exclusion>
             <exclusion>
-                <artifactId>rhino</artifactId>
-                <groupId>org.mozilla</groupId>
-            </exclusion>
-            <exclusion>
                 <artifactId>servlet-api</artifactId>
                 <groupId>tomcat</groupId>
             </exclusion>
@@ -123,10 +119,6 @@
               <exclusion>
                   <artifactId>cglib-nodep</artifactId>
                   <groupId>net.sf.cglib</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>rhino</artifactId>
-                  <groupId>org.mozilla</groupId>
               </exclusion>
               <exclusion>
                   <artifactId>servlet-api</artifactId>
@@ -181,10 +173,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -235,10 +223,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -293,10 +277,6 @@
               <groupId>net.sf.cglib</groupId>
           </exclusion>
           <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
-          </exclusion>
-          <exclusion>
               <artifactId>servlet-api</artifactId>
               <groupId>tomcat</groupId>
           </exclusion>
@@ -347,10 +327,6 @@
           <exclusion>
               <artifactId>cglib-nodep</artifactId>
               <groupId>net.sf.cglib</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>rhino</artifactId>
-              <groupId>org.mozilla</groupId>
           </exclusion>
           <exclusion>
               <artifactId>servlet-api</artifactId>

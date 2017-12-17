@@ -22,7 +22,6 @@ import java.util.Optional;
 public enum Extension
 {
     CSS( new String[]{ "css" } ),
-    LESS( new String[]{ "less", "css" } ),
     HTML( new String[]{ "html", "xhtml", "htm", "vm" } ),
     PNG( new String[]{ "png" } ),
     ICO( new String[]{ "ico" } ),

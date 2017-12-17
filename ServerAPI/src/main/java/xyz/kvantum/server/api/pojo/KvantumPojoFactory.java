@@ -45,8 +45,6 @@ public final class KvantumPojoFactory<Object>
     private final Map<String, PojoSetter<Object>> setters;
 
     @Getter
-    private final PojoXmlFactory<Object> xmlFactory = new PojoXmlFactory<>( this );
-    @Getter
     private final PojoJsonFactory<Object> jsonFactory = new PojoJsonFactory<>( this );
     @Getter
     private final Function<Object, KvantumPojo<? extends Object>> mapper = this::of;

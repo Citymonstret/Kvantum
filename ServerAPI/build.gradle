@@ -1,5 +1,5 @@
 dependencies {
-    // Logback
+    // Logback (used for configuration purposes only)
     compile 'ch.qos.logback:logback-classic:1.1.5'
     // Used to simplify code creation
     compileOnly 'org.projectlombok:lombok:1.16.18'
@@ -18,8 +18,6 @@ dependencies {
     compile 'com.github.Sauilitired:Configurable:1.0.0'
     // Great IO utilities (TODO: Look into this dependency)
     compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
-    // Compiles .LESS files
-    compile group: 'org.lesscss', name: 'lesscss', version: '1.7.0.1.1'
     // JSON Implementation
     compile 'com.github.IntellectualSites:json-simple:IntellectualSites-2.0'
     // GSON
@@ -32,9 +30,6 @@ dependencies {
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
     compile group: 'xyz.kvantum', name: 'lambda-factory', version: '2.0.2-SNAPSHOT'
-    // XML Utility
-    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
-
     //
     // Modules
     //

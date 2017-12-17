@@ -26,8 +26,7 @@ public enum FileType
 {
     HTML( "html", Header.CONTENT_TYPE_HTML ),
     CSS( "css", Header.CONTENT_TYPE_CSS ),
-    JAVASCRIPT( "js", Header.CONTENT_TYPE_JAVASCRIPT ),
-    LESS( "less", Header.CONTENT_TYPE_CSS );
+    JAVASCRIPT( "js", Header.CONTENT_TYPE_JAVASCRIPT );
 
     private final String extension;
 
