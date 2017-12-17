@@ -22,6 +22,8 @@ import com.intellectualsites.commands.CommandInstance;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogWrapper;
 
+import java.util.Locale;
+
 
 @CommandDeclaration(
         command = "show",
@@ -40,7 +42,7 @@ public class Show extends Command
         } else
         {
             String[] lines = new String[ 0 ];
-            switch ( args[ 0 ].toLowerCase() )
+            switch ( args[ 0 ].toLowerCase( Locale.ENGLISH ) )
             {
                 case "c":
                     lines = new String[]{
@@ -204,7 +206,7 @@ public class Show extends Command
                     };
                     break;
                 default:
-                    ServerImplementation.getImplementation().log( "> Unknown Parameter `%s`", args[ 0 ].toLowerCase() );
+                    ServerImplementation.getImplementation().log( "> Unknown Parameter `%s`", args[ 0 ].toLowerCase( Locale.ENGLISH ) );
                     break;
             }
             LogWrapper wrapper = ServerImplementation.getImplementation().getLogWrapper();

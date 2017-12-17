@@ -45,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -212,9 +213,9 @@ public abstract class AbstractRequest implements
     {
         Assert.notNull( name );
 
-        if ( this.headers.containsKey( name.toLowerCase() ) )
+        if ( this.headers.containsKey( name.toLowerCase( Locale.ENGLISH ) ) )
         {
-            return this.headers.get( name.toLowerCase() );
+            return this.headers.get( name.toLowerCase( Locale.ENGLISH ) );
         }
 
         return "";

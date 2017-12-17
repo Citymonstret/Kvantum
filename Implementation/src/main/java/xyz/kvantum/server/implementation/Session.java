@@ -26,6 +26,7 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,13 +58,13 @@ public final class Session implements ISession, VariableProvider
     @Override
     public boolean contains(final String variable)
     {
-        return sessionStorage.containsKey( Assert.notNull( variable ).toLowerCase() );
+        return sessionStorage.containsKey( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
     }
 
     @Override
     public Object get(final String variable)
     {
-        return sessionStorage.get( Assert.notNull( variable ).toLowerCase() );
+        return sessionStorage.get( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
     }
 
     @Override
@@ -82,7 +83,7 @@ public final class Session implements ISession, VariableProvider
             sessionStorage.remove( s );
         } else
         {
-            sessionStorage.put( s.toLowerCase(), o );
+            sessionStorage.put( s.toLowerCase( Locale.ENGLISH ), o );
         }
 
         return this;

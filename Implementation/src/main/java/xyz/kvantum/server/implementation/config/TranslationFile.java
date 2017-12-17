@@ -20,6 +20,7 @@ import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.logging.LogModes;
 
 import java.io.File;
+import java.util.Locale;
 
 final public class TranslationFile extends YamlConfiguration
 {
@@ -49,7 +50,7 @@ final public class TranslationFile extends YamlConfiguration
                     nameSpace = "info";
                     break;
             }
-            this.setIfNotExists( nameSpace + "." + message.name().toLowerCase(), message.toString() );
+            this.setIfNotExists( nameSpace + "." + message.name().toLowerCase( Locale.ENGLISH ), message.toString() );
         }
         this.saveFile();
     }

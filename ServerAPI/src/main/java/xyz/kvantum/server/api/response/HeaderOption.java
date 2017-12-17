@@ -26,6 +26,7 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -50,15 +51,15 @@ public final class HeaderOption
     public static HeaderOption create(final String text, boolean cacheApplicable)
     {
         final HeaderOption headerOption = new HeaderOption( Assert.notNull( text ) ).cacheApplicable( cacheApplicable );
-        headerOptionMap.put( text.toLowerCase(), headerOption );
+        headerOptionMap.put( text.toLowerCase( Locale.ENGLISH ), headerOption );
         return headerOption;
     }
 
     public static HeaderOption getOrCreate(final String text)
     {
-        if ( headerOptionMap.containsKey( text.toLowerCase() ) )
+        if ( headerOptionMap.containsKey( text.toLowerCase( Locale.ENGLISH ) ) )
         {
-            return headerOptionMap.get( text.toLowerCase() );
+            return headerOptionMap.get( text.toLowerCase( Locale.ENGLISH ) );
         }
         if ( CoreConfig.debug )
         {

@@ -100,12 +100,13 @@ final public class KvantumMain
                 }
             }
 
-            final File file = new File( folder );
+            final File file = new File( folder, "kvantum" );
 
             System.out.printf( "INFO%nUsing server folder: %s%n%n", file.getAbsolutePath() );
 
             final Optional<Kvantum> server = ServerContext.builder().coreFolder( file )
                     .standalone( true ).logWrapper( new DefaultLogWrapper() ).router( RequestManager.builder().build() )
+                    .serverSupplier( StandaloneServer::new )
                     .build().create();
             if ( server.isPresent() )
             {

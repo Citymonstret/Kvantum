@@ -20,6 +20,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -43,9 +44,9 @@ final public class IfStatement extends Syntax
             String neg = matcher.group( 2 );
             String namespace = matcher.group( 3 );
             String variable = matcher.group( 4 );
-            if ( factories.containsKey( namespace.toLowerCase() ) )
+            if ( factories.containsKey( namespace.toLowerCase( Locale.ENGLISH ) ) )
             {
-                Optional<VariableProvider> pOptional = factories.get( namespace.toLowerCase() ).get( r );
+                Optional<VariableProvider> pOptional = factories.get( namespace.toLowerCase( Locale.ENGLISH ) ).get( r );
                 if ( pOptional.isPresent() )
                 {
                     final VariableProvider p = pOptional.get();

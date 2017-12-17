@@ -31,15 +31,18 @@ public class ViewLoader
 {
 
     private Map<String, Map<String, Object>> views = new HashMap<>();
+    private Map<String, Class<? extends View>> viewBindings;
 
-    ViewLoader(final ConfigurationFile viewConfiguration)
+    ViewLoader(final ConfigurationFile viewConfiguration, final Map<String, Class<? extends View>> viewBindings)
     {
+        this.viewBindings = viewBindings;
         this.addViews( viewConfiguration );
         this.views.entrySet().forEach( this::loadView );
     }
 
-    ViewLoader(final Map<String, Map<String, Object>> views)
+    ViewLoader(final Map<String, Map<String, Object>> views, Map<String, Class<? extends View>> viewBindings)
     {
+        this.viewBindings = viewBindings;
         this.views = views;
         this.views.entrySet().forEach( this::loadView );
     }
@@ -57,7 +60,7 @@ public class ViewLoader
                     try
                     {
                         includeFile = new YamlConfiguration( object,
-                                new File( new File( Server.getInstance().getCoreFolder(), "config" ), object ) );
+                                new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "config" ), object ) );
                         includeFile.loadFile();
                         if ( !includeFile.contains( "views" ) )
                         {
@@ -94,14 +97,13 @@ public class ViewLoader
             Logger.warn( "Invalid view declaration: %s", viewEntry.getKey() );
             return;
         }
-        final String type = viewBody.get( "type" ).toString().toLowerCase( Locale.US );
+        final String type = viewBody.get( "type" ).toString().toLowerCase( Locale.ENGLISH );
         final String filter = viewBody.get( "filter" ).toString();
         final Map<String, Object> options = (Map<String, Object>) viewBody.getOrDefault( "options", new HashMap<>() );
         options.put( "internalName", viewEntry.getKey() );
-        if ( Server.getInstance().getViewBindings().containsKey( type ) )
+        if ( viewBindings.containsKey( type ) )
         {
-            final Class<? extends View> vc = Server.getInstance().getViewBindings()
-                    .get( type.toLowerCase( Locale.US ) );
+            final Class<? extends View> vc = viewBindings.get( type.toLowerCase( Locale.ENGLISH ) );
             try
             {
                 final View vv = vc.getDeclaredConstructor( String.class, Map.class )

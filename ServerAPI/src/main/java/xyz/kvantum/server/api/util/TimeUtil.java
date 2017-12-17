@@ -36,9 +36,9 @@ public final class TimeUtil
 
     static
     {
-        httpFormat = new SimpleDateFormat( "EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.US );
-        logFormat = new SimpleDateFormat( "HH:mm:ss", Locale.US );
-        logFileFormat = new SimpleDateFormat( "dd MMM yyyy kk-mm-ss", Locale.US );
+        httpFormat = new SimpleDateFormat( "EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.ENGLISH );
+        logFormat = new SimpleDateFormat( "HH:mm:ss", Locale.ENGLISH );
+        logFileFormat = new SimpleDateFormat( "dd MMM yyyy kk-mm-ss", Locale.ENGLISH );
     }
 
     /**

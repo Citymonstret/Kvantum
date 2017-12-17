@@ -30,9 +30,7 @@ import java.util.Map;
 public class ScriptView extends View
 {
 
-    private final Path script;
-    private final ViewScriptEngine viewScriptEngine;
-
+    private static ScriptManager scriptManager;
     public ScriptView(final String filter, final Map<String, Object> options)
     {
         super( filter, "script", options, HttpMethod.ALL );
@@ -40,13 +38,24 @@ public class ScriptView extends View
         {
             throw new IllegalArgumentException( "No script provided for script type..." );
         }
-        this.viewScriptEngine = ServerImplementation.getImplementation().getScriptManager()
-                .getViewScriptEngine();
+        this.viewScriptEngine = getScriptManager().getViewScriptEngine();
         this.script = this.viewScriptEngine.getPath().getPath( options.get( "script" ).toString() );
         if ( !script.exists() )
         {
             Logger.error( "Provided script (%s) does not exist...", options.get( "script" ) );
         }
+    }
+
+    private final Path script;
+    private final ViewScriptEngine viewScriptEngine;
+
+    private static ScriptManager getScriptManager()
+    {
+        if ( scriptManager == null )
+        {
+            scriptManager = new ScriptManager( ServerImplementation.getImplementation() );
+        }
+        return scriptManager;
     }
 
     @Override

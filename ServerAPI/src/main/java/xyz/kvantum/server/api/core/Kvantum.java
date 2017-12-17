@@ -33,7 +33,6 @@ import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
-import xyz.kvantum.server.api.scripts.ScriptManager;
 import xyz.kvantum.server.api.session.SessionManager;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 import xyz.kvantum.server.api.util.Assert;
@@ -41,11 +40,9 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 import xyz.kvantum.server.api.util.Generator;
 import xyz.kvantum.server.api.util.ITempFileManagerFactory;
 import xyz.kvantum.server.api.views.RequestHandler;
-import xyz.kvantum.server.api.views.View;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -99,21 +96,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
     }
 
     /**
-     * Add a view binding to the engine
-     *
-     * @param key Binding Key
-     * @param c   The View Class
-     * @see #validateViews()
-     */
-    void addViewBinding(String key, Class<? extends View> c);
-
-    /**
-     * Validate the views, and make sure they
-     * contain the right constructor
-     */
-    void validateViews();
-
-    /**
      * Get the file system used in the server implementation
      *
      * @return File system (defaults to .kvantum)
@@ -127,12 +109,7 @@ public interface Kvantum extends CommandCaller<Kvantum>
      */
     FileWatcher getFileWatcher();
 
-    /**
-     * Get the implementation specific script manager
-     *
-     * @return Script manager
-     */
-    ScriptManager getScriptManager();
+    ConfigurationFile getTranslations();
 
     /**
      * Create a simple request handler
@@ -142,11 +119,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return The created request handler
      */
     RequestHandler createSimpleRequestHandler(String filter, BiConsumer<AbstractRequest, Response> generator);
-
-    /**
-     * Load all plugins
-     */
-    void loadPlugins();
 
     CommandManager getCommandManager();
 
@@ -193,12 +165,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
     LogWrapper getLogWrapper();
 
     /**
-     * Get the translation configuration file instance
-     * @return Translation file
-     */
-    ConfigurationFile getTranslations();
-
-    /**
      * Get the main folder (configured_folder/.kvantum/)
      * @return main folder
      */
@@ -209,12 +175,6 @@ public interface Kvantum extends CommandCaller<Kvantum>
      * @return boolean indicating whether or not the server is in standalone mode
      */
     boolean isStandalone();
-
-    /**
-     * Get all view bindings
-     * @return map containing all view bindings
-     */
-    Map<String, Class<? extends View>> getViewBindings();
 
     /**
      * Check to see if the server is in silent mode

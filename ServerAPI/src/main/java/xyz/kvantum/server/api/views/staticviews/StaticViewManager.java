@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 final public class StaticViewManager
@@ -72,16 +73,16 @@ final public class StaticViewManager
                     declaration.setForceHttps( matcher.forceHTTPS() );
                     declaration.setHttpMethod( matcher.httpMethod() );
                     if ( !matcher.outputType().isEmpty() && converters.containsKey( matcher.outputType()
-                            .toLowerCase() ) )
+                            .toLowerCase( Locale.ENGLISH ) ) )
                     {
-                        final OutputConverter<?> outputConverter = converters.get( matcher.outputType().toLowerCase() );
+                        final OutputConverter<?> outputConverter = converters.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) );
                         if ( !outputConverter.getClazz().equals( m.getReturnType() ) )
                         {
                             new IllegalArgumentException( m.getName() + " should return " + outputConverter.getClazz
                                     ().getSimpleName() ).printStackTrace();
                         } else
                         {
-                            declaration.setOutputConverter( converters.get( matcher.outputType().toLowerCase() ) );
+                            declaration.setOutputConverter( converters.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) ) );
                         }
                     }
                     if ( matcher.name().isEmpty() )
@@ -133,7 +134,7 @@ final public class StaticViewManager
 
     public static void registerConverter(final OutputConverter<?> converter)
     {
-        converters.put( converter.getKey().toLowerCase(), converter );
+        converters.put( converter.getKey().toLowerCase( Locale.ENGLISH ), converter );
     }
 
 }

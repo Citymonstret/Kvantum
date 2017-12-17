@@ -16,6 +16,8 @@
  */
 package xyz.kvantum.crush.syntax;
 
+import java.util.Locale;
+
 public abstract class Filter
 {
 
@@ -23,7 +25,7 @@ public abstract class Filter
 
     public Filter(final String key)
     {
-        this.key = key.toUpperCase();
+        this.key = key.toUpperCase( Locale.ENGLISH );
     }
 
     public abstract Object handle(final String objectName, final Object in);

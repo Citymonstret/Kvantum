@@ -19,6 +19,8 @@ package xyz.kvantum.server.api.config;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogModes;
 
+import java.util.Locale;
+
 /**
  * These are logging messages
  */
@@ -129,11 +131,11 @@ public enum Message
                     nameSpace = "info";
                     break;
             }
-            if ( ServerImplementation.getImplementation().getTranslations().contains( nameSpace + "." + this.name().toLowerCase()
+            if ( ServerImplementation.getImplementation().getTranslations().contains( nameSpace + "." + this.name().toLowerCase( Locale.ENGLISH )
             ) )
             {
                 return ( ServerImplementation.getImplementation().getTranslations().get( nameSpace + "." + this.name
-                        ().toLowerCase() ) );
+                        ().toLowerCase( Locale.ENGLISH ) ) );
             }
         }
         return this.message;

@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.logging.Logger;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @UtilityClass
@@ -35,9 +36,9 @@ public class Examples
 
     public static void loadExample(final String input)
     {
-        if ( exampleMap.containsKey( input.toLowerCase() ) )
+        if ( exampleMap.containsKey( input.toLowerCase( Locale.ENGLISH ) ) )
         {
-            exampleMap.get( input.toLowerCase() ).initExample();
+            exampleMap.get( input.toLowerCase( Locale.ENGLISH ) ).initExample();
         } else
         {
             Logger.error( "Unknown example: \"%s\"", input );

@@ -19,8 +19,6 @@ package xyz.kvantum.server.api.logging;
 public interface LogWrapper
 {
 
-    void setFormat(String format);
-
     void log(LogContext logContext);
 
     void log(String s);

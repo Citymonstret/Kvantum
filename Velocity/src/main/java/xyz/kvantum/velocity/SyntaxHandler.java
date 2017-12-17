@@ -28,6 +28,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,12 +49,12 @@ public class SyntaxHandler extends TemplateSyntaxHandler
 
         for ( final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get().getProviders() )
         {
-            factories.put( factory.providerName().toLowerCase(), factory );
+            factories.put( factory.providerName().toLowerCase( Locale.ENGLISH ), factory );
         }
         final ProviderFactory z = requestHandler.getFactory( request );
         if ( z != null )
         {
-            factories.put( z.providerName().toLowerCase(), z );
+            factories.put( z.providerName().toLowerCase( Locale.ENGLISH ), z );
         }
         factories.putAll( request.getModels() );
         factories.put( "request", request );

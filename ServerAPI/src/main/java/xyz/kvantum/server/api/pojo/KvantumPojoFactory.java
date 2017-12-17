@@ -106,7 +106,7 @@ public final class KvantumPojoFactory<Object>
             //
             String name = method.getName().replaceFirst( prefix, "" );
             String firstChar = new String( new char[]{ name.charAt( 0 ) } );
-            name = firstChar.toLowerCase( Locale.US ) + name.substring( 1 );
+            name = firstChar.toLowerCase( Locale.ENGLISH ) + name.substring( 1 );
 
             if ( getter )
             {

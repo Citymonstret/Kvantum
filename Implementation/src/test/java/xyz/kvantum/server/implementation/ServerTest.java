@@ -17,6 +17,7 @@
 package xyz.kvantum.server.implementation;
 
 import org.junit.jupiter.api.Test;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.views.RequestHandler;
 
 import java.io.File;
@@ -47,8 +48,8 @@ class ServerTest extends GenericServerTest
     @Test
     void getInstance()
     {
-        assertNotNull( Server.getInstance() );
-        assertEquals( serverInstance, Server.getInstance() );
+        assertNotNull( ServerImplementation.getImplementation() );
+        assertEquals( serverInstance, ServerImplementation.getImplementation() );
     }
 
     @Test

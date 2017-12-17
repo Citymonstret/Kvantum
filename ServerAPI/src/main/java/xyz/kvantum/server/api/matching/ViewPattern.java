@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -77,7 +78,7 @@ public class ViewPattern
 
         this.raw = in;
 
-        final SmartString string = new SmartString( raw.toLowerCase() );
+        final SmartString string = new SmartString( raw.toLowerCase( Locale.ENGLISH ) );
         string.replaceLastIf( '/', SmartString.nil );
         string.replaceFirstIf( '/', SmartString.nil );
 

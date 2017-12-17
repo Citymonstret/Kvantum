@@ -17,6 +17,7 @@
 package xyz.kvantum.server.api.account.roles;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -40,7 +41,7 @@ public class SimpleAccountRole extends AccountRole
     @Override
     public boolean hasPermission(final String permissionKey)
     {
-        return this.permissionSet.contains( permissionKey.toLowerCase() );
+        return this.permissionSet.contains( permissionKey.toLowerCase( Locale.ENGLISH ) );
     }
 
     @Override

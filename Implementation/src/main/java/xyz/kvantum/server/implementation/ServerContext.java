@@ -19,6 +19,7 @@ package xyz.kvantum.server.implementation;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.matching.Router;
@@ -26,6 +27,7 @@ import xyz.kvantum.server.api.util.Assert;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -37,6 +39,7 @@ import java.util.Optional;
  * or by using {@code new ServerContextBuilder()}
  * </p>
  */
+@Setter
 @Getter
 @Builder
 @SuppressWarnings( "WeakerAccess" )
@@ -51,6 +54,9 @@ public final class ServerContext
     private LogWrapper logWrapper;
     @NonNull
     private Router router;
+    @NonNull
+    @Builder.Default
+    private Function<ServerContext, SimpleServer> serverSupplier = SimpleServer::new;
 
     /**
      * Creates a server instance using this context.
@@ -62,15 +68,15 @@ public final class ServerContext
     {
         Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
                 "Cannot use a folder with '!' path as core folder" );
-        Server server = null;
+        SimpleServer simpleServer = null;
         try
         {
-            server = new Server( this );
+            simpleServer = serverSupplier.apply( this );
         } catch ( final Exception e )
         {
             e.printStackTrace();
         }
-        return Optional.ofNullable( server );
+        return Optional.ofNullable( simpleServer );
     }
 
 }

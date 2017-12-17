@@ -63,7 +63,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     private ByteBuf byteBuf;
     private WorkerContext workerContext;
     private RequestReader requestReader;
-    private SocketContext socketContext;
 
     @Override
     public void handlerAdded(final ChannelHandlerContext context)
@@ -75,8 +74,8 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         //
         final Supplier<Boolean> activeCheck = () -> context.channel().isOpen() && context.channel().isActive();
         final SocketAddress remoteAddress = context.channel().remoteAddress();
-        this.socketContext = new SocketContext( this.protocolType, remoteAddress, activeCheck );
-        this.workerContext = new WorkerContext( Server.getInstance(), ServerImplementation.getImplementation()
+        SocketContext socketContext = new SocketContext( this.protocolType, remoteAddress, activeCheck );
+        this.workerContext = new WorkerContext( ServerImplementation.getImplementation(), ServerImplementation.getImplementation()
                 .getProcedure().getInstance(), this );
         this.workerContext.setSocketContext( socketContext );
         final Request request = new Request( socketContext );
@@ -318,9 +317,9 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         workerContext.setBytes( bytes );
     }
 
-    void handleResponse(final ChannelHandlerContext context) throws Throwable
+    private void handleResponse(final ChannelHandlerContext context) throws Throwable
     {
-        workerContext.setRequestHandler( Server.getInstance().getRouter().match( workerContext.getRequest() ) );
+        workerContext.setRequestHandler( ServerImplementation.getImplementation().getRouter().match( workerContext.getRequest() ) );
         if ( workerContext.getRequestHandler() == null )
         {
             throw new ReturnStatus( Header.STATUS_NOT_FOUND, workerContext );
@@ -344,6 +343,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         this.sendResponse( context );
     }
 
+    @SuppressWarnings("ALL")
     private void sendResponse(final ChannelHandlerContext context)
     {
         workerContext.determineGzipStatus();
@@ -353,7 +353,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 
         if ( CoreConfig.contentMd5 )
         {
-            final Md5Handler md5Handler = Server.md5HandlerPool.getNullable();
+            final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
 
             Assert.notNull( bytes );
             Assert.notNull( body );
@@ -364,20 +364,20 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             body.getHeader().set( Header.HEADER_CONTENT_MD5, checksum );
             body.getHeader().set( Header.HEADER_ETAG, checksum );
 
-            Server.md5HandlerPool.add( md5Handler );
+            SimpleServer.md5HandlerPool.add( md5Handler );
         }
 
         if ( workerContext.isGzip() )
         {
             try
             {
-                final GzipHandler gzipHandler = Server.gzipHandlerPool.getNullable();
+                final GzipHandler gzipHandler = SimpleServer.gzipHandlerPool.getNullable();
                 bytes = gzipHandler.compress( bytes );
                 if ( body.getHeader().hasHeader( Header.HEADER_CONTENT_LENGTH ) )
                 {
                     body.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + bytes.length );
                 }
-                Server.gzipHandlerPool.add( gzipHandler );
+                SimpleServer.gzipHandlerPool.add( gzipHandler );
             } catch ( final IOException e )
             {
                 new KvantumException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();

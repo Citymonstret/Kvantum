@@ -20,13 +20,15 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.RequestManager;
 import xyz.kvantum.server.implementation.DefaultLogWrapper;
 import xyz.kvantum.server.implementation.ServerContext;
+import xyz.kvantum.server.implementation.SimpleServer;
+import xyz.kvantum.server.implementation.StandaloneServer;
 
 import java.io.File;
 import java.util.Optional;
 
 /**
  * Example that will started a {@link Kvantum} instance,
- * implemented by {@link xyz.kvantum.server.implementation.Server}.
+ * implemented by {@link SimpleServer}.
  * <p>
  * This example will also load {@link HelloWorld}, {@link ExampleLogin}
  * &amp; {@link ExampleSession}
@@ -41,6 +43,7 @@ public final class ExampleServer
                 .logWrapper( new DefaultLogWrapper() )
                 .router( RequestManager.builder().build() )
                 .standalone( true )
+                .serverSupplier( StandaloneServer::new )
                 .build();
         final Optional<Kvantum> serverOptional = serverContext.create();
         if ( serverOptional.isPresent() )

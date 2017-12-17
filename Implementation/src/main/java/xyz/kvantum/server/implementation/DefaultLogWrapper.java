@@ -16,8 +16,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.AllArgsConstructor;
-import lombok.Setter;
 import org.apache.commons.text.StrSubstitutor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -32,26 +30,17 @@ import java.io.PrintStream;
  * The default log handler. UsesAnsi.FColor for colored output
  */
 @SuppressWarnings( "WeakerAccess" )
-@AllArgsConstructor
 public class DefaultLogWrapper implements LogWrapper
 {
-
-    @Setter
-    private String format;
-
-    public DefaultLogWrapper()
-    {
-        this( CoreConfig.Logging.logFormat );
-    }
 
     @Override
     public void log(final LogContext logContext)
     {
         Assert.notNull( logContext );
-        final String replacedMessage = StrSubstitutor.replace( format, logContext.toMap() );
+        final String replacedMessage = StrSubstitutor.replace( CoreConfig.Logging.logFormat, logContext.toMap() );
         if ( ServerImplementation.hasImplementation() )
         {
-            final PrintStream stream = ( (Server) ServerImplementation.getImplementation() ).logStream;
+            final PrintStream stream = ( (SimpleServer) ServerImplementation.getImplementation() ).logStream;
             if ( stream != null )
             {
                 stream.println( replacedMessage );
@@ -65,7 +54,7 @@ public class DefaultLogWrapper implements LogWrapper
     {
         Assert.notNull( s );
         System.out.println( s );
-        ( (Server) ServerImplementation.getImplementation() ).logStream.println( s );
+        ( (SimpleServer) ServerImplementation.getImplementation() ).logStream.println( s );
     }
 
     @Override

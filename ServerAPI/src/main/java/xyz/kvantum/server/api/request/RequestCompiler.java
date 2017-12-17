@@ -23,6 +23,7 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.RequestException;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,7 +46,7 @@ public class RequestCompiler
         {
             return Optional.empty();
         }
-        return Optional.of( new HeaderPair( matcher.group( "key" ).toLowerCase(),
+        return Optional.of( new HeaderPair( matcher.group( "key" ).toLowerCase( Locale.ENGLISH ),
                 matcher.group( "value" ) ) );
     }
 

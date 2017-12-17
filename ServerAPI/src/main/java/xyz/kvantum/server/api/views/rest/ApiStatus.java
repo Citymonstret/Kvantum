@@ -18,6 +18,8 @@ package xyz.kvantum.server.api.views.rest;
 
 import org.json.simple.JSONObject;
 
+import java.util.Locale;
+
 public enum ApiStatus
 {
     SUCCESS,
@@ -28,7 +30,7 @@ public enum ApiStatus
     {
         final JSONObject object = new JSONObject();
         object.put( "statusCode", this.ordinal() );
-        object.put( "status", this.toString().toLowerCase() );
+        object.put( "status", this.toString().toLowerCase( Locale.ENGLISH ) );
         return object;
     }
 

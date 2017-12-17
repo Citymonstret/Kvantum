@@ -22,6 +22,7 @@ import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -46,9 +47,9 @@ final public class ForEachBlock extends Syntax
 
             try
             {
-                if ( factories.containsKey( provider.toLowerCase() ) )
+                if ( factories.containsKey( provider.toLowerCase( Locale.ENGLISH ) ) )
                 {
-                    Optional<VariableProvider> pOptional = factories.get( provider.toLowerCase() ).get( r );
+                    Optional<VariableProvider> pOptional = factories.get( provider.toLowerCase( Locale.ENGLISH ) ).get( r );
                     if ( pOptional.isPresent() )
                     {
                         final VariableProvider p = pOptional.get();

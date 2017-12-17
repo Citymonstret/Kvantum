@@ -28,6 +28,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -67,11 +68,11 @@ final public class Variable extends Syntax
             {
                 filter = matcher.group().split( " \\|\\| " )[ 1 ].replace( "}}", "" );
             }
-            if ( factories.containsKey( provider.toLowerCase() ) )
+            if ( factories.containsKey( provider.toLowerCase( Locale.ENGLISH ) ) )
             {
                 try
                 {
-                    Optional pOptional = factories.get( provider.toLowerCase() ).get( r );
+                    Optional pOptional = factories.get( provider.toLowerCase( Locale.ENGLISH ) ).get( r );
                     if ( pOptional.isPresent() )
                     {
                         final VariableProvider p = (VariableProvider) pOptional.get();
@@ -80,7 +81,7 @@ final public class Variable extends Syntax
                             Object o = p.get( variable );
                             if ( !"".equals( filter ) )
                             {
-                                o = filters.get( filter.toUpperCase() ).handle( variable, o );
+                                o = filters.get( filter.toUpperCase( Locale.ENGLISH ) ).handle( variable, o );
                             }
                             content = content.replace( matcher.group(), o.toString() );
                         }
@@ -97,7 +98,7 @@ final public class Variable extends Syntax
             {
                 if ( CoreConfig.debug )
                 {
-                    Logger.debug( "Template requesting unknown variable factory [%s]", provider.toLowerCase() );
+                    Logger.debug( "Template requesting unknown variable factory [%s]", provider.toLowerCase( Locale.ENGLISH ) );
                 }
                 content = content.replace( matcher.group(), "" );
             }

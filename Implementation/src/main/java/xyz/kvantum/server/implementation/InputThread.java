@@ -30,6 +30,8 @@ import xyz.kvantum.server.implementation.commands.Help;
 import xyz.kvantum.server.implementation.commands.Show;
 import xyz.kvantum.server.implementation.commands.Stop;
 
+import java.util.Locale;
+
 /**
  * The thread which handles command inputs, when ran as a standalone
  * applications.
@@ -82,7 +84,7 @@ public final class InputThread extends Thread
                 }
                 if ( line.startsWith( "/" ) )
                 {
-                    line = line.replace( "/", "" ).toLowerCase();
+                    line = line.replace( "/", "" ).toLowerCase( Locale.ENGLISH );
                     final CommandResult result = ServerImplementation.getImplementation().getCommandManager().handle(
                             ServerImplementation.getImplementation(), line );
 

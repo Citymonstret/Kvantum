@@ -18,6 +18,7 @@ package xyz.kvantum.server.implementation;
 
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+import xyz.kvantum.server.api.core.ServerImplementation;
 
 final class ExitSignalHandler implements SignalHandler
 {
@@ -27,7 +28,7 @@ final class ExitSignalHandler implements SignalHandler
     {
         if ( signal.toString().equals( "SIGINT" ) )
         {
-            Server.getInstance().stopServer();
+            ServerImplementation.getImplementation().stopServer();
         }
     }
 
