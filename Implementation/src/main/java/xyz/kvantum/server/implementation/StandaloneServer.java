@@ -17,9 +17,11 @@ package xyz.kvantum.server.implementation;
 
 import com.intellectualsites.configurable.ConfigurationFactory;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import xyz.kvantum.files.Extension;
+import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -48,6 +50,7 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -244,6 +247,39 @@ public final class StandaloneServer extends SimpleServer
         // Validating views
         this.log( Message.VALIDATING_VIEWS );
         this.validateViews();
+        if ( CoreConfig.loadWebJars )
+        {
+            try
+            {
+                @NonNull final URL url = StandaloneServer.class.getResource( "/META-INF/resources/webjars" );
+                @NonNull final java.nio.file.Path resourcePath = new File( url.toURI().toString() ).toPath();
+                final FileSystem webjarsFileSystem = new FileSystem( resourcePath, getFileSystem()
+                        .getFileCacheManager() );
+                if ( CoreConfig.debug )
+                {
+                    webjarsFileSystem.getPath( "" ).getSubPaths().forEach( path ->
+                            Logger.info( "Found path: " + path ) );
+                }
+                @NonNull final Path remote = getFileSystem().getPath( "" ).forcePath( "webjars" );
+                final boolean result = webjarsFileSystem.getPath( "" ).copy( remote );
+                if ( !result )
+                {
+                    Logger.error( "Failed to copy webjars resources into kvantum/webjars..." );
+                } else
+                {
+                    final ViewDetector viewDetector = new ViewDetector( "webjars/", remote, Collections.emptyList() );
+                    final int loaded = viewDetector.loadPaths();
+                    Logger.info( "Found %s folders", loaded );
+                    viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+                    viewDetector.generateViewEntries();
+                    Logger.info( "Loaded %s webjars resource(s)", viewDetector.getViewEntries().size() );
+                    new ViewLoader( viewDetector.getViewEntries(), this.viewBindings );
+                }
+            } catch ( final Exception e )
+            {
+                e.printStackTrace();
+            }
+        }
         if ( CoreConfig.autoDetectViews )
         {
             Logger.info( "Auto-Detecting views..." );

@@ -18,6 +18,7 @@ package xyz.kvantum.files;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.WatchEvent;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
@@ -241,6 +242,16 @@ public class Path
         return fileSystem.getPath( this, path );
     }
 
+    public Path forcePath(final String path)
+    {
+        final Path subPath = getPath( path );
+        if ( !subPath.exists() )
+        {
+            subPath.create();
+        }
+        return subPath;
+    }
+
     public Path getPath(final String path, final Extension extension)
     {
         final Collection<Path> subPaths = getSubPaths();
@@ -360,6 +371,33 @@ public class Path
         }
     }
 
+    public boolean copy(final Path targetDirectory)
+    {
+        final Path target = targetDirectory.forcePath( this.getEntityName() + "." + this.getExtension() );
+        if ( this.isFolder() )
+        {
+            for ( final Path subPath : getSubPaths() )
+            {
+                final boolean result = subPath.copy( targetDirectory );
+                if ( !result )
+                {
+                    return false;
+                }
+            }
+        } else
+        {
+            try
+            {
+                Files.copy( this.getJavaPath(), target.javaPath, StandardCopyOption.REPLACE_EXISTING );
+            } catch ( final IOException e )
+            {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Get all sub paths
      *
@@ -422,4 +460,17 @@ public class Path
         return stream.collect( Collectors.toList() );
     }
 
+    public void delete()
+    {
+        if ( Files.exists( getJavaPath() ) )
+        {
+            try
+            {
+                Files.delete( getJavaPath() );
+            } catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+        }
+    }
 }

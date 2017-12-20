@@ -39,6 +39,7 @@ public class CoreConfig
     public static String logPrefix = "Web";
     public static boolean verbose = false;
     public static boolean disableViews = false;
+    public static boolean loadWebJars = true;
     public static boolean autoDetectViews = false;
     public static boolean debug = true;
     public static boolean gzip = true;

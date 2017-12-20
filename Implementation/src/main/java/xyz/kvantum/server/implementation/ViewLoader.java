@@ -16,6 +16,7 @@
 package xyz.kvantum.server.implementation;
 
 import xyz.kvantum.server.api.config.ConfigurationFile;
+import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
@@ -108,6 +109,10 @@ public class ViewLoader
             {
                 final View vv = vc.getDeclaredConstructor( String.class, Map.class )
                         .newInstance( filter, options );
+                if ( CoreConfig.debug )
+                {
+                    Logger.debug( "Added view " + vv.getName() );
+                }
                 ServerImplementation.getImplementation().getRouter().add( vv );
             } catch ( final Exception e )
             {
