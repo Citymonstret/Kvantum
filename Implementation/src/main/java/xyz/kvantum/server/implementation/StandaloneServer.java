@@ -267,13 +267,16 @@ public final class StandaloneServer extends SimpleServer
                     Logger.error( "Failed to copy webjars resources into kvantum/webjars..." );
                 } else
                 {
-                    final ViewDetector viewDetector = new ViewDetector( "webjars/", remote, Collections.emptyList() );
-                    final int loaded = viewDetector.loadPaths();
-                    Logger.info( "Found %s folders", loaded );
-                    viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
-                    viewDetector.generateViewEntries();
-                    Logger.info( "Loaded %s webjars resource(s)", viewDetector.getViewEntries().size() );
-                    new ViewLoader( viewDetector.getViewEntries(), this.viewBindings );
+                    if ( !CoreConfig.autoDetectViews )
+                    {
+                        final ViewDetector viewDetector = new ViewDetector( "webjars/", remote, Collections.emptyList() );
+                        final int loaded = viewDetector.loadPaths();
+                        Logger.info( "Found %s folders", loaded );
+                        viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+                        viewDetector.generateViewEntries();
+                        Logger.info( "Loaded %s webjars resource(s)", viewDetector.getViewEntries().size() );
+                        new ViewLoader( viewDetector.getViewEntries(), this.viewBindings );
+                    }
                 }
             } catch ( final Exception e )
             {
