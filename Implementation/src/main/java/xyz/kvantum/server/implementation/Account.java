@@ -216,6 +216,12 @@ public class Account implements IAccount
     }
 
     @Override
+    public String getSuppliedPassword()
+    {
+        return this.password;
+    }
+
+    @Override
     public boolean isPermitted(final String permissionKey)
     {
         if ( this.roleList == null )

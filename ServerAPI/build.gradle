@@ -29,7 +29,7 @@ dependencies {
     // Field verification (used in KvantumObject)
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
-    compile group: 'xyz.kvantum', name: 'lambda-factory', version: '2.0.2-SNAPSHOT'
+    compile 'com.github.Hervian:lambda-factory:91bc62f8c2'
     //
     // Modules
     //

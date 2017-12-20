@@ -38,7 +38,7 @@ class ViewPatternTest
     @Test
     void matches()
     {
-        final String username = getRandomString( 10 );
+        final String username = getRandomString( 10 ) + "_";
 
         final ViewPattern pattern1 = new ViewPattern( "user/<username>" );
         Map<String, String> map = pattern1.matches( "user/" + username );

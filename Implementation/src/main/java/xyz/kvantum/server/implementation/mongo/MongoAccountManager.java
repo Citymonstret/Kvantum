@@ -73,8 +73,11 @@ final public class MongoAccountManager implements IAccountManager
     }
 
     @Override
-    public Optional<IAccount> createAccount(final String username, final String password)
+    public Optional<IAccount> createAccount(final IAccount temporary)
     {
+        final String username = temporary.getUsername();
+        final String password = temporary.getSuppliedPassword();
+
         Assert.notEmpty( username );
         Assert.notEmpty( password );
 
@@ -89,6 +92,12 @@ final public class MongoAccountManager implements IAccountManager
         this.applicationStructure.getMorphiaDatastore().save( account );
 
         return Optional.of( account );
+    }
+
+    @Override
+    public Optional<IAccount> createAccount(final String username, final String password)
+    {
+        return createAccount( new Account( -1, username, password ) );
     }
 
     @Override

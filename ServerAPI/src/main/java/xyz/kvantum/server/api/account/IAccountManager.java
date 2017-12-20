@@ -77,6 +77,8 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
      */
     Optional<IAccount> createAccount(String username, String password);
 
+    Optional<IAccount> createAccount(IAccount temporary);
+
     /**
      * Get an {@link IAccount} by username.
      * @param username Account username

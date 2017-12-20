@@ -109,6 +109,8 @@ public interface IAccount extends LogFormatted
      */
     void removeRole(AccountRole role);
 
+    String getSuppliedPassword();
+
     /**
      * Check if the account is permitted to perform an action
      * @param permissionKey Permission key

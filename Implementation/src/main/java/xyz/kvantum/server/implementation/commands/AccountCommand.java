@@ -21,11 +21,15 @@ import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import com.intellectualsites.commands.parser.impl.StringParser;
 import xyz.kvantum.server.api.account.IAccount;
+import xyz.kvantum.server.api.account.verification.AccountVerifier;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.MapUtil;
+import xyz.kvantum.server.api.verification.Rule;
+import xyz.kvantum.server.implementation.Account;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @CommandDeclaration(
@@ -183,6 +187,15 @@ public class AccountCommand extends Command
                 send( "There is already an account with that username!" );
             } else
             {
+                final IAccount temporaryAccount = new Account( -1, username, password );
+                final AccountVerifier accountVerifier = AccountVerifier.getGlobalAccountVerifier();
+                final Collection<Rule<IAccount>> brokenRules = accountVerifier.verifyAccount( temporaryAccount );
+                if ( !brokenRules.isEmpty() )
+                {
+                    send( "Error when creating account: " );
+                    brokenRules.forEach( rule -> send( "- " + rule.getRuleDescription() ) );
+                    return true;
+                }
                 try
                 {
                     send( "Account created (Username: " + username + ")" );

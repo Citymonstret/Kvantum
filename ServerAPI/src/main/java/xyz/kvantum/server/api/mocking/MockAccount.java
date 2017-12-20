@@ -91,6 +91,12 @@ public class MockAccount implements IAccount
     }
 
     @Override
+    public String getSuppliedPassword()
+    {
+        return "";
+    }
+
+    @Override
     public boolean isPermitted(final String permissionKey)
     {
         return true;
