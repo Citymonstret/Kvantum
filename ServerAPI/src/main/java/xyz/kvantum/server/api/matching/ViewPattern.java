@@ -156,6 +156,11 @@ public class ViewPattern
         url.replaceFirstIf( '/', SmartString.nil );
         url.replaceLastIf( '/', SmartString.nil );
 
+        if ( url.count( '.' ) >= 2 )
+        {
+            url.replaceAllButLast( '.', '§' );
+        }
+
         if ( parts.isEmpty() )
         {
             if ( url.toString().isEmpty() )
@@ -355,6 +360,36 @@ public class ViewPattern
             replaceIf( length - 1, c, k );
         }
 
+        int count(char search)
+        {
+            int i = 0;
+            for ( char c : this.chars )
+            {
+                if ( c == search )
+                {
+                    i += 1;
+                }
+            }
+            return i;
+        }
+
+        int[] search(char search)
+        {
+            final int count = this.count( search );
+            int[] indices = new int[ count ];
+            char c;
+            int indexPointer = 0;
+            for ( int index = 0; index < this.chars.length; index++ )
+            {
+                c = this.chars[ index ];
+                if ( c == search )
+                {
+                    indices[ indexPointer++ ] = index;
+                }
+            }
+            return indices;
+        }
+
         void replaceIf(int n, char c, char k)
         {
             if ( length == 0 )
@@ -451,9 +486,18 @@ public class ViewPattern
             };
         }
 
-        public void replaceFirstIf(char c1, char c2)
+        void replaceFirstIf(char c1, char c2)
         {
             replaceIf( 0, c1, c2 );
+        }
+
+        void replaceAllButLast(char search, char replacement)
+        {
+            final int[] indices = search( search );
+            for ( int index = 0; index < indices.length - 1; index++ )
+            {
+                this.chars[ indices[ index ] ] = replacement;
+            }
         }
     }
 

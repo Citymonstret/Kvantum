@@ -36,6 +36,14 @@ public class FileSystem
      */
     public FileSystem(final java.nio.file.Path coreFolder, final FileCacheManager fileCacheManager)
     {
+        if ( coreFolder == null )
+        {
+            throw new NullPointerException( "folder was null" );
+        }
+        if ( fileCacheManager == null )
+        {
+            throw new NullPointerException( "cache manager was null" );
+        }
         this.coreFolder = coreFolder;
         this.fileCacheManager = fileCacheManager;
         this.corePath = new Path( this, "/", true );
@@ -93,6 +101,10 @@ public class FileSystem
      */
     public Path getPath(final Path parent, String rawPath) throws IllegalPathException
     {
+        if ( rawPath == null )
+        {
+            throw new NullPointerException( "Path was null..." );
+        }
         final String[] parts = rawPath.split( "((?<=/)|(?=/))" );
         if ( parts.length < 1 )
         {
@@ -110,7 +122,7 @@ public class FileSystem
         }
         for ( final String part : parts )
         {
-            if ( StringUtils.countMatches( part, '.' ) > 1 )
+            if ( StringUtils.contains( part, ".." ) )
             {
                 throw new IllegalPathException( rawPath );
             }

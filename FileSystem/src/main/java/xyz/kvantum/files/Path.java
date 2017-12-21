@@ -66,6 +66,11 @@ public class Path
         this.exists = Files.exists( this.javaPath );
     }
 
+    private static String replaceName(final String in)
+    {
+        return in.replaceAll( "§", "\\." );
+    }
+
     /**
      * Get the java nio version of this path
      *
@@ -239,7 +244,7 @@ public class Path
      */
     public Path getPath(final String path)
     {
-        return fileSystem.getPath( this, path );
+        return fileSystem.getPath( this, replaceName( path ) );
     }
 
     public Path forcePath(final String path)
@@ -252,9 +257,11 @@ public class Path
         return subPath;
     }
 
-    public Path getPath(final String path, final Extension extension)
+    public Path getPath(String path, final Extension extension)
     {
+        path = replaceName( path );
         final Collection<Path> subPaths = getSubPaths();
+
         for ( final Path subPath : subPaths )
         {
             if ( subPath.getEntityName().equalsIgnoreCase( path ) )
@@ -273,7 +280,7 @@ public class Path
 
     private Path getPathUnsafe(final String path)
     {
-        return fileSystem.getPathUnsafe( this, path );
+        return fileSystem.getPathUnsafe( this, replaceName( path ) );
     }
 
     /**
