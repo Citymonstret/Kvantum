@@ -51,6 +51,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * This is not split into multiple handlers because the
+ * netty implementation is supposed to interfere as little
+ * as possible with the rest of the project. It's there as
+ * a necessity and thus it should remain as contained
+ * as possible.
+ */
 @RequiredArgsConstructor
 final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 {
@@ -96,6 +103,11 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws Exception
     {
+        //
+        // It is pushed here, rather than in #handlerAdded, as it would otherwise
+        // be impossible to gracefully shutdown the connection.
+        // Blame the HTTP protocol for that.
+        //
         final ConnectionEstablishedEvent connectionEstablishedEvent = new ConnectionEstablishedEvent(
                 this.workerContext.getSocketContext().getIP() );
         ServerImplementation.getImplementation().getEventBus().emit( connectionEstablishedEvent );

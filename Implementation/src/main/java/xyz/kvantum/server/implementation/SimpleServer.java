@@ -44,6 +44,7 @@ import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.events.ServerStartedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
 import xyz.kvantum.server.api.jtwig.JTwigEngine;
@@ -331,8 +332,8 @@ public class SimpleServer implements Kvantum
         // Setup causam (EventBus)
         //
         final SubscriptionSelectorService selectorService =
-                CachingSubscriptionSelectorServiceDecorator.standard( SubscriptionSelectorService.simple() );
-        final SubscriptionRegistry registry = SetBasedSubscriptionRegistry.concurrentHash( selectorService );
+                CachingSubscriptionSelectorServiceDecorator.concurrent( SubscriptionSelectorService.simple() );
+        final SubscriptionRegistry registry = SetBasedSubscriptionRegistry.hash( selectorService );
         final Publisher publisher = Publisher.immediate();
         final EventEmitter emitter = EventEmitter.standard( registry, publisher );
         this.eventBus = EventBus.standard( registry, emitter );
@@ -548,6 +549,11 @@ public class SimpleServer implements Kvantum
     public void stopServer()
     {
         Message.SHUTTING_DOWN.log();
+
+        //
+        // Emit the shut down event
+        //
+        getEventBus().emit( new ServerShutdownEvent( this ) );
 
         //
         // Gracefully shutdown the file watcher

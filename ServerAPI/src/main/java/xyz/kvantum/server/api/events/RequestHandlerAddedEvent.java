@@ -17,19 +17,28 @@ package xyz.kvantum.server.api.events;
 
 import lombok.Getter;
 import lombok.NonNull;
-import xyz.kvantum.server.api.core.Kvantum;
+import lombok.Setter;
+import pw.stamina.causam.event.Cancellable;
+import xyz.kvantum.server.api.views.RequestHandler;
 
-@SuppressWarnings({ "WeakerAccess" })
-public abstract class ServerEvent extends Event
+public final class RequestHandlerAddedEvent extends Event implements Cancellable
 {
 
     @Getter
-    private final Kvantum serverInstance;
+    private final RequestHandler context;
+    @Getter
+    @Setter
+    private boolean cancelled = false;
 
-    ServerEvent(@NonNull final Kvantum instance, final String name)
+    public RequestHandlerAddedEvent(@NonNull final RequestHandler context)
     {
-        super( name );
-        this.serverInstance = instance;
+        super( "requestHandlerAddedEvent" );
+        this.context = context;
     }
 
+    @Override
+    public void cancel()
+    {
+        this.setCancelled( true );
+    }
 }

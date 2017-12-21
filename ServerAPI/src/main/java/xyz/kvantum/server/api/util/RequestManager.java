@@ -23,6 +23,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.events.RequestHandlerAddedEvent;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -61,12 +63,29 @@ final public class RequestManager extends Router
     @Override
     public RequestHandler add(@NonNull final RequestHandler view)
     {
+        //
+        // make sure the view pattern isn't registered yet
+        //
         final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst( views, v -> v.toString()
                 .equalsIgnoreCase( view.toString() ) );
         if ( illegalRequestHandler.isPresent() )
         {
             throw new IllegalArgumentException( "Duplicate view pattern!" );
         }
+
+        //
+        // Call event
+        //
+        final RequestHandlerAddedEvent requestHandlerAddedEvent = new RequestHandlerAddedEvent( view );
+        ServerImplementation.getImplementation().getEventBus().emit( requestHandlerAddedEvent );
+        if ( requestHandlerAddedEvent.isCancelled() )
+        {
+            return null;
+        }
+
+        //
+        // register handler
+        //
         views.add( view );
         return view;
     }

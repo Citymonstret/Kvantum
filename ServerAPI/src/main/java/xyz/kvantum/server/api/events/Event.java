@@ -16,12 +16,14 @@
 package xyz.kvantum.server.api.events;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public abstract class Event
+abstract class Event
 {
 
+    @NonNull
     @Getter
     private final String name;
 

@@ -15,21 +15,13 @@
  */
 package xyz.kvantum.server.api.events;
 
-import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.core.Kvantum;
 
-@SuppressWarnings({ "WeakerAccess" })
-public abstract class ServerEvent extends Event
+public final class ServerShutdownEvent extends ServerEvent
 {
 
-    @Getter
-    private final Kvantum serverInstance;
-
-    ServerEvent(@NonNull final Kvantum instance, final String name)
+    public ServerShutdownEvent(final Kvantum instance)
     {
-        super( name );
-        this.serverInstance = instance;
+        super( instance, "serverShutdownEvent" );
     }
-
 }
