@@ -27,6 +27,7 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Request;
@@ -95,10 +96,10 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws Exception
     {
-        //
-        // Throttle requests
-        //
-        if ( ConnectionThrottle.shouldThrottle( workerContext ) )
+        final ConnectionEstablishedEvent connectionEstablishedEvent = new ConnectionEstablishedEvent(
+                this.workerContext.getSocketContext().getIP() );
+        ServerImplementation.getImplementation().getEventBus().emit( connectionEstablishedEvent );
+        if ( connectionEstablishedEvent.isCancelled() )
         {
             ctx.close();
         }

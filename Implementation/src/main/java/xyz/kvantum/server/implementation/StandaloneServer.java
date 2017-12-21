@@ -27,6 +27,7 @@ import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.config.YamlConfiguration;
+import xyz.kvantum.server.api.events.ServerInitializedEvent;
 import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.plugin.PluginLoader;
@@ -236,6 +237,7 @@ public final class StandaloneServer extends SimpleServer
         {
             throw new KvantumInitializationException( "Couldn't load in views", e );
         }
+        this.getEventBus().emit( new ServerInitializedEvent( this ) );
     }
 
     @Override
@@ -311,6 +313,12 @@ public final class StandaloneServer extends SimpleServer
         {
             Message.VIEWS_DISABLED.log();
         }
+    }
+
+    @SneakyThrows
+    private <T> void emit(@NonNull final T event)
+    {
+        this.getEventBus().emit( event );
     }
 
     private void loadPlugins()

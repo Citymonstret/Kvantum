@@ -24,6 +24,13 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
+import pw.stamina.causam.EventBus;
+import pw.stamina.causam.event.EventEmitter;
+import pw.stamina.causam.publish.Publisher;
+import pw.stamina.causam.registry.SetBasedSubscriptionRegistry;
+import pw.stamina.causam.registry.SubscriptionRegistry;
+import pw.stamina.causam.select.CachingSubscriptionSelectorServiceDecorator;
+import pw.stamina.causam.select.SubscriptionSelectorService;
 import sun.misc.Signal;
 import xyz.kvantum.crush.CrushEngine;
 import xyz.kvantum.files.FileSystem;
@@ -37,6 +44,7 @@ import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.events.ServerStartedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
 import xyz.kvantum.server.api.jtwig.JTwigEngine;
 import xyz.kvantum.server.api.logging.LogContext;
@@ -126,6 +134,8 @@ public class SimpleServer implements Kvantum
     private ApplicationStructure applicationStructure;
     @Getter
     private ConfigurationFile translations;
+    @Getter
+    private EventBus eventBus;
 
     /**
      * @param serverContext ServerContext that will be used to initialize the server
@@ -316,6 +326,21 @@ public class SimpleServer implements Kvantum
         // Setup the session manager implementation
         //
         this.sessionManager = new SessionManager( new SessionFactory(), sessionDatabase );
+
+        //
+        // Setup causam (EventBus)
+        //
+        final SubscriptionSelectorService selectorService =
+                CachingSubscriptionSelectorServiceDecorator.standard( SubscriptionSelectorService.simple() );
+        final SubscriptionRegistry registry = SetBasedSubscriptionRegistry.concurrentHash( selectorService );
+        final Publisher publisher = Publisher.immediate();
+        final EventEmitter emitter = EventEmitter.standard( registry, publisher );
+        this.eventBus = EventBus.standard( registry, emitter );
+
+        //
+        // Setup the connection throttler
+        //
+        ConnectionThrottle.initialize();
     }
 
     @Override
@@ -439,6 +464,7 @@ public class SimpleServer implements Kvantum
             return;
         }
         this.httpThread.start();
+        this.getEventBus().emit( new ServerStartedEvent( this ) );
     }
 
     @Override

@@ -30,6 +30,8 @@ dependencies {
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
     compile 'com.github.Hervian:lambda-factory:91bc62f8c2'
+    // Event handling
+    compile 'com.github.staminapw:causam:efb517dfaa'
     //
     // Modules
     //

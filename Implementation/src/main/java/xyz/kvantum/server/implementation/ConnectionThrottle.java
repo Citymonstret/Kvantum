@@ -16,7 +16,10 @@
 package xyz.kvantum.server.implementation;
 
 import lombok.Data;
+import pw.stamina.causam.scan.method.model.Subscriber;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.memguard.LeakageProne;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
@@ -33,7 +36,7 @@ import java.util.stream.Collectors;
 final class ConnectionThrottle implements LeakageProne
 {
 
-    private static ConnectionThrottle instance = new ConnectionThrottle();
+    private static ConnectionThrottle instance;
     private static long timeLimit = -1;
     private final Map<String, AttemptMapping> attemptMapping;
 
@@ -51,6 +54,15 @@ final class ConnectionThrottle implements LeakageProne
         // Register in the memory guard
         //
         MemoryGuard.getInstance().register( this );
+        //
+        // Register event listener
+        //
+        ServerImplementation.getImplementation().getEventBus().register( this );
+    }
+
+    static void initialize()
+    {
+        setInstance( new ConnectionThrottle() );
     }
 
     private static void setInstance(final ConnectionThrottle instance)
@@ -67,7 +79,7 @@ final class ConnectionThrottle implements LeakageProne
         return timeLimit;
     }
 
-    public static boolean shouldThrottle(final WorkerContext workerContext)
+    private static boolean shouldThrottle(final String address)
     {
         Assert.notNull( instance );
         //
@@ -77,7 +89,6 @@ final class ConnectionThrottle implements LeakageProne
         {
             return false;
         }
-        final String address = workerContext.getSocketContext().getIP();
         final AttemptMapping attemptMapping;
         if ( !instance.attemptMapping.containsKey( address ) )
         {
@@ -98,6 +109,17 @@ final class ConnectionThrottle implements LeakageProne
 
         final int totalAttempts = attemptMapping.getTotalAttempts().incrementAndGet();
         return totalAttempts > CoreConfig.Throttle.limit;
+    }
+
+    @Subscriber
+    @SuppressWarnings("unused")
+    private void listenForConnections(final ConnectionEstablishedEvent establishedEvent)
+    {
+        if ( CoreConfig.debug )
+        {
+            Logger.debug( "Checking for throttle for " + establishedEvent.getIp() );
+        }
+        establishedEvent.setCancelled( shouldThrottle( establishedEvent.getIp() ) );
     }
 
     private boolean shouldReset(final AttemptMapping attemptMapping)
