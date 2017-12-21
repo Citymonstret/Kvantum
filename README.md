@@ -20,13 +20,14 @@ Code examples can be found at [this](https://github.com/IntellectualSites/Kvantu
 ## Description
 Kvantum is a lightweight, portable and (if you so desire) embeddable (HTTP/HTTPS) web server, written entirely in java. It is meant to be easy to use, yet offer a wide variety of tools and utilities to simplify the development of your website. It comes shipped with tools such as account management, database connectors and template engine support. All to remove the need for repeated boilerplate. 
 
-Kvantum can be used both as a standlone webserver for static content, natively serving:
+Kvantum can be used both as a standalone web server for static content, natively serving:
 * HTML
 * CSS 
 * JavaScript
 * (Downloading of...) PDF, TXT &amp; ZIP
 * Images (PNG, ICO, SVG)
-* ... and the system can also be extended programatically, both by extending the application itself, by scripts and by plugins. 
+* Webjars resources as static files
+* ... and the system can also be extended programmatically, both by extending the application itself, by scripts and by plugins. 
 
 and as a web framework with a powerful API. Everything served by Kvantum, regardless if it's dynamic or static, can be managed by templates. Kvantum supports Crush, JTwig and Apache Velocity out of the box!
 
@@ -66,7 +67,7 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>xyz.kvantum.Kvantum</groupId>
     <artifactId>Implementation</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>50d9618</version>
 </dependency>
 ```
 

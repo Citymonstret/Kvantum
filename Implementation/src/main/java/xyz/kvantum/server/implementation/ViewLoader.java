@@ -15,6 +15,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.YamlConfiguration;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @SuppressWarnings("ALL")
 public class ViewLoader
@@ -33,16 +35,23 @@ public class ViewLoader
 
     private Map<String, Map<String, Object>> views = new HashMap<>();
     private Map<String, Class<? extends View>> viewBindings;
+    private final Supplier<FileSystem> fileSystemSupplier;
 
-    ViewLoader(final ConfigurationFile viewConfiguration, final Map<String, Class<? extends View>> viewBindings)
+    ViewLoader(final ConfigurationFile viewConfiguration,
+               final Supplier<FileSystem> fileSystemSupplier,
+               final Map<String, Class<? extends View>> viewBindings)
     {
+        this.fileSystemSupplier = fileSystemSupplier;
         this.viewBindings = viewBindings;
         this.addViews( viewConfiguration );
         this.views.entrySet().forEach( this::loadView );
     }
 
-    ViewLoader(final Map<String, Map<String, Object>> views, Map<String, Class<? extends View>> viewBindings)
+    ViewLoader(final Supplier<FileSystem> fileSystemSupplier,
+               final Map<String, Map<String, Object>> views,
+               final Map<String, Class<? extends View>> viewBindings)
     {
+        this.fileSystemSupplier = fileSystemSupplier;
         this.viewBindings = viewBindings;
         this.views = views;
         this.views.entrySet().forEach( this::loadView );
@@ -109,6 +118,7 @@ public class ViewLoader
             {
                 final View vv = vc.getDeclaredConstructor( String.class, Map.class )
                         .newInstance( filter, options );
+                vv.setFileSystemSupplier( this.fileSystemSupplier );
                 if ( CoreConfig.debug )
                 {
                     Logger.debug( "Added view " + vv.getName() );

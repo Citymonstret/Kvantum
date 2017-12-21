@@ -50,7 +50,9 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -247,12 +249,20 @@ public final class StandaloneServer extends SimpleServer
         // Validating views
         this.log( Message.VALIDATING_VIEWS );
         this.validateViews();
+        loadWebJars:
         if ( CoreConfig.loadWebJars )
         {
             try
             {
                 @NonNull final URL url = StandaloneServer.class.getResource( "/META-INF/resources/webjars" );
-                @NonNull final java.nio.file.Path resourcePath = new File( url.toURI().toString() ).toPath();
+                @NonNull final URI uri = url.toURI();
+                @NonNull final File file = new File( uri );
+                @NonNull final java.nio.file.Path resourcePath = file.toPath();
+                if ( !Files.exists( resourcePath ) )
+                {
+                    Logger.warn( "`loadWebJars`= true, but no webjars resources present..." );
+                    break loadWebJars;
+                }
                 final FileSystem webjarsFileSystem = new FileSystem( resourcePath, getFileSystem()
                         .getFileCacheManager() );
                 if ( CoreConfig.debug )
@@ -260,23 +270,16 @@ public final class StandaloneServer extends SimpleServer
                     webjarsFileSystem.getPath( "" ).getSubPaths().forEach( path ->
                             Logger.info( "Found path: " + path ) );
                 }
-                @NonNull final Path remote = getFileSystem().getPath( "" ).forcePath( "webjars" );
-                final boolean result = webjarsFileSystem.getPath( "" ).copy( remote );
-                if ( !result )
+                if ( !CoreConfig.autoDetectViews )
                 {
-                    Logger.error( "Failed to copy webjars resources into kvantum/webjars..." );
-                } else
-                {
-                    if ( !CoreConfig.autoDetectViews )
-                    {
-                        final ViewDetector viewDetector = new ViewDetector( "webjars/", remote, Collections.emptyList() );
-                        final int loaded = viewDetector.loadPaths();
-                        Logger.info( "Found %s folders", loaded );
-                        viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
-                        viewDetector.generateViewEntries();
-                        Logger.info( "Loaded %s webjars resource(s)", viewDetector.getViewEntries().size() );
-                        new ViewLoader( viewDetector.getViewEntries(), this.viewBindings );
-                    }
+                    final ViewDetector viewDetector = new ViewDetector( "webjars/",
+                            webjarsFileSystem.getPath( "" ), Collections.emptyList() );
+                    final int loaded = viewDetector.loadPaths();
+                    Logger.info( "Found %s folders", loaded );
+                    viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+                    viewDetector.generateViewEntries();
+                    Logger.info( "Loaded %s webjars resource(s)", viewDetector.getViewEntries().size() );
+                    new ViewLoader( () -> webjarsFileSystem, viewDetector.getViewEntries(), this.viewBindings );
                 }
             } catch ( final Exception e )
             {
@@ -298,12 +301,12 @@ public final class StandaloneServer extends SimpleServer
             Logger.info( "Found %s folders", loaded );
             viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
             viewDetector.generateViewEntries();
-            new ViewLoader( viewDetector.getViewEntries(), this.viewBindings );
+            new ViewLoader( this::getFileSystem, viewDetector.getViewEntries(), this.viewBindings );
         } else if ( !CoreConfig.disableViews )
         {
             this.log( Message.LOADING_VIEWS );
             this.log( "" );
-            new ViewLoader( configViews, this.viewBindings );
+            new ViewLoader( configViews, this::getFileSystem, this.viewBindings );
         } else
         {
             Message.VIEWS_DISABLED.log();

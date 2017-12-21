@@ -17,6 +17,9 @@
 package xyz.kvantum.server.api.views;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -37,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * These are the view management classes.
@@ -90,6 +94,9 @@ public class View extends RequestHandler
     private int buffer = -1;
     private ViewReturn viewReturn;
     private FilePattern filePattern;
+    @Getter
+    @Setter
+    private Supplier<FileSystem> fileSystemSupplier = ServerImplementation.getImplementation()::getFileSystem;
 
     public View(final String pattern, final String internalName)
     {
@@ -266,13 +273,13 @@ public class View extends RequestHandler
         {
             if ( containsOption( "folder" ) )
             {
-                this.folder = ServerImplementation.getImplementation().getFileSystem().getPath( getOption( "folder" ).toString() );
+                this.folder = fileSystemSupplier.get().getPath( getOption( "folder" ).toString() );
             } else if ( relatedFolderPath != null )
             {
-                this.folder = ServerImplementation.getImplementation().getFileSystem().getPath( relatedFolderPath );
+                this.folder = fileSystemSupplier.get().getPath( relatedFolderPath );
             } else
             {
-                this.folder = ServerImplementation.getImplementation().getFileSystem().getPath( "/" + internalName );
+                this.folder = fileSystemSupplier.get().getPath( "/" + internalName );
             }
             if ( !folder.exists() && !folder.create() )
             {
