@@ -31,13 +31,9 @@ import xyz.kvantum.server.api.util.Assert;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings({ "unused", "WeakerAccess " })
 public abstract class PostRequest implements RequestChild
 {
-
-    /*
-    TODO: Support more POST request body types, such as:
-    - JSON
-     */
 
     @Getter
     private final AbstractRequest parent;

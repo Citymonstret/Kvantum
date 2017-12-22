@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.validation;
 
+import lombok.SneakyThrows;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.request.post.PostRequest;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({ "unused", "WeakerAccess " })
 public class ValidationManager
 {
 
@@ -44,6 +46,23 @@ public class ValidationManager
         {
             validators.put( stage, new ArrayList<>() );
         }
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("ALL")
+    private static <T> RequestValidation<T> castValidator(final RequestValidation validator)
+    {
+        return (RequestValidation<T>) validator;
+    }
+
+    private static RequestValidation<PostRequest> asPostRequestValidator(final RequestValidation validator)
+    {
+        return castValidator( validator );
+    }
+
+    private static RequestValidation<AbstractRequest.Query> asQueryValidator(final RequestValidation validator)
+    {
+        return castValidator( validator );
     }
 
     public boolean isEmpty()
@@ -66,11 +85,11 @@ public class ValidationManager
     {
         if ( request.getQuery().getMethod() == HttpMethod.POST )
         {
-            for ( final RequestValidation<PostRequest> validator :
+            for ( final RequestValidation<?> validator :
                     this.getValidators( RequestValidation.ValidationStage.POST_PARAMETERS ) )
             {
-                final RequestValidation.ValidationResult result = validator.validate( request
-                        .getPostRequest() );
+                final RequestValidation.ValidationResult result = asPostRequestValidator( validator )
+                        .validate( request.getPostRequest() );
                 if ( !result.isSuccess() )
                 {
                     throw new ValidationException( result );
@@ -78,10 +97,11 @@ public class ValidationManager
             }
         } else
         {
-            for ( final RequestValidation<AbstractRequest.Query> validator :
+            for ( final RequestValidation<?> validator :
                     this.getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
             {
-                final RequestValidation.ValidationResult result = validator.validate( request.getQuery() );
+                final RequestValidation.ValidationResult result = asQueryValidator( validator )
+                        .validate( request.getQuery() );
                 if ( !result.isSuccess() )
                 {
                     throw new ValidationException( result );
@@ -89,5 +109,4 @@ public class ValidationManager
             }
         }
     }
-
 }

@@ -28,7 +28,7 @@ import xyz.kvantum.server.api.views.staticviews.OutputConverter;
 public class XmlConverter extends OutputConverter<String>
 {
 
-    protected XmlConverter()
+    XmlConverter()
     {
         super( "xml", String.class );
     }

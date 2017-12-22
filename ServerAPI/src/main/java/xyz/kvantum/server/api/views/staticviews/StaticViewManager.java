@@ -137,6 +137,7 @@ final public class StaticViewManager
         } ).foreach( annotatedMethods );
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static void registerConverter(final OutputConverter<?> converter)
     {
         converters.put( converter.getKey().toLowerCase( Locale.ENGLISH ), converter );

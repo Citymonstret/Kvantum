@@ -64,8 +64,8 @@ public final class PluginClassLoader extends URLClassLoader
         this.desc = desc;
         this.data = new File( file.getParent(), desc.name );
 
-        Class jar;
-        Class plg;
+        Class<?> jar;
+        Class<? extends Plugin> plg;
         try
         {
             jar = Class.forName( desc.mainClass, true, this );
@@ -83,7 +83,7 @@ public final class PluginClassLoader extends URLClassLoader
         }
         try
         {
-            plugin = (Plugin) plg.newInstance();
+            plugin = plg.newInstance();
         } catch ( InstantiationException | IllegalAccessException e )
         {
             e.printStackTrace();
@@ -158,10 +158,5 @@ public final class PluginClassLoader extends URLClassLoader
         }
         init = plugin;
         plugin.create( desc, data, this );
-    }
-
-    PluginFile getDesc()
-    {
-        return desc;
     }
 }

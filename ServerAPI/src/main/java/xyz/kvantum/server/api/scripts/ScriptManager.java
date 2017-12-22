@@ -30,7 +30,7 @@ import xyz.kvantum.server.api.logging.Logger;
 import javax.script.ScriptEngineManager;
 import java.util.Arrays;
 
-public final class ScriptManager
+final class ScriptManager
 {
 
     private final Path corePath;
@@ -38,7 +38,7 @@ public final class ScriptManager
     @Getter
     private final ViewScriptEngine viewScriptEngine;
 
-    public ScriptManager(@NonNull final Kvantum server)
+    ScriptManager(@NonNull final Kvantum server)
     {
         this.corePath = server.getFileSystem().getPath( "scripts" );
         if ( !corePath.exists() && !corePath.create() )

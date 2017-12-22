@@ -36,7 +36,7 @@ public final class PluginFile
 {
 
     public final String name;
-    public final String mainClass;
+    final String mainClass;
     public final String author;
     public final String version;
 

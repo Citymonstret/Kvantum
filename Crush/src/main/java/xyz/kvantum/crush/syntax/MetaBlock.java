@@ -23,6 +23,7 @@ package xyz.kvantum.crush.syntax;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -40,7 +41,10 @@ final public class MetaBlock extends Syntax
     }
 
     @Override
-    public String process(String in, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories)
+    public String process(String in,
+                          Matcher matcher,
+                          AbstractRequest r,
+                          Map<String, ProviderFactory<? extends VariableProvider>> factories)
     {
         while ( matcher.find() )
         {

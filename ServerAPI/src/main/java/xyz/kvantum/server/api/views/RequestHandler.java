@@ -21,7 +21,10 @@
  */
 package xyz.kvantum.server.api.views;
 
+import com.hervian.lambda.Lambda;
+import com.hervian.lambda.LambdaFactory;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
@@ -29,12 +32,12 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.validation.ValidationManager;
 import xyz.kvantum.server.api.views.requesthandler.DebugMiddleware;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueue;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,15 +49,16 @@ import java.util.UUID;
  * request to generate a response
  */
 @EqualsAndHashCode(of = "uniqueId")
+@SuppressWarnings("WeakerAccess")
 public abstract class RequestHandler
 {
 
     private static final Class[] REQUIRED_PARAMETERS = new Class[]{ AbstractRequest.class, Response.class };
 
-    protected final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
+    private final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
     private final ValidationManager validationManager = new ValidationManager();
-    private final Map<String, Method> alternateOutcomes = new HashMap<>();
+    private final Map<String, Lambda> alternateOutcomes = new HashMap<>();
     private final String uniqueId = UUID.randomUUID().toString();
 
     {
@@ -65,7 +69,7 @@ public abstract class RequestHandler
             try
             {
                 this.registerAlternateOutcome( "debug", "handleDebug" );
-            } catch ( Exception e )
+            } catch ( final Throwable e )
             {
                 e.printStackTrace();
             }
@@ -88,7 +92,9 @@ public abstract class RequestHandler
      * @param methodName Name of the method ( in the class, or any parent super classes )
      * @throws Exception If anything goes wrong
      */
-    protected void registerAlternateOutcome(final String identifier, final String methodName) throws Exception
+    @SuppressWarnings("ALL")
+    public void registerAlternateOutcome(@NonNull final String identifier,
+                                         @NonNull final String methodName) throws Throwable
     {
         Assert.notEmpty( identifier );
         Assert.notEmpty( methodName );
@@ -115,11 +121,11 @@ public abstract class RequestHandler
         {
             throw new KvantumException( "Could not find #" + methodName + "( Request, Response )" );
         }
-        method.setAccessible( true );
-        this.alternateOutcomes.put( identifier, method );
+        final Lambda lambda = LambdaFactory.create( method );
+        this.alternateOutcomes.put( identifier, lambda );
     }
 
-    public Optional<Method> getAlternateOutcomeMethod(final String identifier)
+    public Optional<Lambda> getAlternateOutcomeMethod(final String identifier)
     {
         if ( alternateOutcomes.containsKey( identifier ) )
         {
@@ -141,6 +147,7 @@ public abstract class RequestHandler
     /**
      * Simple alternate outcome for the {@link DebugMiddleware} middleware
      */
+    @SuppressWarnings("unused")
     protected void handleDebug(final AbstractRequest request, final Response response)
     {
         ServerImplementation.getImplementation().log( "Using the handleDebug alternate outcome!" );
@@ -162,19 +169,13 @@ public abstract class RequestHandler
         if ( request.hasMeta( AbstractRequest.ALTERNATE_OUTCOME ) )
         {
             //noinspection ConstantConditions
-            final Optional<Method> method = getAlternateOutcomeMethod( request.getMeta( AbstractRequest.ALTERNATE_OUTCOME )
-                    .toString() );
+            final Optional<Lambda> method = getAlternateOutcomeMethod( request.getMeta( AbstractRequest
+                    .ALTERNATE_OUTCOME ).toString() );
             if ( method.isPresent() )
             {
-                final Method m = method.get();
+                final Lambda lambda = method.get();
                 final Response response = new Response( this );
-                try
-                {
-                    m.invoke( this, request, response );
-                } catch ( IllegalAccessException | InvocationTargetException e )
-                {
-                    throw new KvantumException( "Failed to handle alternate outcome method", e );
-                }
+                lambda.invoke_for_void( this, request, response );
                 return response;
             } else
             {
@@ -200,7 +201,7 @@ public abstract class RequestHandler
      * @param r Request IN
      * @return Null by default, or the ProviderFactory (if set by the view)
      */
-    public ProviderFactory getFactory(final AbstractRequest r)
+    public ProviderFactory<? extends VariableProvider> getFactory(final AbstractRequest r)
     {
         return null;
     }

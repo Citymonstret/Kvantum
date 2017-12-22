@@ -26,6 +26,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.template.TemplateSyntaxHandler;
 import xyz.kvantum.server.api.templates.TemplateManager;
 import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.views.RequestHandler;
 
 import java.util.HashMap;
@@ -47,12 +48,12 @@ public final class SyntaxHandler extends TemplateSyntaxHandler
     public String handle(final RequestHandler requestHandler, final AbstractRequest request, final String in)
     {
         String out = in;
-        final Map<String, ProviderFactory> factories = new HashMap<>();
-        for ( final ProviderFactory factory : TemplateManager.get().getProviders() )
+        final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
+        for ( final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get().getProviders() )
         {
             factories.put( factory.providerName().toLowerCase( Locale.ENGLISH ), factory );
         }
-        final ProviderFactory z = requestHandler.getFactory( request );
+        final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory( request );
         if ( z != null )
         {
             factories.put( z.providerName().toLowerCase( Locale.ENGLISH ), z );

@@ -33,16 +33,17 @@ import xyz.kvantum.server.api.views.ViewReturn;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
-final public class ResponseMethod implements BiConsumer<AbstractRequest, Response>, ViewReturn
+final public class ResponseMethod<T> implements
+        BiConsumer<AbstractRequest, Response>, ViewReturn
 {
 
     private final Lambda lambda;
     private final Object instance;
     private final boolean passResponse;
-    private final OutputConverter outputConverter;
+    private final OutputConverter<T> outputConverter;
 
     ResponseMethod(@NonNull final Method method, @NonNull final Object instance,
-                   @Nullable final OutputConverter<?> outputConverter) throws Throwable
+                   @Nullable final OutputConverter<T> outputConverter) throws Throwable
     {
         Assert.notNull( method, instance );
 
@@ -65,7 +66,7 @@ final public class ResponseMethod implements BiConsumer<AbstractRequest, Respons
         final Object output = this.lambda.invoke_for_Object( instance, r );
         if ( outputConverter != null )
         {
-            return outputConverter.generateResponse( output );
+            return outputConverter.generateResponse( outputConverter.getClazz().cast( output ) );
         }
         return (Response) output;
     }

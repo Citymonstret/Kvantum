@@ -249,6 +249,7 @@ final class RequestReader
         return this.readBytes( bytes, bytes.length );
     }
 
+    @SuppressWarnings("ALL")
     int readBytes(final ByteBuf byteBuf) throws Throwable
     {
         final int length = byteBuf.readableBytes();

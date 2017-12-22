@@ -30,6 +30,7 @@ import xyz.kvantum.server.api.request.HttpMethod;
 
 import java.util.Map;
 
+@SuppressWarnings({ "unused", "WeakerAccess " })
 public abstract class RestResponse
 {
 

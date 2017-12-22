@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.validation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestChild;
 
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public abstract class RequestValidation<T>
 {
 

@@ -79,7 +79,7 @@ public class SyntaxHandler extends TemplateSyntaxHandler
         {
             factories.put( factory.providerName().toLowerCase( Locale.ENGLISH ), factory );
         }
-        final ProviderFactory z = requestHandler.getFactory( request );
+        final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory( request );
         if ( z != null )
         {
             factories.put( z.providerName().toLowerCase( Locale.ENGLISH ), z );

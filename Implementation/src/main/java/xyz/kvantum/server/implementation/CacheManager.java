@@ -70,7 +70,7 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
-    public Optional<IAccount> getCachedAccount(@NonNull final int id)
+    public Optional<IAccount> getCachedAccount(final int id)
     {
         return Optional.ofNullable( cachedAccounts.getIfPresent( id ) );
     }

@@ -130,6 +130,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         }
     }
 
+    @SuppressWarnings("ALL")
     private void convertToMap(String in, final Object value)
     {
         Assert.notNull( in, value );
@@ -220,6 +221,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
     }
 
     @Override
+    @SuppressWarnings("ALL")
     public final boolean contains(final String key)
     {
         Assert.notNull( key );

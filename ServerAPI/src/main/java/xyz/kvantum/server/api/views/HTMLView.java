@@ -65,7 +65,7 @@ public class HTMLView extends StaticFileView implements CacheApplicable
 
         private final Map<String, String> storage = new HashMap<>();
 
-        public HTMLProvider(final AbstractRequest r)
+        HTMLProvider(final AbstractRequest r)
         {
             storage.put( "name", r.getMeta( "html_file" ) + ".html" );
         }

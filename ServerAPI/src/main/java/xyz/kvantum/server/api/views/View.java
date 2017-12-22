@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.views;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.Path;
@@ -198,10 +199,8 @@ public class View extends RequestHandler
      * @see #containsOption(String) Check if the option exists before getting it
      */
     @SuppressWarnings("ALL")
-    final public <T> T getOption(final String s)
+    final public <T> T getOption(@NonNull final String s)
     {
-        Assert.notNull( s );
-
         return ( (T) options.get( s ) );
     }
 

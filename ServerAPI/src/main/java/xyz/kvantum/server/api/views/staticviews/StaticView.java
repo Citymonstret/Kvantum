@@ -27,7 +27,7 @@ final class StaticView extends SimpleRequestHandler
 {
 
     StaticView(final ViewDeclaration declaration,
-               final ResponseMethod method)
+               final ResponseMethod<?> method)
     {
         super( declaration.getFilter(), method, declaration.isForceHttps(), declaration.getHttpMethod() );
     }

@@ -34,10 +34,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public abstract class StaticFileView extends View
 {
 
-    protected final Collection<FileExtension> extensionList;
+    final Collection<FileExtension> extensionList;
 
     public StaticFileView(String filter, Map<String, Object> options, String name, Collection<FileExtension> extensions)
     {

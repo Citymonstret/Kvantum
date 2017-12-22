@@ -435,22 +435,19 @@ final public class Header
      * @param cookie Cookie key
      * @return Instance
      */
-    public Header removeCookie(@NonNull final String cookie)
+    public void removeCookie(@NonNull final String cookie)
     {
         final ResponseCookie responseCookie = ResponseCookie.builder().cookie( cookie )
                 .value( "deleted" ).expires( new Date( 0 ) ).build();
-        return setCookie( responseCookie );
+        this.setCookie( responseCookie );
     }
 
     /**
      * Clear all stored headers and return this instance
-     *
-     * @return Instance
      */
-    public Header clear()
+    public void clear()
     {
         this.headers.clear();
-        return this;
     }
 
     /**

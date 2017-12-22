@@ -41,7 +41,8 @@ final public class ForEachBlock extends Syntax
         super( Pattern.compile( "\\{#foreach ([A-Za-z0-9]*).([A-Za-z0-9]*) -> ([A-Za-z0-9]*)\\}([A-Za-z0-9<>\"'-_\\/\\\\ }{}\\n\\s]*)\\{\\/foreach\\}" ) );
     }
 
-    public String process(String content, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories)
+    public String process(String content, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory<? extends
+            VariableProvider>> factories)
     {
         while ( matcher.find() )
         {
@@ -54,7 +55,8 @@ final public class ForEachBlock extends Syntax
             {
                 if ( factories.containsKey( provider.toLowerCase( Locale.ENGLISH ) ) )
                 {
-                    Optional<VariableProvider> pOptional = factories.get( provider.toLowerCase( Locale.ENGLISH ) ).get( r );
+                    final Optional<? extends VariableProvider> pOptional = factories
+                            .get( provider.toLowerCase( Locale.ENGLISH ) ).get( r );
                     if ( pOptional.isPresent() )
                     {
                         final VariableProvider p = pOptional.get();

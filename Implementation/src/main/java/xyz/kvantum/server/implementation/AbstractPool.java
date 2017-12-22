@@ -55,7 +55,7 @@ class AbstractPool<T>
      * @return The next available object
      * @throws InterruptedException If the polling of the queue is interrupted
      */
-    final T getAvailable() throws InterruptedException
+    private T getAvailable() throws InterruptedException
     {
         return this.availableObjects.takeFirst();
     }

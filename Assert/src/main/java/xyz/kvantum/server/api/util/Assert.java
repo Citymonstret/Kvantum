@@ -92,7 +92,7 @@ public final class Assert
      * @param number Number to be tested
      * @return the number
      */
-    public static Number isPositive(final Number number)
+    public static <T extends Number> T isPositive(final T number)
     {
         equals( notNull( number ).intValue() >= 0, true );
         return number;

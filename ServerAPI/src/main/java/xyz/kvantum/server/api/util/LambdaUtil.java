@@ -74,9 +74,9 @@ public final class LambdaUtil
      * @return assigned collection
      */
     public static <T> Collection<T> collectionAssign(@NonNull final Provider<Collection<T>> collectionProvider,
-                                                     @NonNull final Provider<T> valueProvider, final int number)
+                                                     @NonNull final Provider<T> valueProvider, int number)
     {
-        Assert.isPositive( number );
+        number = Assert.isPositive( number );
 
         final Collection<T> list = collectionProvider.provide();
         for ( int i = 0; i < number; i++ )

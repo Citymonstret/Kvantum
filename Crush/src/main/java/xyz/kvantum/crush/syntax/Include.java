@@ -25,6 +25,7 @@ import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,23 +43,20 @@ final public class Include extends Syntax
     }
 
     @Override
-    public String process(final String in, final Matcher matcher, final AbstractRequest r, final Map<String, ProviderFactory>
-            factories)
+    public String process(final String in,
+                          final Matcher matcher,
+                          final AbstractRequest r,
+                          final Map<String, ProviderFactory<? extends VariableProvider>> factories)
     {
         String out = in;
         while ( matcher.find() )
         {
-            boolean setCache;
-
             ICacheManager manager = ServerImplementation.getImplementation().getCacheManager();
             String s = manager.getCachedInclude( matcher.group() );
             if ( s != null )
             {
                 out = out.replace( matcher.group(), s );
                 continue;
-            } else
-            {
-                setCache = true;
             }
 
             File file = new File( ServerImplementation.getImplementation().getCoreFolder(), matcher.group( 1 ) );
@@ -77,12 +75,9 @@ final public class Include extends Syntax
                     e.printStackTrace();
                 }
 
-                if ( setCache )
-                {
-                    ServerImplementation.getImplementation().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
-                            ( ".css" ) ?
-                            "<style>\n" + c + "<style>" : c.toString() );
-                }
+                ServerImplementation.getImplementation().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
+                        ( ".css" ) ?
+                        "<style>\n" + c + "<style>" : c.toString() );
 
                 if ( file.getName().endsWith( ".css" ) )
                 {

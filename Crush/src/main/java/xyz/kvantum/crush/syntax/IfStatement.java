@@ -40,8 +40,10 @@ final public class IfStatement extends Syntax
     }
 
     @Override
-    public String process(final String in, final Matcher matcher, final AbstractRequest r, final Map<String, ProviderFactory>
-            factories)
+    public String process(final String in,
+                          final Matcher matcher,
+                          final AbstractRequest r,
+                          final Map<String, ProviderFactory<? extends VariableProvider>> factories)
     {
         String workingString = in;
         while ( matcher.find() )
@@ -51,7 +53,8 @@ final public class IfStatement extends Syntax
             String variable = matcher.group( 4 );
             if ( factories.containsKey( namespace.toLowerCase( Locale.ENGLISH ) ) )
             {
-                Optional<VariableProvider> pOptional = factories.get( namespace.toLowerCase( Locale.ENGLISH ) ).get( r );
+                final Optional<? extends VariableProvider> pOptional =
+                        factories.get( namespace.toLowerCase( Locale.ENGLISH ) ).get( r );
                 if ( pOptional.isPresent() )
                 {
                     final VariableProvider p = pOptional.get();

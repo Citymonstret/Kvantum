@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.request.post.PostRequest;
@@ -286,6 +287,7 @@ public abstract class AbstractRequest implements
     }
 
     @Override
+    @SuppressWarnings("ALL")
     public Map<String, String> getVariables()
     {
         return (Map<String, String>) getMeta( "variables" );
@@ -309,6 +311,8 @@ public abstract class AbstractRequest implements
 
     public abstract void requestSession();
 
+    @SuppressWarnings("ALL")
+    @SneakyThrows
     public <T> T getMetaUnsafe(final String key)
     {
         return (T) this.getMeta( key );
@@ -415,7 +419,7 @@ public abstract class AbstractRequest implements
         @Getter
         private final String password;
 
-        protected Authorization(final String input)
+        Authorization(final String input)
         {
             final String[] parts = input.split( "\\s" );
             this.mechanism = parts[ 1 ];

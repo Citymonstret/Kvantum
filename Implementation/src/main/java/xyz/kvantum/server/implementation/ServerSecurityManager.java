@@ -34,6 +34,7 @@ import java.util.Locale;
  * inside of the logger, but might be extended to handle more in the
  * future
  */
+@SuppressWarnings("ALL")
 final class ServerSecurityManager
 {
 

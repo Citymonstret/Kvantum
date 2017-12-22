@@ -31,12 +31,13 @@ public final class PojoJsonFactory<Pojo>
 
     private final KvantumPojoFactory<Pojo> kvantumPojoFactory;
 
-    public JSONObject toJson(final KvantumPojo<Pojo> kvantumPojo)
+    JSONObject toJson(final KvantumPojo<Pojo> kvantumPojo)
     {
         return new JSONObject( kvantumPojo.getAll() );
     }
 
-    public JSONObject toJson(final Pojo pojo)
+    @SuppressWarnings("unused")
+    JSONObject toJson(final Pojo pojo)
     {
         return this.toJson( kvantumPojoFactory.of( pojo ) );
     }

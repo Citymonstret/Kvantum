@@ -61,7 +61,9 @@ final public class Variable extends Syntax
     }
 
     @Override
-    public String process(String content, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories)
+    public String process(String content,
+                          Matcher matcher,
+                          AbstractRequest r, Map<String, ProviderFactory<? extends VariableProvider>> factories)
     {
         while ( matcher.find() )
         {

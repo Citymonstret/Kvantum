@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.validation;
 
+@SuppressWarnings("WeakerAccess")
 public class ValidationException extends Exception
 {
 

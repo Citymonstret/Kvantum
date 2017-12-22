@@ -36,7 +36,7 @@ public abstract class SQLiteApplicationStructure extends ApplicationStructure
     @Getter
     private final SQLiteManager databaseManager;
 
-    public SQLiteApplicationStructure(final String applicationName)
+    SQLiteApplicationStructure(final String applicationName)
     {
         super( applicationName );
         try

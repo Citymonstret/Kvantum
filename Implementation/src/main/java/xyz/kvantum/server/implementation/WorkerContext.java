@@ -39,7 +39,7 @@ import java.nio.charset.StandardCharsets;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class WorkerContext
+class WorkerContext
 {
 
     private static final String CONTENT_TYPE = "content_type";

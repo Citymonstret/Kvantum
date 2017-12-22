@@ -31,9 +31,9 @@ public abstract class OutputConverter<T>
     @Getter
     private final String key;
     @Getter
-    private final Class<?> clazz;
+    private final Class<T> clazz;
 
-    protected OutputConverter(@NonNull final String key, @NonNull final Class<?> clazz)
+    protected OutputConverter(@NonNull final String key, @NonNull final Class<T> clazz)
     {
         this.key = key;
         this.clazz = clazz;

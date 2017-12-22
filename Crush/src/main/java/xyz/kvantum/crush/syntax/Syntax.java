@@ -23,6 +23,7 @@ package xyz.kvantum.crush.syntax;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -61,7 +62,8 @@ public abstract class Syntax
      * @return Processed string
      * @see #handle(String, AbstractRequest, Map) Simple wrapper
      */
-    public abstract String process(String in, Matcher matcher, AbstractRequest r, Map<String, ProviderFactory> factories);
+    public abstract String process(String in, Matcher matcher, AbstractRequest r,
+                                   Map<String, ProviderFactory<? extends VariableProvider>> factories);
 
     /**
      * A simple wrapper for the process method
@@ -72,7 +74,9 @@ public abstract class Syntax
      * @return Processed Input
      * @see #process(String, Matcher, AbstractRequest, Map) Wraps around this
      */
-    public final String handle(final String in, final AbstractRequest r, final Map<String, ProviderFactory> factories)
+    public final String handle(final String in,
+                               final AbstractRequest r,
+                               final Map<String, ProviderFactory<? extends VariableProvider>> factories)
     {
         return process( in, pattern.matcher( in ), r, factories );
     }

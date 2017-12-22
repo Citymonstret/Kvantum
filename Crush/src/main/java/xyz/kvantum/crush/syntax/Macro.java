@@ -24,6 +24,7 @@ package xyz.kvantum.crush.syntax;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -55,7 +56,7 @@ public class Macro extends Syntax
 
     @Override
     public String process(String in, final Matcher matcher, final AbstractRequest r,
-                          final Map<String, ProviderFactory> factories)
+                          final Map<String, ProviderFactory<? extends VariableProvider>> factories)
     {
         final Map<String, DefinedMacro> macroMap = new HashMap<>();
 
