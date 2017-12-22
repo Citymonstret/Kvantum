@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -51,7 +56,7 @@ public abstract class MongoApplicationStructure extends ApplicationStructure
 
         this.mongoClient = new MongoClient( new MongoClientURI( CoreConfig.MongoDB.uri ) );
         this.accountManager = createNewAccountManager();
-        xyz.kvantum.server.api.logging.Logger.info( "Initialized MongoApplicationStructure: %s", this
+        xyz.kvantum.server.api.logging.Logger.info( "Initialized MongoApplicationStructure: {}", this
                 .applicationName );
 
         this.morphia = new Morphia();

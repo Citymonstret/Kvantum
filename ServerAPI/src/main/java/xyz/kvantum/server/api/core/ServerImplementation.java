@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -44,6 +49,7 @@ public final class ServerImplementation
 
     /**
      * Get the registered implementation
+     *
      * @return Implementation or mull
      */
     public static Kvantum getImplementation()
@@ -51,6 +57,11 @@ public final class ServerImplementation
         return intellectualServer;
     }
 
+    /**
+     * Check if an implementation has been registered
+     *
+     * @return True if an implementation has been registered
+     */
     public static boolean hasImplementation()
     {
         return getImplementation() != null;

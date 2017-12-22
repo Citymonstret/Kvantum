@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +50,7 @@ public final class ScriptManager
             final Path path = this.corePath.getPath( string );
             if ( !path.exists() && !path.create() )
             {
-                Logger.error( "Failed to create kvantum/scripts/%s - Please do it manually!", string );
+                Logger.error( "Failed to create kvantum/scripts/{} - Please do it manually!", string );
             }
         } );
         final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();

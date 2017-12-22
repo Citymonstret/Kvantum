@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -16,10 +21,19 @@
  */
 package xyz.kvantum.server.api.logging;
 
+/**
+ * Interface for classes that may
+ * provide log messages
+ */
 @FunctionalInterface
 public interface LogProvider
 {
 
+    /**
+     * Log prefix
+     *
+     * @return Log prefix
+     */
     String getLogIdentifier();
 
 }

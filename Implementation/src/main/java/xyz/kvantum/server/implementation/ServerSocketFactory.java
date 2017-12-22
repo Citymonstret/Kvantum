@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +64,7 @@ class ServerSocketFactory
                     port = 1024;
                 } else if ( e.getMessage().startsWith( "Address already in use" ) )
                 {
-                    Logger.error( "Port %s is occupied. Trying %s...", port, ++port );
+                    Logger.error( "Port {0} is occupied. Trying {1}...", port, ++port );
                 } else
                 {
                     Logger.error( e.getMessage() );

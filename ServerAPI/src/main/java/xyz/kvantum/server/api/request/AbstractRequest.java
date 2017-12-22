@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -233,7 +238,7 @@ public abstract class AbstractRequest implements
                 "User-Agent" ),
                 getHeader( "query" ), getHeader( "Host" ), this.query.buildLog() } )
         {
-            msg = msg.replaceFirst( "%s", a.toString() );
+            msg = msg.replaceFirst( "\\{}", a.toString() );
         }
         return msg;
     }

@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -57,7 +62,7 @@ final class IntellectualFileSystem extends FileSystem
     {
         if ( CoreConfig.debug )
         {
-            Logger.debug( "Registering cache invalidation watcher for: %s", path.getEntityName() );
+            Logger.debug( "Registering cache invalidation watcher for: {}", path.getEntityName() );
         }
         final FileWatcher fileWatcher = ServerImplementation.getImplementation().getFileWatcher();
         try
@@ -79,7 +84,7 @@ final class IntellectualFileSystem extends FileSystem
         {
             return;
         }
-        Logger.info( "Removing cache entry for: %s", path );
+        Logger.info( "Removing cache entry for: {}", path );
         ServerImplementation.getImplementation().getCacheManager().removeFileCache( path );
     }
 }

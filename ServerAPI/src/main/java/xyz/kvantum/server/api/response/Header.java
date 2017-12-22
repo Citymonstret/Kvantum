@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -413,7 +418,7 @@ final public class Header
     {
         if ( CoreConfig.debug )
         {
-            Logger.debug( "Cookie set! Key: %s, Value: %s, Full: %s", cookie.getCookie(), cookie.getValue(),
+            Logger.debug( "Cookie set! Key: {}, Value: {}, Full: {}", cookie.getCookie(), cookie.getValue(),
                     cookie.toString() );
         }
         if ( this.headers.containsEntry( HEADER_SET_COOKIE, cookie.toString() ) )

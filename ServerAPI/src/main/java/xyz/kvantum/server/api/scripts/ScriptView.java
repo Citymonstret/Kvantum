@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +48,7 @@ public class ScriptView extends View
         this.script = this.viewScriptEngine.getPath().getPath( options.get( "script" ).toString() );
         if ( !script.exists() )
         {
-            Logger.error( "Provided script (%s) does not exist...", options.get( "script" ) );
+            Logger.error( "Provided script ({}) does not exist...", options.get( "script" ) );
         }
     }
 

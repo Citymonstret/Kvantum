@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -100,7 +105,7 @@ public interface ICacheManager
     void setCache(RequestHandler view, ResponseBody body);
 
     /**
-     * Get the cached reponse for a view
+     * Get the cached response for a view
      *
      * @param view RequestHandler
      * @return the cached ResponseBody
@@ -108,6 +113,11 @@ public interface ICacheManager
      */
     CachedResponse getCache(RequestHandler view);
 
+    /**
+     * Remove a file from the file cache
+     *
+     * @param path File to remove
+     */
     void removeFileCache(Path path);
 
 }

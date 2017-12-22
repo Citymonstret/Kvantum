@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +24,22 @@ package xyz.kvantum.server.api.events;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import xyz.kvantum.server.api.core.Kvantum;
 
+/**
+ * An event represents something that may occur
+ * in the server, and that can be broadcasted to
+ * {@link pw.stamina.causam.scan.method.model.Subscriber subscribers}
+ * <p>
+ * One can subscribe to these events using {@link Kvantum#getEventBus()}
+ */
 @RequiredArgsConstructor
 abstract class Event
 {
 
+    /**
+     * The name of the event
+     */
     @NonNull
     @Getter
     private final String name;

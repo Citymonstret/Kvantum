@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -26,8 +31,20 @@ import java.lang.annotation.Target;
 public @interface KvantumInsert
 {
 
+    /**
+     * Name of the {@link KvantumField} that is
+     * associated with this constructor parameter
+     *
+     * @return Name of associated {@link KvantumField}
+     */
     String value();
 
+    /**
+     * Default value (will be parsed and converted
+     * to appropriate type)
+     *
+     * @return Default value, {@code null} by default
+     */
     String defaultValue() default "null";
 
 }

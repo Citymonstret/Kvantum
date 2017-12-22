@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -68,6 +73,7 @@ public interface Kvantum extends CommandCaller<Kvantum>
 
     /**
      * Returns itself
+     *
      * @return this.
      */
     @Override
@@ -142,78 +148,97 @@ public interface Kvantum extends CommandCaller<Kvantum>
     WorkerProcedure getProcedure();
 
     /**
-     * Send a message (Replaces %s with arg#toString)
+     * Replaces string arguments using the pattern {num} from
+     * an array of objects, starting from index 0, as such:
+     * 0 &le; num &lt; args.length. If num &ge; args.length, then
+     * the pattern will be replaced by an empty string. An argument
+     * can also be passed as "{}" or "{}", in which case the
+     * number will be implied.
      *
-     * @param message Message
-     * @param args    Arguments
+     * @param message message to be logged
+     * @param args    Replacements
      */
     void log(Message message, Object... args);
 
     /**
-     * Send a message (Replaces %s with arg#toString)
+     * Replaces string arguments using the pattern {num} from
+     * an array of objects, starting from index 0, as such:
+     * 0 &le; num &lt; args.length. If num &ge; args.length, then
+     * the pattern will be replaced by an empty string. An argument
+     * can also be passed as "{}" or "{}", in which case the
+     * number will be implied.
      *
-     * @param message Message
-     * @param mode    Log Mode {@link LogModes}
-     * @param args    Arguments
+     * @param message message to be logged
+     * @param mode    log mode ({@link LogModes})
+     * @param args    Replacements
      */
     void log(String message, int mode, Object... args);
 
     /**
      * Get the cache manager instance
+     *
      * @return Cache manager instance
      */
     ICacheManager getCacheManager();
 
     /**
      * Get the currently used log wrapper instance
+     *
      * @return Log wrapper
      */
     LogWrapper getLogWrapper();
 
     /**
      * Get the main folder (configured_folder/.kvantum/)
+     *
      * @return main folder
      */
     File getCoreFolder();
 
     /**
      * Check to see if the server is in standalone mode
+     *
      * @return boolean indicating whether or not the server is in standalone mode
      */
     boolean isStandalone();
 
     /**
      * Check to see if the server is in silent mode
+     *
      * @return boolean indicating whether or not the server is in silent mode
      */
     boolean isSilent();
 
     /**
      * Check if the server is started
+     *
      * @return boolean indicating whether or not the server has started
      */
     boolean isStarted();
 
     /**
      * Get the application structure that is currently backing Kvantum
+     *
      * @return Application structure
      */
     ApplicationStructure getApplicationStructure();
 
     /**
      * Log a message
+     *
      * @param message Message
-     * @param args Arguments, will replace "%s" in the order provided, uses
-     *             #toString
+     * @param args    Arguments, will replace "{}" in the order provided, uses
+     *                #toString
      */
     void log(String message, Object... args);
 
     /**
      * Log a message
+     *
      * @param provider Message provider
-     * @param message Message
-     * @param args Arguments, will replace "%s" in the order provided, uses
-     *             #toString
+     * @param message  Message
+     * @param args     Arguments, will replace "{}" in the order provided, uses
+     *                 #toString
      */
     void log(LogProvider provider, String message, Object... args);
 
@@ -224,24 +249,28 @@ public interface Kvantum extends CommandCaller<Kvantum>
 
     /**
      * Get the session manager instance
+     *
      * @return Session manager
      */
     SessionManager getSessionManager();
 
     /**
      * Get the current router instance
+     *
      * @return Current router
      */
     Router getRouter();
 
     /**
      * Is the server currently shutting down?
+     *
      * @return true if the server is shutting down
      */
     boolean isStopping();
 
     /**
      * Is the server currently paused? This could be when the server is waiting for required input, etc.
+     *
      * @return true if the server is paused
      */
     boolean isPaused();
@@ -249,6 +278,7 @@ public interface Kvantum extends CommandCaller<Kvantum>
     /**
      * Get a GSON implementation with
      * parsers for implementations
+     *
      * @return GSON implementation
      */
     Gson getGson();

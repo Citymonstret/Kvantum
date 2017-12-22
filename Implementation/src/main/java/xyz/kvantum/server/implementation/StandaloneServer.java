@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,10 +104,7 @@ public final class StandaloneServer extends SimpleServer
         //
         // File Watcher that will invalidate cache entries if files are updated
         //
-        if ( CoreConfig.Cache.enabled )
-        {
-            ( (IntellectualFileSystem) getFileSystem() ).registerFileWatcher();
-        }
+        ( (IntellectualFileSystem) getFileSystem() ).registerFileWatcher();
 
         //
         // Enable the custom security manager
@@ -277,10 +280,10 @@ public final class StandaloneServer extends SimpleServer
                     final ViewDetector viewDetector = new ViewDetector( "webjars/",
                             webjarsFileSystem.getPath( "" ), Collections.emptyList() );
                     final int loaded = viewDetector.loadPaths();
-                    Logger.info( "Found %s folders", loaded );
-                    viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+                    Logger.info( "Found {} folders", loaded );
+                    viewDetector.getPaths().forEach( p -> Logger.info( "- {}", p.toString() ) );
                     viewDetector.generateViewEntries();
-                    Logger.info( "Loaded %s webjars resource(s)", viewDetector.getViewEntries().size() );
+                    Logger.info( "Loaded {} webjars resource(s)", viewDetector.getViewEntries().size() );
                     new ViewLoader( () -> webjarsFileSystem, viewDetector.getViewEntries(), this.viewBindings );
                 }
             } catch ( final Exception e )
@@ -300,8 +303,8 @@ public final class StandaloneServer extends SimpleServer
             final ViewDetector viewDetector = new ViewDetector( "",
                     getFileSystem().getPath( "" ), ignore );
             final int loaded = viewDetector.loadPaths();
-            Logger.info( "Found %s folders", loaded );
-            viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+            Logger.info( "Found {} folders", loaded );
+            viewDetector.getPaths().forEach( p -> Logger.info( "- {}", p.toString() ) );
             viewDetector.generateViewEntries();
             new ViewLoader( this::getFileSystem, viewDetector.getViewEntries(), this.viewBindings );
         } else if ( !CoreConfig.disableViews )

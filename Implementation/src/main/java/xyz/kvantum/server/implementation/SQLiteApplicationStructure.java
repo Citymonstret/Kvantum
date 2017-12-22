@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -42,7 +47,7 @@ public abstract class SQLiteApplicationStructure extends ApplicationStructure
             throw new KvantumException( e );
         }
         this.accountManager = createNewAccountManager();
-        Logger.info( "Initialized SQLiteApplicationStructure: %s", this.applicationName );
+        Logger.info( "Initialized SQLiteApplicationStructure: {}", this.applicationName );
     }
 
 }

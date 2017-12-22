@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -17,10 +22,10 @@
 package xyz.kvantum.server.api.cache;
 
 import lombok.Getter;
+import lombok.NonNull;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.ResponseBody;
-import xyz.kvantum.server.api.util.Assert;
 
 /**
  * A saved response generated from a previous response, and saved in the {@link ICacheManager}.
@@ -38,10 +43,8 @@ final public class CachedResponse implements ResponseBody
      *
      * @param parent parent body
      */
-    public CachedResponse(final ResponseBody parent)
+    public CachedResponse(@NonNull final ResponseBody parent)
     {
-        Assert.notNull( parent );
-
         this.header = parent.getHeader();
         if ( parent.isText() )
         {

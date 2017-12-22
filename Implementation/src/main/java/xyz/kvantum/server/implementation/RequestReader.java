@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,7 +126,7 @@ final class RequestReader
                         }
                     } catch ( final Exception e )
                     {
-                        Logger.warn( "Failed to read url encoded postAbstractRequest (Request: %s): %s",
+                        Logger.warn( "Failed to read url encoded postAbstractRequest (Request: {0}): {1}",
                                 abstractRequest, e.getMessage() );
                     }
                 } else if ( contentType.startsWith( "multipart" ) )
@@ -131,8 +137,8 @@ final class RequestReader
                     abstractRequest.setPostRequest( new MultipartPostRequest( abstractRequest, "" ) );
                 } else
                 {
-                    Logger.warn( "Request provided unknown postabstractRequest type (Request: %s): %s", abstractRequest,
-                            contentType );
+                    Logger.warn( "Request provided unknown post request type (Request: {0}): {1}",
+                            abstractRequest, contentType );
                     abstractRequest.setPostRequest( new DummyPostRequest( abstractRequest, "" ) );
                 }
 
@@ -164,7 +170,7 @@ final class RequestReader
                 {
                     if ( CoreConfig.debug )
                     {
-                        Logger.debug( "Supplied post body size too large (%s > %s)", contentLength,
+                        Logger.debug( "Supplied post body size too large ({0} > {1})", contentLength,
                                 CoreConfig.Limits.limitPostBasicSize );
                     }
                     throw new ReturnStatus( Header.STATUS_ENTITY_TOO_LARGE, null );
@@ -195,7 +201,7 @@ final class RequestReader
                             this.abstractRequest.getHeaders().put( pair.getKey(), pair.getValue() );
                         } else
                         {
-                            Logger.warn( "Failed to readabstractRequest line: '%s'", line );
+                            Logger.warn( "Failed to read post request line: '{}'", line );
                         }
                     }
                 }

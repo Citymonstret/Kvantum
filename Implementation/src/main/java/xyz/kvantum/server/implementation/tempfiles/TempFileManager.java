@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -44,7 +49,7 @@ final public class TempFileManager extends AutoCloseable implements ITempFileMan
             return Optional.of( path );
         } catch ( final IOException e )
         {
-            Logger.error( "Failed to create temp file: %s", e.getMessage() );
+            Logger.error( "Failed to create temp file: {}", e.getMessage() );
         }
         return Optional.empty();
     }
@@ -62,7 +67,7 @@ final public class TempFileManager extends AutoCloseable implements ITempFileMan
                     Files.delete( path );
                 } catch ( final IOException e )
                 {
-                    Logger.error( "Failed to delete temp file [%s]: %s", path.getFileName(), e.getMessage() );
+                    Logger.error( "Failed to delete temp file [{}]: {}", path.getFileName(), e.getMessage() );
                 }
             }
         }

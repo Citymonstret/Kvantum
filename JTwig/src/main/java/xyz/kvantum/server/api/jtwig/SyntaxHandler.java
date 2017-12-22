@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -20,7 +25,6 @@ import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 import org.jtwig.environment.DefaultEnvironmentConfiguration;
 import org.jtwig.environment.EnvironmentConfiguration;
-import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.template.TemplateHandler;
 import xyz.kvantum.server.api.template.TemplateSyntaxHandler;
@@ -51,15 +55,12 @@ public class SyntaxHandler extends TemplateSyntaxHandler
         String out = in;
         JtwigTemplate template = null;
         boolean shouldCache = false;
-        if ( CoreConfig.Cache.enabled )
+        if ( templateStorage.containsKey( requestHandler.getName() ) )
         {
-            if ( templateStorage.containsKey( requestHandler.getName() ) )
-            {
-                template = templateStorage.get( requestHandler.getName() );
-            } else
-            {
-                shouldCache = true;
-            }
+            template = templateStorage.get( requestHandler.getName() );
+        } else
+        {
+            shouldCache = true;
         }
 
         if ( template == null )

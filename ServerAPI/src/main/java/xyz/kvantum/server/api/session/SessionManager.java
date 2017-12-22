@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -143,7 +148,7 @@ public final class SessionManager implements ProviderFactory<ISession>
                 {
                     if ( CoreConfig.debug )
                     {
-                        Logger.debug( "Deleted outdated session: %s", session );
+                        Logger.debug( "Deleted outdated session: {}", session );
                     }
                     this.sessions.invalidate( sessionCookie );
                     this.sessionDatabase.deleteSession( sessionCookie );
@@ -161,7 +166,7 @@ public final class SessionManager implements ProviderFactory<ISession>
                 {
                     // Session isn't valid, remove old cookie
                     ServerImplementation.getImplementation()
-                            .log( "Deleting invalid session cookie for request %s", r );
+                            .log( "Deleting invalid session cookie for request {}", r );
                     session = null;
                 }
             }
@@ -170,7 +175,7 @@ public final class SessionManager implements ProviderFactory<ISession>
             {
                 if ( CoreConfig.debug )
                 {
-                    Logger.debug( "Deleted session: %s (Cause: %s)", session, "Wrong session key" );
+                    Logger.debug( "Deleted session: {} (Cause: {})", session, "Wrong session key" );
                 }
                 this.sessions.invalidate( sessionCookie );
                 this.sessionDatabase.deleteSession( sessionCookie );

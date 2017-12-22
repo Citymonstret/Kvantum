@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -41,7 +46,7 @@ public class Examples
             exampleMap.get( input.toLowerCase( Locale.ENGLISH ) ).initExample();
         } else
         {
-            Logger.error( "Unknown example: \"%s\"", input );
+            Logger.error( "Unknown example: \"{}\"", input );
         }
     }
 

@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -90,12 +95,16 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Locale;
 import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Main {@link Kvantum} implementation.
  */
 public class SimpleServer implements Kvantum
 {
+
+    private static final Pattern LOG_ARG_PATTERN = Pattern.compile( "\\{(?<num>([0-9])+)}" );
 
     static AbstractPool<GzipHandler> gzipHandlerPool;
     static AbstractPool<Md5Handler> md5HandlerPool;
@@ -112,7 +121,7 @@ public class SimpleServer implements Kvantum
     private final ServerContext serverContext;
     PrintStream logStream;
     @Getter
-    private volatile ICacheManager cacheManager;
+    protected ICacheManager cacheManager;
     @Getter
     private boolean silent = false;
     @Getter
@@ -414,14 +423,6 @@ public class SimpleServer implements Kvantum
 
         getRouter().dump( this );
 
-        if ( !CoreConfig.Cache.enabled )
-        {
-            log( Message.CACHING_DISABLED );
-        } else
-        {
-            log( Message.CACHING_ENABLED );
-        }
-
         log( "" );
 
         log( Message.STARTING_ON_PORT, CoreConfig.port );
@@ -508,26 +509,62 @@ public class SimpleServer implements Kvantum
         this.log( prefix, message, args );
     }
 
+    /**
+     * Replaces string arguments using the pattern {num} from
+     * an array of objects, starting from index 0, as such:
+     * 0 &le; num &lt; args.length. If num &ge; args.length, then
+     * the pattern will be replaced by an empty string. An argument
+     * can also be passed as "{}", in which case the
+     * number will be implied.
+     *
+     * @param prefix  Log prefix
+     * @param message String to be replaced. Cannot be null.
+     * @param args    Replacements
+     */
     @Synchronized
-    private void log(final String prefix, final String message, final Object... args)
+    private void log(@NonNull final String prefix,
+                     @NonNull final String message, final Object... args)
     {
         String msg = message;
-        for ( final Object a : args )
+
+        final Matcher matcher = LOG_ARG_PATTERN.matcher( msg );
+
+        int index = 0;
+        boolean containsEmptyBrackets;
+        while ( ( containsEmptyBrackets = msg.contains( "{}" ) ) ||
+                matcher.find() )
         {
-            String objectString;
-            if ( a == null )
+            final int argumentNum;
+            final String toReplace;
+            if ( containsEmptyBrackets )
             {
-                objectString = "null";
-            } else if ( a instanceof LogFormatted )
-            {
-                objectString = ( (LogFormatted) a ).getLogFormatted();
+                argumentNum = index++;
+                toReplace = "{}";
             } else
             {
-                objectString = a.toString();
+                toReplace = matcher.group();
+                argumentNum = Integer.parseInt( matcher.group( "num" ) );
             }
-            msg = msg.replaceFirst( "%s", objectString ).replaceFirst( "\\{}", objectString );
+            if ( argumentNum < args.length )
+            {
+                final Object object = args[ argumentNum ];
+                String objectString;
+                if ( object == null )
+                {
+                    objectString = "null";
+                } else if ( object instanceof LogFormatted )
+                {
+                    objectString = ( (LogFormatted) object ).getLogFormatted();
+                } else
+                {
+                    objectString = object.toString();
+                }
+                msg = msg.replace( toReplace, objectString );
+            } else
+            {
+                msg = msg.replace( toReplace, "" );
+            }
         }
-
         getLogWrapper().log( LogContext.builder().applicationPrefix( CoreConfig.logPrefix ).logPrefix( prefix ).timeStamp(
                 TimeUtil.getTimeStamp() ).message( msg ).thread( Thread.currentThread().getName() ).build() );
     }

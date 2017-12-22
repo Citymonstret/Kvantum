@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -328,7 +333,7 @@ public class View extends RequestHandler
 
         if ( CoreConfig.debug )
         {
-            ServerImplementation.getImplementation().log( "Translated file name: '%s'", fileMatcher.getFileName() );
+            ServerImplementation.getImplementation().log( "Translated file name: '{}'", fileMatcher.getFileName() );
         }
 
         String fileName = fileMatcher.getFileName();
@@ -348,7 +353,7 @@ public class View extends RequestHandler
                 final String rewritten = rewrite.get( variableExtension ).toString();
                 if ( CoreConfig.debug )
                 {
-                    Logger.debug( "Rewrote %s to %s",
+                    Logger.debug( "Rewrote {} to {}",
                             variableExtension,
                             rewritten
                     );
@@ -412,8 +417,8 @@ public class View extends RequestHandler
 
         if ( CoreConfig.debug && map == null )
         {
-            ServerImplementation.getImplementation().log( "Request: '%s' failed to " +
-                            "pass '%s'", request.getQuery().getFullRequest(),
+            ServerImplementation.getImplementation().log( "Request: '{}' failed to " +
+                            "pass '{}'", request.getQuery().getFullRequest(),
                     viewPattern.toString() );
         }
 

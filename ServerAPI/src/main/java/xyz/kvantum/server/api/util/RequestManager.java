@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -70,7 +75,7 @@ final public class RequestManager extends Router
                 .equalsIgnoreCase( view.toString() ) );
         if ( illegalRequestHandler.isPresent() )
         {
-            throw new IllegalArgumentException( "Duplicate view pattern!" );
+            throw new IllegalArgumentException( "Duplicate view pattern: " + view.toString() );
         }
 
         //

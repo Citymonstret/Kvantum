@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -24,9 +29,7 @@ import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.cache.CachedResponse;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.response.ResponseBody;
-import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.RequestHandler;
 
 import java.util.Optional;
@@ -61,95 +64,71 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
-    public String getCachedInclude(final String group)
+    public String getCachedInclude(@NonNull final String group)
     {
-        Assert.notNull( group );
-
         return this.cachedIncludes.getIfPresent( group );
     }
 
     @Override
-    public Optional<IAccount> getCachedAccount(final int id)
+    public Optional<IAccount> getCachedAccount(@NonNull final int id)
     {
         return Optional.ofNullable( cachedAccounts.getIfPresent( id ) );
     }
 
     @Override
-    public Optional<Integer> getCachedId(final String username)
+    public Optional<Integer> getCachedId(@NonNull final String username)
     {
         return Optional.ofNullable( cachedAccountIds.getIfPresent( username ) );
     }
 
     @Override
-    public void setCachedAccount(final IAccount account)
+    public void setCachedAccount(@NonNull final IAccount account)
     {
         this.cachedAccounts.put( account.getId(), account );
         this.cachedAccountIds.put( account.getUsername(), account.getId() );
     }
 
     @Override
-    public Optional<String> getCachedFile(final Path file)
+    public Optional<String> getCachedFile(@NonNull final Path file)
     {
-        Assert.notNull( file );
-
-        if ( CoreConfig.debug )
-        {
-            Message.CACHE_FILE_ACCESS.log( file );
-        }
-
-        if ( !CoreConfig.Cache.enabled )
-        {
-            return Optional.empty();
-        }
-
         return Optional.ofNullable( cachedFiles.getIfPresent( file.toString() ) );
     }
 
     @Override
-    public void setCachedFile(@NonNull final Path file, @NonNull final String content)
+    public void setCachedFile(@NonNull final Path file,
+                              @NonNull final String content)
     {
         cachedFiles.put( file.toString(), content );
     }
 
     @Override
-    public void setCachedInclude(final String group, final String document)
+    public void setCachedInclude(@NonNull final String group,
+                                 @NonNull final String document)
     {
-        Assert.notNull( group, document );
-
         this.cachedIncludes.put( group, document );
     }
 
     @Override
-    public boolean hasCache(final RequestHandler view)
+    public boolean hasCache(@NonNull final RequestHandler view)
     {
-        Assert.notNull( view );
-
         return this.cachedBodies.getIfPresent( view.toString() ) != null;
     }
 
     @Override
-    public void setCache(final RequestHandler view, final ResponseBody responseBody)
+    public void setCache(@NonNull final RequestHandler view,
+                         @NonNull final ResponseBody responseBody)
     {
-        Assert.notNull( view, responseBody );
-
         this.cachedBodies.put( view.toString(), new CachedResponse( responseBody ) );
     }
 
     @Override
-    public CachedResponse getCache(final RequestHandler view)
+    public CachedResponse getCache(@NonNull final RequestHandler view)
     {
-        Assert.notNull( view );
-
-        if ( CoreConfig.debug )
-        {
-            Message.CACHE_REQUEST_ACCESS.log( view );
-        }
-
         return this.cachedBodies.getIfPresent( view.toString() );
     }
 
     @Override
-    public void removeFileCache(final Path path)
+    public void removeFileCache(@NonNull final Path path)
     {
         this.cachedFiles.invalidate( path.toString() );
     }

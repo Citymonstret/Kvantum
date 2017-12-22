@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -40,7 +45,7 @@ import java.util.Optional;
  * final RequestRequirements.RequirementStatus requirementStatus = requestRequirements.testRequirements( request );
  * if ( !requirementStatus.passed() )
  * {
- *      Logger.debug( "Request failed checks: %s", requirementStatus.getMessage() );
+ *      Logger.debug( "Request failed checks: {}", requirementStatus.getMessage() );
  * }
  * }</pre>
  */

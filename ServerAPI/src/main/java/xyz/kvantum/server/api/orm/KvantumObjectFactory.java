@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -140,8 +145,8 @@ final public class KvantumObjectFactory<T>
                 {
                     throw new IllegalArgumentException(
                             String.format(
-                                    "Failed to parse @KvantumField [%s]: " +
-                                            "KvantumFields may not be of type [%s]",
+                                    "Failed to parse @KvantumField [{}]: " +
+                                            "KvantumFields may not be of type [{}]",
                                     field.getName(), field.getType().getName() ) );
                 }
                 //
@@ -178,7 +183,7 @@ final public class KvantumObjectFactory<T>
                     {
                         throw new IllegalArgumentException(
                                 String.format(
-                                        "Failed to parse @KvantumField [%s]: %s",
+                                        "Failed to parse @KvantumField [{}]: {}",
                                         field.getName(), parserResult.getError() ) );
                     }
                 }

@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -17,7 +22,6 @@
 package xyz.kvantum.crush.syntax;
 
 import xyz.kvantum.server.api.cache.ICacheManager;
-import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
@@ -44,19 +48,17 @@ final public class Include extends Syntax
         String out = in;
         while ( matcher.find() )
         {
-            boolean setCache = false;
-            if ( CoreConfig.Cache.enabled )
+            boolean setCache;
+
+            ICacheManager manager = ServerImplementation.getImplementation().getCacheManager();
+            String s = manager.getCachedInclude( matcher.group() );
+            if ( s != null )
             {
-                ICacheManager manager = ServerImplementation.getImplementation().getCacheManager();
-                String s = manager.getCachedInclude( matcher.group() );
-                if ( s != null )
-                {
-                    out = out.replace( matcher.group(), s );
-                    continue;
-                } else
-                {
-                    setCache = true;
-                }
+                out = out.replace( matcher.group(), s );
+                continue;
+            } else
+            {
+                setCache = true;
             }
 
             File file = new File( ServerImplementation.getImplementation().getCoreFolder(), matcher.group( 1 ) );
@@ -91,7 +93,7 @@ final public class Include extends Syntax
                 }
             } else
             {
-                ServerImplementation.getImplementation().log( "Couldn't find file for '%s'", matcher.group() );
+                ServerImplementation.getImplementation().log( "Couldn't find file for '{}'", matcher.group() );
             }
         }
         return out;

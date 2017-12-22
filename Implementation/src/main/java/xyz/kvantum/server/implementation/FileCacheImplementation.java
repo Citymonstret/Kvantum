@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -18,7 +23,6 @@ package xyz.kvantum.server.implementation;
 
 import xyz.kvantum.files.FileCacheManager;
 import xyz.kvantum.files.Path;
-import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
 import java.util.Optional;
@@ -29,20 +33,12 @@ public final class FileCacheImplementation implements FileCacheManager
     @Override
     public Optional<String> readCachedFile(final Path path)
     {
-        if ( !CoreConfig.Cache.enabled )
-        {
-            return Optional.empty();
-        }
         return ServerImplementation.getImplementation().getCacheManager().getCachedFile( path );
     }
 
     @Override
     public void writeCachedFile(final Path path, final String content)
     {
-        if ( !CoreConfig.Cache.enabled )
-        {
-            return;
-        }
         ServerImplementation.getImplementation().getCacheManager().setCachedFile( path, content );
     }
 }

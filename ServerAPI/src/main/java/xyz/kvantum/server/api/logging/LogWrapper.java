@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -16,15 +21,34 @@
  */
 package xyz.kvantum.server.api.logging;
 
+/**
+ * Wrapper meant to hide the logging implementation details
+ */
 public interface LogWrapper
 {
 
+    /**
+     * Log a constructed context
+     *
+     * @param logContext Context to log
+     */
     void log(LogContext logContext);
 
+    /**
+     * Log a message
+     *
+     * @param s Log message
+     */
     void log(String s);
 
+    /**
+     * Send a line break
+     */
     void breakLine();
 
+    /**
+     * Log an empty string
+     */
     default void log()
     {
         log( "" );
@@ -42,7 +66,5 @@ public interface LogWrapper
     {
 
         String process(String in);
-
     }
-
 }

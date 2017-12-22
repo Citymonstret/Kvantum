@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +33,28 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+/**
+ * Utility object that aims to provide
+ * an easy, and uniform, way to verify
+ * that account information follows
+ * a set standard. This system is used
+ * in the account command registration
+ * system.
+ * <p>
+ * There is a default implementation
+ * setup, that can be replaced. This
+ * implementation can be retrieved
+ * by using {@link #getGlobalAccountVerifier()}
+ * and set using {@link #setGlobalAccountVerifier(AccountVerifier)}.
+ * The default implementation checks the following:
+ * <ul>
+ * <li>Email follows email syntax (If email is given)</li>
+ * <li>Password has at least 8 characters</li>
+ * <li>Password is no more than 16 characters</li>
+ * <li>Password is not the same as the username</li>
+ * <li>Username has at least 5 characters</li>
+ * </ul>
+ */
 @SuppressWarnings({ "unused", "WeakerAccess" })
 public class AccountVerifier
 {
@@ -78,11 +106,26 @@ public class AccountVerifier
         this.internalVerifier = builder.build();
     }
 
+    /**
+     * Check if an account is valid
+     *
+     * @param account Account to verify
+     * @return True if the account passes all checks,
+     * false if not
+     */
     public final boolean isValid(final IAccount account)
     {
         return this.verifyAccount( account ).isEmpty();
     }
 
+    /**
+     * Check if an account is valid, and return a list
+     * of constraint violations if it isn't
+     *
+     * @param account Account to verify
+     * @return Collection containing all violations,
+     * An empty collection if the account is valid
+     */
     public final Collection<Rule<IAccount>> verifyAccount(final IAccount account)
     {
         return this.internalVerifier.verify( account );

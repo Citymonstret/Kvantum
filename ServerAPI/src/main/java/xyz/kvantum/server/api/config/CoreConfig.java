@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -155,7 +160,6 @@ public class CoreConfig
     {
 
         public static int limitRequestLineSize = 8190;
-        public static int limitPostMultipartSize = 8190;
         public static int limitPostBasicSize = 8190;
 
     }
@@ -163,8 +167,6 @@ public class CoreConfig
     @ConfigSection(name = "cache")
     public static class Cache
     {
-
-        public static boolean enabled = true;
         public static int cachedIncludesExpiry = 60 * 60; // 1h
         public static int cachedIncludesMaxItems = 1000;
         public static int cachedAccountsExpiry = 60 * 30;
@@ -176,7 +178,6 @@ public class CoreConfig
         public static int cachedFilesExpiry = 60 * 60 * 24;
         public static int cachedFilesMaxItems = 1000;
         public static int cachedSessionsMaxItems = 1000;
-
     }
 
     @ConfigSection(name = "mongodb")

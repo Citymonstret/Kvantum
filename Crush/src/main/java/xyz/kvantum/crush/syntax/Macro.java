@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -75,7 +80,7 @@ public class Macro extends Syntax
             final String macroName = usageMatcher.group( "name" );
             if ( !macroMap.containsKey( macroName ) )
             {
-                Logger.warn( "Crush template requesting invalid macro: %s", macroName );
+                Logger.warn( "Crush template requesting invalid macro: {}", macroName );
                 continue;
             }
             final DefinedMacro definedMacro = macroMap.get( macroName );

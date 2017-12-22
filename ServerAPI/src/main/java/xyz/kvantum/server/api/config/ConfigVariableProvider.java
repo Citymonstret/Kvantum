@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -28,8 +33,6 @@ import java.util.Optional;
 /**
  * This allows you to access configuration
  * variables through the variable syntax
- *
- * @author Citymonstret
  */
 public class ConfigVariableProvider implements ProviderFactory<ConfigVariableProvider>, VariableProvider
 {

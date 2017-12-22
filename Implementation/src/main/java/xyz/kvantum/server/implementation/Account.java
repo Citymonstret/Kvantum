@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -176,7 +181,7 @@ public class Account implements IAccount
                     this.roleList.add( roleOptional.get() );
                 } else
                 {
-                    Logger.warn("Account [%s] has account role [%s] stored," +
+                    Logger.warn( "Account [{}] has account role [{}] stored," +
                             " but the role is not registered in  the account manager", getUsername(), string );
                 }
             }

@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -72,7 +77,7 @@ public class FileUtils
                 }
             }
         }
-        Logger.info( "Successfully copied '%s' to '%s'", resourcePath, path.getFileName() );
+        Logger.info( "Successfully copied '{0}' to '{1}'", resourcePath, path.getFileName() );
     }
 
     /**

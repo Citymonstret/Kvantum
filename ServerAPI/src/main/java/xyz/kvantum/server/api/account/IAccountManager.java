@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -38,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link Kvantum#getApplicationStructure()} then {@link ApplicationStructure#getAccountManager()}
  * </p>
  */
+@SuppressWarnings("unused")
 public interface IAccountManager extends SearchResultProvider<IAccount, IAccount>
 {
 
@@ -58,22 +64,25 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Get the container {@link ApplicationStructure}
-     * @return {@link ApplicationStructure} implemenation
+     *
+     * @return {@link ApplicationStructure} implementation
      */
     ApplicationStructure getApplicationStructure();
 
     /**
      * Setup the account manager
+     *
      * @throws Exception if anything goes wrong
      */
     void setup() throws Exception;
 
     /**
      * Create an {@link IAccount}
+     *
      * @param username Account username
      * @param password Account password
      * @return {@link Optional} containing the account if it was created successfully,
-     *                          otherwise an empty optional ({@link Optional#empty()} is returned.
+     * otherwise an empty optional ({@link Optional#empty()} is returned.
      */
     Optional<IAccount> createAccount(String username, String password);
 
@@ -81,25 +90,28 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Get an {@link IAccount} by username.
+     *
      * @param username Account username
      * @return {@link Optional} containing the account if it exsists
-     *                          otherwise an empty optional ({@link Optional#empty()} is returned.
+     * otherwise an empty optional ({@link Optional#empty()} is returned.
      */
     Optional<IAccount> getAccount(String username);
 
     /**
      * Get an {@link IAccount} by ID.
+     *
      * @param accountId Account ID
      * @return {@link Optional} containing the account if it exsists
-     *                          otherwise an empty optional ({@link Optional#empty()} is returned.
+     * otherwise an empty optional ({@link Optional#empty()} is returned.
      */
     Optional<IAccount> getAccount(int accountId);
 
     /**
      * Get an {@link IAccount} by session.
+     *
      * @param session session.
      * @return {@link Optional} containing the account if it exsists
-     *                          otherwise an empty optional ({@link Optional#empty()} is returned.
+     * otherwise an empty optional ({@link Optional#empty()} is returned.
      */
     default Optional<IAccount> getAccount(final ISession session)
     {
@@ -112,6 +124,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Bind an {@link IAccount} to a {@link ISession}
+     *
      * @param account Account
      * @param session Session
      */
@@ -122,6 +135,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Unbind any account from a {@link ISession}
+     *
      * @param session Session to be unbound
      */
     default void unbindAccount(final ISession session)
@@ -131,21 +145,24 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Set the data for an account
+     *
      * @param account Account
-     * @param key Data key
-     * @param value Data value
+     * @param key     Data key
+     * @param value   Data value
      */
     void setData(IAccount account, String key, String value);
 
     /**
      * Remove a data value from an account
+     *
      * @param account Account
-     * @param key Data key
+     * @param key     Data key
      */
     void removeData(IAccount account, String key);
 
     /**
      * Load the data into a {@link IAccount}
+     *
      * @param account Account to be loaded
      */
     void loadData(IAccount account);
@@ -183,6 +200,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
     /**
      * Search for an account in the account database by
      * comparing either user ID or username (or both)
+     *
      * @param searchQuery Query containing the information
      *                    that will be compared
      * @return Optional
@@ -222,6 +240,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Register an account role
+     *
      * @param role Role instance
      */
     default void registerAccountRole(final AccountRole role)
@@ -231,6 +250,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Get all account roles that are registered in the manager
+     *
      * @return registered account roles
      */
     default Collection<AccountRole> getRegisteredAccountRoles()
@@ -240,6 +260,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
 
     /**
      * Try to retrieve an account role based on its identifier
+     *
      * @param roleIdentifier Role identifier ({@link AccountRole#getRoleIdentifier()})
      * @return Optional
      */

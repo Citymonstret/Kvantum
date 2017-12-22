@@ -1,4 +1,9 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
  *    Copyright (C) 2017 IntellectualSites
  *
@@ -98,7 +103,7 @@ public final class InputThread extends Thread
                         case CommandHandlingOutput.NOT_FOUND:
                             if ( result.getClosestMatch() != null )
                             {
-                                ServerImplementation.getImplementation().log( "Did you mean: /%s", result
+                                ServerImplementation.getImplementation().log( "Did you mean: /{0}", result
                                         .getClosestMatch().getCommand() );
                             } else
                             {

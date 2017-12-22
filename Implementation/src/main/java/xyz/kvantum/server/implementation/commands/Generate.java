@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,14 +65,14 @@ public class Generate extends Command
         final Path path = ServerImplementation.getImplementation().getFileSystem().getPath( folderName );
         if ( !path.exists() )
         {
-            Logger.error( "No such folder: %s", path.toString() );
+            Logger.error( "No such folder: {}", path.toString() );
             return true;
         }
 
         final ViewDetector viewDetector = new ViewDetector( basePath, path, Collections.emptyList() );
         final int loaded = viewDetector.loadPaths();
-        Logger.info( "Found %s folders inside of %s", loaded, path );
-        viewDetector.getPaths().forEach( p -> Logger.info( "- %s", p.toString() ) );
+        Logger.info( "Found {} folders inside of {}", loaded, path );
+        viewDetector.getPaths().forEach( p -> Logger.info( "- {}", p.toString() ) );
         viewDetector.generateViewEntries();
 
         final String fileName = UUID.randomUUID().toString();
@@ -79,14 +85,14 @@ public class Generate extends Command
             configurationFile.loadFile();
         } catch ( Exception e )
         {
-            Logger.error( "Failed to generate view declaration for %s", path );
+            Logger.error( "Failed to generate view declaration for {}", path );
             e.printStackTrace();
             return true;
         }
         configurationFile.set( "views", viewDetector.getViewEntries() );
         configurationFile.saveFile();
-        Logger.info( "Generated views can be found in 'config/%s.yml'", fileName );
-        Logger.info( "Add '%s: %s.yml' to views.yml to load the file", fileName, fileName );
+        Logger.info( "Generated views can be found in 'config/{}.yml'", fileName );
+        Logger.info( "Add '{}: {}.yml' to views.yml to load the file", fileName, fileName );
         return true;
     }
 

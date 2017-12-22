@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,7 +140,7 @@ final class ConnectionThrottle implements LeakageProne
         final List<AttemptMapping> shouldReset = this.attemptMapping.values().stream().filter( this::shouldReset )
                 .collect( Collectors.toList() );
         shouldReset.forEach( a -> attemptMapping.remove( a.getIp() ) );
-        Logger.info( "Cleaned up %s stored connection attempts!", shouldReset.size() );
+        Logger.info( "Cleaned up {} stored connection attempts!", shouldReset.size() );
     }
 
     @Data

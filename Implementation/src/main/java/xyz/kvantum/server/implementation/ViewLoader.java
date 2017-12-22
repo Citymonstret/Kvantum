@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,7 +90,7 @@ public class ViewLoader
                 } else
                 {
                     Logger.warn( "Trying to include view declaration " +
-                            "that is not of YAML type: %s", object );
+                            "that is not of YAML type: {}", object );
                     continue;
                 }
                 this.addViews( includeFile );
@@ -104,7 +110,7 @@ public class ViewLoader
         final Map<String, Object> viewBody = (Map<String, Object>) viewEntry.getValue();
         if ( !validateView( viewBody ) )
         {
-            Logger.warn( "Invalid view declaration: %s", viewEntry.getKey() );
+            Logger.warn( "Invalid view declaration: {}", viewEntry.getKey() );
             return;
         }
         final String type = viewBody.get( "type" ).toString().toLowerCase( Locale.ENGLISH );
@@ -130,7 +136,7 @@ public class ViewLoader
             }
         } else
         {
-            Logger.warn( "View declaration '%s' trying to declare unknown type: %s",
+            Logger.warn( "View declaration '{}' trying to declare unknown type: {}",
                     viewEntry.getKey(), type );
         }
     }

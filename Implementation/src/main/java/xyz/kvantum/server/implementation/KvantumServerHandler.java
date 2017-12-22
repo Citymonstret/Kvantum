@@ -1,4 +1,10 @@
 /*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
  *    Copyright (C) 2017 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -201,7 +207,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             //
             // Try to find cached response
             //
-            if ( CoreConfig.Cache.enabled && requestHandler instanceof CacheApplicable
+            if ( requestHandler instanceof CacheApplicable
                     && ( (CacheApplicable) requestHandler ).isApplicable( request ) )
             {
                 cache = true;
@@ -342,12 +348,12 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         {
             if ( CoreConfig.debug )
             {
-                Logger.debug( "Redirecting request [%s] to HTTPS version of [%s]", workerContext.getRequest(),
+                Logger.debug( "Redirecting request [{}] to HTTPS version of [{}]", workerContext.getRequest(),
                         workerContext.getRequestHandler() );
             }
             if ( !CoreConfig.SSL.enable )
             {
-                Logger.error( "RequestHandler (%s) forces HTTPS but SSL runner not enabled!" );
+                Logger.error( "RequestHandler ({}) forces HTTPS but SSL runner not enabled!" );
                 throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext );
             }
             workerContext.setRequestHandler( HTTPSRedirectHandler.getInstance() );
