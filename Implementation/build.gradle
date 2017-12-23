@@ -34,7 +34,10 @@ artifacts {
 
 dependencies {
     // AsyncBufferedOutputStream
-    compile group: 'de.jungblut.common', name: 'thomasjungblut-common', version: '1.1'
+    compile (group: 'de.jungblut.common', name: 'thomasjungblut-common', version: '1.1') {
+                transitive = false
+                exclude group: '*'
+    }
     // Powers the MongoDB implementation
     compile 'org.mongodb:mongo-java-driver:3.5.0'
     compile 'org.mongodb.morphia:morphia:1.3.2'
@@ -49,8 +52,7 @@ dependencies {
     // Apache commons, self-explanatory
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
     // Netty
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.18.Final'
-    compile 'org.webjars:bootstrap:4.0.0-beta.2'
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.19.Final'
     //
     // Modules
     //
