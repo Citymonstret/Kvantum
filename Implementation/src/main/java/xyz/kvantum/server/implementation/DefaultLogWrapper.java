@@ -21,12 +21,12 @@
  */
 package xyz.kvantum.server.implementation;
 
+import lombok.NonNull;
 import org.apache.commons.text.StrSubstitutor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogContext;
 import xyz.kvantum.server.api.logging.LogWrapper;
-import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ColorUtil;
 
 import java.io.PrintStream;
@@ -39,25 +39,24 @@ public class DefaultLogWrapper implements LogWrapper
 {
 
     @Override
-    public void log(final LogContext logContext)
+    public void log(@NonNull final LogContext logContext)
     {
-        Assert.notNull( logContext );
-        final String replacedMessage = StrSubstitutor.replace( CoreConfig.Logging.logFormat, logContext.toMap() );
+        final String replacedMessage = StrSubstitutor.replace( CoreConfig.Logging.logFormat,
+                logContext.toMap() );
         if ( ServerImplementation.hasImplementation() )
         {
             final PrintStream stream = ( (SimpleServer) ServerImplementation.getImplementation() ).logStream;
             if ( stream != null )
             {
-                stream.println( replacedMessage );
+                stream.println( ColorUtil.getStripped( replacedMessage ) );
             }
         }
         System.out.println( ColorUtil.getReplaced( replacedMessage ) );
     }
 
     @Override
-    public void log(final String s)
+    public void log(@NonNull final String s)
     {
-        Assert.notNull( s );
         System.out.println( s );
         ( (SimpleServer) ServerImplementation.getImplementation() ).logStream.println( s );
     }

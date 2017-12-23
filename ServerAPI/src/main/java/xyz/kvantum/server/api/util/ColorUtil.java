@@ -52,4 +52,13 @@ public class ColorUtil
         return in;
     }
 
+    public static String getStripped(@NonNull String in)
+    {
+        for ( final char key : coloredMapping.keySet() )
+        {
+            in = in.replace( "&" + key, "" );
+        }
+        return in;
+    }
+
 }
