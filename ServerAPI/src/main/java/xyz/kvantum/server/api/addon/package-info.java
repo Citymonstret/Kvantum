@@ -24,4 +24,4 @@
  * server behavior without changing the internal
  * application code and functionality
  */
-package xyz.kvantum.server.api.plugin;
+package xyz.kvantum.server.api.addon;

@@ -29,6 +29,7 @@ import lombok.Synchronized;
 import xyz.kvantum.files.Extension;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.Path;
+import xyz.kvantum.server.api.addon.AddOnManager;
 import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -36,8 +37,6 @@ import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.events.ServerInitializedEvent;
 import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.plugin.PluginLoader;
-import xyz.kvantum.server.api.plugin.PluginManager;
 import xyz.kvantum.server.api.scripts.ScriptView;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.FileUtils;
@@ -334,9 +333,9 @@ public final class StandaloneServer extends SimpleServer
                 log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
                 return;
             }
-            PluginLoader pluginLoader = new PluginLoader( new PluginManager() );
-            pluginLoader.loadAllPlugins( file );
-            pluginLoader.enableAllPlugins();
+            final AddOnManager addOnManager = new AddOnManager( file );
+            addOnManager.load();
+            addOnManager.enableAddOns();
         } else
         {
             log( Message.STANDALONE_NOT_LOADING_PLUGINS );
