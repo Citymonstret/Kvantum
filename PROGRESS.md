@@ -30,6 +30,7 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 
 #### 1.3 Misc
 * Connection Throttling
+* Keep-Alive Support
 
 ## 2 View/Request Handling
 #### 2.1 All views
@@ -39,12 +40,13 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 
 #### 2.2 Static Resources
 Kvantum comes with default views for serving of static files (or pseudo-dynamic through static template rendering). These views makes sure that the appropritate headers are sent alongside with the response, according to the HTTP/1.1 specifications.
+Resources can also be loaded from WebJars (This is automatic). Static files are automatically cached, and the cache 
+entry is automatically purged when the files are modified in any way.
 
 ##### 2.2.1 Default views
 * HTML - Serves html files and templates (currently: .vm and .twig)
 * JavaScript - Serves javascript files
 * CSS - Serves cascading stylesheets
-* LESS - Compiles LESS files into CSS and serves as CSS
 * Download - Sends binary representations of specified files to the client
 * Image - Serves images (of common formats)
 * Standard - Automatically detect and serve: HTML, JavaScript, CSS, LESS and Images.
@@ -62,7 +64,8 @@ requirements of the users:
 
 #### 2.3 API
 Kvantum allows views/request handlers to be defined through:
-* (@)Annotations on inline methods
+* (@)Annotations on inline methods (Fast, thanks to Lambda generation)
+    * Support for response conversion (example: From String to HTMl and JSONObject to JSON String)
 * Fluent builder-patterns (Kvantum#createSimpleRequestHandler and SimpleRequestHandler#builder)
 * OOP (by extending View, or other more specific implementations for different levels of abstraction)
 
@@ -104,6 +107,7 @@ Kvantum comes with an account system, that is meant to remove the need for accou
 * Account creation
 * Password management
 * Account role (permission) system with API and persistent role storage
+* Account registration verification API
 
 ### 4.2 Plugin System
 Kvantum has a plugin system implementation that allows plugins to be loaded by the server at runtime
@@ -134,3 +138,6 @@ Kvantum includes a framework which allows you to map objects to <string,string> 
 automatically generate objects based on these parameters
 
 * Currently supports: String, Boolean, Integer, Long, Short, Byte, Char, Double, Float
+
+### 4.11 POJO
+Kvantum includes its own POJO utilities.
