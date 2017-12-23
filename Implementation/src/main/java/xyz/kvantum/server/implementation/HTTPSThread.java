@@ -94,6 +94,7 @@ final class HTTPSThread extends Thread
                             sslEngine.setUseClientMode( false );
                             sslEngine.setNeedClientAuth( false );
                             ch.pipeline().addLast( new SslHandler( sslEngine ) );
+                            ch.pipeline().addLast( new KvantumReadTimeoutHandler() );
                             ch.pipeline().addLast( new KvantumServerHandler( ProtocolType.HTTPS ) );
                         }
                     } );

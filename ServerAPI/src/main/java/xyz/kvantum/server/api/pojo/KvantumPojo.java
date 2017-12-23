@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.util.VariableProvider;
 
@@ -41,7 +42,7 @@ import java.util.Map;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @SuppressWarnings({ "unused", "WeakerAccess" })
-public final class KvantumPojo<Pojo> implements VariableProvider
+public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware
 {
 
     @NonNull
@@ -215,5 +216,11 @@ public final class KvantumPojo<Pojo> implements VariableProvider
     public ImmutableKvantumPojo<Pojo> toImmutable()
     {
         return new ImmutableKvantumPojo<>( this.instance, this.fieldValues );
+    }
+
+    @Override
+    public String toJSONString()
+    {
+        return this.toJson().toString();
     }
 }

@@ -26,6 +26,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.kvantum.server.api.cache.CacheApplicable;
@@ -77,6 +78,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     private ByteBuf byteBuf;
     private WorkerContext workerContext;
     private RequestReader requestReader;
+    private boolean reused = false;
 
     @Override
     public void handlerAdded(final ChannelHandlerContext context)
@@ -89,14 +91,19 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         final Supplier<Boolean> activeCheck = () -> context.channel().isOpen() && context.channel().isActive();
         final SocketAddress remoteAddress = context.channel().remoteAddress();
         SocketContext socketContext = new SocketContext( this.protocolType, remoteAddress, activeCheck );
+        this.createNew( socketContext );
+
+        Message.CONNECTION_ACCEPTED.log( workerContext.getSocketContext().getAddress() );
+    }
+
+    private void createNew(final SocketContext socketContext)
+    {
         this.workerContext = new WorkerContext( ServerImplementation.getImplementation(), ServerImplementation.getImplementation()
                 .getProcedure().getInstance(), this );
         this.workerContext.setSocketContext( socketContext );
         final Request request = new Request( socketContext );
         this.workerContext.setRequest( request );
         this.requestReader = new RequestReader( request );
-
-        Message.CONNECTION_ACCEPTED.log( workerContext.getSocketContext().getAddress() );
     }
 
     @Override
@@ -127,6 +134,11 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelRead(final ChannelHandlerContext context, final Object messageObject)
     {
+        if ( reused && CoreConfig.debug )
+        {
+            Logger.debug( "Reused socket: {}", this.workerContext.getSocketContext().getIP() );
+            this.reused = false;
+        }
         final ByteBuf message = (ByteBuf) messageObject;
         this.byteBuf.writeBytes( message );
         message.release();
@@ -411,6 +423,27 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                     .forEach( Logger::debug );
         }
 
+        final boolean keepAlive;
+        if ( workerContext.getRequest().getHeaders().getOrDefault( "connection", "close" ).equalsIgnoreCase(
+                "keep-alive" ) )
+        {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Request " + workerContext.getRequest() + " requested keep-alive..." );
+            }
+            keepAlive = true;
+            //
+            // Apply "connection: keep-alive" and "content-length: n" headers to
+            // make sure that the client keeps the connection open
+            //
+            body.getHeader().set( Header.HEADER_CONNECTION, "keep-alive" );
+            body.getHeader().set( Header.HEADER_CONTENT_LENGTH, String.valueOf( bytes.length ) );
+        } else
+        {
+            keepAlive = false;
+            body.getHeader().set( Header.HEADER_CONNECTION, "close" );
+        }
+
         final ByteBuf buf = context.alloc().buffer();
 
         //
@@ -430,21 +463,42 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         buf.writeBytes( bytes );
 
         //
-        // Make sure everything is written
-        //
-        final ChannelFuture future = context.writeAndFlush( buf );
-        future.addListener( (ChannelFutureListener) f -> context.close() );
-
-        //
         // Invalidate request to make sure that it isn't handled anywhere else, again (wouldn't work)
         //
         workerContext.getRequest().setValid( false );
+
+        //
+        // Make sure everything is written
+        //
+        final ChannelFuture future = context.writeAndFlush( buf );
+        if ( keepAlive )
+        {
+            this.reused = true;
+            this.byteBuf.clear();
+            this.requestReader.clear();
+            this.createNew( workerContext.getSocketContext() );
+        } else
+        {
+            future.addListener( ChannelFutureListener.CLOSE );
+        }
     }
 
     @Override
-    public void exceptionCaught(final ChannelHandlerContext context, final Throwable cause)
+    public void exceptionCaught(final ChannelHandlerContext context,
+                                final Throwable cause)
     {
-        cause.printStackTrace();
+        if ( cause instanceof ReadTimeoutException )
+        {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Connection for {} timed out", workerContext.getSocketContext().getIP() );
+            }
+        } else
+        {
+            Logger.error( "Encountered error..." );
+            cause.printStackTrace();
+        }
         context.close();
     }
+
 }

@@ -54,6 +54,9 @@ public class CoreConfig
     public static boolean exitOnStop = true;
     public static boolean enablePlugins = true;
 
+    public static long timeout = 15;
+    public static String timeoutUnit = "SECONDS";
+
     @ConfigSection(name = "Throttling")
     public static class Throttle
     {
