@@ -174,7 +174,7 @@ public class SimpleServer implements Kvantum
         try
         {
             FileUtils.addToZip( new File( logFolder, "old.zip" ),
-                    logFolder.listFiles( (dir, name) -> name.endsWith( ".txt" ) ) );
+                    logFolder.listFiles( (dir, name) -> name.endsWith( ".log" ) && !name.contains( "access" ) ) );
         } catch ( final Exception e )
         {
             e.printStackTrace();
@@ -346,6 +346,11 @@ public class SimpleServer implements Kvantum
         final Publisher publisher = Publisher.immediate();
         final EventEmitter emitter = EventEmitter.standard( registry, publisher );
         this.eventBus = EventBus.standard( registry, emitter );
+
+        //
+        // Initialize access.log logger
+        //
+        this.eventBus.register( new AccessLogStream( logFolder ) );
 
         //
         // Setup the connection throttler

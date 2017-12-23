@@ -38,6 +38,7 @@ import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Request;
+import xyz.kvantum.server.api.response.FinalizedResponse;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.response.Response;
@@ -466,6 +467,14 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         // Invalidate request to make sure that it isn't handled anywhere else, again (wouldn't work)
         //
         workerContext.getRequest().setValid( false );
+
+        final FinalizedResponse finalizedResponse = FinalizedResponse.builder()
+                .address( this.workerContext.getSocketContext().getIP() )
+                .authorization( this.workerContext.getRequest().getAuthorization().orElse( null ) )
+                .length( bytes.length )
+                .status( body.getHeader().getStatus() ).query( this.workerContext.getRequest().getQuery() )
+                .timeFinished( System.currentTimeMillis() ).build();
+        ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse );
 
         //
         // Make sure everything is written

@@ -38,12 +38,14 @@ public final class TimeUtil
     public final static SimpleDateFormat logFileFormat;
     public final static SimpleDateFormat httpFormat;
     public final static SimpleDateFormat logFormat;
+    public static final SimpleDateFormat accessLogFormat;
 
     static
     {
         httpFormat = new SimpleDateFormat( "EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.ENGLISH );
         logFormat = new SimpleDateFormat( "HH:mm:ss", Locale.ENGLISH );
         logFileFormat = new SimpleDateFormat( "dd MMM yyyy kk-mm-ss", Locale.ENGLISH );
+        accessLogFormat = new SimpleDateFormat( "dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH );
     }
 
     /**
@@ -64,6 +66,11 @@ public final class TimeUtil
     public static String getHTTPTimeStamp(final Date date)
     {
         return getTimeStamp( httpFormat, date );
+    }
+
+    public static String getAccessLogTimeStamp(final long time)
+    {
+        return getTimeStamp( accessLogFormat, new Date( time ) );
     }
 
     /**
