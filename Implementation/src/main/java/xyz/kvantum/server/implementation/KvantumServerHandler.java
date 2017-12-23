@@ -28,7 +28,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -308,17 +307,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                         textContent = handler.act( requestHandler, request, textContent );
                     }
                     bytes = textContent.getBytes( StandardCharsets.UTF_8 );
-                }
-
-                if ( !workerContext.getWorkerProcedureInstance().getByteHandlers().isEmpty() )
-                {
-                    Byte[] wrapper = ArrayUtils.toObject( bytes );
-                    for ( final WorkerProcedure.Handler<Byte[]> handler : workerContext.getWorkerProcedureInstance()
-                            .getByteHandlers() )
-                    {
-                        wrapper = handler.act( requestHandler, request, wrapper );
-                    }
-                    bytes = ArrayUtils.toPrimitive( wrapper );
                 }
             }
         } catch ( final Exception e )

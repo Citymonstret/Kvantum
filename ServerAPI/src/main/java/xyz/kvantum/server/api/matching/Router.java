@@ -21,8 +21,9 @@
  */
 package xyz.kvantum.server.api.matching;
 
-import org.apache.commons.lang3.NotImplementedException;
+import lombok.SneakyThrows;
 import xyz.kvantum.server.api.core.Kvantum;
+import xyz.kvantum.server.api.exceptions.NotImplementedException;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 
@@ -67,6 +68,7 @@ public abstract class Router
      * Dump Router contents onto the server log
      * @param server Server instance
      */
+    @SneakyThrows
     public void dump(final Kvantum server)
     {
         throw new NotImplementedException( "Dump has not been overridden by the Router implementation" );

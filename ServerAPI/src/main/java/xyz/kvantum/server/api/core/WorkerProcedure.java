@@ -121,16 +121,12 @@ public final class WorkerProcedure
     private void setChanged()
     {
         final Collection<StringHandler> stringHandlers = new ArrayList<>();
-        final Collection<ByteHandler> byteHandlers = new ArrayList<>();
 
         for ( final Handler handler : handlers.values() )
         {
             if ( handler instanceof StringHandler )
             {
                 stringHandlers.add( (StringHandler) handler );
-            } else
-            {
-                byteHandlers.add( (ByteHandler) handler );
             }
         }
 
@@ -139,7 +135,6 @@ public final class WorkerProcedure
             final WorkerProcedureInstance instance = instanceReference.get();
             if ( instance != null )
             {
-                instance.byteHandlers = byteHandlers;
                 instance.stringHandlers = stringHandlers;
             }
         }
@@ -160,19 +155,6 @@ public final class WorkerProcedure
 
         Class<T> getType();
 
-    }
-
-    @EqualsAndHashCode(of = "uniqueID")
-    public static abstract class ByteHandler implements Handler<Byte[]>
-    {
-
-        private final String uniqueID = UUID.randomUUID().toString();
-
-        @Override
-        public Class<Byte[]> getType()
-        {
-            return Byte[].class;
-        }
     }
 
     @EqualsAndHashCode(of = "uniqueID")
@@ -199,7 +181,6 @@ public final class WorkerProcedure
     {
 
         private volatile Collection<StringHandler> stringHandlers = new ArrayList<>();
-        private volatile Collection<ByteHandler> byteHandlers = new ArrayList<>();
 
         WorkerProcedureInstance()
         {
@@ -209,9 +190,6 @@ public final class WorkerProcedure
                 if ( handler instanceof StringHandler )
                 {
                     stringHandlers.add( (StringHandler) handler );
-                } else
-                {
-                    byteHandlers.add( (ByteHandler) handler );
                 }
             }
         }
@@ -221,10 +199,6 @@ public final class WorkerProcedure
             return this.stringHandlers;
         }
 
-        public Collection<ByteHandler> getByteHandlers()
-        {
-            return this.byteHandlers;
-        }
     }
 
 }

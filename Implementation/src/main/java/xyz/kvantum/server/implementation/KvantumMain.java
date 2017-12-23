@@ -23,7 +23,6 @@ package xyz.kvantum.server.implementation;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.apache.commons.lang3.SystemUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.logging.LogContext;
@@ -36,6 +35,7 @@ import xyz.kvantum.server.implementation.example.Examples;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.Optional;
 
 @SuppressWarnings("ALL")
@@ -49,7 +49,9 @@ final public class KvantumMain
      */
     public static void main(final String[] args) throws Throwable
     {
-        if ( SystemUtils.IS_OS_LINUX )
+        final String osName = System.getProperty( "os.name" );
+
+        if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
         {
             System.out.println( "Server running on Linux! Checking privileges..." );
 

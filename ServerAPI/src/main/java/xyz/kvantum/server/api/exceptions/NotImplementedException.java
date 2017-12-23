@@ -19,33 +19,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation;
+package xyz.kvantum.server.api.exceptions;
 
-import de.jungblut.datastructure.AsyncBufferedOutputStream;
-import lombok.NonNull;
-import pw.stamina.causam.scan.method.model.Subscriber;
-import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.response.FinalizedResponse;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-
-final class AccessLogStream extends PrintStream
+public final class NotImplementedException extends IllegalAccessException
 {
 
-    AccessLogStream(final File logFolder) throws FileNotFoundException
+    public NotImplementedException(final String message)
     {
-        super( new AsyncBufferedOutputStream( new FileOutputStream( new File( logFolder, "access.log" ), true ) ) );
-    }
-
-    @Subscriber
-    private void onRequestFinish(@NonNull final FinalizedResponse response)
-    {
-        Logger.info( "Logging {}", response.toLogString() );
-        this.println( response.toLogString() );
-        this.flush();
+        super( message );
     }
 
 }

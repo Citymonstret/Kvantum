@@ -8,8 +8,6 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // Makes input handling better and more fluent
     compile group: 'org.jline', name: 'jline', version: '3.5.1'
-    // Has great string utilities
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
     // Command management system
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     // Password encryption

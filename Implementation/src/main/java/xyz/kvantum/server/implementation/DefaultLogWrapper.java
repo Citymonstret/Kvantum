@@ -22,7 +22,7 @@
 package xyz.kvantum.server.implementation;
 
 import lombok.NonNull;
-import org.apache.commons.text.StrSubstitutor;
+import lombok.val;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogContext;
@@ -41,8 +41,14 @@ public class DefaultLogWrapper implements LogWrapper
     @Override
     public void log(@NonNull final LogContext logContext)
     {
-        final String replacedMessage = StrSubstitutor.replace( CoreConfig.Logging.logFormat,
-                logContext.toMap() );
+        final val map = logContext.toMap();
+        final String replacedMessage = CoreConfig.Logging.logFormat
+                .replace( "${applicationPrefix}", map.get( "applicationPrefix" ) )
+                .replace( "${logPrefix}", map.get( "logPrefix" ) )
+                .replace( "${thread}", map.get( "thread" ) )
+                .replace( "${timeStamp}", map.get( "timeStamp" ) )
+                .replace( "${message}", map.get( "message" ) );
+
         if ( ServerImplementation.hasImplementation() )
         {
             final PrintStream stream = ( (SimpleServer) ServerImplementation.getImplementation() ).logStream;

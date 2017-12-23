@@ -25,14 +25,16 @@ import lombok.Getter;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.io.IOUtils;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.fileupload.KvantumFileUploadContext;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MultipartPostRequest extends PostRequest
@@ -67,7 +69,16 @@ public class MultipartPostRequest extends PostRequest
                     }
                     try ( final InputStream inputStream = item.openStream() )
                     {
-                        final List lines = IOUtils.readLines( inputStream );
+                        final List<String> lines = new ArrayList<>();
+                        try ( BufferedReader bufferedReader =
+                                      new BufferedReader( new InputStreamReader( inputStream ) ) )
+                        {
+                            String line;
+                            while ( ( line = bufferedReader.readLine() ) != null )
+                            {
+                                lines.add( line );
+                            }
+                        }
                         if ( lines.size() != 1 )
                         {
                             Logger.warn( "FileItem simple field line count is not 0 (Request: {})", getParent() );

@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.files;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * A very simple (and restrictive) file system
  */
@@ -127,7 +125,7 @@ public class FileSystem
         }
         for ( final String part : parts )
         {
-            if ( StringUtils.contains( part, ".." ) )
+            if ( part.contains( ".." ) )
             {
                 throw new IllegalPathException( rawPath );
             }
