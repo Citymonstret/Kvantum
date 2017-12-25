@@ -27,6 +27,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.ReadTimeoutException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -78,7 +79,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 
     private final ProtocolType protocolType;
 
-    private ByteBuf byteBuf;
     private WorkerContext workerContext;
     private RequestReader requestReader;
     private boolean reused = false;
@@ -86,20 +86,20 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     @Override
     public void handlerAdded(final ChannelHandlerContext context)
     {
-        this.byteBuf = context.alloc().buffer();
-
         //
         // Prepare request
         //
         final Supplier<Boolean> activeCheck = () -> context.channel().isOpen() && context.channel().isActive();
         final SocketAddress remoteAddress = context.channel().remoteAddress();
-        SocketContext socketContext = new SocketContext( this.protocolType, remoteAddress, activeCheck );
-        this.createNew( socketContext );
+        this.createNew( new SocketContext( this.protocolType, remoteAddress, activeCheck ) );
 
+        //
+        // Log "Connection accepted from '{}' - Handling the data!"
+        //
         Message.CONNECTION_ACCEPTED.log( workerContext.getSocketContext().getAddress() );
     }
 
-    private void createNew(final SocketContext socketContext)
+    private void createNew(@NonNull final SocketContext socketContext)
     {
         this.workerContext = new WorkerContext( ServerImplementation.getImplementation(), ServerImplementation.getImplementation()
                 .getProcedure().getInstance(), this );
@@ -107,13 +107,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         final Request request = new Request( socketContext );
         this.workerContext.setRequest( request );
         this.requestReader = new RequestReader( request );
-    }
-
-    @Override
-    public void handlerRemoved(final ChannelHandlerContext context)
-    {
-        this.byteBuf.release();
-        this.byteBuf = null;
     }
 
     @Override
@@ -140,23 +133,39 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         if ( reused && CoreConfig.debug )
         {
             Logger.debug( "Reused socket: {}", this.workerContext.getSocketContext().getIP() );
-            this.reused = false;
         }
+
+        //
+        // Always reset "reused" state
+        //
+        this.reused = false;
+
+
+        //
+        // Read incoming message
+        //
         final ByteBuf message = (ByteBuf) messageObject;
-        this.byteBuf.writeBytes( message );
-        message.release();
+
         try
         {
-            this.requestReader.readBytes( this.byteBuf );
+            this.requestReader.readBytes( message );
         } catch ( final Throwable throwable )
         {
             this.handleThrowable( throwable, context );
+        } finally
+        {
+            message.release();
         }
+
+        //
+        // Handle complete requests
+        //
         if ( this.requestReader.isDone() )
         {
             // Release content
             this.requestReader.clear();
             this.workerContext.getRequest().onCompileFinish();
+
             if ( CoreConfig.debug )
             {
                 this.workerContext.getRequest().dumpRequest();
@@ -359,8 +368,8 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         {
             throw new ReturnStatus( Header.STATUS_NOT_FOUND, workerContext );
         }
-        if ( workerContext.getRequest().getProtocolType() != ProtocolType.HTTPS && workerContext.getRequestHandler()
-                .forceHTTPS() )
+        if ( workerContext.getRequest().getProtocolType() != ProtocolType.HTTPS &&
+                workerContext.getRequestHandler().forceHTTPS() )
         {
             if ( CoreConfig.debug )
             {
@@ -448,7 +457,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             body.getHeader().set( Header.HEADER_CONNECTION, "close" );
         }
 
-        final ByteBuf buf = context.alloc().buffer();
+        final ByteBuf buf = context.alloc().buffer( CoreConfig.Buffer.out );
 
         //
         // Send the header to the client
@@ -492,7 +501,6 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         if ( keepAlive )
         {
             this.reused = true;
-            this.byteBuf.clear();
             this.requestReader.clear();
             this.createNew( workerContext.getSocketContext() );
         } else
