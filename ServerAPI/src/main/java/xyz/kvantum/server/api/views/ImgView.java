@@ -47,4 +47,5 @@ public class ImgView extends StaticFileView implements CacheApplicable, IgnoreSy
     {
         return false;
     }
+
 }

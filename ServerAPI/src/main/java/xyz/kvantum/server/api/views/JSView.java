@@ -51,4 +51,5 @@ public class JSView extends StaticFileView implements CacheApplicable
         final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
         return cacheApplicableBoolean.orElse( true );
     }
+
 }

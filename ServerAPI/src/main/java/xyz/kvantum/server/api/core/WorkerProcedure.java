@@ -41,7 +41,7 @@ public final class WorkerProcedure
 {
 
     private final List<WeakReference<WorkerProcedureInstance>> instances = new ArrayList<>();
-    private volatile Map<String, Handler> handlers = new LinkedHashMap<>();
+    private volatile Map<String, StringHandler> handlers = new LinkedHashMap<>();
 
     /**
      * Add a procedure, and allow the Worker to use it
@@ -49,7 +49,7 @@ public final class WorkerProcedure
      * @param handler Procedure Handler
      */
     @Synchronized
-    public void addProcedure(final String name, final Handler handler)
+    public void addProcedure(final String name, final StringHandler handler)
     {
         this.handlers.put( name, handler );
         this.setChanged();
@@ -63,14 +63,14 @@ public final class WorkerProcedure
      * @param handler Procedure handler
      */
     @Synchronized
-    public void addProcedureBefore(final String name, final String before, final Handler handler)
+    public void addProcedureBefore(final String name, final String before, final StringHandler handler)
     {
         Assert.notEmpty( name );
         Assert.notEmpty( before );
         Assert.notNull( handler );
 
-        final Map<String, Handler> temporaryMap = new HashMap<>();
-        for ( final Map.Entry<String, Handler> entry : handlers.entrySet() )
+        final Map<String, StringHandler> temporaryMap = new HashMap<>();
+        for ( final Map.Entry<String, StringHandler> entry : handlers.entrySet() )
         {
             if ( entry.getKey().equalsIgnoreCase( before ) )
             {
@@ -86,6 +86,11 @@ public final class WorkerProcedure
         this.setChanged();
     }
 
+    public boolean hasHandlers()
+    {
+        return !this.handlers.isEmpty();
+    }
+
     /**
      * Add a procedure after another procedure. If there is no procedure with the specified name, it will be
      * added to the last position of the queue
@@ -94,14 +99,14 @@ public final class WorkerProcedure
      * @param handler Procedure handler
      */
     @Synchronized
-    public void addProcedureAfter(final String name, final String after, final Handler handler)
+    public void addProcedureAfter(final String name, final String after, final StringHandler handler)
     {
         Assert.notEmpty( name );
         Assert.notEmpty( after );
         Assert.notNull( handler );
 
-        final Map<String, Handler> temporaryMap = new HashMap<>();
-        for ( final Map.Entry<String, Handler> entry : handlers.entrySet() )
+        final Map<String, StringHandler> temporaryMap = new HashMap<>();
+        for ( final Map.Entry<String, StringHandler> entry : handlers.entrySet() )
         {
             temporaryMap.put( entry.getKey(), entry.getValue() );
             if ( entry.getKey().equalsIgnoreCase( after ) )
@@ -177,21 +182,17 @@ public final class WorkerProcedure
      *
      * The instance gets updated automatically when the WorkerProcedure is updated
      */
-    public class WorkerProcedureInstance
+    public final class WorkerProcedureInstance
     {
 
         private volatile Collection<StringHandler> stringHandlers = new ArrayList<>();
+        private boolean containsHandlers;
 
         WorkerProcedureInstance()
         {
             instances.add( new WeakReference<>( this ) );
-            for ( final Handler handler : handlers.values() )
-            {
-                if ( handler instanceof StringHandler )
-                {
-                    stringHandlers.add( (StringHandler) handler );
-                }
-            }
+            this.stringHandlers.addAll( handlers.values() );
+            this.containsHandlers = !stringHandlers.isEmpty();
         }
 
         public Collection<StringHandler> getStringHandlers()
@@ -199,6 +200,10 @@ public final class WorkerProcedure
             return this.stringHandlers;
         }
 
+        public boolean containsHandlers()
+        {
+            return hasHandlers();
+        }
     }
 
 }

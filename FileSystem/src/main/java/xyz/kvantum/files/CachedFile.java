@@ -19,27 +19,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation;
+package xyz.kvantum.files;
 
-import xyz.kvantum.files.CachedFile;
-import xyz.kvantum.files.FileCacheManager;
-import xyz.kvantum.files.Path;
-import xyz.kvantum.server.api.core.ServerImplementation;
+import java.nio.charset.StandardCharsets;
 
-import java.util.Optional;
-
-public final class FileCacheImplementation implements FileCacheManager
+public final class CachedFile
 {
 
-    @Override
-    public Optional<CachedFile> readCachedFile(final Path path)
+    private final byte[] bytes;
+
+    CachedFile(final String content)
     {
-        return ServerImplementation.getImplementation().getCacheManager().getCachedFile( path );
+        if ( content == null )
+        {
+            throw new NullPointerException( "Given string content was null" );
+        }
+        this.bytes = content.getBytes( StandardCharsets.UTF_8 );
+    }
+
+    CachedFile(final byte[] bytes)
+    {
+        if ( bytes == null )
+        {
+            throw new NullPointerException( "Given byte[] content was null" );
+        }
+        this.bytes = bytes;
     }
 
     @Override
-    public void writeCachedFile(final Path path, final CachedFile content)
+    public String toString()
     {
-        ServerImplementation.getImplementation().getCacheManager().setCachedFile( path, content );
+        return this.getAsString();
+    }
+
+    String getAsString()
+    {
+        return new String( bytes, StandardCharsets.UTF_8 );
+    }
+
+    byte[] getAsByteArray()
+    {
+        return this.bytes;
     }
 }

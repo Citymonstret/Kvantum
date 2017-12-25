@@ -211,6 +211,10 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 
         try
         {
+            //
+            // Validate the request, if there are
+            // registered request validators
+            //
             if ( !requestHandler.getValidationManager().isEmpty() )
             {
                 requestHandler.getValidationManager().validate( request );
@@ -274,6 +278,9 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                 textContent = body.getContent();
             } else
             {
+                //
+                // We do NOT verify encoding.
+                //
                 bytes = body.getBytes();
             }
 
@@ -295,17 +302,25 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             }
 
             //
-            // Turn response into a byte array
+            // Allow text handlers to act upon the content
             //
             if ( request.getQuery().getMethod().hasBody() )
             {
                 if ( body.isText() )
                 {
-                    for ( final WorkerProcedure.Handler<String> handler : workerContext.getWorkerProcedureInstance()
-                            .getStringHandlers() )
+                    if ( workerContext.getWorkerProcedureInstance().containsHandlers() )
                     {
-                        textContent = handler.act( requestHandler, request, textContent );
+                        for ( final WorkerProcedure.Handler<String> handler : workerContext.getWorkerProcedureInstance()
+                                .getStringHandlers() )
+                        {
+                            textContent = handler.act( requestHandler, request, textContent );
+                        }
                     }
+                    //
+                    // This uses UTF-8 rather than US ASCII as the
+                    // HTTP protocol doesn't specify the character
+                    // encoding of the entity body
+                    //
                     bytes = textContent.getBytes( StandardCharsets.UTF_8 );
                 }
             }

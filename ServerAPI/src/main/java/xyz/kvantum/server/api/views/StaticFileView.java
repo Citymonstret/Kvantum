@@ -22,6 +22,8 @@
 package xyz.kvantum.server.api.views;
 
 import xyz.kvantum.files.Path;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.FilePattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -40,7 +42,10 @@ public abstract class StaticFileView extends View
 
     final Collection<FileExtension> extensionList;
 
-    public StaticFileView(String filter, Map<String, Object> options, String name, Collection<FileExtension> extensions)
+    public StaticFileView(String filter,
+                          Map<String, Object> options,
+                          String name,
+                          Collection<FileExtension> extensions)
     {
         super( filter, name, options, HttpMethod.ALL );
         this.extensionList = extensions;
@@ -93,8 +98,13 @@ public abstract class StaticFileView extends View
         final Path path = (Path) r.getMeta( "file" );
         final FileExtension extension = (FileExtension) r.getMeta( "extension" );
         response.getHeader().set( Header.HEADER_CONTENT_TYPE, extension.getContentType() );
-        if ( extension.getReadType() == FileExtension.ReadType.BYTES )
+        if ( extension.getReadType() == FileExtension.ReadType.BYTES || !ServerImplementation.getImplementation()
+                .getProcedure().hasHandlers() )
         {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Serving {} using byte[]", this );
+            }
             response.setBytes( path.readBytes() );
         } else
         {

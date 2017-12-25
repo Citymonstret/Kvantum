@@ -35,13 +35,14 @@ public interface FileCacheManager
      * @param path (Unique) File identifier
      * @return Optional file content
      */
-    Optional<String> readCachedFile(Path path);
+    Optional<CachedFile> readCachedFile(Path path);
 
     /**
      * Write a file to the file cache
-     * @param path (Unique) File identifier
-     * @param content File content
+     *
+     * @param path       (Unique) File identifier
+     * @param cachedFile File content
      */
-    void writeCachedFile(Path path, String content);
+    void writeCachedFile(Path path, CachedFile cachedFile);
 
 }

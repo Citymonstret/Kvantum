@@ -24,6 +24,7 @@ package xyz.kvantum.server.implementation;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.NonNull;
+import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.cache.CachedResponse;
@@ -44,7 +45,7 @@ public final class CacheManager implements ICacheManager
 {
 
     private final Cache<String, String> cachedIncludes;
-    private final Cache<String, String> cachedFiles;
+    private final Cache<String, CachedFile> cachedFiles;
     private final Cache<String, CachedResponse> cachedBodies;
     private final Cache<Integer, IAccount> cachedAccounts;
     private final Cache<String, Integer> cachedAccountIds;
@@ -89,14 +90,14 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
-    public Optional<String> getCachedFile(@NonNull final Path file)
+    public Optional<CachedFile> getCachedFile(@NonNull final Path file)
     {
         return Optional.ofNullable( cachedFiles.getIfPresent( file.toString() ) );
     }
 
     @Override
     public void setCachedFile(@NonNull final Path file,
-                              @NonNull final String content)
+                              @NonNull final CachedFile content)
     {
         cachedFiles.put( file.toString(), content );
     }

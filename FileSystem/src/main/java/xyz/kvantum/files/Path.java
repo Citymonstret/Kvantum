@@ -166,6 +166,11 @@ public class Path
         {
             return new byte[ 0 ];
         }
+        final Optional<CachedFile> cacheEntry = fileSystem.getFileCacheManager().readCachedFile( this );
+        if ( cacheEntry.isPresent() )
+        {
+            return cacheEntry.get().getAsByteArray();
+        }
         byte[] content = new byte[ 0 ];
         if ( Files.isReadable( javaPath ) )
         {
@@ -177,6 +182,7 @@ public class Path
                 e.printStackTrace();
             }
         }
+        fileSystem.getFileCacheManager().writeCachedFile( this, new CachedFile( content ) );
         return content;
     }
 
@@ -189,14 +195,14 @@ public class Path
      */
     final public String readFile()
     {
-        final Optional<String> cacheEntry = fileSystem.getFileCacheManager().readCachedFile( this );
-        if ( cacheEntry.isPresent() )
-        {
-            return cacheEntry.get();
-        }
         if ( !exists )
         {
             return "";
+        }
+        final Optional<CachedFile> cacheEntry = fileSystem.getFileCacheManager().readCachedFile( this );
+        if ( cacheEntry.isPresent() )
+        {
+            return cacheEntry.get().getAsString();
         }
         final StringBuilder document = new StringBuilder();
         if ( Files.isReadable( javaPath ) )
@@ -210,7 +216,7 @@ public class Path
             }
         }
         final String content = document.toString();
-        fileSystem.getFileCacheManager().writeCachedFile( this, content );
+        fileSystem.getFileCacheManager().writeCachedFile( this, new CachedFile( content ) );
         return content;
     }
 

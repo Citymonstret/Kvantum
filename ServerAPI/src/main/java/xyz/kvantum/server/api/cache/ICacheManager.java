@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.cache;
 
+import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.response.ResponseBody;
@@ -70,14 +71,14 @@ public interface ICacheManager
      * @param file File name
      * @return File, if it stored
      */
-    Optional<String> getCachedFile(Path file);
+    Optional<CachedFile> getCachedFile(Path file);
 
     /**
      * Save an account to the cache
      * @param file File name
      * @param content File content
      */
-    void setCachedFile(Path file, String content);
+    void setCachedFile(Path file, CachedFile content);
 
     /**
      * Set a cached include block
