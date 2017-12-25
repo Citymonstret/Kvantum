@@ -21,7 +21,7 @@
  */
 package xyz.kvantum.example;
 
-import xyz.kvantum.example.object.DebugLoginAttempt;
+import xyz.kvantum.example.object.LoginAttempt;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -61,9 +61,9 @@ class ExampleLogin
             return;
         }
 
-        final KvantumObjectFactory<DebugLoginAttempt> factory = KvantumObjectFactory.from( DebugLoginAttempt
+        final KvantumObjectFactory<LoginAttempt> factory = KvantumObjectFactory.from( LoginAttempt
                 .class );
-        final KvantumObjectParserResult<DebugLoginAttempt> result
+        final KvantumObjectParserResult<LoginAttempt> result
                 = factory.build( ParameterScope.POST ).parseRequest( request );
 
         if ( !result.isSuccess() )

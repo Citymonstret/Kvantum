@@ -30,8 +30,6 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @SuppressWarnings("unused")
 class ExampleSession
 {
@@ -45,20 +43,13 @@ class ExampleSession
     }
 
     @ViewMatcher(filter = "session", name = "debugSession", httpMethod = HttpMethod.GET)
-    public final void debugSession(final AbstractRequest request, final Response response)
+    public final void debugSession(final AbstractRequest request,
+                                   final Response response)
     {
         //
         // A simple visit counter
         //
-        final AtomicInteger visits;
-        if ( !request.getSession().contains( "visits" ) )
-        {
-            visits = new AtomicInteger( 0 );
-            request.getSession().set( "visits", visits );
-        } else
-        {
-            visits = (AtomicInteger) request.getSession().get( "visits" );
-        }
+        final Counter counter = request.getSession().getOrCompute( "visits", string -> new Counter() );
 
         //
         // Convert the java object to a KvantumPojo instance
@@ -68,7 +59,7 @@ class ExampleSession
         //
         // Update the java object
         //
-        pojo.set( "message", "You have visited a total of " + visits.incrementAndGet() + " times!" );
+        pojo.set( "message", "You have visited a total of " + counter.increment() + " times!" );
 
         //
         // Add the object to the model
@@ -79,6 +70,22 @@ class ExampleSession
         // Render the object
         //
         response.setContent( "<h1><b>Session: {{pojo.id}}</b></h1><br/>Message: {{pojo.message}}" );
+    }
+
+    private static final class Counter
+    {
+
+        private int visits;
+
+        private Counter()
+        {
+            this.visits = 0;
+        }
+
+        public synchronized int increment()
+        {
+            return ++visits;
+        }
     }
 
     private static final class SessionPojo

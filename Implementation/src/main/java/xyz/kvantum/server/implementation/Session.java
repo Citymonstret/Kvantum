@@ -23,7 +23,9 @@ package xyz.kvantum.server.implementation;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import lombok.Synchronized;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.session.ISession;
@@ -34,8 +36,10 @@ import xyz.kvantum.server.api.util.VariableProvider;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
-@EqualsAndHashCode(of = { "sessionId", "sessionKey" })
+@EqualsAndHashCode(of = { "sessionKey" })
 @SuppressWarnings("unused")
 public final class Session implements ISession, VariableProvider
 {
@@ -44,9 +48,9 @@ public final class Session implements ISession, VariableProvider
     private static final KvantumPojoFactory<ISession> kvantumPojoFactory = KvantumPojoFactory
             .forClass( ISession.class );
     private static long id = 0L;
+
     private final Map<String, Object> sessionStorage;
-    @Getter
-    private long sessionId = 0;
+
     @Getter
     private boolean deleted = false;
 
@@ -57,18 +61,19 @@ public final class Session implements ISession, VariableProvider
     Session()
     {
         this.sessionKey = AsciiString.randomUUIDAsciiString();
-        this.sessionStorage = new HashMap<>();
-        this.sessionId = id++;
+        this.sessionStorage = new ConcurrentHashMap<>();
         this.sessionStorage.put( "id", "n/a" );
     }
 
     @Override
+    @Synchronized
     public boolean contains(final String variable)
     {
         return sessionStorage.containsKey( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
     }
 
     @Override
+    @Synchronized
     public Object get(final String variable)
     {
         return sessionStorage.get( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
@@ -81,16 +86,17 @@ public final class Session implements ISession, VariableProvider
     }
 
     @Override
+    @Synchronized
     public Map<String, Object> getAll()
     {
         return new HashMap<>( sessionStorage );
     }
 
     @Override
-    public ISession set(final String s, final Object o)
+    @Synchronized
+    public ISession set(@NonNull final String s,
+                        @NonNull final Object o)
     {
-        Assert.notNull( s );
-
         if ( o == null )
         {
             sessionStorage.remove( s );
@@ -98,7 +104,6 @@ public final class Session implements ISession, VariableProvider
         {
             sessionStorage.put( s.toLowerCase( Locale.ENGLISH ), o );
         }
-
         return this;
     }
 
@@ -106,6 +111,22 @@ public final class Session implements ISession, VariableProvider
     public KvantumPojo<ISession> toKvantumPojo()
     {
         return kvantumPojoFactory.of( this );
+    }
+
+    @Override
+    @SuppressWarnings("ALL")
+    public <T> T getOrCompute(String key, Function<String, ? extends T> function)
+    {
+        final T object;
+        if ( !this.contains( key ) )
+        {
+            object = function.apply( key );
+            this.set( key, object );
+        } else
+        {
+            object = (T) get( key );
+        }
+        return object;
     }
 
 }

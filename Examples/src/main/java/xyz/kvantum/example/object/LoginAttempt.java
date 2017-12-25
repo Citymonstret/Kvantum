@@ -28,7 +28,7 @@ import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 
 @KvantumObject(checkValidity = true)
-public final class DebugLoginAttempt
+public final class LoginAttempt
 {
 
     @NotNull
@@ -42,7 +42,7 @@ public final class DebugLoginAttempt
     private String password;
 
     @KvantumConstructor
-    private DebugLoginAttempt()
+    private LoginAttempt()
     {
     }
 
