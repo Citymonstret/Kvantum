@@ -52,13 +52,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Implementation of {@link IAccount} that also
+ * fully supports {@link KvantumObjectFactory} and
+ * {@link KvantumPojoFactory}
+ *
+ * @see #getKvantumPojoFactory()
+ * @see #getKvantumAccountFactory()
+ */
 @KvantumObject(checkValidity = true)
 @EqualsAndHashCode(of = { "username", "id" })
 @NoArgsConstructor
 @Entity("accounts")
 @SuppressWarnings("WeakerAccess")
-public class Account implements IAccount
+public final class Account implements IAccount
 {
+
     @Getter
     private static final KvantumObjectFactory<Account> kvantumAccountFactory =
             KvantumObjectFactory.from( Account.class );
@@ -90,7 +99,10 @@ public class Account implements IAccount
     private StringList rawRoleList;
     private Collection<AccountRole> roleList;
 
-    public Account(final int id, final String username, final String password, final Map<String, String> data)
+    public Account(final int id,
+                   final String username,
+                   final String password,
+                   final Map<String, String> data)
     {
         this.id = id;
         this.username = username;

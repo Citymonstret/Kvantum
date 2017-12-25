@@ -27,6 +27,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslHandler;
+import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -60,7 +61,7 @@ final class HTTPSThread extends Thread
 
     private ChannelFuture future;
 
-    HTTPSThread(final NioClassResolver classResolver)
+    HTTPSThread(@NonNull final NioClassResolver classResolver)
             throws KvantumInitializationException
     {
         super( "https" );

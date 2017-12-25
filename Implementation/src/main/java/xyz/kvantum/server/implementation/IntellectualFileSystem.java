@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import lombok.NonNull;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.files.Path;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 final class IntellectualFileSystem extends FileSystem
 {
 
-    IntellectualFileSystem(final java.nio.file.Path coreFolder)
+    IntellectualFileSystem(@NonNull final java.nio.file.Path coreFolder)
     {
         super( coreFolder, new FileCacheImplementation() );
     }
@@ -48,7 +49,7 @@ final class IntellectualFileSystem extends FileSystem
         this.actOnSubPaths( this.getPath( "" ) );
     }
 
-    private void actOnSubPaths(final Path path)
+    private void actOnSubPaths(@NonNull final Path path)
     {
         final Collection<Path> subPaths = path.getSubPaths().stream()
                 .filter( Path::isFolder )
@@ -58,7 +59,7 @@ final class IntellectualFileSystem extends FileSystem
         subPaths.forEach( this::actOnSubPaths );
     }
 
-    private void registerCacheWatcher(final Path path)
+    private void registerCacheWatcher(@NonNull final Path path)
     {
         if ( CoreConfig.debug )
         {
@@ -75,7 +76,8 @@ final class IntellectualFileSystem extends FileSystem
     }
 
     @SuppressWarnings("unused")
-    private void eventListener(final Path path, final WatchEvent.Kind<?> eventKind)
+    private void eventListener(@NonNull final Path path,
+                               @NonNull final WatchEvent.Kind<?> eventKind)
     {
         //
         // Ignore file creation and temporary job files

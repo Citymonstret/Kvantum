@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 
@@ -58,7 +59,7 @@ final class GzipHandler extends AutoCloseable
      * @return GZIP compressed data
      * @throws IOException If compression fails
      */
-    byte[] compress(final byte[] data) throws IOException
+    byte[] compress(@NonNull final byte[] data) throws IOException
     {
         Assert.notNull( data );
 
@@ -73,6 +74,4 @@ final class GzipHandler extends AutoCloseable
 
         return compressed;
     }
-
-
 }

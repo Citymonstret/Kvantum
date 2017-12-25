@@ -76,6 +76,8 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     private static final byte[] NEW_LINE = AsciiString.of( "\n" ).getValue();
     private static final byte[] COLON_SPACE = AsciiString.of( ": " ).getValue();
     private static final byte[] SPACE = AsciiString.of( " " ).getValue();
+    private static final AsciiString KEEP_ALIVE = AsciiString.of( "keep-alive" );
+    private static final AsciiString CLOSE = AsciiString.of( "close" );
 
     private final ProtocolType protocolType;
 
@@ -194,7 +196,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             final Response response = new Response();
             response.getHeader().clear();
             response.getHeader().setStatus( returnStatus.getStatus() );
-            response.getHeader().set( Header.HEADER_CONNECTION, "close" );
+            response.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
 
             this.workerContext.setBody( response );
             this.workerContext.setBytes( response.getBytes() );
@@ -449,12 +451,12 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             // Apply "connection: keep-alive" and "content-length: n" headers to
             // make sure that the client keeps the connection open
             //
-            body.getHeader().set( Header.HEADER_CONNECTION, "keep-alive" );
+            body.getHeader().set( Header.HEADER_CONNECTION, KEEP_ALIVE );
             body.getHeader().set( Header.HEADER_CONTENT_LENGTH, String.valueOf( bytes.length ) );
         } else
         {
             keepAlive = false;
-            body.getHeader().set( Header.HEADER_CONNECTION, "close" );
+            body.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
         }
 
         final ByteBuf buf = context.alloc().buffer( CoreConfig.Buffer.out );

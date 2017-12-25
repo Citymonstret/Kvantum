@@ -37,7 +37,7 @@ import java.lang.reflect.Type;
  * GSON serializer for accounts. Will only expose ID and username (not data), so this
  * can be used publicly
  */
-final public class AccountSerializer implements JsonSerializer<Account>, JsonDeserializer<Account>
+public final class AccountSerializer implements JsonSerializer<Account>, JsonDeserializer<Account>
 {
 
     @Override

@@ -32,7 +32,7 @@ import xyz.kvantum.server.api.util.ColorUtil;
 import java.io.PrintStream;
 
 /**
- * The default log handler. UsesAnsi.FColor for colored output
+ * The default log handler.
  */
 @SuppressWarnings( "WeakerAccess" )
 public class DefaultLogWrapper implements LogWrapper
