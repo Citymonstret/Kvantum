@@ -51,6 +51,9 @@ dependencies {
     compile group: 'com.beust', name: 'jcommander', version: '1.72'
     // Netty
     compile group: 'io.netty', name: 'netty-all', version: '4.1.19.Final'
+    // Netty native transports
+    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.19.Final',
+            classifier: 'linux-x86_64'
     //
     // Modules
     //

@@ -441,6 +441,8 @@ public class SimpleServer implements Kvantum
 
         log( "" );
 
+        final NioClassResolver classResolver = new NioClassResolver();
+
         if ( CoreConfig.SSL.enable )
         {
             log( Message.STARTING_SSL_ON_PORT, CoreConfig.SSL.port );
@@ -449,7 +451,7 @@ public class SimpleServer implements Kvantum
                 System.setProperty( "javax.net.ssl.keyStore", CoreConfig.SSL.keyStore );
                 System.setProperty( "javax.net.ssl.keyStorePassword", CoreConfig.SSL.keyStorePassword );
 
-                this.httpsThread = new HTTPSThread();
+                this.httpsThread = new HTTPSThread( classResolver );
                 this.httpsThread.start();
             } catch ( final Exception e )
             {
@@ -463,7 +465,7 @@ public class SimpleServer implements Kvantum
 
         try
         {
-            this.httpThread = new HTTPThread( new ServerSocketFactory() );
+            this.httpThread = new HTTPThread( new ServerSocketFactory(), classResolver );
         } catch ( KvantumInitializationException e )
         {
             Logger.error( "Failed to start server..." );

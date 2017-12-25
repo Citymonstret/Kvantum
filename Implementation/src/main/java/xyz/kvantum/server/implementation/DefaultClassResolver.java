@@ -21,21 +21,24 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
-import xyz.kvantum.server.api.core.ServerImplementation;
+import io.netty.channel.MultithreadEventLoopGroup;
+import io.netty.channel.ServerChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-final class ExitSignalHandler implements SignalHandler
+final class DefaultClassResolver implements NioClassResolver.ClassProvider
 {
 
     @Override
-    public void handle(@NonNull final Signal signal)
+    public MultithreadEventLoopGroup getEventLoopGroup(final int threads)
     {
-        if ( signal.toString().equals( "SIGINT" ) )
-        {
-            ServerImplementation.getImplementation().stopServer();
-        }
+        return new NioEventLoopGroup( threads );
+    }
+
+    @Override
+    public Class<? extends ServerChannel> getServerSocketChannelClass()
+    {
+        return NioServerSocketChannel.class;
     }
 
 }

@@ -26,9 +26,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -50,14 +48,15 @@ final class HTTPThread extends Thread
     private final int port;
     private ChannelFuture future;
 
-    HTTPThread(final ServerSocketFactory serverSocketFactory)
+    HTTPThread(final ServerSocketFactory serverSocketFactory, final NioClassResolver classResolver)
             throws KvantumInitializationException
     {
         super( "http" );
         this.setPriority( Thread.MAX_PRIORITY );
 
-        this.workerGroup = new NioEventLoopGroup( CoreConfig.Pools.httpWorkerGroupThreads );
-        this.bossGroup = new NioEventLoopGroup( CoreConfig.Pools.httpBossGroupThreads );
+        this.workerGroup = classResolver.getClassProvider()
+                .getEventLoopGroup( CoreConfig.Pools.httpWorkerGroupThreads );
+        this.bossGroup = classResolver.getClassProvider().getEventLoopGroup( CoreConfig.Pools.httpBossGroupThreads );
 
         if ( !serverSocketFactory.createServerSocket() )
         {
@@ -69,7 +68,7 @@ final class HTTPThread extends Thread
         this.serverBootstrap = new ServerBootstrap();
         this.serverBootstrap.option( ChannelOption.SO_BACKLOG, 1024 );
         serverBootstrap.group( bossGroup, workerGroup )
-                .channel( NioServerSocketChannel.class )
+                .channel( classResolver.getClassProvider().getServerSocketChannelClass() )
                 .childHandler( new ChannelInitializer<SocketChannel>()
                 {
                     @Override

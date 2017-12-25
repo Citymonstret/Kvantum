@@ -21,21 +21,38 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
-import xyz.kvantum.server.api.core.ServerImplementation;
+import io.netty.channel.MultithreadEventLoopGroup;
+import io.netty.channel.ServerChannel;
+import lombok.Getter;
+import xyz.kvantum.server.api.logging.Logger;
 
-final class ExitSignalHandler implements SignalHandler
+import java.util.Locale;
+
+final class NioClassResolver
 {
 
-    @Override
-    public void handle(@NonNull final Signal signal)
+    @Getter
+    private final ClassProvider classProvider;
+
+    NioClassResolver()
     {
-        if ( signal.toString().equals( "SIGINT" ) )
+        final String osName = System.getProperty( "os.name" );
+        if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
         {
-            ServerImplementation.getImplementation().stopServer();
+            Logger.info( "Using EpollClassResolver" );
+            this.classProvider = new EpollClassResolver();
+        } else
+        {
+            Logger.info( "Using DefaultClassResolver" );
+            this.classProvider = new DefaultClassResolver();
         }
     }
 
+    interface ClassProvider
+    {
+
+        MultithreadEventLoopGroup getEventLoopGroup(final int threads);
+
+        Class<? extends ServerChannel> getServerSocketChannelClass();
+    }
 }

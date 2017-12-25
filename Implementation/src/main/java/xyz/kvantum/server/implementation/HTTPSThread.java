@@ -25,9 +25,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslHandler;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
@@ -62,14 +60,15 @@ final class HTTPSThread extends Thread
 
     private ChannelFuture future;
 
-    HTTPSThread()
+    HTTPSThread(final NioClassResolver classResolver)
             throws KvantumInitializationException
     {
         super( "https" );
         this.setPriority( Thread.MAX_PRIORITY );
 
-        this.workerGroup = new NioEventLoopGroup( CoreConfig.Pools.httpsWorkerGroupThreads );
-        this.bossGroup = new NioEventLoopGroup( CoreConfig.Pools.httpsBossGroupThreads );
+        this.workerGroup = classResolver.getClassProvider()
+                .getEventLoopGroup( CoreConfig.Pools.httpsWorkerGroupThreads );
+        this.bossGroup = classResolver.getClassProvider().getEventLoopGroup( CoreConfig.Pools.httpsBossGroupThreads );
 
         try
         {
@@ -84,7 +83,7 @@ final class HTTPSThread extends Thread
 
             this.serverBootstrap = new ServerBootstrap();
             serverBootstrap.group( bossGroup, workerGroup )
-                    .channel( NioServerSocketChannel.class )
+                    .channel( classResolver.getClassProvider().getServerSocketChannelClass() )
                     .childHandler( new ChannelInitializer<SocketChannel>()
                     {
                         @Override
