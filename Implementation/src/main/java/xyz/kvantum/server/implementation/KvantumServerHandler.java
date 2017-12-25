@@ -43,6 +43,7 @@ import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.socket.SocketContext;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.DebugTree;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -69,9 +70,11 @@ import java.util.function.Supplier;
 final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 {
 
-    private static final byte[] EMPTY = "NULL".getBytes( StandardCharsets.UTF_8 );
+    private static final byte[] EMPTY = AsciiString.of( "NULL" ).getValue();
     private static final String CONTENT_TYPE = "content_type";
-    private static final byte[] NEW_LINE = "\n".getBytes( StandardCharsets.UTF_8 );
+    private static final byte[] NEW_LINE = AsciiString.of( "\n" ).getValue();
+    private static final byte[] COLON_SPACE = AsciiString.of( ": " ).getValue();
+    private static final byte[] SPACE = AsciiString.of( " " ).getValue();
 
     private final ProtocolType protocolType;
 
@@ -285,10 +288,10 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             //
             // Add the content type meta to the request, can then be used by worker processes
             //
-            final Optional<String> contentType = body.getHeader().get( Header.HEADER_CONTENT_TYPE );
+            final Optional<AsciiString> contentType = body.getHeader().get( Header.HEADER_CONTENT_TYPE );
             if ( contentType.isPresent() )
             {
-                request.addMeta( CONTENT_TYPE, contentType.get() );
+                request.addMeta( CONTENT_TYPE, contentType.get().toString() );
             } else
             {
                 request.addMeta( CONTENT_TYPE, null );
@@ -438,11 +441,16 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         //
         // Send the header to the client
         //
-        buf.writeBytes( ( body.getHeader().getFormat() + " " + body.getHeader().getStatus() + "\n" )
-                .getBytes( StandardCharsets.UTF_8 ) );
-        for ( final Map.Entry<HeaderOption, String> entry : body.getHeader().getHeaders().entries() )
+        buf.writeBytes( body.getHeader().getFormat().getValue() );
+        buf.writeBytes( SPACE );
+        buf.writeBytes( body.getHeader().getStatus().getValue() );
+        buf.writeBytes( NEW_LINE );
+        for ( final Map.Entry<HeaderOption, AsciiString> entry : body.getHeader().getHeaders().entries() )
         {
-            buf.writeBytes( ( entry.getKey() + ": " + entry.getValue() + "\n" ).getBytes( StandardCharsets.UTF_8 ) );
+            buf.writeBytes( entry.getKey().getBytes() );
+            buf.writeBytes( COLON_SPACE );
+            buf.writeBytes( entry.getValue().getValue() );
+            buf.writeBytes( NEW_LINE );
         }
         // Print one empty line to indicate that the header sending is finished, this is important as the content
         // would otherwise be classed as headers, which really isn't optimal <3
@@ -460,7 +468,8 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                 .address( this.workerContext.getSocketContext().getIP() )
                 .authorization( this.workerContext.getRequest().getAuthorization().orElse( null ) )
                 .length( bytes.length )
-                .status( body.getHeader().getStatus() ).query( this.workerContext.getRequest().getQuery() )
+                .status( body.getHeader().getStatus().toString() )
+                .query( this.workerContext.getRequest().getQuery() )
                 .timeFinished( System.currentTimeMillis() ).build();
         ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse );
 

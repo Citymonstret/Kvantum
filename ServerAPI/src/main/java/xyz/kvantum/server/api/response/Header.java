@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.TimeUtil;
 
 import java.util.ArrayList;
@@ -39,63 +40,63 @@ import java.util.Optional;
 final public class Header
 {
 
-    public static final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
-    public static final String CONTENT_TYPE_OCTET_STREAM = "application/octet-stream; charset=utf-8";
-    public static final String CONTENT_TYPE_HTML = "text/html; charset=utf-8";
-    public static final String CONTENT_TYPE_JAVASCRIPT = "text/javascript; charset=utf-8";
-    public static final String CONTENT_TYPE_TEXT_EXAMPLE = "text/example; charset=utf-8";
-    public static final String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
-    public static final String CONTENT_TYPE_XML = "text/xml; charset=utf-8";
+    public static final AsciiString CONTENT_TYPE_CSS = AsciiString.of( "text/css; charset=utf-8" );
+    public static final AsciiString CONTENT_TYPE_OCTET_STREAM = AsciiString.of( "application/octet-stream; charset=utf-8" );
+    public static final AsciiString CONTENT_TYPE_HTML = AsciiString.of( "text/html; charset=utf-8" );
+    public static final AsciiString CONTENT_TYPE_JAVASCRIPT = AsciiString.of( "text/javascript; charset=utf-8" );
+    public static final AsciiString CONTENT_TYPE_TEXT_EXAMPLE = AsciiString.of( "text/example; charset=utf-8" );
+    public static final AsciiString CONTENT_TYPE_JSON = AsciiString.of( "application/json; charset=utf-8" );
+    public static final AsciiString CONTENT_TYPE_XML = AsciiString.of( "text/xml; charset=utf-8" );
 
-    public static final String CACHE_NO_CACHE = "no-cache";
+    public static final AsciiString CACHE_NO_CACHE = AsciiString.of( "no-cache" );
 
-    public static final String POWERED_BY = "Kvantum";
+    public static final AsciiString POWERED_BY = AsciiString.of( "Kvantum" );
 
     //
     // 1xx Informational
     //
-    public static final String STATUS_CONTINUE = "100 Continue";
-    public static final String STATUS_SWITCHING_PROTOCOLS = "101 Switching Protocols";
-    public static final String STATUS_PROCESSING = "102 Processing";
+    public static final AsciiString STATUS_CONTINUE = AsciiString.of( "100 Continue" );
+    public static final AsciiString STATUS_SWITCHING_PROTOCOLS = AsciiString.of( "101 Switching Protocols" );
+    public static final AsciiString STATUS_PROCESSING = AsciiString.of( "102 Processing" );
 
     //
     // 2xx Success
     //
-    public static final String STATUS_OK = "200 OK";
-    public static final String STATUS_CREATED = "2001 Created";
-    public static final String STATUS_NON_AUTHORITATIVE_INFORMATION = "203 Non-Authoriative Information";
-    public static final String STATUS_ACCEPTED = "202 Accepted";
-    public static final String STATUS_NO_CONTENT = "204 No Content";
-    public static final String STATUS_RESET_CONTENT = "205 Reset Content";
-    public static final String STATUS_PARTIAL_CONTENT = "206 Partial Content";
+    public static final AsciiString STATUS_OK = AsciiString.of( "200 OK" );
+    public static final AsciiString STATUS_CREATED = AsciiString.of( "2001 Created" );
+    public static final AsciiString STATUS_NON_AUTHORITATIVE_INFORMATION = AsciiString.of( "203 Non-Authoriative Information" );
+    public static final AsciiString STATUS_ACCEPTED = AsciiString.of( "202 Accepted" );
+    public static final AsciiString STATUS_NO_CONTENT = AsciiString.of( "204 No Content" );
+    public static final AsciiString STATUS_RESET_CONTENT = AsciiString.of( "205 Reset Content" );
+    public static final AsciiString STATUS_PARTIAL_CONTENT = AsciiString.of( "206 Partial Content" );
 
     //
     // 3xx Redirection
     //
-    public static final String STATUS_MOVED_PERMANENTLY = "301 Moved Permanently";
-    public static final String STATUS_TEMPORARY_REDIRECT = "307 Temporary Redirect";
+    public static final AsciiString STATUS_MOVED_PERMANENTLY = AsciiString.of( "301 Moved Permanently" );
+    public static final AsciiString STATUS_TEMPORARY_REDIRECT = AsciiString.of( "307 Temporary Redirect" );
 
     //
     // 4xx Client errors
     //
-    public static final String STATUS_BAD_REQUEST = "400 Bad Request";
-    public static final String STATUS_ACCESS_DENIED = "401 Access Denied";
-    public static final String STATUS_UNAUTHORIZED = "401 Unauthorized status";
-    public static final String STATUS_NOT_FOUND = "404 Not Found";
-    public static final String STATUS_NOT_ALLOWED = "405 Method not allowed";
-    public static final String STATUS_NOT_ACCEPTABLE = "406 Not Acceptable";
-    public static final String STATUS_PAYLOAD_TOO_LARGE = "413 Payload Too Large";
-    public static final String STATUS_ENTITY_TOO_LARGE = "413 Entity Too Large";
-    public static final String STATUS_REQUEST_TIMEOUT = "408 Request Timeout";
-    public static final String STATUS_TOO_MANY_REQUESTS = "429 Too Many Requests";
+    public static final AsciiString STATUS_BAD_REQUEST = AsciiString.of( "400 Bad Request" );
+    public static final AsciiString STATUS_ACCESS_DENIED = AsciiString.of( "401 Access Denied" );
+    public static final AsciiString STATUS_UNAUTHORIZED = AsciiString.of( "401 Unauthorized status" );
+    public static final AsciiString STATUS_NOT_FOUND = AsciiString.of( "404 Not Found" );
+    public static final AsciiString STATUS_NOT_ALLOWED = AsciiString.of( "405 Method not allowed" );
+    public static final AsciiString STATUS_NOT_ACCEPTABLE = AsciiString.of( "406 Not Acceptable" );
+    public static final AsciiString STATUS_PAYLOAD_TOO_LARGE = AsciiString.of( "413 Payload Too Large" );
+    public static final AsciiString STATUS_ENTITY_TOO_LARGE = AsciiString.of( "413 Entity Too Large" );
+    public static final AsciiString STATUS_REQUEST_TIMEOUT = AsciiString.of( "408 Request Timeout" );
+    public static final AsciiString STATUS_TOO_MANY_REQUESTS = AsciiString.of( "429 Too Many Requests" );
 
     //
     // 5xx Server errors
     //
-    public static final String STATUS_HTTP_VERSION_NOT_SUPPORTED = "505 HTTP Version Not Supported";
-    public static final String STATUS_INTERNAL_ERROR = "500 Internal Server Error";
+    public static final AsciiString STATUS_HTTP_VERSION_NOT_SUPPORTED = AsciiString.of( "505 HTTP Version Not Supported" );
+    public static final AsciiString STATUS_INTERNAL_ERROR = AsciiString.of( "500 Internal Server Error" );
 
-    public static final String ALLOW_ALL = "*";
+    public static final AsciiString ALLOW_ALL = AsciiString.of( "*" );
 
     public static final HeaderOption X_CONTENT_TYPE_OPTIONS = HeaderOption.create( "X-Content-Type-Options" );
     public static final HeaderOption X_FRAME_OPTIONS = HeaderOption.create( "X-Frame-Options" );
@@ -279,13 +280,13 @@ final public class Header
      * or a HTTP-date
      */
     public static final HeaderOption HEADER_RETRY_AFTER = HeaderOption.create( "Retry-After" );
-
-    private final ListMultimap<HeaderOption, String> headers = MultimapBuilder.hashKeys().arrayListValues().build();
-
+    private static final AsciiString DEFAULT_FORMAT = AsciiString.of( "HTTP/1.1" );
+    private final ListMultimap<HeaderOption, AsciiString> headers = MultimapBuilder.hashKeys()
+            .arrayListValues().build();
     @Getter
-    private String status;
+    private AsciiString status;
     @Getter
-    private String format;
+    private AsciiString format;
 
     /**
      * Construct a new header instance
@@ -293,7 +294,8 @@ final public class Header
      * @param status HTTP status
      * @param format HTTP version
      */
-    public Header(final String status, final String format)
+    public Header(@NonNull final AsciiString status,
+                  @NonNull final AsciiString format)
     {
         this.status = status;
         this.format = format;
@@ -305,9 +307,9 @@ final public class Header
      *
      * @param status Status
      */
-    public Header(final String status)
+    public Header(final AsciiString status)
     {
-        this( status, "HTTP/1.1" );
+        this( status, DEFAULT_FORMAT );
     }
 
     /**
@@ -316,7 +318,7 @@ final public class Header
      * @param status Response status
      * @return Instance
      */
-    public Header setStatus(@NonNull final String status)
+    public Header setStatus(@NonNull final AsciiString status)
     {
         this.status = status;
         this.set( HEADER_STATUS, status );
@@ -332,6 +334,18 @@ final public class Header
      */
     public Header set(final HeaderOption key, final String value)
     {
+        return set( key, AsciiString.of( value, false ) );
+    }
+
+    /**
+     * Store a header and overwrite previous entries
+     *
+     * @param key   Header key
+     * @param value Header value
+     * @return Instance
+     */
+    public Header set(final HeaderOption key, final AsciiString value)
+    {
         return set( key, value, false );
     }
 
@@ -344,6 +358,19 @@ final public class Header
      * @return Instance
      */
     public Header set(@NonNull final HeaderOption key, @NonNull final String value, final boolean allowDuplicates)
+    {
+        return this.set( key, AsciiString.of( value, false ), allowDuplicates );
+    }
+
+    /**
+     * Store a header
+     *
+     * @param key             Header key
+     * @param value           Header value
+     * @param allowDuplicates If this is set to false, then previous entries will be overwritten
+     * @return Instance
+     */
+    public Header set(@NonNull final HeaderOption key, @NonNull final AsciiString value, final boolean allowDuplicates)
     {
         if ( !allowDuplicates )
         {
@@ -359,9 +386,9 @@ final public class Header
      * @param key Header eky
      * @return Collection with all stored values
      */
-    public Collection<String> getMultiple(@NonNull final HeaderOption key)
+    public Collection<AsciiString> getMultiple(@NonNull final HeaderOption key)
     {
-        final Collection<String> values = new ArrayList<>();
+        final Collection<AsciiString> values = new ArrayList<>();
         if ( this.headers.containsKey( key ) )
         {
             values.addAll( this.headers.get( key ) );
@@ -375,7 +402,7 @@ final public class Header
      * @param key Header key
      * @return Optional
      */
-    public Optional<String> get(@NonNull final HeaderOption key)
+    public Optional<AsciiString> get(@NonNull final HeaderOption key)
     {
         if ( this.headers.containsKey( key ) )
         {
@@ -388,7 +415,7 @@ final public class Header
     /**
      * Redirect to another URL using status 307 Temporary Redirect
      *
-     * @see #redirect(String, String) to specify redirect header
+     * @see #redirect(String, AsciiString) to specify redirect header
      */
     public void redirect(final String newURL)
     {
@@ -401,7 +428,7 @@ final public class Header
      * @param newURL         New URL
      * @param redirectHeader Status code
      */
-    public void redirect(@NonNull final String newURL, @NonNull final String redirectHeader)
+    public void redirect(@NonNull final String newURL, @NonNull final AsciiString redirectHeader)
     {
         set( Header.HEADER_LOCATION, newURL );
         set( Header.HEADER_STATUS, redirectHeader );
@@ -425,7 +452,7 @@ final public class Header
         {
             this.headers.remove( HEADER_SET_COOKIE, cookie.toString() );
         }
-        this.headers.put( HEADER_SET_COOKIE, cookie.toString() );
+        this.headers.put( HEADER_SET_COOKIE, cookie.toAsciiString() );
         return this;
     }
 
@@ -433,12 +460,11 @@ final public class Header
      * Remove a specified cookie and return this instance
      *
      * @param cookie Cookie key
-     * @return Instance
      */
-    public void removeCookie(@NonNull final String cookie)
+    public void removeCookie(@NonNull final AsciiString cookie)
     {
         final ResponseCookie responseCookie = ResponseCookie.builder().cookie( cookie )
-                .value( "deleted" ).expires( new Date( 0 ) ).build();
+                .value( AsciiString.of( "deleted" ) ).expires( new Date( 0 ) ).build();
         this.setCookie( responseCookie );
     }
 
@@ -466,7 +492,7 @@ final public class Header
      *
      * @return Copy of the internal map
      */
-    public Multimap<HeaderOption, String> getHeaders()
+    public Multimap<HeaderOption, AsciiString> getHeaders()
     {
         return MultimapBuilder.ListMultimapBuilder.hashKeys( headers.size() ).arrayListValues().build( headers );
     }

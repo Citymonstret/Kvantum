@@ -24,6 +24,8 @@ package xyz.kvantum.server.api.response;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import xyz.kvantum.server.api.util.AsciiString;
+import xyz.kvantum.server.api.util.AsciiStringable;
 import xyz.kvantum.server.api.util.TimeUtil;
 
 import java.util.Date;
@@ -31,13 +33,13 @@ import java.util.Date;
 @EqualsAndHashCode
 @Getter
 @Builder
-public final class ResponseCookie
+public final class ResponseCookie implements AsciiStringable
 {
 
     @Builder.Default
-    public String path = "/";
-    private String cookie;
-    private String value;
+    public AsciiString path = AsciiString.of( "/" );
+    private AsciiString cookie;
+    private AsciiString value;
     @Builder.Default
     private Date expires = null;
     @Builder.Default
@@ -65,4 +67,9 @@ public final class ResponseCookie
         return builder.toString();
     }
 
+    @Override
+    public AsciiString toAsciiString()
+    {
+        return AsciiString.of( this.toString(), false );
+    }
 }

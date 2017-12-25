@@ -32,6 +32,7 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.implementation.MongoApplicationStructure;
 
 @RequiredArgsConstructor
@@ -54,7 +55,7 @@ final public class MongoSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public SessionLoad getSessionLoad(final String sessionID)
+    public SessionLoad getSessionLoad(final AsciiString sessionID)
     {
         final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
         final DBCursor cursor = collection.find( object );
@@ -73,9 +74,9 @@ final public class MongoSessionDatabase implements ISessionDatabase
     @Override
     public void storeSession(final ISession session)
     {
-        if ( getSessionLoad( session.get( "id" ).toString() ) != null )
+        if ( getSessionLoad( (AsciiString) session.get( "id" ) ) != null )
         {
-            updateSession( session.get( "id" ).toString() );
+            updateSession( (AsciiString) session.get( "id" ) );
         } else
         {
             final DBObject object = new BasicDBObject()
@@ -87,14 +88,14 @@ final public class MongoSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public void updateSession(final String session)
+    public void updateSession(final AsciiString session)
     {
         collection.update( new BasicDBObject( FIELD_SESSION_ID, session ), new BasicDBObject( "$set",
                 new BasicDBObject( FIELD_LAST_ACTIVE, System.currentTimeMillis() ) ) );
     }
 
     @Override
-    public void deleteSession(final String session)
+    public void deleteSession(final AsciiString session)
     {
         collection.remove( new BasicDBObject( FIELD_SESSION_ID, session ) );
     }

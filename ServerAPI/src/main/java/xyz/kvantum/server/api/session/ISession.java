@@ -22,14 +22,15 @@
 package xyz.kvantum.server.api.session;
 
 import xyz.kvantum.server.api.pojo.KvantumPojo;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.VariableProvider;
 
 public interface ISession extends VariableProvider
 {
 
-    String getSessionKey();
+    AsciiString getSessionKey();
 
-    void setSessionKey(final String sessionKey);
+    void setSessionKey(final AsciiString sessionKey);
 
     long getSessionId();
 

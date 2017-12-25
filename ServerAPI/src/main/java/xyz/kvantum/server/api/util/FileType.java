@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 
 import java.util.Optional;
@@ -35,9 +36,9 @@ public enum FileType
 
     private final String extension;
 
-    private final String contentType;
+    private final AsciiString contentType;
 
-    FileType(String extension, String contentType)
+    FileType(@NonNull final String extension, @NonNull final AsciiString contentType)
     {
         this.extension = extension;
         this.contentType = contentType;
@@ -56,7 +57,7 @@ public enum FileType
         return extension;
     }
 
-    public String getContentType()
+    public AsciiString getContentType()
     {
         return contentType;
     }

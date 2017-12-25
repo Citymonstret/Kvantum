@@ -91,7 +91,6 @@ Kvantum has a built in console command system that can be extended programmatica
 
 **Current commands:**
 * /dump - Dump request handler info to the console
-* /metrics - Dump metric info to the console
 * /help - Show a list of supported console commands
 * /account - Account management
 * /show - Show license and warranty information

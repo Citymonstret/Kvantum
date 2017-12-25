@@ -39,6 +39,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 
 import java.io.File;
@@ -154,7 +155,7 @@ public class View extends RequestHandler
         if ( this.options.containsKey( "headers" ) )
         {
             ( (Map<String, String>) this.options.get( "headers" ) ).forEach( (key, value) ->
-                    headers.put( HeaderOption.getOrCreate( key ), value ) );
+                    headers.put( HeaderOption.getOrCreate( AsciiString.of( key, false ) ), value ) );
         }
         this.viewPattern = new ViewPattern( pattern );
         this.viewReturn = viewReturn;

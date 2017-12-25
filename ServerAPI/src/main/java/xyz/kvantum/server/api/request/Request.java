@@ -28,6 +28,7 @@ import xyz.kvantum.server.api.exceptions.QueryException;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CookieManager;
 import xyz.kvantum.server.api.util.DebugTree;
@@ -101,7 +102,7 @@ final public class Request extends AbstractRequest
         {
             setSession( session.get() );
             ServerImplementation.getImplementation().getSessionManager()
-                    .setSessionLastActive( session.get().get( "id" ).toString() );
+                    .setSessionLastActive( (AsciiString) session.get().get( "id" ) );
         } else
         {
             Logger.warn( "Could not initialize session!" );

@@ -27,13 +27,13 @@ import lombok.Setter;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.session.ISession;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 @EqualsAndHashCode(of = { "sessionId", "sessionKey" })
 @SuppressWarnings("unused")
@@ -50,11 +50,11 @@ public final class Session implements ISession, VariableProvider
 
     @Setter
     @Getter
-    private String sessionKey;
+    private AsciiString sessionKey;
 
     Session()
     {
-        this.sessionKey = UUID.randomUUID().toString();
+        this.sessionKey = AsciiString.randomUUIDAsciiString();
         this.sessionStorage = new HashMap<>();
         this.sessionId = id++;
         this.sessionStorage.put( "id", "n/a" );

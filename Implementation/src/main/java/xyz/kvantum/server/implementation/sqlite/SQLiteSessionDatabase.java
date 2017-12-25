@@ -21,10 +21,12 @@
  */
 package xyz.kvantum.server.implementation.sqlite;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
 
 import java.sql.PreparedStatement;
@@ -49,13 +51,13 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public SessionLoad getSessionLoad(String sessionID)
+    public SessionLoad getSessionLoad(@NonNull final AsciiString sessionID)
     {
         SessionLoad sessionLoad = null;
         try ( final PreparedStatement statement = this.applicationStructure
                 .getDatabaseManager().prepareStatement( "SELECT * FROM sessions WHERE id = ?" ) )
         {
-            statement.setString( 1, sessionID );
+            statement.setString( 1, sessionID.toString() );
             try ( final ResultSet resultSet = statement.executeQuery() )
             {
                 if ( resultSet.next() )
@@ -74,9 +76,9 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
     @Override
     public void storeSession(final ISession session)
     {
-        if ( getSessionLoad( session.get( "id" ).toString() ) != null )
+        if ( getSessionLoad( (AsciiString) session.get( "id" ) ) != null )
         {
-            updateSession( session.get( "id" ).toString() );
+            updateSession( (AsciiString) session.get( "id" ) );
         } else
         {
             try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
@@ -84,7 +86,7 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
             {
                 statement.setString( 1, session.get( "id" ).toString() );
                 statement.setLong( 2, System.currentTimeMillis() );
-                statement.setString( 3, session.getSessionKey() );
+                statement.setString( 3, session.getSessionKey().toString() );
                 statement.executeUpdate();
             } catch ( final Exception e )
             {
@@ -94,12 +96,12 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public void deleteSession(String session)
+    public void deleteSession(@NonNull final AsciiString session)
     {
         try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
                 .prepareStatement( "DELETE FROM sessions WHERE id = ?" ) )
         {
-            statement.setString( 1, session );
+            statement.setString( 1, session.toString() );
             statement.executeUpdate();
         } catch ( final Exception e )
         {
@@ -108,13 +110,13 @@ final public class SQLiteSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public void updateSession(final String session)
+    public void updateSession(final AsciiString session)
     {
         try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
                 .prepareStatement( "UPDATE sessions SET last_active = ? WHERE id = ?" ) )
         {
             statement.setLong( 1, System.currentTimeMillis() );
-            statement.setString( 2, session );
+            statement.setString( 2, session.toString() );
             statement.executeUpdate();
         } catch ( final Exception e )
         {

@@ -46,7 +46,8 @@ public final class CookieManager
 
     private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" +
             "(?<value>.*)?" );
-    private static final ListMultimap<String, Cookie> EMPTY_COOKIES = ArrayListMultimap.create( 0, 0 );
+    private static final ListMultimap<AsciiString, Cookie> EMPTY_COOKIES =
+            ArrayListMultimap.create( 0, 0 );
 
     /**
      * Get all cookies from a HTTP Request
@@ -54,7 +55,7 @@ public final class CookieManager
      * @param r HTTP Request
      * @return an array containing the cookies
      */
-    public static ListMultimap<String, Cookie> getCookies(@NonNull final AbstractRequest r)
+    public static ListMultimap<AsciiString, Cookie> getCookies(@NonNull final AbstractRequest r)
     {
         Assert.isValid( r );
 
@@ -65,7 +66,7 @@ public final class CookieManager
             return EMPTY_COOKIES;
         }
 
-        final ListMultimap<String, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues()
+        final ListMultimap<AsciiString, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues()
                 .build();
 
         final StringTokenizer cookieTokenizer = new StringTokenizer( raw, ";" );
@@ -76,14 +77,11 @@ public final class CookieManager
             final Matcher matcher = PATTERN_COOKIE.matcher( cookieString );
             if ( matcher.matches() )
             {
-                if ( matcher.groupCount() < 2 )
-                {
-                    cookies.put( matcher.group( "key" ), new Cookie( matcher.group( "key" ), "" ) );
-                } else
-                {
-                    cookies.put( matcher.group( "key" ), new Cookie( matcher.group( "key" ),
-                            matcher.group( "value" ) ) );
-                }
+                final AsciiString key = AsciiString.of( matcher.group( "key" ) );
+                final AsciiString value = matcher.groupCount() < 2 ?
+                        AsciiString.empty :
+                        AsciiString.of( matcher.group( "value" ), false );
+                cookies.put( key, new Cookie( key, value ) );
             }
         }
 

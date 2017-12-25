@@ -35,6 +35,7 @@ import xyz.kvantum.server.api.request.post.PostRequest;
 import xyz.kvantum.server.api.response.ResponseCookie;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ITempFileManager;
 import xyz.kvantum.server.api.util.MapUtil;
@@ -94,7 +95,7 @@ public abstract class AbstractRequest implements
     private Map<String, String> headers = new HashMap<>();
     @Setter(AccessLevel.PROTECTED)
     @Getter
-    private ListMultimap<String, Cookie> cookies = ArrayListMultimap.create();
+    private ListMultimap<AsciiString, Cookie> cookies = ArrayListMultimap.create();
     @Setter(AccessLevel.PROTECTED)
     @Getter
     private Query query;

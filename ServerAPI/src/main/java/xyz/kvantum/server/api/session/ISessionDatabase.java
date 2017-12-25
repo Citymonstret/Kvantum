@@ -23,15 +23,16 @@ package xyz.kvantum.server.api.session;
 
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.util.AsciiString;
 
 public interface ISessionDatabase
 {
 
     void setup() throws Exception;
 
-    SessionLoad getSessionLoad(String sessionID);
+    SessionLoad getSessionLoad(AsciiString sessionID);
 
-    default SessionLoad isValid(final String session)
+    default SessionLoad isValid(final AsciiString session)
     {
         final SessionLoad sessionLoad = getSessionLoad( session );
         if ( sessionLoad == null )
@@ -54,8 +55,8 @@ public interface ISessionDatabase
 
     void storeSession(ISession session);
 
-    void updateSession(String session);
+    void updateSession(AsciiString session);
 
-    void deleteSession(String session);
+    void deleteSession(AsciiString session);
 
 }

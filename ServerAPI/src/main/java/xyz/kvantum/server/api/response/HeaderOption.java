@@ -28,43 +28,49 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.AsciiString;
+import xyz.kvantum.server.api.util.AsciiStringable;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings("unused")
 @EqualsAndHashCode(of = "text")
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HeaderOption
+public final class HeaderOption implements AsciiStringable
 {
 
-    private static Map<String, HeaderOption> headerOptionMap = new HashMap<>();
+    private static Map<AsciiString, HeaderOption> headerOptionMap = new HashMap<>();
 
     @NonNull
     @Getter
-    private final String text;
+    private final AsciiString text;
     @Getter
     private boolean cacheApplicable = true;
 
-    public static HeaderOption create(final String text)
+    public static HeaderOption create(final String string)
+    {
+        return create( AsciiString.of( string ) );
+    }
+
+    public static HeaderOption create(final AsciiString text)
     {
         return create( text, true );
     }
 
-    public static HeaderOption create(final String text, boolean cacheApplicable)
+    public static HeaderOption create(@NonNull final AsciiString text,
+                                      boolean cacheApplicable)
     {
-        final HeaderOption headerOption = new HeaderOption( Assert.notNull( text ) ).cacheApplicable( cacheApplicable );
-        headerOptionMap.put( text.toLowerCase( Locale.ENGLISH ), headerOption );
+        final HeaderOption headerOption = new HeaderOption( text ).cacheApplicable( cacheApplicable );
+        headerOptionMap.put( text.toLowerCase(), headerOption );
         return headerOption;
     }
 
-    public static HeaderOption getOrCreate(final String text)
+    public static HeaderOption getOrCreate(@NonNull final AsciiString text)
     {
-        if ( headerOptionMap.containsKey( text.toLowerCase( Locale.ENGLISH ) ) )
+        if ( headerOptionMap.containsKey( text.toLowerCase() ) )
         {
-            return headerOptionMap.get( text.toLowerCase( Locale.ENGLISH ) );
+            return headerOptionMap.get( text.toLowerCase() );
         }
         if ( CoreConfig.debug )
         {
@@ -82,7 +88,17 @@ public final class HeaderOption
     @Override
     public final String toString()
     {
+        return this.text.toString();
+    }
+
+    @Override
+    public final AsciiString toAsciiString()
+    {
         return this.text;
     }
 
+    public final byte[] getBytes()
+    {
+        return this.toAsciiString().getValue();
+    }
 }

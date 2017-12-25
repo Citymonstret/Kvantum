@@ -34,11 +34,11 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Cookie;
 import xyz.kvantum.server.api.response.HeaderProvider;
 import xyz.kvantum.server.api.response.ResponseCookie;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ProviderFactory;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({ "WeakerAccess", "unused" })
@@ -46,21 +46,20 @@ import java.util.concurrent.TimeUnit;
 public final class SessionManager implements ProviderFactory<ISession>
 {
 
-    private final Cache<String, ISession> sessions = CacheBuilder.newBuilder()
-            .maximumSize( CoreConfig.Cache.cachedSessionsMaxItems )
-            .expireAfterAccess( CoreConfig.Sessions.sessionTimeout, TimeUnit.SECONDS ).build();
+    private static final AsciiString SESSION_KEY = AsciiString.of( "intellectual_session" );
 
     private final ISessionCreator sessionCreator;
     private final ISessionDatabase sessionDatabase;
-
-    private static final String SESSION_KEY = "intellectual_session";
-    private static final String SESSION_PASS = "intellectual_key";
+    private static final AsciiString SESSION_PASS = AsciiString.of( "intellectual_key" );
+    private final Cache<AsciiString, ISession> sessions = CacheBuilder.newBuilder()
+            .maximumSize( CoreConfig.Cache.cachedSessionsMaxItems )
+            .expireAfterAccess( CoreConfig.Sessions.sessionTimeout, TimeUnit.SECONDS ).build();
 
     private ISession createSession(@NonNull final AbstractRequest r)
     {
         Assert.isValid( r );
 
-        final String sessionID = UUID.randomUUID().toString();
+        final AsciiString sessionID = AsciiString.randomUUIDAsciiString();
         if ( CoreConfig.debug )
         {
             Message.SESSION_SET.log( SESSION_KEY, sessionID );
@@ -72,7 +71,7 @@ public final class SessionManager implements ProviderFactory<ISession>
 
     private void saveCookies(@NonNull final AbstractRequest r,
                              @NonNull final ISession session,
-                             @NonNull final String sessionID)
+                             @NonNull final AsciiString sessionID)
     {
         r.postponedCookies.add( ResponseCookie.builder()
                 .cookie( SESSION_KEY ).value( sessionID ).httpOnly( true ).build() );
@@ -86,10 +85,8 @@ public final class SessionManager implements ProviderFactory<ISession>
     }
 
     @Synchronized
-    private ISession createSession(@NonNull final String sessionID)
+    private ISession createSession(@NonNull final AsciiString sessionID)
     {
-        Assert.notEmpty( sessionID );
-
         final ISession session = sessionCreator.createSession().set( "id", sessionID );
         this.sessions.put( sessionID, session );
         this.sessionDatabase.storeSession( session );
@@ -110,8 +107,8 @@ public final class SessionManager implements ProviderFactory<ISession>
 
         ISession session = null;
 
-        String sessionCookie = null;
-        String sessionPassCookie = null;
+        AsciiString sessionCookie = null;
+        AsciiString sessionPassCookie = null;
 
         //
         // STEP 1: Check if the client provides the required headers
@@ -160,7 +157,7 @@ public final class SessionManager implements ProviderFactory<ISession>
                 if ( load != null )
                 {
                     session = createSession( sessionCookie );
-                    session.setSessionKey( load.getSessionKey() );
+                    session.setSessionKey( AsciiString.of( load.getSessionKey(), false ) );
                     return Optional.of( session );
                 } else
                 {
@@ -194,12 +191,12 @@ public final class SessionManager implements ProviderFactory<ISession>
         return Optional.ofNullable( session );
     }
 
-    public Optional<ISession> getSession(final String sessionID)
+    public Optional<ISession> getSession(final AsciiString sessionID)
     {
         return Optional.ofNullable( sessions.getIfPresent( sessionID ) );
     }
 
-    public void setSessionLastActive(final String sessionID)
+    public void setSessionLastActive(final AsciiString sessionID)
     {
         final Optional<ISession> session = getSession( sessionID );
         if ( session.isPresent() )

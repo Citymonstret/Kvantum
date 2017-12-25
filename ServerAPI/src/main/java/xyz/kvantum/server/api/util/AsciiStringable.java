@@ -19,22 +19,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation;
+package xyz.kvantum.server.api.util;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import xyz.kvantum.server.api.util.AsciiString;
-
-@AllArgsConstructor
-final class ReturnStatus extends Throwable
+/**
+ * Represents an object that is able to
+ * provide a {@link AsciiString} representing
+ * its internal state
+ */
+@FunctionalInterface
+public interface AsciiStringable
 {
 
-    @Getter
-    private AsciiString status;
-
-    @Setter
-    @Getter
-    private WorkerContext applicableContext;
+    /**
+     * Return an ascii string representing the
+     * objects internal state
+     *
+     * @return AsciiString object.
+     * Cannot return null.
+     */
+    AsciiString toAsciiString();
 
 }

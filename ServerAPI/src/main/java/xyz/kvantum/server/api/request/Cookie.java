@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.request;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import xyz.kvantum.server.api.util.AsciiString;
 
 /**
  * A very simple representation of a cookie
@@ -34,9 +35,9 @@ public final class Cookie
 {
 
     @Getter
-    private final String name;
+    private final AsciiString name;
     @Getter
-    private final String value;
+    private final AsciiString value;
 
     /**
      * Get the full cookie, as per the HTTP protocol format
@@ -46,5 +47,4 @@ public final class Cookie
     {
         return name + "=" + value;
     }
-
 }
