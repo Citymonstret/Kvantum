@@ -91,11 +91,15 @@ final public class Request extends AbstractRequest
     @Override
     public void requestSession()
     {
+        //
+        // Make sure we only request sessions once
+        //
         if ( hasBeenRequested )
         {
             return;
         }
         hasBeenRequested = true;
+
         final Optional<ISession> session = ServerImplementation.getImplementation().getSessionManager()
                 .getSession( this );
         if ( session.isPresent() )

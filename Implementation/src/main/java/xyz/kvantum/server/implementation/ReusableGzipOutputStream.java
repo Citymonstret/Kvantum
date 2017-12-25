@@ -39,7 +39,7 @@ class ReusableGzipOutputStream extends DeflaterOutputStream
             0x00,                   // flags (NOT using CRC16, filename, etc)
             0x00, 0x00, 0x00, 0x00, // no modification time available (don't leak this!)
             0x02,                   // maximum compression
-            (byte) 0xFF              // unknown creator OS (!!!)
+            (byte) 0xFF             // unknown creator OS (!!!)
     };
     private final ByteArrayOutputStream bufferStream;
     private final CRC32 crc32;

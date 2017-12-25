@@ -285,7 +285,7 @@ final class RequestReader
     }
 
     /**
-     * Clear theabstractRequest reader
+     * Clear the request reader
      */
     public void clear()
     {

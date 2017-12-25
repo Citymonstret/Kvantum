@@ -161,10 +161,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             {
                 this.workerContext.getRequest().dumpRequest();
             }
-            if ( CoreConfig.Sessions.autoLoad )
-            {
-                workerContext.getRequest().requestSession();
-            }
+
             try
             {
                 this.handleResponse( context );

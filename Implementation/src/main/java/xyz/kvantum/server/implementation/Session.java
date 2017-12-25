@@ -47,6 +47,8 @@ public final class Session implements ISession, VariableProvider
     private final Map<String, Object> sessionStorage;
     @Getter
     private long sessionId = 0;
+    @Getter
+    private boolean deleted = false;
 
     @Setter
     @Getter
@@ -70,6 +72,12 @@ public final class Session implements ISession, VariableProvider
     public Object get(final String variable)
     {
         return sessionStorage.get( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
+    }
+
+    @Override
+    public void setDeleted()
+    {
+        this.deleted = true;
     }
 
     @Override

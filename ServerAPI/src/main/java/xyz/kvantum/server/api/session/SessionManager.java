@@ -23,9 +23,11 @@ package xyz.kvantum.server.api.session;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalNotification;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Synchronized;
+import lombok.val;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -53,6 +55,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     private static final AsciiString SESSION_PASS = AsciiString.of( "intellectual_key" );
     private final Cache<AsciiString, ISession> sessions = CacheBuilder.newBuilder()
             .maximumSize( CoreConfig.Cache.cachedSessionsMaxItems )
+            .removalListener( this::saveSession )
             .expireAfterAccess( CoreConfig.Sessions.sessionTimeout, TimeUnit.SECONDS ).build();
 
     private ISession createSession(@NonNull final AbstractRequest r)
@@ -67,6 +70,14 @@ public final class SessionManager implements ProviderFactory<ISession>
         final ISession session = createSession( sessionID );
         saveCookies( r, session, sessionID );
         return session;
+    }
+
+    private void saveSession(@NonNull final RemovalNotification<AsciiString, ISession> notification)
+    {
+        if ( !notification.getValue().isDeleted() )
+        {
+            this.sessionDatabase.updateSession( notification.getKey() );
+        }
     }
 
     private void saveCookies(@NonNull final AbstractRequest r,
@@ -113,19 +124,16 @@ public final class SessionManager implements ProviderFactory<ISession>
         //
         // STEP 1: Check if the client provides the required headers
         //
-        for ( final Cookie cookie : r.getCookies().values() )
+        findCookie:
         {
-            if ( sessionCookie == null && cookie.getName().equalsIgnoreCase( SESSION_KEY ) )
+            final val keyCookieList = r.getCookies().get( SESSION_KEY );
+            final val passCookieList = r.getCookies().get( SESSION_PASS );
+            if ( keyCookieList.isEmpty() || passCookieList.isEmpty() )
             {
-                sessionCookie = cookie.getValue();
-            } else if ( sessionPassCookie == null && cookie.getName().equalsIgnoreCase( SESSION_PASS ) )
-            {
-                sessionPassCookie = cookie.getValue();
+                break findCookie;
             }
-            if ( sessionCookie != null && sessionPassCookie != null )
-            {
-                break;
-            }
+            sessionCookie = keyCookieList.get( 0 ).getValue();
+            sessionPassCookie = passCookieList.get( 0 ).getValue();
         }
 
         //
@@ -133,13 +141,18 @@ public final class SessionManager implements ProviderFactory<ISession>
         //
         if ( sessionCookie != null && sessionPassCookie != null )
         {
+            //
+            // Check the session cache
+            //
             if ( ( session = this.sessions.getIfPresent( sessionCookie ) ) != null )
             {
                 if ( CoreConfig.debug )
                 {
                     Message.SESSION_FOUND.log( session, sessionCookie, r );
                 }
-
+                //
+                // Make sure it isn't expired
+                //
                 long difference = ( System.currentTimeMillis() - (long) session.get( "last_active" ) ) / 1000;
                 if ( difference >= CoreConfig.Sessions.sessionTimeout )
                 {
@@ -147,12 +160,16 @@ public final class SessionManager implements ProviderFactory<ISession>
                     {
                         Logger.debug( "Deleted outdated session: {}", session );
                     }
+                    session.setDeleted();
                     this.sessions.invalidate( sessionCookie );
                     this.sessionDatabase.deleteSession( sessionCookie );
                     session = null;
                 }
             } else
             {
+                //
+                // If it cannot be found, try to load it from the database
+                //
                 final SessionLoad load = sessionDatabase.isValid( sessionCookie );
                 if ( load != null )
                 {
@@ -168,12 +185,16 @@ public final class SessionManager implements ProviderFactory<ISession>
                 }
             }
 
+            //
+            // Make sure that the session has the correct passcode
+            //
             if ( session != null && !session.getSessionKey().equalsIgnoreCase( sessionPassCookie ) )
             {
                 if ( CoreConfig.debug )
                 {
                     Logger.debug( "Deleted session: {} (Cause: {})", session, "Wrong session key" );
                 }
+                session.setDeleted();
                 this.sessions.invalidate( sessionCookie );
                 this.sessionDatabase.deleteSession( sessionCookie );
                 session = null;
@@ -199,11 +220,7 @@ public final class SessionManager implements ProviderFactory<ISession>
     public void setSessionLastActive(final AsciiString sessionID)
     {
         final Optional<ISession> session = getSession( sessionID );
-        if ( session.isPresent() )
-        {
-            session.get().set( "last_active", System.currentTimeMillis() );
-            this.sessionDatabase.updateSession( sessionID );
-        }
+        session.ifPresent( iSession -> iSession.set( "last_active", System.currentTimeMillis() ) );
     }
 
     @Override

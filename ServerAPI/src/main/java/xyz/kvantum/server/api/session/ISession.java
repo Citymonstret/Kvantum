@@ -34,6 +34,10 @@ public interface ISession extends VariableProvider
 
     long getSessionId();
 
+    void setDeleted();
+
+    boolean isDeleted();
+
     ISession set(final String s, final Object o);
 
     KvantumPojo<ISession> toKvantumPojo();
