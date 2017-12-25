@@ -19,42 +19,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews;
+package xyz.kvantum.server.api.views.annotatedviews;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
-import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.IConsumer;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.views.RequestHandler;
+import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
-import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-final public class StaticViewManager
+public final class AnnotatedViewManager
 {
 
-    private static final Class<?>[] parameters = new Class<?>[]{ AbstractRequest.class };
-    private static final Class<?>[] alternativeParameters = new Class<?>[]{ AbstractRequest.class, Response.class };
-    private static final Map<String, OutputConverter<?>> converters = new HashMap<>();
+    private final Class<?>[] parameters = new Class<?>[]{ AbstractRequest.class };
+    private final Class<?>[] alternativeParameters = new Class<?>[]{ AbstractRequest.class, Response.class };
+    private final Map<String, OutputConverter<?>> converters = new HashMap<>();
 
-    static
+    public AnnotatedViewManager()
     {
-        StandardConverters.registerStandardConverters();
+        StandardConverters.registerStandardConverters( this );
     }
 
-    public static void generate(@NonNull final Object viewDeclaration) throws Exception
+    public <T> Collection<? extends RequestHandler> generate(@NonNull final T viewDeclaration) throws Exception
     {
         final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
                 ReflectionUtils.getAnnotatedMethods( ViewMatcher.class, clazz );
+        final ImmutableCollection.Builder<RequestHandler> builder = ImmutableList.builder();
         ( (IConsumer<ReflectionUtils.AnnotatedMethod<ViewMatcher>>) annotatedMethod ->
         {
             final Method m = annotatedMethod.getMethod();
@@ -103,7 +106,7 @@ final public class StaticViewManager
                     {
                         try
                         {
-                            view = new CachedStaticView( declaration, new ResponseMethod( m, viewDeclaration,
+                            view = new CachedAnnotatedView<>( declaration, new ResponseMethod<>( m, viewDeclaration,
                                     declaration.getOutputConverter() ) );
                         } catch ( Throwable throwable )
                         {
@@ -113,7 +116,7 @@ final public class StaticViewManager
                     {
                         try
                         {
-                            view = new StaticView( declaration, new ResponseMethod( m, viewDeclaration,
+                            view = new AnnotatedView<>( declaration, new ResponseMethod<>( m, viewDeclaration,
                                     declaration.getOutputConverter() ) );
                         } catch ( Throwable throwable )
                         {
@@ -131,16 +134,16 @@ final public class StaticViewManager
                         view.getMiddlewareQueuePopulator().add( middleware );
                     }
 
-                    ServerImplementation.getImplementation().getRouter().add( view );
+                    builder.add( view );
                 }
             }
         } ).foreach( annotatedMethods );
+        return builder.build();
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static void registerConverter(final OutputConverter<?> converter)
+    public void registerConverter(@NonNull final OutputConverter<?> converter)
     {
         converters.put( converter.getKey().toLowerCase( Locale.ENGLISH ), converter );
     }
-
 }

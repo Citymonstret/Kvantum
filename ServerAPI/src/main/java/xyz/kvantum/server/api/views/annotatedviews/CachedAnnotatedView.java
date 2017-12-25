@@ -19,17 +19,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews;
+package xyz.kvantum.server.api.views.annotatedviews;
 
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.View;
 
-final class CachedStaticView extends View implements CacheApplicable
+final class CachedAnnotatedView<C> extends View implements CacheApplicable
 {
 
-    CachedStaticView(final ViewDeclaration viewDeclaration,
-                     final ResponseMethod method)
+    CachedAnnotatedView(final ViewDeclaration viewDeclaration,
+                        final ResponseMethod<?, C> method)
     {
         super( viewDeclaration.getFilter(), viewDeclaration.getName(),
                 null, method, viewDeclaration.getHttpMethod() );

@@ -31,8 +31,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.ParameterScope;
-import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
-import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
+import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
 import java.util.Optional;
 
@@ -48,13 +47,7 @@ class ExampleLogin
 
     ExampleLogin()
     {
-        try
-        {
-            StaticViewManager.generate( this );
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
+        ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
     }
 
     @ViewMatcher(filter = "login", httpMethod = HttpMethod.POST)

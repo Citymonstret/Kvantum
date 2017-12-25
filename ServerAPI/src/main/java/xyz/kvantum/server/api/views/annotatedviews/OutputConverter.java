@@ -19,7 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews;
+package xyz.kvantum.server.api.views.annotatedviews;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,7 +37,6 @@ public abstract class OutputConverter<T>
     {
         this.key = key;
         this.clazz = clazz;
-        StaticViewManager.registerConverter( this );
     }
 
     protected abstract Response generateResponse(final T input);

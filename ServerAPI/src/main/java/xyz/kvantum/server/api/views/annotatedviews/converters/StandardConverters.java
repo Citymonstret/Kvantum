@@ -19,33 +19,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews;
+package xyz.kvantum.server.api.views.annotatedviews.converters;
 
-import xyz.kvantum.server.api.request.HttpMethod;
-import xyz.kvantum.server.api.views.requesthandler.Middleware;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ViewMatcher
+@UtilityClass
+public class StandardConverters
 {
 
-    String filter();
+    public static final String HTML = "html";
+    public static final String JSON = "json";
+    public static final String XML = "xml";
 
-    String name() default "";
-
-    Class<? extends Middleware>[] middlewares() default Middleware.class;
-
-    boolean cache() default false;
-
-    boolean forceHTTPS() default false;
-
-    HttpMethod httpMethod() default HttpMethod.ALL;
-
-    String outputType() default "";
+    public static void registerStandardConverters(@NonNull final AnnotatedViewManager staticViewManager)
+    {
+        new HtmlConverter( staticViewManager );
+        new JsonConverter( staticViewManager );
+        new XmlConverter( staticViewManager );
+    }
 
 }

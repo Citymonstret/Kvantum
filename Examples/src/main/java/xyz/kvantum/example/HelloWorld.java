@@ -29,9 +29,8 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.MapBuilder;
 import xyz.kvantum.server.api.views.View;
-import xyz.kvantum.server.api.views.staticviews.StaticViewManager;
-import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
-import xyz.kvantum.server.api.views.staticviews.converters.StandardConverters;
+import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
+import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters;
 
 /**
  * Different examples of how to construct the well known "Hello World"
@@ -45,16 +44,7 @@ public final class HelloWorld
 
     HelloWorld()
     {
-        try
-        {
-            //
-            // Scan the instance for @Annotation-based views
-            //
-            StaticViewManager.generate( this );
-        } catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
+        ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
         //
         // Load the function-based view constructor
         //

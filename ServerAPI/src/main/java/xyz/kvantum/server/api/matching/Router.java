@@ -21,20 +21,26 @@
  */
 package xyz.kvantum.server.api.matching;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.exceptions.NotImplementedException;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
+import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Router that is responsible for {@link RequestHandler} matching
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public abstract class Router
 {
+
+    @Getter
+    private final AnnotatedViewManager annotatedViewManager = new AnnotatedViewManager();
 
     /**
      * Attempt to match a request to a {@link RequestHandler}
@@ -51,13 +57,54 @@ public abstract class Router
      * @param handler RequestHandler that is to be registered
      * @return The added {@link RequestHandler}
      */
-    public abstract RequestHandler add(RequestHandler handler);
+    public abstract <T extends RequestHandler> T add(T handler);
+
+    /**
+     * Add a collection containing {@link RequestHandler RequestHandlers} to the router
+     *
+     * @param handlers RequestHandlers that are to be registered
+     */
+    public final void addAll(final Collection<? extends RequestHandler> handlers)
+    {
+        handlers.forEach( this::add );
+    }
+
+    /**
+     * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and
+     * register all constructed {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView StaticViews}
+     *
+     * @param instance Instance to be scanned
+     */
+    public final <T> void scanAndAdd(final T instance)
+    {
+        this.addAll( this.scan( instance ) );
+    }
+
+    /**
+     * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and return
+     * a collection of constructed {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView}
+     *
+     * @param instance Instance to be scanned
+     * @return Constructed views
+     */
+    public final <T> Collection<? extends RequestHandler> scan(final T instance)
+    {
+        try
+        {
+            return this.annotatedViewManager.generate( instance );
+        } catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
 
     /**
      * Attempts to remove a RequestHandler from the Router
+     *
      * @param handler RequestHandler to be removed
      */
-    public abstract void remove(RequestHandler handler);
+    public abstract <T extends RequestHandler> void remove(T handler);
 
     /**
      * Clear all handlers from the router
@@ -66,6 +113,7 @@ public abstract class Router
 
     /**
      * Dump Router contents onto the server log
+     *
      * @param server Server instance
      */
     @SneakyThrows

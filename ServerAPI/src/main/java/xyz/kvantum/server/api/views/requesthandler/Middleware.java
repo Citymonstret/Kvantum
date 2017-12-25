@@ -23,7 +23,7 @@ package xyz.kvantum.server.api.views.requesthandler;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.View;
-import xyz.kvantum.server.api.views.staticviews.ViewMatcher;
+import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
 /**
  * <p>

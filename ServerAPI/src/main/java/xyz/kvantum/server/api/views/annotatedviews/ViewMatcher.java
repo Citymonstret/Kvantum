@@ -19,28 +19,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews.converters;
+package xyz.kvantum.server.api.views.annotatedviews;
 
-import xyz.kvantum.server.api.response.Header;
-import xyz.kvantum.server.api.response.Response;
-import xyz.kvantum.server.api.views.staticviews.OutputConverter;
+import xyz.kvantum.server.api.request.HttpMethod;
+import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-public class XmlConverter extends OutputConverter<String>
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ViewMatcher
 {
 
-    XmlConverter()
-    {
-        super( "xml", String.class );
-    }
+    String filter();
 
-    @Override
-    protected Response generateResponse(final String input)
-    {
-        final Response response = new Response();
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_XML );
-        response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
-        response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
-        response.setContent( input );
-        return response;
-    }
+    String name() default "";
+
+    Class<? extends Middleware>[] middlewares() default Middleware.class;
+
+    boolean cache() default false;
+
+    boolean forceHTTPS() default false;
+
+    HttpMethod httpMethod() default HttpMethod.ALL;
+
+    String outputType() default "";
+
 }

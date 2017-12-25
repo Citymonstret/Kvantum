@@ -19,27 +19,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews.converters;
-
-import xyz.kvantum.server.api.response.Header;
-import xyz.kvantum.server.api.response.Response;
-import xyz.kvantum.server.api.views.staticviews.OutputConverter;
-
-final class HtmlConverter extends OutputConverter<String>
-{
-
-    HtmlConverter()
-    {
-        super( "html", String.class );
-    }
-
-    @Override
-    protected Response generateResponse(final String input)
-    {
-        final Response response = new Response();
-        response.setContent( input );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
-        return response;
-    }
-
-}
+package xyz.kvantum.server.api.views.annotatedviews;

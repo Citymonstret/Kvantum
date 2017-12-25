@@ -19,31 +19,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews.converters;
+package xyz.kvantum.server.api.views.annotatedviews.converters;
 
 import lombok.NonNull;
-import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
-import xyz.kvantum.server.api.views.staticviews.OutputConverter;
+import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
+import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
-final class JsonConverter extends OutputConverter<JSONObject>
+public class XmlConverter extends OutputConverter<String>
 {
 
-    JsonConverter()
+    XmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
     {
-        super( "json", JSONObject.class );
+        super( "xml", String.class );
+        annotatedViewManager.registerConverter( this );
     }
 
     @Override
-    protected Response generateResponse(@NonNull final JSONObject input)
+    protected Response generateResponse(final String input)
     {
         final Response response = new Response();
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
+        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_XML );
         response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
         response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
-        response.getHeader().set( Header.CONTENT_SECURITY_POLICY, "default-src 'none'" );
-        response.setContent( input.toString() );
+        response.setContent( input );
         return response;
     }
 }

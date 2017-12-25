@@ -19,22 +19,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews;
+package xyz.kvantum.server.api.views.annotatedviews;
 
-import lombok.Data;
-import xyz.kvantum.server.api.request.HttpMethod;
-import xyz.kvantum.server.api.views.requesthandler.Middleware;
+import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 
-@Data
-final class ViewDeclaration
+final class AnnotatedView<C> extends SimpleRequestHandler
 {
 
-    private String filter;
-    private String name;
-    private Class<? extends Middleware>[] middlewares;
-    private boolean cache = true;
-    private boolean forceHttps = true;
-    private HttpMethod httpMethod = HttpMethod.ALL;
-    private OutputConverter<?> outputConverter = null;
+    AnnotatedView(final ViewDeclaration declaration,
+                  final ResponseMethod<?, C> method)
+    {
+        super( declaration.getFilter(), method, declaration.isForceHttps(), declaration.getHttpMethod() );
+    }
 
 }

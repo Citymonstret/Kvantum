@@ -19,7 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews;
+package xyz.kvantum.server.api.views.annotatedviews;
 
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
@@ -33,16 +33,16 @@ import xyz.kvantum.server.api.views.ViewReturn;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
-final public class ResponseMethod<T> implements
+final public class ResponseMethod<T, C> implements
         BiConsumer<AbstractRequest, Response>, ViewReturn
 {
 
     private final Lambda lambda;
-    private final Object instance;
+    private final C instance;
     private final boolean passResponse;
     private final OutputConverter<T> outputConverter;
 
-    ResponseMethod(@NonNull final Method method, @NonNull final Object instance,
+    ResponseMethod(@NonNull final Method method, @NonNull final C instance,
                    @Nullable final OutputConverter<T> outputConverter) throws Throwable
     {
         Assert.notNull( method, instance );

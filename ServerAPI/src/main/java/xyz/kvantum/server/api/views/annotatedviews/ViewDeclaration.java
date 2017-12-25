@@ -19,23 +19,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.staticviews.converters;
+package xyz.kvantum.server.api.views.annotatedviews;
 
-import lombok.experimental.UtilityClass;
+import lombok.Data;
+import xyz.kvantum.server.api.request.HttpMethod;
+import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-@UtilityClass
-public class StandardConverters
+@Data
+final class ViewDeclaration
 {
 
-    public static final String HTML = "html";
-    public static final String JSON = "json";
-    public static final String XML = "xml";
-
-    public static void registerStandardConverters()
-    {
-        new HtmlConverter();
-        new JsonConverter();
-        new XmlConverter();
-    }
+    private String filter;
+    private String name;
+    private Class<? extends Middleware>[] middlewares;
+    private boolean cache = true;
+    private boolean forceHttps = true;
+    private HttpMethod httpMethod = HttpMethod.ALL;
+    private OutputConverter<?> outputConverter = null;
 
 }
