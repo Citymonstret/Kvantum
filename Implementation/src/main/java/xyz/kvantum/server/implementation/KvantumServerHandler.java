@@ -78,6 +78,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
     private static final byte[] SPACE = AsciiString.of( " " ).getValue();
     private static final AsciiString KEEP_ALIVE = AsciiString.of( "keep-alive" );
     private static final AsciiString CLOSE = AsciiString.of( "close" );
+    private static final AsciiString CONNECTION = AsciiString.of( "connection" );
 
     private final ProtocolType protocolType;
 
@@ -439,8 +440,8 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         }
 
         final boolean keepAlive;
-        if ( workerContext.getRequest().getHeaders().getOrDefault( "connection", "close" ).equalsIgnoreCase(
-                "keep-alive" ) )
+        if ( workerContext.getRequest().getHeaders().getOrDefault( CONNECTION, CLOSE )
+                .equalsIgnoreCase( KEEP_ALIVE ) )
         {
             if ( CoreConfig.debug )
             {

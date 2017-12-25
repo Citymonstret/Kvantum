@@ -25,10 +25,13 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.HashBiMap;
 import lombok.NonNull;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Utility object for dealing with US-ASCII encoded strings.
@@ -56,6 +59,15 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         this.uppercase = this.string.toUpperCase( Locale.ENGLISH ).equals( this.string );
     }
 
+    private AsciiString(@NonNull final byte[] value)
+    {
+        this.value = value;
+        this.string = new String( value, StandardCharsets.US_ASCII );
+        this.hashCode = this.string.hashCode();
+        this.lowercase = this.string.toLowerCase( Locale.ENGLISH ).equals( this.string );
+        this.uppercase = this.string.toUpperCase( Locale.ENGLISH ).equals( this.string );
+    }
+
     public static AsciiString randomUUIDAsciiString()
     {
         return of( UUID.randomUUID().toString(), false );
@@ -76,7 +88,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
     public static AsciiString of(@NonNull final String string,
                                  final boolean cache)
     {
-        if ( cache && map.containsKey( string ) )
+        if ( map.containsKey( string ) )
         {
             return map.get( string );
         }
@@ -86,6 +98,16 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
             map.put( string, asciiString );
         }
         return asciiString;
+    }
+
+    public static AsciiString of(final byte[] string)
+    {
+        return new AsciiString( string );
+    }
+
+    public boolean isEmpty()
+    {
+        return this.length() == 0;
     }
 
     /**
@@ -222,7 +244,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         {
             return this;
         }
-        return of( this.string.toLowerCase( Locale.ENGLISH ) );
+        return of( this.string.toLowerCase( Locale.ENGLISH ), false );
     }
 
     public AsciiString toUpperCase()
@@ -231,7 +253,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         {
             return this;
         }
-        return of( this.string.toUpperCase( Locale.ENGLISH ) );
+        return of( this.string.toUpperCase( Locale.ENGLISH ), false );
     }
 
     @Override
@@ -248,5 +270,16 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
             return 0;
         }
         return sequence.toString().compareTo( this.string );
+    }
+
+    public List<AsciiString> split(@NonNull final String delimiter)
+    {
+        return Arrays.stream( this.string.split( delimiter ) ).map( string -> AsciiString.of( string, false ) )
+                .collect( Collectors.toList() );
+    }
+
+    public boolean startsWith(@NonNull final String part)
+    {
+        return this.string.startsWith( part );
     }
 }

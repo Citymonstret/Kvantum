@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.val;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.request.post.PostRequest;
@@ -52,7 +53,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -92,7 +93,7 @@ public abstract class AbstractRequest implements
     @Getter(AccessLevel.PROTECTED)
     private Map<String, Object> meta = new HashMap<>();
     @Getter
-    private Map<String, String> headers = new HashMap<>();
+    private Map<AsciiString, AsciiString> headers = new HashMap<>();
     @Setter(AccessLevel.PROTECTED)
     @Getter
     private ListMultimap<AsciiString, Cookie> cookies = ArrayListMultimap.create();
@@ -216,16 +217,21 @@ public abstract class AbstractRequest implements
      * @param name Header Name
      * @return The header value, if the header exists. Otherwise an empty string will be returned.
      */
-    public String getHeader(final String name)
+    public AsciiString getHeader(final AsciiString name)
     {
         Assert.notNull( name );
 
-        if ( this.headers.containsKey( name.toLowerCase( Locale.ENGLISH ) ) )
+        if ( this.headers.containsKey( name.toLowerCase() ) )
         {
-            return this.headers.get( name.toLowerCase( Locale.ENGLISH ) );
+            return this.headers.get( name.toLowerCase() );
         }
 
-        return "";
+        return AsciiString.empty;
+    }
+
+    public AsciiString getHeader(final String name)
+    {
+        return getHeader( AsciiString.of( name ) );
     }
 
     /**
@@ -236,9 +242,8 @@ public abstract class AbstractRequest implements
     public String buildLog()
     {
         String msg = Message.REQUEST_LOG.toString();
-        for ( final Object a : new String[]{ socket.getAddress().toString(), getHeader(
-                "User-Agent" ),
-                getHeader( "query" ), getHeader( "Host" ), this.query.buildLog() } )
+        for ( final Object a : new CharSequence[]{ socket.getAddress().toString(), getHeader(
+                "User-Agent" ), getHeader( "query" ), getHeader( "Host" ), this.query.buildLog() } )
         {
             msg = msg.replaceFirst( "\\{}", a.toString() );
         }
@@ -414,26 +419,26 @@ public abstract class AbstractRequest implements
     {
 
         @Getter
-        private final String mechanism;
+        private final AsciiString mechanism;
         @Getter
-        private final String username;
+        private final AsciiString username;
         @Getter
-        private final String password;
+        private final AsciiString password;
 
-        Authorization(final String input)
+        Authorization(final AsciiString input)
         {
-            final String[] parts = input.split( "\\s" );
-            this.mechanism = parts[ 1 ];
-            final String[] auth = new String( Base64.getDecoder().decode( parts[ 2 ] ), StandardCharsets.UTF_8 )
+            final List<AsciiString> parts = input.split( "\\s" );
+            this.mechanism = parts.get( 1 );
+            final val auth = AsciiString.of( Base64.getDecoder().decode( parts.get( 2 ).getValue() ) )
                     .split( ":" );
-            if ( auth.length < 2 )
+            if ( auth.size() < 2 )
             {
                 this.username = null;
                 this.password = null;
             } else
             {
-                this.username = auth[ 0 ];
-                this.password = auth[ 1 ];
+                this.username = auth.get( 0 );
+                this.password = auth.get( 1 );
             }
         }
 

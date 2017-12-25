@@ -59,15 +59,14 @@ public final class CookieManager
     {
         Assert.isValid( r );
 
-        String raw = r.getHeader( "Cookie" ).replaceAll( "\\s", "" );
+        final String raw = r.getHeader( "Cookie" ).toString().replaceAll( "\\s", "" );
 
         if ( raw.isEmpty() )
         {
             return EMPTY_COOKIES;
         }
 
-        final ListMultimap<AsciiString, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues()
-                .build();
+        final ListMultimap<AsciiString, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues().build();
 
         final StringTokenizer cookieTokenizer = new StringTokenizer( raw, ";" );
         while ( cookieTokenizer.hasMoreTokens() )

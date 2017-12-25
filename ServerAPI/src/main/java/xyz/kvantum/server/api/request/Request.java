@@ -40,7 +40,7 @@ import java.util.Optional;
 final public class Request extends AbstractRequest
 {
 
-    private static final String HEADER_AUTHORIZATION = "Authorization";
+    private static final AsciiString HEADER_AUTHORIZATION = AsciiString.of( "Authorization" );
     private boolean hasBeenRequested = false;
 
     public Request(final SocketContext socket)

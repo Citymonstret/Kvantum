@@ -34,6 +34,7 @@ import xyz.kvantum.server.api.request.post.JsonPostRequest;
 import xyz.kvantum.server.api.request.post.MultipartPostRequest;
 import xyz.kvantum.server.api.request.post.UrlEncodedPostRequest;
 import xyz.kvantum.server.api.response.Header;
+import xyz.kvantum.server.api.util.AsciiString;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +48,9 @@ import java.util.Optional;
 @SuppressWarnings({ "unused", "WeakerAccess" })
 final class RequestReader
 {
+
+    private static final AsciiString CONTENT_TYPE = AsciiString.of( "content-type" );
+    private static final AsciiString CONTENT_LENGTH = AsciiString.of( "content-length" );
 
     @Getter
     private final StringBuilder builder;
@@ -106,11 +110,11 @@ final class RequestReader
             this.overloadBuffer.writeByte( b );
             if ( overloadBuffer.readableBytes() == contentLength )
             {
-                final String contentType = abstractRequest.getHeader( "Content-Type" );
+                final AsciiString contentType = abstractRequest.getHeader( CONTENT_TYPE );
                 boolean isFormURLEncoded;
 
                 if ( ( isFormURLEncoded = contentType.startsWith( "application/x-www-form-urlencoded" ) ) ||
-                        ( EntityType.JSON.getContentType().startsWith( contentType ) ) )
+                        ( EntityType.JSON.getContentType().startsWith( contentType.toString() ) ) )
                 {
                     try
                     {
@@ -153,14 +157,14 @@ final class RequestReader
         {
             if ( character == '\n' )
             {
-                final String contentLength = abstractRequest.getHeader( "content-length" );
+                final AsciiString contentLength = abstractRequest.getHeader( CONTENT_LENGTH );
                 if ( contentLength.isEmpty() )
                 {
                     return ( done = true );
                 }
                 try
                 {
-                    this.contentLength = Integer.parseInt( contentLength );
+                    this.contentLength = Integer.parseInt( contentLength.toString() );
                 } catch ( final Exception e )
                 {
                     throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null );

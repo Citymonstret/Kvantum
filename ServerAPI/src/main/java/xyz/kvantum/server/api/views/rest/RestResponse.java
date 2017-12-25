@@ -27,7 +27,9 @@ import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.matching.ViewPattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
+import xyz.kvantum.server.api.util.AsciiString;
 
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings({ "unused", "WeakerAccess " })
@@ -73,14 +75,14 @@ public abstract class RestResponse
             // We simply don't care.
             return true;
         }
-        final String supplied = request.getHeader( "Accept" );
+        final AsciiString supplied = request.getHeader( "Accept" );
         if ( supplied.isEmpty() )
         {
             // Assume that they will accept everything
             return true;
         }
-        final String[] parts = supplied.split( "\\s+" );
-        for ( String part : parts )
+        final List<AsciiString> parts = supplied.split( "\\s+" );
+        for ( AsciiString part : parts )
         {
             if ( part.equals( "*/*" ) || part.equals( this.contentType ) )
             {

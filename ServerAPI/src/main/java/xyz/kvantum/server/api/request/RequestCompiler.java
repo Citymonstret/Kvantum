@@ -28,6 +28,7 @@ import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.RequestException;
+import xyz.kvantum.server.api.util.AsciiString;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -52,8 +53,9 @@ public class RequestCompiler
         {
             return Optional.empty();
         }
-        return Optional.of( new HeaderPair( matcher.group( "key" ).toLowerCase( Locale.ENGLISH ),
-                matcher.group( "value" ) ) );
+        final AsciiString key = AsciiString.of( matcher.group( "key" ).toLowerCase( Locale.ENGLISH ) );
+        final AsciiString value = AsciiString.of( matcher.group( "value" ), false );
+        return Optional.of( new HeaderPair( key, value ) );
     }
 
     public static void compileQuery(@NonNull final AbstractRequest request, @NonNull final String line)
@@ -83,9 +85,9 @@ public class RequestCompiler
     {
 
         @NonNull
-        private final String key;
+        private final AsciiString key;
         @NonNull
-        private final String value;
+        private final AsciiString value;
     }
 
 }
