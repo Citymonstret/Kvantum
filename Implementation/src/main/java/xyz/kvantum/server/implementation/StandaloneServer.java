@@ -50,6 +50,7 @@ import xyz.kvantum.server.api.views.JSView;
 import xyz.kvantum.server.api.views.StandardView;
 import xyz.kvantum.server.api.views.View;
 import xyz.kvantum.server.api.views.ViewDetector;
+import xyz.kvantum.server.api.views.decorators.CacheDecorator;
 import xyz.kvantum.server.implementation.error.KvantumException;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 
@@ -66,6 +67,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public final class StandaloneServer extends SimpleServer
 {
@@ -283,7 +285,10 @@ public final class StandaloneServer extends SimpleServer
                     viewDetector.getPaths().forEach( p -> Logger.info( "- {}", p.toString() ) );
                     viewDetector.generateViewEntries();
                     Logger.info( "Loaded {} webjars resource(s)", viewDetector.getViewEntries().size() );
-                    new ViewLoader( () -> webjarsFileSystem, viewDetector.getViewEntries(), this.viewBindings );
+                    final CacheDecorator decorator = CacheDecorator.builder()
+                            .maxAge( TimeUnit.DAYS.toMillis( 365 ) ).cachePublic( true ).build();
+                    new ViewLoader( () -> webjarsFileSystem, Collections.singleton( decorator.getDecorator() ),
+                            viewDetector.getViewEntries(), this.viewBindings );
                 }
             } catch ( final Exception e )
             {
@@ -305,12 +310,13 @@ public final class StandaloneServer extends SimpleServer
             Logger.info( "Found {} folders", loaded );
             viewDetector.getPaths().forEach( p -> Logger.info( "- {}", p.toString() ) );
             viewDetector.generateViewEntries();
-            new ViewLoader( this::getFileSystem, viewDetector.getViewEntries(), this.viewBindings );
+            new ViewLoader( this::getFileSystem, Collections.emptyList(),
+                    viewDetector.getViewEntries(), this.viewBindings );
         } else if ( !CoreConfig.disableViews )
         {
             this.log( Message.LOADING_VIEWS );
             this.log( "" );
-            new ViewLoader( configViews, this::getFileSystem, this.viewBindings );
+            new ViewLoader( configViews, this::getFileSystem, Collections.emptyList(), this.viewBindings );
         } else
         {
             Message.VIEWS_DISABLED.log();

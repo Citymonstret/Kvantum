@@ -31,8 +31,10 @@ import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileExtension;
+import xyz.kvantum.server.api.util.TimeUtil;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -111,5 +113,7 @@ public abstract class StaticFileView extends View
             response.setContent( extension.getComment( "Served to you by Kvantum" ) + System.lineSeparator()
                     + path.readFile() );
         }
+        response.getHeader().set( Header.HEADER_LAST_MODIFIED,
+                TimeUtil.getHTTPTimeStamp( new Date( path.getLastModified() ) ) );
     }
 }

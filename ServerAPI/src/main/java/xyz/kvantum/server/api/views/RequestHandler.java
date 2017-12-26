@@ -39,6 +39,8 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueue;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -60,6 +62,7 @@ public abstract class RequestHandler
     private final ValidationManager validationManager = new ValidationManager();
     private final Map<String, Lambda> alternateOutcomes = new HashMap<>();
     private final String uniqueId = UUID.randomUUID().toString();
+    private final Collection<Decorator> decorators = new ArrayList<>();
 
     {
         if ( CoreConfig.debug )
@@ -125,6 +128,11 @@ public abstract class RequestHandler
         this.alternateOutcomes.put( identifier, lambda );
     }
 
+    public void addResponseDecorator(@NonNull final Decorator decorator)
+    {
+        this.decorators.add( decorator );
+    }
+
     public Optional<Lambda> getAlternateOutcomeMethod(final String identifier)
     {
         if ( alternateOutcomes.containsKey( identifier ) )
@@ -184,7 +192,16 @@ public abstract class RequestHandler
             }
         }
 
-        return generate( request );
+        final Response response = generate( request );
+        if ( response == null )
+        {
+            throw new KvantumException( "ResponseHandler (" + this.getName() + ") generated a null response" );
+        }
+        for ( final Decorator decorator : this.decorators )
+        {
+            decorator.decorate( response );
+        }
+        return response;
     }
 
     /**

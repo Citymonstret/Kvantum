@@ -48,6 +48,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.DebugTree;
 import xyz.kvantum.server.api.util.ProtocolType;
+import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.ViewException;
 import xyz.kvantum.server.api.views.requesthandler.HTTPSRedirectHandler;
@@ -398,20 +399,22 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         ResponseBody body = workerContext.getBody();
         byte[] bytes = workerContext.getBytes();
 
-        if ( CoreConfig.contentMd5 )
+        final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
+
+        Assert.notNull( bytes );
+        Assert.notNull( body );
+        Assert.notNull( body.getHeader() );
+
+        final String checksum = md5Handler.generateChecksum( bytes );
+
+        body.getHeader().set( Header.HEADER_CONTENT_MD5, checksum );
+        body.getHeader().set( Header.HEADER_ETAG, checksum );
+
+        SimpleServer.md5HandlerPool.add( md5Handler );
+
+        if ( !body.getHeader().get( Header.HEADER_LAST_MODIFIED ).isPresent() )
         {
-            final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
-
-            Assert.notNull( bytes );
-            Assert.notNull( body );
-            Assert.notNull( body.getHeader() );
-
-            final String checksum = md5Handler.generateChecksum( bytes );
-
-            body.getHeader().set( Header.HEADER_CONTENT_MD5, checksum );
-            body.getHeader().set( Header.HEADER_ETAG, checksum );
-
-            SimpleServer.md5HandlerPool.add( md5Handler );
+            body.getHeader().set( Header.HEADER_LAST_MODIFIED, TimeUtil.getHTTPTimeStamp() );
         }
 
         if ( workerContext.isGzip() )

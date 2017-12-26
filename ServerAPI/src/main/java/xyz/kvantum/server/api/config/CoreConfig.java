@@ -48,7 +48,6 @@ public class CoreConfig
     public static boolean autoDetectViews = false;
     public static boolean debug = true;
     public static boolean gzip = true;
-    public static boolean contentMd5 = true;
     public static boolean enableSecurityManager = true;
     public static boolean enableInputThread = true;
     public static boolean exitOnStop = true;

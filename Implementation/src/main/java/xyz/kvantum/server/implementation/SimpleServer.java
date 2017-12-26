@@ -396,10 +396,7 @@ public class SimpleServer implements Kvantum
         {
             gzipHandlerPool = new ObjectPool<>( CoreConfig.Pools.gzipHandlers, GzipHandler::new );
         }
-        if ( CoreConfig.contentMd5 )
-        {
-            md5HandlerPool = new ObjectPool<>( CoreConfig.Pools.md5Handlers, Md5Handler::new );
-        }
+        md5HandlerPool = new ObjectPool<>( CoreConfig.Pools.md5Handlers, Md5Handler::new );
 
         try
         {

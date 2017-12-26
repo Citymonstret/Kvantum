@@ -28,9 +28,11 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.views.Decorator;
 import xyz.kvantum.server.api.views.View;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -47,22 +49,27 @@ final class ViewLoader
     private Map<String, Map<String, Object>> views = new HashMap<>();
     private Map<String, Class<? extends View>> viewBindings;
     private final Supplier<FileSystem> fileSystemSupplier;
+    private final Collection<Decorator> decorators;
 
     ViewLoader(@NonNull final ConfigurationFile viewConfiguration,
                @NonNull final Supplier<FileSystem> fileSystemSupplier,
+               @NonNull final Collection<Decorator> decorators,
                @NonNull final Map<String, Class<? extends View>> viewBindings)
     {
         this.fileSystemSupplier = fileSystemSupplier;
         this.viewBindings = viewBindings;
+        this.decorators = decorators;
         this.addViews( viewConfiguration );
         this.views.entrySet().forEach( this::loadView );
     }
 
     ViewLoader(@NonNull final Supplier<FileSystem> fileSystemSupplier,
+               @NonNull final Collection<Decorator> decorators,
                @NonNull final Map<String, Map<String, Object>> views,
                @NonNull final Map<String, Class<? extends View>> viewBindings)
     {
         this.fileSystemSupplier = fileSystemSupplier;
+        this.decorators = decorators;
         this.viewBindings = viewBindings;
         this.views = views;
         this.views.entrySet().forEach( this::loadView );
@@ -130,6 +137,7 @@ final class ViewLoader
                 final View vv = vc.getDeclaredConstructor( String.class, Map.class )
                         .newInstance( filter, options );
                 vv.setFileSystemSupplier( this.fileSystemSupplier );
+                this.decorators.forEach( vv::addResponseDecorator );
                 if ( CoreConfig.debug )
                 {
                     Logger.debug( "Added view " + vv.getName() );

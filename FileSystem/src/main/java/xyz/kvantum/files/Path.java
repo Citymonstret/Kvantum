@@ -146,6 +146,19 @@ public class Path
         return -1;
     }
 
+    public long getLastModified()
+    {
+        try
+        {
+            this.loadAttributes();
+            return this.basicFileAttributes.lastModifiedTime().toMillis();
+        } catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     /**
      * Removes the stored sub paths
      */
