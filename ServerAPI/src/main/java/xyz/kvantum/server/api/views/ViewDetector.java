@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.views;
 
+import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.util.MapBuilder;
 
@@ -32,6 +33,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Can be used to detect file structures
+ * that could be served by the standard
+ * library of {@link View views}
+ */
 @SuppressWarnings({ "unused", "WeakerAccess" })
 public final class ViewDetector
 {
@@ -42,7 +48,9 @@ public final class ViewDetector
     private final Set<Path> paths = new HashSet<>();
     private final Map<String, Map<String, Object>> viewEntries = new HashMap<>();
 
-    public ViewDetector(final String basePath, final Path basePathObject, final Collection<String> ignore)
+    public ViewDetector(@NonNull final String basePath,
+                        @NonNull final Path basePathObject,
+                        @NonNull final Collection<String> ignore)
     {
         this.basePath = basePath;
         this.ignore = ignore;
@@ -71,8 +79,10 @@ public final class ViewDetector
         this.paths.forEach( p -> loadSubPath( viewEntries, basePath, basePathObject.toString(), p ) );
     }
 
-    private void loadSubPath(final Map<String, Map<String, Object>> viewEntries, final String basePath,
-                             final String toRemove, final Path path)
+    private void loadSubPath(final Map<String, Map<String, Object>> viewEntries,
+                             final String basePath,
+                             final String toRemove,
+                             final Path path)
     {
         String extension = null;
         boolean moreThanOneType = false;
@@ -167,7 +177,6 @@ public final class ViewDetector
 
         viewEntries.put( UUID.randomUUID().toString(), info );
     }
-
 
     private void addSubPaths(final Path path)
     {

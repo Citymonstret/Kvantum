@@ -100,6 +100,7 @@ import java.util.regex.Pattern;
 
 /**
  * Main {@link Kvantum} implementation.
+ * Extended by {@link StandaloneServer}
  */
 public class SimpleServer implements Kvantum
 {

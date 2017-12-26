@@ -90,6 +90,13 @@ public final class CacheManager implements ICacheManager
     }
 
     @Override
+    public void deleteAccount(@NonNull final IAccount account)
+    {
+        this.cachedAccounts.invalidate( account.getId() );
+        this.cachedAccountIds.invalidate( account.getUsername() );
+    }
+
+    @Override
     public Optional<CachedFile> getCachedFile(@NonNull final Path file)
     {
         return Optional.ofNullable( cachedFiles.getIfPresent( file.toString() ) );

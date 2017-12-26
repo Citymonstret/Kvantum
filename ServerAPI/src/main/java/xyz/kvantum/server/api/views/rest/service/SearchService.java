@@ -33,11 +33,12 @@ import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.matching.ViewPattern;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
+import xyz.kvantum.server.api.repository.KvantumRepository;
+import xyz.kvantum.server.api.repository.MatcherFactory;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.util.RequestManager;
-import xyz.kvantum.server.api.util.SearchResultProvider;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
@@ -82,7 +83,12 @@ final public class SearchService<QueryType, ObjectType>
     /**
      * Provider of search results, i.e {@link IAccountManager}
      */
-    private final SearchResultProvider<QueryType, ObjectType> resultProvider;
+    private final KvantumRepository<ObjectType, ?> resultProvider;
+
+    /**
+     * Matches queries to objects
+     */
+    private final MatcherFactory<QueryType, ObjectType> matcher;
 
     /**
      * Whether GET or POST parameters will be used to read the object
@@ -142,7 +148,8 @@ final public class SearchService<QueryType, ObjectType>
                 return;
             }
             final QueryType query = result.getParsedObject();
-            final Collection<? extends ObjectType> queryResult = resultProvider.getResults( query );
+            final val matcher = getMatcher().createMatcher( query );
+            final Collection<? extends ObjectType> queryResult = resultProvider.findAllByQuery( matcher );
             if ( queryResult.isEmpty() )
             {
                 final JsonObject requestStatus = new JsonObject();

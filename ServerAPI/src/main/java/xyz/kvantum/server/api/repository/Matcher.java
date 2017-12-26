@@ -19,23 +19,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.util;
+package xyz.kvantum.server.api.repository;
 
-import java.util.Collection;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.util.function.Predicate;
 
 /**
- * An interface for objects that perform a query and returns a collection of results
+ * Matcher for queries
+ *
+ * @param <Q> Query Type
+ * @param <V> Value type
  */
-@FunctionalInterface
-public interface SearchResultProvider<QueryType, ObjectType>
+@RequiredArgsConstructor
+public abstract class Matcher<Q, V> implements Predicate<V>
 {
 
+    @NonNull
+    private final Q queryObject;
+
+    abstract protected boolean matches(Q query, V value);
+
     /**
-     * Get all results matching the given query
+     * Check if an object matches the query
      *
-     * @param query Query
-     * @return Collection containing all the matching results
+     * @param value Value
+     * @return True it there is a match
      */
-    Collection<? extends ObjectType> getResults(QueryType query);
+    public final boolean matches(@NonNull final V value)
+    {
+        return this.matches( queryObject, value );
+    }
+
+    @Override
+    public final boolean test(@NonNull final V value)
+    {
+        return this.matches( value );
+    }
 
 }

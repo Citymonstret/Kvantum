@@ -19,27 +19,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation.example;
+package xyz.kvantum.server.api.account;
 
-import xyz.kvantum.server.api.core.ServerImplementation;
-import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.util.ParameterScope;
-import xyz.kvantum.server.api.views.rest.Rest;
-import xyz.kvantum.server.implementation.Account;
+import lombok.NonNull;
+import xyz.kvantum.server.api.repository.Matcher;
 
-class UserSearchExample implements Example
+/**
+ * Matcher that matches account queries (often generated using
+ * {@link xyz.kvantum.server.api.orm.KvantumObjectFactory}
+ * <p>
+ * Instances are built using {@link AccountMatcherFactory}
+ *
+ * @param <A> Query Type
+ * @param <B> Value type
+ */
+public final class AccountMatcher<A extends IAccount, B extends IAccount> extends Matcher<A, B>
 {
 
-    @Override
-    public void initExample()
+    AccountMatcher(@NonNull final A queryObject)
     {
-        Logger.info( "" );
-        Logger.info( "INITIALIZING EXAMPLE: UserSearch" );
-        Rest.createSearch( "/search", Account.class, ParameterScope.GET, ServerImplementation.getImplementation()
-                .getApplicationStructure().getAccountManager() );
-        Logger.info( "ACCESS THE EXAMPLE AT: /search?username=<username>&id=<id>" );
-        Logger.info( "EXAMPLE: /search?username=admin" );
-        Logger.info( "" );
+        super( queryObject );
     }
 
+    @Override
+    protected boolean matches(@NonNull final A query, @NonNull final B value)
+    {
+        return query.getUsername().equalsIgnoreCase( value.getUsername() )
+                || query.getId() == value.getId();
+    }
 }

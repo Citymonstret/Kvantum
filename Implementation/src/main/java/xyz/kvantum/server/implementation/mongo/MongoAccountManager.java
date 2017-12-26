@@ -21,10 +21,12 @@
  */
 package xyz.kvantum.server.implementation.mongo;
 
+import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import xyz.kvantum.server.api.account.IAccount;
@@ -35,6 +37,7 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.implementation.Account;
 import xyz.kvantum.server.implementation.MongoApplicationStructure;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -171,4 +174,20 @@ final public class MongoAccountManager implements IAccountManager
     {
         // Done automatically
     }
+
+    @Override
+    public ImmutableList<? extends IAccount> findAll()
+    {
+        final List<? extends IAccount> list = applicationStructure.getMorphiaDatastore().find( Account.class ).asList();
+        final ImmutableList.Builder<IAccount> builder = ImmutableList.builderWithExpectedSize( list.size() );
+        return builder.addAll( list ).build();
+    }
+
+    @Override
+    public void deleteAccount(@NonNull final IAccount account)
+    {
+        this.applicationStructure.getMorphiaDatastore().delete( account );
+        ServerImplementation.getImplementation().getCacheManager().deleteAccount( account );
+    }
+
 }

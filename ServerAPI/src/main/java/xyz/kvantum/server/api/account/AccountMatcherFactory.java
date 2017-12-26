@@ -19,11 +19,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation.example;
+package xyz.kvantum.server.api.account;
 
-public interface Example
+import xyz.kvantum.server.api.repository.Matcher;
+import xyz.kvantum.server.api.repository.MatcherFactory;
+
+/**
+ * Factory class for {@link AccountMatcher}
+ */
+public final class AccountMatcherFactory<A extends IAccount, B extends IAccount> implements MatcherFactory<A, B>
 {
 
-    void initExample();
+    @Override
+    public Matcher<? extends A, ? super B> createMatcher(A queryObject)
+    {
+        return new AccountMatcher<>( queryObject );
+    }
 
 }

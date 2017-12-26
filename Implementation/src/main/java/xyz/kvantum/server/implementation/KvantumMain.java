@@ -30,7 +30,6 @@ import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.util.RequestManager;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
-import xyz.kvantum.server.implementation.example.Examples;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -126,10 +125,6 @@ final public class KvantumMain
                 {
                     CoreConfig.port = options.port;
                 }
-                if ( !options.example.isEmpty() )
-                {
-                    Examples.loadExample( options.example );
-                }
                 try
                 {
                     server.get().start();
@@ -196,9 +191,6 @@ final public class KvantumMain
 
         @Parameter(names = "-debug", description = "Enable debugging")
         private String debug = "";
-
-        @Parameter(names = "-example", description = "Run an example view. Current examples: usersearch")
-        private String example = "";
 
     }
 }

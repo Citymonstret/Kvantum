@@ -57,6 +57,7 @@ public final class ExampleServer
             new HelloWorld(); // Initialize Hello World examples
             new ExampleLogin(); // Initialize the login example
             new ExampleSession();
+            new ExampleSearch();
             serverOptional.get().start();
             Logger.info( "Server started successfully!" );
         } else

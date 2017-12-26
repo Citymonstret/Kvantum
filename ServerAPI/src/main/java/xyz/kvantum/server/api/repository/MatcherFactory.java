@@ -19,18 +19,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation;
+package xyz.kvantum.server.api.repository;
 
-import xyz.kvantum.server.api.session.ISession;
-import xyz.kvantum.server.api.session.ISessionCreator;
-
-final class SessionFactory implements ISessionCreator
+/**
+ * Factory class for {@link Matcher} instances
+ *
+ * @param <Q> Query Type
+ * @param <V> Value type
+ */
+@FunctionalInterface
+public interface MatcherFactory<Q, V>
 {
 
-    @Override
-    public ISession createSession()
-    {
-        return new Session();
-    }
+    /**
+     * Create a new {@link Matcher} instance
+     *
+     * @param queryObject Query object
+     * @return Matcher instance
+     */
+    Matcher<? extends Q, ? super V> createMatcher(final Q queryObject);
 
 }

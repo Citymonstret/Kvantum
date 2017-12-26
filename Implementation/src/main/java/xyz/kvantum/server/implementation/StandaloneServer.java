@@ -318,6 +318,7 @@ public final class StandaloneServer extends SimpleServer
     }
 
     @SneakyThrows
+    @SuppressWarnings("unused")
     private <T> void emit(@NonNull final T event)
     {
         this.getEventBus().emit( event );

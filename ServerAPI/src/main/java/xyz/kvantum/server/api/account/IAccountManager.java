@@ -21,17 +21,20 @@
  */
 package xyz.kvantum.server.api.account;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
+import lombok.NonNull;
 import org.mindrot.jbcrypt.BCrypt;
 import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.account.roles.defaults.Administrator;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
+import xyz.kvantum.server.api.repository.KvantumRepository;
+import xyz.kvantum.server.api.repository.Matcher;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.util.ApplicationStructure;
-import xyz.kvantum.server.api.util.SearchResultProvider;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  */
 @SuppressWarnings("unused")
-public interface IAccountManager extends SearchResultProvider<IAccount, IAccount>
+public interface IAccountManager extends KvantumRepository<IAccount, Integer>
 {
 
     String SESSION_ACCOUNT_CONSTANT = "__user_id__";
@@ -168,6 +171,13 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
     void loadData(IAccount account);
 
     /**
+     * Delete an account from the database
+     *
+     * @param account Account to be deleted
+     */
+    void deleteAccount(IAccount account);
+
+    /**
      * Check if the admin account is created, otherwise a new admin account will be created
      * with credentials:
      * <ul>
@@ -198,52 +208,11 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
     }
 
     /**
-     * Search for an account in the account database by
-     * comparing either user ID or username (or both)
-     *
-     * @param searchQuery Query containing the information
-     *                    that will be compared
-     * @return Optional
-     */
-    default Optional<IAccount> searchForAccount(final IAccount searchQuery)
-    {
-        boolean searchId = searchQuery.getId() != -1;
-        boolean searchUsername = searchQuery.getUsername() != null &&
-                searchQuery.getUsername() != null &&
-                !searchQuery.getUsername().isEmpty() &&
-                !"null".equals( searchQuery.getUsername() );
-        if ( searchId )
-        {
-            final Optional<IAccount> returnOptional = getAccount( searchQuery.getId() );
-            if ( returnOptional.isPresent() )
-            {
-                return returnOptional;
-            }
-        }
-        if ( searchUsername )
-        {
-            final Optional<IAccount> returnOptional = getAccount( searchQuery.getUsername() );
-            if ( returnOptional.isPresent() )
-            {
-                return returnOptional;
-            }
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    default Collection<? extends IAccount> getResults(final IAccount query)
-    {
-        final Optional<IAccount> accountOptional = searchForAccount( query );
-        return accountOptional.<Collection<? extends IAccount>>map( Collections::singletonList ).orElseGet( Collections::emptyList );
-    }
-
-    /**
      * Register an account role
      *
      * @param role Role instance
      */
-    default void registerAccountRole(final AccountRole role)
+    default void registerAccountRole(@NonNull final AccountRole role)
     {
         this.ROLE_MAP.put( role.getRoleIdentifier(), role );
     }
@@ -255,7 +224,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
      */
     default Collection<AccountRole> getRegisteredAccountRoles()
     {
-        return this.ROLE_MAP.values();
+        return ImmutableList.copyOf( this.ROLE_MAP.values() );
     }
 
     /**
@@ -264,7 +233,7 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
      * @param roleIdentifier Role identifier ({@link AccountRole#getRoleIdentifier()})
      * @return Optional
      */
-    default Optional<AccountRole> getAccountRole(final String roleIdentifier)
+    default Optional<AccountRole> getAccountRole(@NonNull final String roleIdentifier)
     {
         if ( this.ROLE_MAP.containsKey( roleIdentifier ) )
         {
@@ -273,4 +242,48 @@ public interface IAccountManager extends SearchResultProvider<IAccount, IAccount
         return Optional.empty();
     }
 
+    @Override
+    default ImmutableList<? extends IAccount> findAllById(@NonNull final Collection<Integer> collection)
+    {
+        final ImmutableList.Builder<IAccount> builder = ImmutableList.builder();
+        collection.stream().map( this::getAccount ).filter( Optional::isPresent ).map( Optional::get )
+                .forEach( builder::add );
+        return builder.build();
+    }
+
+    @Override
+    default ImmutableList<? extends IAccount> findAllByQuery(@NonNull final Matcher<?, ? super IAccount> matcher)
+    {
+        final ImmutableList.Builder<IAccount> builder = ImmutableList.builder();
+        findAll().stream().filter( matcher::matches ).forEach( builder::add );
+        return builder.build();
+    }
+
+    @Override
+    default ImmutableCollection<? extends IAccount> save(@NonNull final Collection<? extends IAccount> collection)
+    {
+        final ImmutableList.Builder<IAccount> builder = ImmutableList.builderWithExpectedSize( collection.size() );
+        collection.stream().map( this::createAccount ).filter( Optional::isPresent ).map( Optional::get )
+                .forEach( builder::add );
+        return builder.build();
+    }
+
+    @Override
+    default void delete(@NonNull final Collection<IAccount> collection)
+    {
+        collection.forEach( this::deleteAccount );
+    }
+
+    @Override
+    default Optional<? extends IAccount> findSingle(@NonNull final Integer identifier)
+    {
+        return this.getAccount( identifier );
+    }
+
+    @Override
+    default ImmutableCollection<? extends IAccount> findAll(@NonNull final Integer identifier)
+    {
+        final Optional<? extends IAccount> optional = findSingle( identifier );
+        return optional.<ImmutableCollection<? extends IAccount>>map( ImmutableList::of ).orElseGet( ImmutableList::of );
+    }
 }

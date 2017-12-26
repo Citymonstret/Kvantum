@@ -37,9 +37,10 @@ public interface ICacheManager
 
     /**
      * Get the file content for a cached Crush <pre>{{include}}</pre> file
+     *
      * @param file File
      * @return null if the file is not stored in the cache, otherwise
-     *         the file content
+     * the file content
      */
     String getCachedInclude(String file);
 
@@ -55,6 +56,7 @@ public interface ICacheManager
 
     /**
      * Get a cached account ID, if it is stored in the cache
+     *
      * @param username Account username
      * @return Account ID if it is stored
      */
@@ -62,12 +64,21 @@ public interface ICacheManager
 
     /**
      * Save an account to the cache
+     *
      * @param account Account to save
      */
     void setCachedAccount(IAccount account);
 
     /**
+     * Remove an account from the cache
+     *
+     * @param account Account to be removed
+     */
+    void deleteAccount(IAccount account);
+
+    /**
      * Get a cached file from the cache, if is stored
+     *
      * @param file File name
      * @return File, if it stored
      */
@@ -75,7 +86,8 @@ public interface ICacheManager
 
     /**
      * Save an account to the cache
-     * @param file File name
+     *
+     * @param file    File name
      * @param content File content
      */
     void setCachedFile(Path file, CachedFile content);
@@ -120,5 +132,4 @@ public interface ICacheManager
      * @param path File to remove
      */
     void removeFileCache(Path path);
-
 }

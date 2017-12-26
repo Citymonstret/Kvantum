@@ -115,7 +115,8 @@ public final class Session implements ISession, VariableProvider
 
     @Override
     @SuppressWarnings("ALL")
-    public <T> T getOrCompute(String key, Function<String, ? extends T> function)
+    public <T> T getOrCompute(@NonNull final String key,
+                              @NonNull final Function<String, ? extends T> function)
     {
         final T object;
         if ( !this.contains( key ) )

@@ -19,35 +19,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation.example;
+package xyz.kvantum.server.api.repository;
 
-import lombok.experimental.UtilityClass;
-import xyz.kvantum.server.api.logging.Logger;
+import java.util.Collection;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-@UtilityClass
-public class Examples
+@FunctionalInterface
+public interface Sorter<T>
 {
 
-    private static Map<String, Example> exampleMap = new HashMap<>();
-
-    static
-    {
-        exampleMap.put( "usersearch", new UserSearchExample() );
-    }
-
-    public static void loadExample(final String input)
-    {
-        if ( exampleMap.containsKey( input.toLowerCase( Locale.ENGLISH ) ) )
-        {
-            exampleMap.get( input.toLowerCase( Locale.ENGLISH ) ).initExample();
-        } else
-        {
-            Logger.error( "Unknown example: \"{}\"", input );
-        }
-    }
+    /**
+     * Sort a given collection and return a new collection.
+     * This is because it is assumed that all given collections
+     * are immutable.
+     *
+     * @param collection Collection to be sorted
+     * @return Sorted collection
+     */
+    <C extends Collection<? extends T>> C sort(C collection);
 
 }
