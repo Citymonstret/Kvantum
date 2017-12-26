@@ -82,7 +82,7 @@ class ExampleSession
             this.visits = 0;
         }
 
-        public synchronized int increment()
+        private synchronized int increment()
         {
             return ++visits;
         }

@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.matching;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.exceptions.NotImplementedException;
@@ -64,7 +65,7 @@ public abstract class Router
      *
      * @param handlers RequestHandlers that are to be registered
      */
-    public final void addAll(final Collection<? extends RequestHandler> handlers)
+    public final void addAll(@NonNull final Collection<? extends RequestHandler> handlers)
     {
         handlers.forEach( this::add );
     }
@@ -87,12 +88,12 @@ public abstract class Router
      * @param instance Instance to be scanned
      * @return Constructed views
      */
-    public final <T> Collection<? extends RequestHandler> scan(final T instance)
+    public final <T> Collection<? extends RequestHandler> scan(@NonNull final T instance)
     {
         try
         {
             return this.annotatedViewManager.generate( instance );
-        } catch ( Exception e )
+        } catch ( final Exception e )
         {
             e.printStackTrace();
         }

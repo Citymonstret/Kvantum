@@ -41,7 +41,7 @@ final public class UrlEncodedPostRequest extends PostRequest
         String fixedRequest;
         try
         {
-            fixedRequest = URLDecoder.decode( request, StandardCharsets.UTF_8.toString() );
+            fixedRequest = URLDecoder.decode( request, StandardCharsets.US_ASCII.toString() );
         } catch ( final Exception e )
         {
             if ( CoreConfig.debug )
