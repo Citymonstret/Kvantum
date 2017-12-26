@@ -42,7 +42,8 @@ public final class AccountMatcher<A extends IAccount, B extends IAccount> extend
     }
 
     @Override
-    protected boolean matches(@NonNull final A query, @NonNull final B value)
+    protected boolean matches(@NonNull final A query,
+                              @NonNull final B value)
     {
         return query.getUsername().equalsIgnoreCase( value.getUsername() )
                 || query.getId() == value.getId();

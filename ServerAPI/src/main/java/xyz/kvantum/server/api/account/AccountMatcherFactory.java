@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.account;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.repository.Matcher;
 import xyz.kvantum.server.api.repository.MatcherFactory;
 
@@ -31,7 +32,7 @@ public final class AccountMatcherFactory<A extends IAccount, B extends IAccount>
 {
 
     @Override
-    public Matcher<? extends A, ? super B> createMatcher(A queryObject)
+    public Matcher<? extends A, ? super B> createMatcher(@NonNull final A queryObject)
     {
         return new AccountMatcher<>( queryObject );
     }
