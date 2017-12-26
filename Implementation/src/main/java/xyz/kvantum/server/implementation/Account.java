@@ -40,6 +40,7 @@ import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumInsert;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
+import xyz.kvantum.server.api.pojo.Ignore;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.util.Assert;
@@ -126,6 +127,7 @@ public final class Account implements IAccount
     }
 
     @Override
+    @Ignore
     public Map<String, String> getRawData()
     {
         return new HashMap<>( data );
@@ -179,6 +181,7 @@ public final class Account implements IAccount
     }
 
     @Override
+    @Ignore
     public Collection<AccountRole> getAccountRoles()
     {
         if ( this.roleList == null )

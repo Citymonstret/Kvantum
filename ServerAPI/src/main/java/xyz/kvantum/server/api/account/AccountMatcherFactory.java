@@ -22,11 +22,12 @@
 package xyz.kvantum.server.api.account;
 
 import lombok.NonNull;
+import xyz.kvantum.server.api.repository.FieldComparator;
 import xyz.kvantum.server.api.repository.Matcher;
 import xyz.kvantum.server.api.repository.MatcherFactory;
 
 /**
- * Factory class for {@link AccountMatcher}
+ * Factory class for {@link FieldComparator}
  */
 public final class AccountMatcherFactory<A extends IAccount, B extends IAccount> implements MatcherFactory<A, B>
 {
@@ -34,7 +35,7 @@ public final class AccountMatcherFactory<A extends IAccount, B extends IAccount>
     @Override
     public Matcher<? extends A, ? super B> createMatcher(@NonNull final A queryObject)
     {
-        return new AccountMatcher<>( queryObject );
+        return new FieldComparator<>( queryObject, true, true );
     }
 
 }

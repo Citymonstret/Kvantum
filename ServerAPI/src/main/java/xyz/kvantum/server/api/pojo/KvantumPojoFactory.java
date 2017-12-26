@@ -29,6 +29,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +72,11 @@ public final class KvantumPojoFactory<Object>
         {
             final String prefix;
             boolean getter = false;
+
+            if ( Modifier.isStatic( method.getModifiers() ) || method.getAnnotation( Ignore.class ) != null )
+            {
+                continue;
+            }
 
             if ( method.getName().startsWith( "is" ) )
             {
@@ -116,7 +122,7 @@ public final class KvantumPojoFactory<Object>
             {
                 try
                 {
-                    getterBuilder.put( name, new PojoGetter<>( LambdaFactory.create( method ),
+                    getterBuilder.put( name, new PojoGetter<>( name, LambdaFactory.create( method ),
                             method.getReturnType() ) );
                 } catch ( final Throwable throwable )
                 {

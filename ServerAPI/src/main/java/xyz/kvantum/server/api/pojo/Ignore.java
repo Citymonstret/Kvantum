@@ -19,33 +19,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.account;
+package xyz.kvantum.server.api.pojo;
 
-import lombok.NonNull;
-import xyz.kvantum.server.api.repository.Matcher;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * Matcher that matches account queries (often generated using
- * {@link xyz.kvantum.server.api.orm.KvantumObjectFactory}
- * <p>
- * Instances are built using {@link AccountMatcherFactory}
- *
- * @param <A> Query Type
- * @param <B> Value type
- */
-public final class AccountMatcher<A extends IAccount, B extends IAccount> extends Matcher<A, B>
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Ignore
 {
 
-    AccountMatcher(@NonNull final A queryObject)
-    {
-        super( queryObject );
-    }
-
-    @Override
-    protected boolean matches(@NonNull final A query,
-                              @NonNull final B value)
-    {
-        return query.getUsername().equalsIgnoreCase( value.getUsername() )
-                || query.getId() == value.getId();
-    }
 }
