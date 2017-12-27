@@ -24,6 +24,9 @@ package xyz.kvantum.server.api.views.requesthandler;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Setter;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.matching.ViewPattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -98,7 +101,7 @@ public class SimpleRequestHandler extends RequestHandler
 
     public final SimpleRequestHandler addToRouter(final Router router)
     {
-        return (SimpleRequestHandler) router.add( this );
+        return router.add( this );
     }
 
     protected ViewPattern getPattern()
@@ -122,12 +125,22 @@ public class SimpleRequestHandler extends RequestHandler
         final HttpMethod requestMethod = request.getQuery().getMethod();
         if ( this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod )
         {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Invalid http method {0}, expected {1} for request {2} in handler {3}",
+                        requestMethod, this.httpMethod, request, this );
+            }
             return false;
         }
         final Map<String, String> map = getPattern().matches( request.getQuery().getFullRequest() );
         if ( map != null )
         {
             request.addMeta( "variables", map );
+        } else if ( CoreConfig.debug )
+        {
+            ServerImplementation.getImplementation().log( "Request: '{0}' failed to " +
+                            "pass '{1}'", request.getQuery().getFullRequest(),
+                    getPattern().toString() );
         }
         return map != null;
     }

@@ -27,6 +27,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.views.View;
 
@@ -76,10 +77,10 @@ public class Error extends View
         template = path.readFile();
     }
 
-    private final int code;
+    private final AsciiString code;
     private final String desc;
 
-    Error(final int code, final String desc)
+    Error(final AsciiString code, final String desc)
     {
         super( "/", "error" );
         this.code = code;
@@ -95,8 +96,11 @@ public class Error extends View
     @Override
     public Response generate(final AbstractRequest r)
     {
-        return new Response().setContent( template.replace( "{{code}}", code + "" ).replace( "{{message}}", desc )
-                .replace( "{{path}}", r.getQuery().getFullRequest() ) );
+        final Response response = new Response().setContent( template.replace( "{{code}}",
+                code + "" ).replace( "{{message}}", desc ).replace( "{{path}}",
+                r.getQuery().getFullRequest() ) );
+        response.getHeader().setStatus( code );
+        return response;
     }
 
 }

@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.views.errors;
 
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.response.Header;
 
 /**
  * Created 2015-04-19 for Kvantum
@@ -33,7 +34,7 @@ public class View404 extends xyz.kvantum.server.api.views.errors.Error
 
     private View404(final String url)
     {
-        super( 404, "Not Found: " + url );
+        super( Header.STATUS_NOT_FOUND, "Not Found: " + url );
     }
 
     public static View404 construct(final String url)

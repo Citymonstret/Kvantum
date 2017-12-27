@@ -76,7 +76,8 @@ public class RequestCompiler
             throw new RequestException( "Unknown request method: " + matcher.group( "method" ),
                     request );
         }
-        request.setQuery( new AbstractRequest.Query( methodOptional.get(), matcher.group( "resource" ) ) );
+        request.setQuery( new AbstractRequest.Query( methodOptional.get(),
+                request.getProtocolType(), matcher.group( "resource" ) ) );
     }
 
     @Getter

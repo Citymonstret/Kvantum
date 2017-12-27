@@ -105,8 +105,14 @@ final public class RequestManager extends Router
     public RequestHandler match(final AbstractRequest request)
     {
         Assert.isValid( request );
-        final Optional<RequestHandler> view = LambdaUtil.getFirst( views, request.matches );
-        return view.orElseGet( () -> error404Generator.generate( request ) );
+        for ( final RequestHandler handler : this.views )
+        {
+            if ( handler.matches( request ) )
+            {
+                return handler;
+            }
+        }
+        return error404Generator.generate( request );
     }
 
     @Override

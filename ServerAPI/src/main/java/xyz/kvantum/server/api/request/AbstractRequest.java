@@ -30,6 +30,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.request.post.PostRequest;
@@ -45,7 +46,6 @@ import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.Validatable;
 import xyz.kvantum.server.api.util.VariableHolder;
 import xyz.kvantum.server.api.util.VariableProvider;
-import xyz.kvantum.server.api.views.RequestHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -57,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * The HTTP Request Class
@@ -85,7 +84,6 @@ public abstract class AbstractRequest implements
     public static final String INTERNAL_REDIRECT = "internalRedirect";
     public static final String ALTERNATE_OUTCOME = "alternateOutcome";
 
-    final public Predicate<RequestHandler> matches = view -> view.matches( this );
     public Set<ResponseCookie> postponedCookies = new HashSet<>();
     @Setter(AccessLevel.PROTECTED)
     @Getter
@@ -355,11 +353,25 @@ public abstract class AbstractRequest implements
          * @param method   Request Method
          * @param resource The requested resource
          */
-        public Query(final HttpMethod method, final String resource)
+        public Query(final HttpMethod method, final ProtocolType protocolType, final String resource)
         {
             Assert.notNull( method, resource );
 
             String resourceName = resource;
+
+            final String illegalBeginning = protocolType == ProtocolType.HTTP ? "http" : "https";
+
+            if ( resourceName.startsWith( illegalBeginning ) )
+            {
+                // For some reason the request has been parsed as http://hostname:port/resource
+                // rather than /resource, let's fix that
+                // We start by calculating the number of characters to be ignored in the split
+                // which is http or https + "://"
+                final int ignoredChars = illegalBeginning.length() + 3;
+                // We'll now split hostname:port/resource into
+                // hostname + resource
+                resourceName = StringUtils.split( resourceName.substring( ignoredChars ), "/", 2 )[ 1 ];
+            }
 
             this.method = method;
             if ( resourceName.contains( "?" ) )

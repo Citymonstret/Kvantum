@@ -65,6 +65,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
                 return true;
             }
         }
+
         return false;
     }
 

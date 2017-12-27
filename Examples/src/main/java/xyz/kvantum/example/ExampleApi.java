@@ -1,0 +1,82 @@
+/*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
+ *    Copyright (C) 2017 IntellectualSites
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package xyz.kvantum.example;
+
+import xyz.kvantum.example.object.FileContext;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.orm.KvantumObjectFactory;
+import xyz.kvantum.server.api.orm.KvantumObjectParserResult;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.response.Header;
+import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.util.ParameterScope;
+import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
+
+import java.util.Collection;
+import java.util.Collections;
+
+/**
+ * Simple REST gateway for https://github.com/Sauilitired/FileServer
+ */
+@SuppressWarnings("unused")
+public class ExampleApi
+{
+
+    private final KvantumObjectFactory<FileContext> factory = KvantumObjectFactory.from( FileContext.class );
+    private final Collection<String> tokens;
+
+    ExampleApi()
+    {
+        ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
+        this.tokens = Collections.singletonList( "randomtokenhere" );
+    }
+
+    @ViewMatcher(filter = "file/update")
+    public void onFileUpdate(final AbstractRequest request, final Response response)
+    {
+        final KvantumObjectParserResult<FileContext> result = factory.build( ParameterScope.POST )
+                .parseRequest( request );
+        if ( result.isSuccess() )
+        {
+            final FileContext attempt = result.getParsedObject();
+            if ( !tokens.contains( attempt.getToken() ) )
+            {
+                Logger.error( "Invalid file update request (Could not Authenticate)" );
+                response.getHeader().setStatus( Header.STATUS_ACCESS_DENIED );
+                response.setContent( "Invalid access token..." );
+            } else
+            {
+                Logger.info( "File update: " + attempt.getName() );
+                Logger.info( "File update type: " + attempt.getType() );
+                response.getHeader().setStatus( Header.STATUS_OK );
+                response.setContent( "File change accepted" );
+            }
+        } else
+        {
+            Logger.error( "Invalid file update request (Cannot Parse)" );
+            response.getHeader().setStatus( Header.STATUS_BAD_REQUEST );
+            response.setContent( "Not a valid request..." );
+        }
+    }
+
+}

@@ -406,6 +406,11 @@ public class View extends RequestHandler
         final HttpMethod requestMethod = request.getQuery().getMethod();
         if ( this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod )
         {
+            if ( CoreConfig.debug )
+            {
+                Logger.debug( "Invalid http method {0}, expected {1} for request {2} in handler {3}",
+                        requestMethod, this.httpMethod, request, this );
+            }
             return false;
         }
 
@@ -417,8 +422,8 @@ public class View extends RequestHandler
 
         if ( CoreConfig.debug && map == null )
         {
-            ServerImplementation.getImplementation().log( "Request: '{}' failed to " +
-                            "pass '{}'", request.getQuery().getFullRequest(),
+            ServerImplementation.getImplementation().log( "Request: '{0}' failed to " +
+                            "pass '{1}'", request.getQuery().getFullRequest(),
                     viewPattern.toString() );
         }
 

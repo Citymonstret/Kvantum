@@ -79,7 +79,7 @@ final public class Request extends AbstractRequest
         request.setPostRequest( this.getPostRequest() );
         request.getHeaders().putAll( this.getHeaders() );
         request.setSocket( this.getSocket() );
-        request.setQuery( new Query( HttpMethod.GET, query ) );
+        request.setQuery( new Query( HttpMethod.GET, this.getProtocolType(), query ) );
         request.getMeta().putAll( this.getMeta() );
         request.setCookies( this.getCookies() );
         request.setProtocolType( this.getProtocolType() );
