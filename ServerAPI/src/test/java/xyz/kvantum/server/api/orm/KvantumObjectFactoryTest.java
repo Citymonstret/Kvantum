@@ -32,6 +32,7 @@ import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.util.ParameterScope;
+import xyz.kvantum.server.api.util.ProtocolType;
 
 class KvantumObjectFactoryTest
 {
@@ -43,7 +44,7 @@ class KvantumObjectFactoryTest
         // Make sure that the request is parsed successfully
         //
         final KvantumObjectFactory<MockObject> factory = KvantumObjectFactory.from( MockObject.class );
-        MockRequest mockRequest = new MockRequest( new AbstractRequest.Query( HttpMethod.POST,
+        MockRequest mockRequest = new MockRequest( new AbstractRequest.Query( HttpMethod.POST, ProtocolType.HTTP,
                 "/?koala=animal" ) );
         KvantumObjectParserResult<MockObject> result = factory.build( ParameterScope.GET )
                 .parseRequest( mockRequest );
@@ -58,7 +59,7 @@ class KvantumObjectFactoryTest
         //
         // Test if the validation fails (minimum size of string1 is 2, but provided string size is 1)
         //
-        mockRequest = new MockRequest( new AbstractRequest.Query( HttpMethod.POST, "/?koala=a" ) );
+        mockRequest = new MockRequest( new AbstractRequest.Query( HttpMethod.POST, ProtocolType.HTTP, "/?koala=a" ) );
         result = factory.build( ParameterScope.GET ).parseRequest( mockRequest );
         Assertions.assertNotNull( result );
         Assertions.assertFalse( result.isSuccess() );
