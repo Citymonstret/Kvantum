@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.util;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
@@ -93,6 +94,17 @@ public final class CollectionUtil
             }
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * Compat utility. Use {@link StringList} directly instead.
+     *
+     * @deprecated Use {@link StringList}
+     */
+    @Deprecated
+    public static Collection<String> toStringCollection(@Nullable final String stringList)
+    {
+        return new StringList( stringList );
     }
 
     /**
