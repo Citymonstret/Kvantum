@@ -66,6 +66,7 @@ final public class RequestManager extends Router
      * @param view The view to register
      */
     @Override
+    @SuppressWarnings("all")
     public RequestHandler add(@NonNull final RequestHandler view)
     {
         //

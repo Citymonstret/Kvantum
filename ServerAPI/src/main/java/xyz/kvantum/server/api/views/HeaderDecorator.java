@@ -25,6 +25,12 @@ import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 
+/**
+ * {@link Decorator} implementation that specifically
+ * decorates {@link Header headers}.
+ * <p>
+ * Extended by {@link xyz.kvantum.server.api.views.decorators.CacheDecorator}
+ */
 public abstract class HeaderDecorator implements Decorator
 {
 

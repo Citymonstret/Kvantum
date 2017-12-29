@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
+import java.util.function.Supplier;
+
 /**
  * A provider is any object that can provide an item.
  * Providers do not have to provide the same object
@@ -29,7 +31,7 @@ package xyz.kvantum.server.api.util;
  * @param <T> Type that the provider provides
  */
 @FunctionalInterface
-public interface Provider<T>
+public interface Provider<T> extends Supplier<T>
 {
 
     /**
@@ -38,4 +40,9 @@ public interface Provider<T>
      */
     T provide();
 
+    @Override
+    default T get()
+    {
+        return this.provide();
+    }
 }

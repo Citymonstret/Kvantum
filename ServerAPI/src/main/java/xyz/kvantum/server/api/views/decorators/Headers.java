@@ -30,8 +30,8 @@ import xyz.kvantum.server.api.views.HeaderDecorator;
 import java.util.Map;
 
 /**
- * Decorator that will apply a set of headers
- * to a request
+ * {@link xyz.kvantum.server.api.views.Decorator} that will apply a
+ * set of {@link HeaderOption}-{@link String} pairs to a {@link Header}
  */
 public final class Headers extends HeaderDecorator
 {
@@ -39,7 +39,7 @@ public final class Headers extends HeaderDecorator
     private final Map<HeaderOption, String> headers;
 
     @SuppressWarnings("WeakerAccess")
-    public Headers(final Map<HeaderOption, String> headers)
+    public Headers(@NonNull final Map<HeaderOption, String> headers)
     {
         this.headers = ImmutableMap.copyOf( headers );
     }

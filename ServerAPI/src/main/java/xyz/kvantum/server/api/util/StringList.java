@@ -33,7 +33,8 @@ import java.util.StringTokenizer;
  * Represents a list of strings, that is stored inside of a string,
  * with the format: string1,string2,string3,string4...
  */
-public final class StringList implements Iterable<String>
+@SuppressWarnings("unused")
+public final class StringList implements Collection<String>, AsciiStringable
 {
 
     private final Collection<String> content;
@@ -67,6 +68,22 @@ public final class StringList implements Iterable<String>
         return this.content.remove( string );
     }
 
+    public boolean addAll(@Nullable final String string)
+    {
+        if ( string != null && !string.isEmpty() )
+        {
+            final StringTokenizer tokenizer = new StringTokenizer( string, "," );
+            while ( tokenizer.hasMoreTokens() )
+            {
+                if ( !this.content.add( tokenizer.nextToken() ) )
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Add an item to the list
      *
@@ -76,6 +93,46 @@ public final class StringList implements Iterable<String>
     public boolean add(@NonNull final String string)
     {
         return this.content.add( string );
+    }
+
+    @Override
+    public boolean remove(@NonNull final Object o)
+    {
+        return o instanceof String && this.remove( (String) o );
+    }
+
+    @Override
+    @SuppressWarnings("ALL")
+    public boolean containsAll(@NonNull final Collection<?> collection)
+    {
+        return this.content.containsAll( collection );
+    }
+
+    @Override
+    @SuppressWarnings("ALL")
+    public boolean addAll(@NonNull final Collection<? extends String> collection)
+    {
+        return this.content.addAll( collection );
+    }
+
+    @Override
+    @SuppressWarnings("ALL")
+    public boolean removeAll(@NonNull final Collection<?> collection)
+    {
+        return this.content.removeAll( collection );
+    }
+
+    @Override
+    @SuppressWarnings("ALL")
+    public boolean retainAll(@NonNull final Collection<?> collection)
+    {
+        return this.content.retainAll( collection );
+    }
+
+    @Override
+    public void clear()
+    {
+        this.content.clear();
     }
 
     /**
@@ -99,6 +156,30 @@ public final class StringList implements Iterable<String>
         return CollectionUtil.join( this.content, "," );
     }
 
+    @Override
+    public AsciiString toAsciiString()
+    {
+        return AsciiString.of( this.toString(), false );
+    }
+
+    @Override
+    public int size()
+    {
+        return this.content.size();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return this.content.isEmpty();
+    }
+
+    @Override
+    public boolean contains(@NonNull final Object o)
+    {
+        return o instanceof String && this.contains( (String) o );
+    }
+
     /**
      * Provide the item iterator. Delegate for {@link ArrayList#iterator()}
      * @return list iterator
@@ -107,5 +188,18 @@ public final class StringList implements Iterable<String>
     public Iterator<String> iterator()
     {
         return this.content.iterator();
+    }
+
+    @Override
+    public Object[] toArray()
+    {
+        return this.content.toArray();
+    }
+
+    @Override
+    @SuppressWarnings("ALL")
+    public <T> T[] toArray(@NonNull final T[] ts)
+    {
+        return this.content.toArray( ts );
     }
 }

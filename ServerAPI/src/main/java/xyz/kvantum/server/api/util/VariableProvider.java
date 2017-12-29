@@ -33,8 +33,6 @@ import java.util.Map;
  * }
  * </pre>
  * whereas the name would be the variable key
- *
- * @author Citymonstret
  */
 public interface VariableProvider
 {
