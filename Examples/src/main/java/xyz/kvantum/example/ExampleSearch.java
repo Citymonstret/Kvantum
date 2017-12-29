@@ -26,7 +26,8 @@ import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ParameterScope;
-import xyz.kvantum.server.api.views.rest.service.SearchService;
+import xyz.kvantum.server.api.views.rest.service.KvantumSearchService;
+import xyz.kvantum.server.api.views.rest.service.RSQLSearchService;
 import xyz.kvantum.server.implementation.Account;
 
 class ExampleSearch
@@ -37,15 +38,50 @@ class ExampleSearch
         Logger.info( "" );
         Logger.info( "INITIALIZING EXAMPLE: UserSearch" );
 
-        SearchService.<Account, IAccount>builder()
+        // GET /search?username=admin
+        // RESULT:
+        // {
+        //      "status": "success"
+        //      "query": {
+        //          "id": -1,
+        //          "username": "admin"
+        //      }
+        //      "result": [
+        //        {
+        //          "id": 1,
+        //          "username: "admin"
+        //        }
+        //      ]
+        // }
+        KvantumSearchService.<Account, IAccount>builder()
                 .filter( "search" )
                 .queryObjectType( Account.class )
                 .resultProvider( ServerImplementation.getImplementation().getApplicationStructure().getAccountManager() )
                 .matcher( new AccountMatcherFactory<>() )
-                .parameterScope( ParameterScope.GET ).build().registerHandler();
+                .parameterScope( ParameterScope.GET ).build().createService();
+
+        // GET /rsqlsearch?query=id=lt=30
+        // RESULT:
+        // {
+        //      "status": "success"
+        //      "query": "id=lt=30",
+        //      "result": [
+        //        {
+        //          "id": 1,
+        //          "username: "admin"
+        //        }
+        //      ]
+        // }
+        RSQLSearchService.<IAccount>builder()
+                .filter( "rsqlsearch" )
+                .parameterScope( ParameterScope.GET )
+                .resultProvider( ServerImplementation.getImplementation().getApplicationStructure().getAccountManager() )
+                .queryKey( "query" ).build().createService();
 
         Logger.info( "ACCESS THE EXAMPLE AT: /search?username=<username>&id=<id>" );
+        Logger.info( "AND: /rsqlsearch?query=<query>" );
         Logger.info( "EXAMPLE: /search?username=admin" );
+        Logger.info( "EXAMPLE: /rsqlsearch?query=id=lt=30" );
         Logger.info( "" );
     }
 

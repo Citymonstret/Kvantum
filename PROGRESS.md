@@ -73,8 +73,9 @@ Kvantum allows views/request handlers to be defined through:
 Kvantum comes with some utilities and rest based views to allow the creation of REST based APIs
 * Utility to autogenerate response for invalid requests (missing parameters)
 * Auto-serving of JSON content through REST Handlers
-* Utilities for static REST microservices using the Kvantum ORM system:
-    * Automatic datastore search: Rest#createSearch
+* Utilities for REST services & microservices using the Kvantum ORM and POJO systems
+* Repository search system (Springlike)
+* Support for RSQL (Rest-Query-Engine)
 
 #### 2.4 Template Engine Support
 Kvantum provides support for the following templating engines:

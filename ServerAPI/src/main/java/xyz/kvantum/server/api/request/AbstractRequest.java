@@ -394,7 +394,7 @@ public abstract class AbstractRequest implements
                     resourceName = parts[ 0 ];
                     for ( final String part : subParts )
                     {
-                        final String[] subSubParts = part.split( "=" );
+                        final String[] subSubParts = StringUtils.split( part, "=", 2 );
                         this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
                     }
                 } else

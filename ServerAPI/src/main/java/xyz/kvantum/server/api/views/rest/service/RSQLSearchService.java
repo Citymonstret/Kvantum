@@ -32,53 +32,27 @@ import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.matching.ViewPattern;
-import xyz.kvantum.server.api.orm.KvantumObjectFactory;
 import xyz.kvantum.server.api.repository.KvantumRepository;
 import xyz.kvantum.server.api.repository.MatcherFactory;
+import xyz.kvantum.server.api.repository.RSQLMatcherFactory;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.util.ParameterScope;
-import xyz.kvantum.server.api.util.RequestManager;
 import xyz.kvantum.server.api.views.RequestHandler;
-import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
 import java.util.Collection;
 import java.util.Optional;
 
-/**
- * Create a REST search gateway that will search within a specified datastore for Kvantum
- * objects and automatically serve them via JSON.
- * <p>
- * Example: <pre>{@code
- * Rest.createSearch(
- *    "/search",
- *    Account.class,
- *    ParameterScope.GET,
- *    ServerImplementation.getImplementation().getApplicationStructure().getAccountManager()
- * );}</pre>
- * </p>
- * <p>
- * To limit the API to certain roles/permissions etc, you may just add a Middleware to the request handler.
- * (See {@link RequestHandler#getMiddlewareQueuePopulator()} and
- * {@link Middleware}
- * </p>
- * @param <QueryType> Type used to query objects
- * @param <ObjectType> Object type
- */
 @Getter
 @Builder
-final public class SearchService<QueryType, ObjectType>
+@SuppressWarnings("ALL")
+public final class RSQLSearchService<ObjectType> implements SearchEngine
 {
 
     /**
      * URL Filter ({@link ViewPattern})
      */
     private final String filter;
-
-    /**
-     * Class, must comply to KvantumObject specifications (see {@link KvantumObjectFactory})
-     */
-    private final Class<? extends QueryType> queryObjectType;
 
     /**
      * Provider of search results, i.e {@link IAccountManager}
@@ -88,14 +62,17 @@ final public class SearchService<QueryType, ObjectType>
     /**
      * Matches queries to objects
      */
-    private final MatcherFactory<QueryType, ObjectType> matcher;
-
+    private final MatcherFactory<String, ObjectType> matcher = new RSQLMatcherFactory<>();
+    /**
+     * String that will be used to get the query variable.
+     * Depends on the parameter type set for {@link #parameterScope}.
+     */
+    private final String queryKey;
     /**
      * Whether GET or POST parameters will be used to read the object
      */
     @Builder.Default
     private ParameterScope parameterScope = ParameterScope.GET;
-
     /**
      * Can be used to set a permission that is required for the service to function.
      * (See {@link AccountRole} and
@@ -104,12 +81,8 @@ final public class SearchService<QueryType, ObjectType>
     @Builder.Default
     private String permissionRequirement = "";
 
-    /**
-     * Register the request handler in the server
-     * {@link RequestManager} implementation
-     * @return The created request handler
-     */
-    public RequestHandler registerHandler()
+    @Override
+    public RequestHandler createService()
     {
         return ServerImplementation.getImplementation().createSimpleRequestHandler( filter, ( (request, response) ->
         {
@@ -137,17 +110,35 @@ final public class SearchService<QueryType, ObjectType>
                 }
             }
 
-            final val factory = KvantumObjectFactory.from( queryObjectType ).build( parameterScope );
-            final val result = factory.parseRequest( request );
             response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
-            if ( !result.isSuccess() )
+            final String query;
+            if ( parameterScope == ParameterScope.GET )
             {
-                final JsonObject requestStatus = new JsonObject();
-                requestStatus.add( "message", new JsonPrimitive( result.getError().getCause() ) );
-                response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
-                return;
+                if ( !request.getQuery().getParameters().containsKey( queryKey ) )
+                {
+                    final JsonObject requestStatus = new JsonObject();
+                    requestStatus.add( "message",
+                            new JsonPrimitive( "No value for key " + queryKey + "was found" ) );
+                    response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+                    return;
+                } else
+                {
+                    query = request.getQuery().getParameters().get( queryKey );
+                }
+            } else
+            {
+                if ( !request.getPostRequest().contains( queryKey ) )
+                {
+                    final JsonObject requestStatus = new JsonObject();
+                    requestStatus.add( "message",
+                            new JsonPrimitive( "No value for key " + queryKey + "was found" ) );
+                    response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+                    return;
+                } else
+                {
+                    query = request.getPostRequest().get( queryKey );
+                }
             }
-            final QueryType query = result.getParsedObject();
             final val matcher = getMatcher().createMatcher( query );
             final Collection<? extends ObjectType> queryResult = resultProvider.findAllByQuery( matcher );
             if ( queryResult.isEmpty() )
@@ -155,15 +146,13 @@ final public class SearchService<QueryType, ObjectType>
                 final JsonObject requestStatus = new JsonObject();
                 requestStatus.add( "status", new JsonPrimitive( "error" ) );
                 requestStatus.add( "message", new JsonPrimitive( "No such object" ) );
-                requestStatus.add( "query", ServerImplementation.getImplementation()
-                        .getGson().toJsonTree( query ) );
+                requestStatus.add( "query", new JsonPrimitive( query ) );
                 response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
             } else
             {
                 final JsonObject requestStatus = new JsonObject();
                 requestStatus.add( "status", new JsonPrimitive( "success" ) );
-                requestStatus.add( "query", ServerImplementation.getImplementation()
-                        .getGson().toJsonTree( query ) );
+                requestStatus.add( "query", new JsonPrimitive( query ) );
                 final JsonArray resultArray = new JsonArray();
                 for ( final ObjectType t : queryResult )
                 {

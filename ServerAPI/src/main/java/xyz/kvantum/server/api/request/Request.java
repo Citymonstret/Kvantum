@@ -125,6 +125,7 @@ final public class Request extends AbstractRequest
         {
             builder.entry( "Post Request", "None" );
         }
+        builder.entry( "Get Parameters", this.getQuery().getParameters() );
         builder.entry( "Headers", this.getHeaders() );
         builder.build().collect().forEach( Logger::debug );
     }
