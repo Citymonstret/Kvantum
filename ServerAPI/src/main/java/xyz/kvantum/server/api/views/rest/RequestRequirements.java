@@ -83,7 +83,7 @@ public class RequestRequirements
                 return status;
             }
         }
-        return null;
+        return RequirementStatus.builder().passed( true ).get();
     }
 
     public final static class GetVariableRequirement extends VariableRequirement

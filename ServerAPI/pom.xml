@@ -203,9 +203,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.jline</groupId>
-      <artifactId>jline</artifactId>
-      <version>3.5.1</version>
+        <groupId>com.github.rutledgepaulv</groupId>
+        <artifactId>rest-query-engine</artifactId>
+        <version>0.7.1</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -259,9 +259,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.6</version>
+        <groupId>org.jline</groupId>
+        <artifactId>jline</artifactId>
+        <version>3.5.1</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>

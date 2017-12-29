@@ -54,11 +54,12 @@ public final class ExampleServer
         final Optional<Kvantum> serverOptional = serverContext.create();
         if ( serverOptional.isPresent() )
         {
-            new HelloWorld(); // Initialize Hello World examples
-            new ExampleLogin(); // Initialize the login example
+            new HelloWorld();
+            new ExampleLogin();
             new ExampleSession();
             new ExampleSearch();
             new ExampleApi();
+            new ExampleAccountRegistration();
             serverOptional.get().start();
             Logger.info( "Server started successfully!" );
         } else

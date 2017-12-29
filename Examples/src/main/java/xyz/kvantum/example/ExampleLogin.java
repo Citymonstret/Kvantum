@@ -40,6 +40,8 @@ import java.util.Optional;
  * required fields: username, password
  * <p>
  * Default admin account is Username: admin Password: admin
+ *
+ * For registration, see {@link ExampleAccountRegistration}
  */
 @SuppressWarnings("unused")
 class ExampleLogin

@@ -89,6 +89,7 @@ public class ViewException extends View
         in.printStackTrace( new PrintWriter( sw ) );
         return new Response().setContent( template.replace( "{{path}}", request.getQuery().getResource() ).replace(
                 "{{exception}}", in.toString() ).replace( "{{cause}}", sw.toString().replace( System.getProperty
-                ( "line.separator" ), "<br/>\n" ) ).replace( "{{message}}", in.getMessage() ) );
+                ( "line.separator" ), "<br/>\n" ) ).replace( "{{message}}", in.getMessage() != null ?
+                in.getMessage() : "" ) );
     }
 }

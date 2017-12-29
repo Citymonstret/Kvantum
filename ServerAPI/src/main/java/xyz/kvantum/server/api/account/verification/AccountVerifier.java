@@ -94,7 +94,7 @@ public class AccountVerifier
     @NonNull
     private Verifier<IAccount> internalVerifier;
 
-    protected AccountVerifier()
+    public AccountVerifier()
     {
         final Verifier.VerifierBuilder<IAccount> builder = Verifier.builder();
         builder.nullable( false )
