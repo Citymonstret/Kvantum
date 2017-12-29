@@ -21,12 +21,21 @@
  */
 package xyz.kvantum.server.api.views;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 
+import java.util.function.Function;
+
 @FunctionalInterface
-public interface ViewReturn
+public interface ViewReturn extends Function<AbstractRequest, Response>
 {
+
+    @Override
+    default Response apply(@NonNull final AbstractRequest request)
+    {
+        return get( request );
+    }
 
     Response get(AbstractRequest r);
 

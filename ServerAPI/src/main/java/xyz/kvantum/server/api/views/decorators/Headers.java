@@ -38,6 +38,7 @@ public final class Headers extends HeaderDecorator
 
     private final Map<HeaderOption, String> headers;
 
+    @SuppressWarnings("WeakerAccess")
     public Headers(final Map<HeaderOption, String> headers)
     {
         this.headers = ImmutableMap.copyOf( headers );
@@ -46,6 +47,10 @@ public final class Headers extends HeaderDecorator
     @Override
     public void decorate(@NonNull final Header header)
     {
-        headers.forEach( header::set );
+        //
+        // Only set the header if it isn't already set
+        //
+        headers.entrySet().stream().filter( entry -> !header.hasHeader( entry.getKey() ) )
+                .forEach( entry -> header.set( entry.getKey(), entry.getValue() ) );
     }
 }

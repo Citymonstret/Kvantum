@@ -49,7 +49,7 @@ public final class MapUtil
                                                    @NonNull final Converter<I, O>
             converter)
     {
-        final Map<String, O> output = new HashMap<>();
+        final Map<String, O> output = new HashMap<>( input.size() );
         input.forEach( (key, value) -> output.put( key, converter.convert( value ) ) );
         return output;
     }

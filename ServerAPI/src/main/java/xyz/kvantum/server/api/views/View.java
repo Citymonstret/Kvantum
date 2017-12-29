@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.views;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -50,11 +51,9 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
- * These are the view management classes.
- * Essentially, these are how the server
- * is able to output anything at all!
- *
- * @author Citymonstret
+ * Higher level implementation of {@link RequestHandler} which
+ * primarely focuses on static resource handling. Extended
+ * by {@link StaticFileView}
  */
 @SuppressWarnings("ALL")
 @EqualsAndHashCode(of = "internalName", callSuper = false)
@@ -105,16 +104,24 @@ public class View extends RequestHandler
     @Setter
     private Supplier<FileSystem> fileSystemSupplier = ServerImplementation.getImplementation()::getFileSystem;
 
+    /**
+     * Delegate for {@link #View(String, String, HttpMethod)} with
+     * httpMethod = {@link HttpMethod#ALL}
+     *
+     * @param pattern      View pattern ({@link ViewPattern})
+     * @param internalName A unique internal name
+     */
     public View(final String pattern, final String internalName)
     {
         this( pattern, internalName, HttpMethod.ALL );
     }
 
     /**
-     * The constructor (Without prestored options)
+     * Constructor without prestored options
      *
-     * @param pattern used to decide whether or not to use this view
-     * @see View(String, Map) - This is an alternate constructor
+     * @param pattern      View pattern ({@link ViewPattern})
+     * @param internalName A unique internal name
+     * @param httpMethod   The http method that will be served by this view
      */
     public View(final String pattern, final String internalName, final HttpMethod httpMethod)
     {
@@ -122,11 +129,12 @@ public class View extends RequestHandler
     }
 
     /**
-     * Constructor with prestored options
+     * Delegate for {@link #View(String, String, Map, ViewReturn, HttpMethod)}
+     * with viewReturn = null
      *
-     * @param pattern      Regex pattern that will decide whether or not to use this view
-     * @param internalName The internal (unqiue) view name
-     * @param options      Pre Stored options
+     * @param pattern      View pattern ({@link ViewPattern})
+     * @param internalName A unique internal name
+     * @param options      Pre Stored options (Nullable)
      * @param httpMethod   The http method that this view will serve
      */
     public View(final String pattern,
@@ -137,11 +145,20 @@ public class View extends RequestHandler
         this( pattern, internalName, options, null, httpMethod );
     }
 
-    public View(final String pattern,
-                final String internalName,
-                final Map<String, Object> options,
-                final ViewReturn viewReturn,
-                final HttpMethod httpMethod)
+    /**
+     * Primary constructor
+     *
+     * @param pattern      View pattern ({@link ViewPattern})
+     * @param internalName A unique internal name
+     * @param options      Pre Stored options (Nullable)
+     * @param viewReturn   {@link ViewReturn} which will be used to generate responses (Nullable)
+     * @param httpMethod   The http method that this view will serve
+     */
+    public View(@NonNull final String pattern,
+                @NonNull final String internalName,
+                @Nullable final Map<String, Object> options,
+                @Nullable final ViewReturn viewReturn,
+                @NonNull final HttpMethod httpMethod)
     {
         if ( options == null )
         {
@@ -205,6 +222,13 @@ public class View extends RequestHandler
         return ( (T) options.get( s ) );
     }
 
+    /**
+     * Get an option, if it exists
+     *
+     * @param s   Option key
+     * @param <T> Option type (Casts to this type)
+     * @return Value
+     */
     final public <T> Optional<T> getOptionSafe(final String s)
     {
         Assert.notNull( s );

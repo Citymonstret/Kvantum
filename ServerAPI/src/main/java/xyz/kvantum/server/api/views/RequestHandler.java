@@ -24,8 +24,8 @@ package xyz.kvantum.server.api.views;
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -34,7 +34,6 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.validation.ValidationManager;
-import xyz.kvantum.server.api.views.requesthandler.DebugMiddleware;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueue;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 
@@ -47,55 +46,46 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * A handler which uses an incoming
- * request to generate a response
+ * The lowest-level class in the request handling chain.
+ * Allows for responses to be generated from incoming requests.
+ * The class also contains utilities and managers that allow
+ * for the termination of invalid requests, and to change how they
+ * are handled.
  */
 @EqualsAndHashCode(of = "uniqueId")
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public abstract class RequestHandler
 {
 
     private static final Class[] REQUIRED_PARAMETERS = new Class[]{ AbstractRequest.class, Response.class };
 
+    /**
+     * Manages middleware and produces queues that are then allowed
+     * to act on the request, and possibly terminate it, or redirect
+     * it to other handle methods ({@link #registerAlternateOutcome(String, String)}
+     */
+    @Getter
     private final MiddlewareQueuePopulator middlewareQueuePopulator = new MiddlewareQueuePopulator();
 
+    /**
+     * Manages validators and allows them to terminate the request
+     * based on certain criteria being fulfilled or not
+     */
+    @Getter
     private final ValidationManager validationManager = new ValidationManager();
     private final Map<String, Lambda> alternateOutcomes = new HashMap<>();
     private final String uniqueId = UUID.randomUUID().toString();
     private final Collection<Decorator> decorators = new ArrayList<>();
 
-    {
-        if ( CoreConfig.debug )
-        {
-            ServerImplementation.getImplementation().log( "Adding DebugMiddleware to SimpleRequestHandler" );
-            this.middlewareQueuePopulator.add( DebugMiddleware.class );
-            try
-            {
-                this.registerAlternateOutcome( "debug", "handleDebug" );
-            } catch ( final Throwable e )
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public ValidationManager getValidationManager()
-    {
-        return validationManager;
-    }
-
-    public MiddlewareQueuePopulator getMiddlewareQueuePopulator()
-    {
-        return middlewareQueuePopulator;
-    }
-
     /**
-     * Register an alternate outcome, which can be triggered using Middleware
+     * Register an alternate outcome, which can be triggered using Middleware, by using
+     * {@link AbstractRequest#useAlternateOutcome(String)}, where the parameter is the
+     * identifier given to this method.
+     *
      * @param identifier Identifier used in {@link AbstractRequest#useAlternateOutcome(String)}
      * @param methodName Name of the method ( in the class, or any parent super classes )
      * @throws Exception If anything goes wrong
      */
-    @SuppressWarnings("ALL")
     public void registerAlternateOutcome(@NonNull final String identifier,
                                          @NonNull final String methodName) throws Throwable
     {
@@ -124,16 +114,28 @@ public abstract class RequestHandler
         {
             throw new KvantumException( "Could not find #" + methodName + "( Request, Response )" );
         }
-        final Lambda lambda = LambdaFactory.create( method );
-        this.alternateOutcomes.put( identifier, lambda );
+        this.alternateOutcomes.put( identifier, LambdaFactory.create( method ) );
     }
 
+    /**
+     * Register a response decorator which will then be able to decorate
+     * the response after it has been generated
+     *
+     * @param decorator Decorator
+     */
     public void addResponseDecorator(@NonNull final Decorator decorator)
     {
         this.decorators.add( decorator );
     }
 
-    public Optional<Lambda> getAlternateOutcomeMethod(final String identifier)
+    /**
+     * Attempt to retrieve an alternate outcome method, based on the identifier
+     * given in {@link #registerAlternateOutcome(String, String)}
+     *
+     * @param identifier Method identifier
+     * @return Alternate outcome method, if present
+     */
+    public Optional<Lambda> getAlternateOutcomeMethod(@NonNull final String identifier)
     {
         if ( alternateOutcomes.containsKey( identifier ) )
         {
@@ -153,19 +155,18 @@ public abstract class RequestHandler
     abstract public boolean matches(AbstractRequest request);
 
     /**
-     * Simple alternate outcome for the {@link DebugMiddleware} middleware
+     * Attempt to serve a request
+     *
+     * @param request Requested to serve
+     * @return Generated response
      */
-    @SuppressWarnings("unused")
-    protected void handleDebug(final AbstractRequest request, final Response response)
-    {
-        ServerImplementation.getImplementation().log( "Using the handleDebug alternate outcome!" );
-        response.copyFrom( generate( request ) );
-    }
-
-    final public Response handle(final AbstractRequest request)
+    public final Response handle(final AbstractRequest request)
     {
         Assert.isValid( request );
 
+        //
+        // Allow middleware to act on the request
+        //
         final MiddlewareQueue middlewareQueue = middlewareQueuePopulator.generateQueue();
         middlewareQueue.handle( request );
         if ( !middlewareQueue.finished() )
@@ -174,6 +175,12 @@ public abstract class RequestHandler
             return null;
         }
 
+        final Response response;
+
+        //
+        // If the middleware requested that an alternative
+        // handling method should be used, we do that here
+        //
         if ( request.hasMeta( AbstractRequest.ALTERNATE_OUTCOME ) )
         {
             //noinspection ConstantConditions
@@ -182,25 +189,40 @@ public abstract class RequestHandler
             if ( method.isPresent() )
             {
                 final Lambda lambda = method.get();
-                final Response response = new Response( this );
+                response = new Response( this );
                 lambda.invoke_for_void( this, request, response );
-                return response;
             } else
             {
                 throw new KvantumException( "Trying to access an internal redirect which isn't registered for type "
                         + this.getName() + ", identified by " + request.getMeta( AbstractRequest.ALTERNATE_OUTCOME ) );
             }
+        } else
+        {
+            //
+            // Here we attempt to generate a response
+            //
+            response = generate( request );
         }
 
-        final Response response = generate( request );
+        //
+        // If a null response is returned, panic
+        //
         if ( response == null )
         {
             throw new KvantumException( "ResponseHandler (" + this.getName() + ") generated a null response" );
         }
+
+        //
+        // Decorators may decorate the responses
+        //
         for ( final Decorator decorator : this.decorators )
         {
             decorator.decorate( response );
         }
+
+        //
+        // Return
+        //
         return response;
     }
 

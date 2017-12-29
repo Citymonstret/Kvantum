@@ -110,6 +110,7 @@ public class SimpleServer implements Kvantum
     static ObjectPool<GzipHandler> gzipHandlerPool;
     static ObjectPool<Md5Handler> md5HandlerPool;
 
+    //region Instance fields
     @Getter
     private final WorkerProcedure procedure = new WorkerProcedure();
     @Getter
@@ -147,6 +148,7 @@ public class SimpleServer implements Kvantum
     private ConfigurationFile translations;
     @Getter
     private EventBus eventBus;
+    //endregion
 
     /**
      * @param serverContext ServerContext that will be used to initialize the server
