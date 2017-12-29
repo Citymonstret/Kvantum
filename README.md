@@ -11,8 +11,8 @@ You can see the current progress [here](https://github.com/IntellectualSites/Kva
 
 [![Project Stats](https://www.openhub.net/p/Kvantum/widgets/project_thin_badge.gif)](https://www.openhub.net/p/Kvantum)
 
-You can join the developer chat at discord: 
-[![Discord](https://discordapp.com/api/guilds/380323926959587338/widget.png)](https://discord.gg/Gb2TDk9)
+Travis CI:
+[![Build Status](https://travis-ci.org/IntellectualSites/Kvantum.svg?branch=master)](https://travis-ci.org/IntellectualSites/Kvantum)
 
 ### Examples
 Code examples can be found at [this](https://github.com/IntellectualSites/Kvantum/tree/master/Examples) link. There are also some sample projects (may not be up to date): [Forum](https://github.com/Sauilitired/Forum), [KvantumBlog](https://github.com/IntellectualSites/KvantumBlog), [Foton](https://github.com/IntellectualSites/Foton) and [KvantumBukkit](https://github.com/Sauilitired/KvantumBukkit).
