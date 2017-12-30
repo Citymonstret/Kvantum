@@ -40,10 +40,10 @@ final public class ResponseMethod<T, C> implements
     private final Lambda lambda;
     private final C instance;
     private final boolean passResponse;
-    private final OutputConverter<T> outputConverter;
+    private final OutputConverter outputConverter;
 
     ResponseMethod(@NonNull final Method method, @NonNull final C instance,
-                   @Nullable final OutputConverter<T> outputConverter) throws Throwable
+                   @Nullable final OutputConverter outputConverter) throws Throwable
     {
         Assert.notNull( method, instance );
 
@@ -66,7 +66,7 @@ final public class ResponseMethod<T, C> implements
         final Object output = this.lambda.invoke_for_Object( instance, r );
         if ( outputConverter != null )
         {
-            return outputConverter.generateResponse( outputConverter.getClazz().cast( output ) );
+            return outputConverter.generateResponse( output );
         }
         return (Response) output;
     }

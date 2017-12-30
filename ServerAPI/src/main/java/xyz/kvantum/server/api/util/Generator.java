@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
+import java.util.function.Function;
+
 /**
  * An object that generates a given type from an inputted object
  *
@@ -28,7 +30,7 @@ package xyz.kvantum.server.api.util;
  * @param <O> Output type
  */
 @FunctionalInterface
-public interface Generator<I, O>
+public interface Generator<I, O> extends Function<I, O>
 {
 
     /**
@@ -39,4 +41,9 @@ public interface Generator<I, O>
      */
     O generate(I input);
 
+    @Override
+    default O apply(I input)
+    {
+        return generate( input );
+    }
 }

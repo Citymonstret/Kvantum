@@ -24,7 +24,9 @@ package xyz.kvantum.server.api.util;
 import xyz.kvantum.server.api.response.Header;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +47,8 @@ public enum FileExtension
     public static final List<FileExtension> DOWNLOADABLE = Collections
             .unmodifiableList( Arrays.asList( PDF, TXT, ZIP ) );
     private final String option;
-    private final String[] extensions;
+    private final Collection<String> extensions;
+    private final String extension;
     private final AsciiString contentType;
     private final ReadType readType;
     private final String comment;
@@ -54,7 +57,8 @@ public enum FileExtension
                   final AsciiString contentType,
                   final String comment)
     {
-        this.extensions = extensions;
+        this.extensions = CollectionUtil.arrayToCollection( HashSet::new, extensions );
+        this.extension = extensions[ 0 ];
         this.contentType = contentType;
         this.option = "";
         this.readType = ReadType.TEXT;
@@ -67,7 +71,8 @@ public enum FileExtension
                   final ReadType readType,
                   final String comment)
     {
-        this.extensions = extensions;
+        this.extensions = CollectionUtil.arrayToCollection( HashSet::new, extensions );
+        this.extension = extensions[ 0 ];
         this.contentType = contentType;
         this.option = option;
         this.readType = readType;
@@ -83,12 +88,9 @@ public enum FileExtension
         }
         for ( final FileExtension extension : values() )
         {
-            for ( final String e : extension.extensions )
+            if ( CollectionUtil.containsIgnoreCase( extension.extensions, workingString ) )
             {
-                if ( e.equalsIgnoreCase( workingString ) )
-                {
-                    return Optional.of( extension );
-                }
+                return Optional.of( extension );
             }
         }
         return Optional.empty();
@@ -138,7 +140,7 @@ public enum FileExtension
 
     public String getExtension()
     {
-        return extensions[ 0 ];
+        return this.extension;
     }
 
     public enum ReadType

@@ -7,7 +7,9 @@ dependencies {
     // Mostly used for its awesome map implementations
     compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // rest query engine
-    compile 'com.github.rutledgepaulv:rest-query-engine:0.7.1'
+    compile ('com.github.rutledgepaulv:rest-query-engine:0.7.1') {
+        exclude group: 'org.springframework', module: '*'
+    }
     // Makes input handling better and more fluent
     compile group: 'org.jline', name: 'jline', version: '3.5.1'
     // Command management system

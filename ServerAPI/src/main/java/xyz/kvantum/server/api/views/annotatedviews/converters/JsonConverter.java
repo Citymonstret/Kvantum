@@ -33,7 +33,7 @@ final class JsonConverter extends OutputConverter
 
     JsonConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
     {
-        super( "json", JSONObject.class );
+        super( "json", JSONObject.class, String.class );
         annotatedViewManager.registerConverter( this );
     }
 

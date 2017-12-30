@@ -269,7 +269,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         {
             return 0;
         }
-        return sequence.toString().compareTo( this.string );
+        return this.string.compareTo( sequence.toString() );
     }
 
     public List<AsciiString> split(@NonNull final String delimiter)

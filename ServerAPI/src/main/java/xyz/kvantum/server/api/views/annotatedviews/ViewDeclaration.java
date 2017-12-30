@@ -35,6 +35,6 @@ final class ViewDeclaration
     private boolean cache = true;
     private boolean forceHttps = true;
     private HttpMethod httpMethod = HttpMethod.ALL;
-    private OutputConverter<?> outputConverter = null;
+    private OutputConverter outputConverter = null;
 
 }

@@ -21,26 +21,17 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.nio.file.Path;
-import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-/**
- * Manages per-request temporary files
- */
-@SuppressWarnings("unused")
-public interface ITempFileManager
+class ColorUtilTest
 {
 
-    /**
-     * Create a new temporary file
-     *
-     * @return new temporary file, if it was successfully created
-     */
-    Optional<Path> createTempFile();
-
-    /**
-     * Delete all temporary files created in this manager
-     */
-    void clearTempFiles();
+    @Test
+    void getStripped()
+    {
+        final String coloredString = "&9Hello &cWorld!";
+        Assertions.assertEquals( "Hello World!", ColorUtil.getStripped( coloredString ) );
+    }
 
 }

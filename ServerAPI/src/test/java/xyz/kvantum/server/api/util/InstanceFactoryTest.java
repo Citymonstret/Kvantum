@@ -21,26 +21,25 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.nio.file.Path;
-import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-/**
- * Manages per-request temporary files
- */
-@SuppressWarnings("unused")
-public interface ITempFileManager
+class InstanceFactoryTest
 {
 
-    /**
-     * Create a new temporary file
-     *
-     * @return new temporary file, if it was successfully created
-     */
-    Optional<Path> createTempFile();
+    @Test
+    void setupInstanceAutomagic()
+    {
+        Assertions.assertNull( TestClass.instance );
+        final TestClass testClass = new TestClass();
+        InstanceFactory.setupInstanceAutomagic( testClass );
+        Assertions.assertEquals( testClass, TestClass.instance );
+    }
 
-    /**
-     * Delete all temporary files created in this manager
-     */
-    void clearTempFiles();
+    private static final class TestClass
+    {
+
+        private static TestClass instance;
+    }
 
 }

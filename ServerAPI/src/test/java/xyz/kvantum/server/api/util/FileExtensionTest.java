@@ -21,26 +21,25 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.nio.file.Path;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.util.Optional;
 
-/**
- * Manages per-request temporary files
- */
-@SuppressWarnings("unused")
-public interface ITempFileManager
+class FileExtensionTest
 {
 
-    /**
-     * Create a new temporary file
-     *
-     * @return new temporary file, if it was successfully created
-     */
-    Optional<Path> createTempFile();
-
-    /**
-     * Delete all temporary files created in this manager
-     */
-    void clearTempFiles();
+    @Test
+    void getExtension()
+    {
+        final String string1 = ".txt";
+        final String string2 = "JPEG";
+        final Optional<FileExtension> ext1 = FileExtension.getExtension( string1 );
+        final Optional<FileExtension> ext2 = FileExtension.getExtension( string2 );
+        Assertions.assertTrue( ext1.isPresent() );
+        Assertions.assertTrue( ext2.isPresent() );
+        Assertions.assertEquals( FileExtension.TXT, ext1.get() );
+        Assertions.assertEquals( FileExtension.JPEG, ext2.get() );
+    }
 
 }
