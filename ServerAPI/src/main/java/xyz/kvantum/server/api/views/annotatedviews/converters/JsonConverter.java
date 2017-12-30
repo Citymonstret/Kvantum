@@ -28,7 +28,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
-final class JsonConverter extends OutputConverter<JSONObject>
+final class JsonConverter extends OutputConverter
 {
 
     JsonConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
@@ -38,7 +38,7 @@ final class JsonConverter extends OutputConverter<JSONObject>
     }
 
     @Override
-    protected Response generateResponse(@NonNull final JSONObject input)
+    protected Response generateResponse(@NonNull final Object input)
     {
         final Response response = new Response();
         response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );

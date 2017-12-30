@@ -27,7 +27,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
-public class XmlConverter extends OutputConverter<String>
+public class XmlConverter extends OutputConverter
 {
 
     XmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
@@ -37,13 +37,13 @@ public class XmlConverter extends OutputConverter<String>
     }
 
     @Override
-    protected Response generateResponse(final String input)
+    protected Response generateResponse(final Object input)
     {
         final Response response = new Response();
         response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_XML );
         response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
         response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
-        response.setContent( input );
+        response.setContent( input.toString() );
         return response;
     }
 }

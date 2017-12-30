@@ -27,7 +27,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
-final class HtmlConverter extends OutputConverter<String>
+final class HtmlConverter extends OutputConverter
 {
 
     HtmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
@@ -37,10 +37,10 @@ final class HtmlConverter extends OutputConverter<String>
     }
 
     @Override
-    protected Response generateResponse(final String input)
+    protected Response generateResponse(final Object input)
     {
         final Response response = new Response();
-        response.setContent( input );
+        response.setContent( input.toString() );
         response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
         return response;
     }

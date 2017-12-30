@@ -24,21 +24,26 @@ package xyz.kvantum.server.api.views.annotatedviews;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.util.CollectionUtil;
 
-public abstract class OutputConverter<T>
+import java.util.Collection;
+import java.util.HashSet;
+
+public abstract class OutputConverter
 {
 
     @Getter
     private final String key;
     @Getter
-    private final Class<T> clazz;
+    private final Collection<Class> classes;
 
-    protected OutputConverter(@NonNull final String key, @NonNull final Class<T> clazz)
+    protected OutputConverter(@NonNull final String key, @NonNull final Class<?>... classes)
     {
         this.key = key;
-        this.clazz = clazz;
+        this.classes = CollectionUtil.arrayToCollection( HashSet::new, classes );
     }
 
-    protected abstract Response generateResponse(final T input);
+    @SuppressWarnings("WeakerAccess")
+    protected abstract Response generateResponse(final Object input);
 
 }

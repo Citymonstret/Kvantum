@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.util.CollectionUtil;
 import xyz.kvantum.server.api.util.IConsumer;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -45,7 +46,7 @@ public final class AnnotatedViewManager
 
     private final Class<?>[] parameters = new Class<?>[]{ AbstractRequest.class };
     private final Class<?>[] alternativeParameters = new Class<?>[]{ AbstractRequest.class, Response.class };
-    private final Map<String, OutputConverter<?>> converters = new HashMap<>();
+    private final Map<String, OutputConverter> converters = new HashMap<>();
 
     public AnnotatedViewManager()
     {
@@ -83,11 +84,12 @@ public final class AnnotatedViewManager
                     if ( !matcher.outputType().isEmpty() && converters.containsKey( matcher.outputType()
                             .toLowerCase( Locale.ENGLISH ) ) )
                     {
-                        final OutputConverter<?> outputConverter = converters.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) );
-                        if ( !outputConverter.getClazz().equals( m.getReturnType() ) )
+                        final OutputConverter outputConverter = converters.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) );
+                        if ( !outputConverter.getClasses().contains( m.getReturnType() ) )
                         {
-                            new IllegalArgumentException( m.getName() + " should return " + outputConverter.getClazz
-                                    ().getSimpleName() ).printStackTrace();
+                            new IllegalArgumentException( m.getName() + " should return one of "
+                                    + CollectionUtil.smartJoin( outputConverter.getClasses(), Class::getSimpleName,
+                                    ", " ) ).printStackTrace();
                         } else
                         {
                             declaration.setOutputConverter( converters.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) ) );
@@ -142,7 +144,7 @@ public final class AnnotatedViewManager
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void registerConverter(@NonNull final OutputConverter<?> converter)
+    public void registerConverter(@NonNull final OutputConverter converter)
     {
         converters.put( converter.getKey().toLowerCase( Locale.ENGLISH ), converter );
     }

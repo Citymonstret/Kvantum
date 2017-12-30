@@ -26,9 +26,12 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for common {@link Collection collection} operations
@@ -97,6 +100,19 @@ public final class CollectionUtil
     }
 
     /**
+     * Create a specific collection from a generic array
+     *
+     * @param creator Collection instance supplier
+     * @param array   Array
+     * @return Created collection
+     */
+    @SafeVarargs
+    public static <T, C extends Collection<T>> C arrayToCollection(final Supplier<C> creator, final T... array)
+    {
+        return Arrays.stream( array ).collect( Collectors.toCollection( creator ) );
+    }
+
+    /**
      * Compat utility. Use {@link StringList} directly instead.
      *
      * @deprecated Use {@link StringList}
@@ -124,8 +140,9 @@ public final class CollectionUtil
 
     /**
      * Check if a string collection contains a string, ignoring string casing
+     *
      * @param collection Collecting
-     * @param string String
+     * @param string     String
      * @return true if the collection contains the string, regardless of casing
      */
     public static boolean containsIgnoreCase(@NonNull final Collection<? extends String> collection,
