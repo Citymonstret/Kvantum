@@ -75,6 +75,8 @@ public final class StandaloneServer extends SimpleServer
     @Getter
     private final Map<String, Class<? extends View>> viewBindings = new HashMap<>();
     private ConfigurationFile configViews;
+    @SuppressWarnings("ALL")
+    private AddOnManager internalAddonManager;
 
     /**
      * @param serverContext ServerContext that will be used to initialize the server
@@ -247,6 +249,49 @@ public final class StandaloneServer extends SimpleServer
     @Override
     protected void onStart()
     {
+        //
+        // Load standard plugins
+        //
+        {
+            try
+            {
+                @NonNull final URL url = StandaloneServer.class.getResource( "/addons" );
+                @NonNull final URI uri = url.toURI();
+                @NonNull final File file = new File( uri );
+                Logger.info( "Loading internal addons..." );
+                Logger.info( "Skipping: " );
+                final Collection<String> skipping = CoreConfig.InternalAddons.disabled;
+                //
+                // Prevent template engines from loading when they're
+                // not enabled
+                //
+                if ( !CoreConfig.Templates.engine.equals( "CRUSH" ) )
+                {
+                    skipping.add( "CrushTemplates" );
+                }
+                if ( !CoreConfig.Templates.engine.equals( "JTWIG" ) )
+                {
+                    skipping.add( "JTwigTemplates" );
+                }
+                if ( !CoreConfig.Templates.engine.equals( "VELOCITY" ) )
+                {
+                    skipping.add( "VelocityTemplates" );
+                }
+                for ( final String disabled : skipping )
+                {
+                    Logger.info( "- {}", disabled );
+                }
+                this.internalAddonManager = new AddOnManager( file, skipping );
+                this.internalAddonManager.load();
+                Logger.info( "Loaded {} internal addons", this.internalAddonManager.getAddOns().size() );
+                Logger.info( "Enabling internal addons..." );
+                this.internalAddonManager.enableAddOns();
+            } catch ( final Exception e )
+            {
+                e.printStackTrace();
+            }
+        }
+
         // Load Plugins
         if ( CoreConfig.enablePlugins )
         {
@@ -340,7 +385,7 @@ public final class StandaloneServer extends SimpleServer
                 log( Message.COULD_NOT_CREATE_PLUGIN_FOLDER, file );
                 return;
             }
-            final AddOnManager addOnManager = new AddOnManager( file );
+            final AddOnManager addOnManager = new AddOnManager( file, Collections.emptyList() );
             addOnManager.load();
             addOnManager.enableAddOns();
         } else

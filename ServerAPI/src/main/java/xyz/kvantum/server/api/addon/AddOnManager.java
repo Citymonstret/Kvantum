@@ -23,9 +23,8 @@ package xyz.kvantum.server.api.addon;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import sun.misc.JarFilter;
 import xyz.kvantum.server.api.util.AutoCloseable;
+import xyz.kvantum.server.api.util.CollectionUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -45,15 +46,22 @@ import java.util.stream.Collectors;
 /**
  * Manages (loads, unloads, enables and disables) {@link AddOn addons}
  */
-@RequiredArgsConstructor
 @SuppressWarnings("unused")
 public final class AddOnManager extends AutoCloseable
 {
 
     @Getter
     private final File addOnFolder;
+    private final Collection<String> disabledAddons;
     private Map<String, Class> globalClassMap = new ConcurrentHashMap<>();
     private Map<String, AddOnClassLoader> classLoaders = new ConcurrentHashMap<>();
+
+    public AddOnManager(@NonNull final File addOnFolder,
+                        final Collection<String> disabledAddons)
+    {
+        this.addOnFolder = addOnFolder;
+        this.disabledAddons = new HashSet<>( disabledAddons );
+    }
 
     /**
      * Load all addons in the specified addon folder
@@ -70,7 +78,11 @@ public final class AddOnManager extends AutoCloseable
                 throw new AddOnManagerException( "Couldn't create AddOn folder" );
             }
         }
-        final File[] files = addOnFolder.listFiles( new JarFilter() );
+        final File[] files = addOnFolder.listFiles( (file, name) ->
+        {
+            final String fileName = name.toLowerCase( Locale.ENGLISH );
+            return fileName.endsWith( ".jar" ) || fileName.endsWith( ".zip" );
+        } );
         if ( files == null )
         {
             return;
@@ -302,6 +314,10 @@ public final class AddOnManager extends AutoCloseable
             if ( this.classLoaders.containsKey( addOnName ) )
             {
                 throw new AddOnManagerException( "AddOn of name \"" + addOnName + "\" has already been loaded..." );
+            }
+            if ( CollectionUtil.containsIgnoreCase( this.disabledAddons, addOnName ) )
+            {
+                return null;
             }
             @NonNull final String main = properties.get( "main" ).toString();
             if ( this.globalClassMap.containsKey( main ) )

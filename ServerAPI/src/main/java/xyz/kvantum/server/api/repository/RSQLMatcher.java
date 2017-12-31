@@ -37,6 +37,7 @@ public final class RSQLMatcher<V> extends Matcher<String, V>
 {
 
     private static final QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
+
     private Predicate<V> predicate;
 
     RSQLMatcher(@NonNull final String queryObject)

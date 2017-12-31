@@ -37,7 +37,6 @@ import pw.stamina.causam.registry.SubscriptionRegistry;
 import pw.stamina.causam.select.CachingSubscriptionSelectorServiceDecorator;
 import pw.stamina.causam.select.SubscriptionSelectorService;
 import sun.misc.Signal;
-import xyz.kvantum.crush.CrushEngine;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.server.api.account.IAccountManager;
@@ -52,7 +51,6 @@ import xyz.kvantum.server.api.core.WorkerProcedure;
 import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.events.ServerStartedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
-import xyz.kvantum.server.api.jtwig.JTwigEngine;
 import xyz.kvantum.server.api.logging.LogContext;
 import xyz.kvantum.server.api.logging.LogFormatted;
 import xyz.kvantum.server.api.logging.LogModes;
@@ -88,7 +86,6 @@ import xyz.kvantum.server.implementation.netty.NettyLoggerFactory;
 import xyz.kvantum.server.implementation.sqlite.SQLiteAccountManager;
 import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
 import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
-import xyz.kvantum.velocity.VelocityEngine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -415,12 +412,6 @@ public class SimpleServer implements Kvantum
         TemplateManager.get().addProviderFactory( ConfigVariableProvider.getInstance() );
         TemplateManager.get().addProviderFactory( new PostProviderFactory() );
         TemplateManager.get().addProviderFactory( new MetaProvider() );
-
-        Logger.info( "Checking templating engines:" );
-        CrushEngine.getInstance().load();
-        VelocityEngine.getInstance().load();
-        JTwigEngine.getInstance().load();
-        Logger.info( "" );
 
         this.onStart();
 

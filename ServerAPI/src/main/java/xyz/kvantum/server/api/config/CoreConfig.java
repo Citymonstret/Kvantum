@@ -65,6 +65,13 @@ public class CoreConfig
         public static long timeSpan = 1;
     }
 
+    @ConfigSection(name = "internalAddons")
+    public static class InternalAddons
+    {
+
+        public static List<String> disabled = Collections.emptyList();
+    }
+
     public enum TemplatingEngine
     {
         CRUSH, VELOCITY, JTWIG, NONE
