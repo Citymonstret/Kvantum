@@ -15,6 +15,7 @@ apply plugin: 'application'
 
 mainClassName = 'xyz.kvantum.server.implementation.KvantumMain'
 tasks.distZip.enabled = false
+tasks.shadowDistZip.enabled = false
 
 jar {
     manifest {
