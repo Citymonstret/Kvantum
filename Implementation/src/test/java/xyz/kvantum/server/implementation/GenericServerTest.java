@@ -77,7 +77,8 @@ public class GenericServerTest
         assertNotNull( requestManager.getError404Generator() );
 
         final ServerContext serverContext = serverContextBuilder.standalone( true ).coreFolder( temporaryFolder )
-                .logWrapper( new DefaultLogWrapper() ).router( requestManager ).build();
+                .logWrapper( new DefaultLogWrapper() ).router( requestManager ).serverSupplier( StandaloneServer::new )
+                .build();
         assertNotNull( serverContext );
 
         final Optional<Kvantum> serverOptional = serverContext.create();
