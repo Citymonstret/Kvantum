@@ -14,10 +14,16 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'application'
 
 mainClassName = 'xyz.kvantum.server.implementation.KvantumMain'
+
+// Disable ZIP artifacts
 tasks.distZip.enabled = false
 tasks.shadowDistZip.enabled = false
-
 configurations.archives.artifacts.removeAll {it.type == 'zip'}
+
+// Disabke TAR artifacts
+tasks.distTar.enabled = false
+tasks.shadowDistTar.enabled = false
+configurations.archives.artifacts.removeAll {it.type == 'tar'}
 
 jar {
     manifest {
