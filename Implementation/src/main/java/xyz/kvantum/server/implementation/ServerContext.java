@@ -52,7 +52,7 @@ public final class ServerContext
 {
 
     @Builder.Default
-    private boolean standalone = false;
+    private boolean standalone = true;
     @NonNull
     private File coreFolder;
     @NonNull
@@ -60,8 +60,7 @@ public final class ServerContext
     @NonNull
     private Router router;
     @NonNull
-    @Builder.Default
-    private Function<ServerContext, SimpleServer> serverSupplier = SimpleServer::new;
+    private Function<ServerContext, SimpleServer> serverSupplier;
 
     /**
      * Creates a server instance using this context.

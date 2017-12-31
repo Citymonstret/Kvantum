@@ -27,6 +27,7 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
 import xyz.kvantum.server.api.orm.KvantumObjectParserResult;
 import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.ParameterScope;
@@ -42,20 +43,41 @@ import java.util.Collections;
 public class ExampleApi
 {
 
+    //
+    // Factory class which parses request parameters into objects, in this
+    // case; FileContexts
+    //
     private final KvantumObjectFactory<FileContext> factory = KvantumObjectFactory.from( FileContext.class );
+
+    //
+    // Valid password tokens
+    //
     private final Collection<String> tokens;
 
     ExampleApi()
     {
+        //
+        // Scan the current instance for @ViewMather annotations
+        //
         ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
         this.tokens = Collections.singletonList( "randomtokenhere" );
     }
 
-    @ViewMatcher(filter = "file/update")
+    //
+    // Match POST requests to "/file/update"
+    //
+    @ViewMatcher(filter = "file/update", httpMethod = HttpMethod.POST)
     public void onFileUpdate(final AbstractRequest request, final Response response)
     {
+        //
+        // Parse the request
+        //
         final KvantumObjectParserResult<FileContext> result = factory.build( ParameterScope.POST )
                 .parseRequest( request );
+        //
+        // Check to see if the parsing was successful, and then generate
+        // a response
+        //
         if ( result.isSuccess() )
         {
             final FileContext attempt = result.getParsedObject();
@@ -73,6 +95,9 @@ public class ExampleApi
             }
         } else
         {
+            //
+            // Request parameters couldn't be parsed into a FileContext
+            //
             Logger.error( "Invalid file update request (Cannot Parse)" );
             response.getHeader().setStatus( Header.STATUS_BAD_REQUEST );
             response.setContent( "Not a valid request..." );

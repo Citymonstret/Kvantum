@@ -49,12 +49,22 @@ class ExampleLogin
 
     ExampleLogin()
     {
+        //
+        // Scan the current instance for @ViewMather annotations
+        //
         ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
     }
 
+    //
+    // Match POST requests to /login
+    //
     @ViewMatcher(filter = "login", httpMethod = HttpMethod.POST)
     public final void debugAccounts(final AbstractRequest request, final Response response)
     {
+        //
+        // Get the account manager implementation. This is also an account repository, and is
+        // responsible for account retrieving, creation and alike.
+        //
         final IAccountManager accountManager = ServerImplementation.getImplementation().getApplicationStructure()
                 .getAccountManager();
         if ( accountManager.getAccount( request.getSession() ).isPresent() )
@@ -63,8 +73,14 @@ class ExampleLogin
             return;
         }
 
+        //
+        // Setup a factory that parses request parameters into LoginAttempt instances
+        //
         final KvantumObjectFactory<LoginAttempt> factory = KvantumObjectFactory.from( LoginAttempt
                 .class );
+        //
+        // Get the result of the parsing
+        //
         final KvantumObjectParserResult<LoginAttempt> result
                 = factory.build( ParameterScope.POST ).parseRequest( request );
 
@@ -74,6 +90,9 @@ class ExampleLogin
             return;
         }
 
+        //
+        // Attempt to find the account in the repository
+        //
         final Optional<IAccount> accountOptional = accountManager.getAccount( result.getParsedObject().getUsername() );
         if ( !accountOptional.isPresent() )
         {
