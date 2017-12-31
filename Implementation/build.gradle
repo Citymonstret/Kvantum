@@ -17,6 +17,8 @@ mainClassName = 'xyz.kvantum.server.implementation.KvantumMain'
 tasks.distZip.enabled = false
 tasks.shadowDistZip.enabled = false
 
+configurations.archives.artifacts.removeAll {it.type == 'zip'}
+
 jar {
     manifest {
         attributes 'Implementation-Title': 'Kvantum',
