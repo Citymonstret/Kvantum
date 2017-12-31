@@ -25,6 +25,7 @@ import com.intellectualsites.configurable.ConfigurationImplementation;
 import com.intellectualsites.configurable.annotations.ConfigSection;
 import com.intellectualsites.configurable.annotations.Configuration;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class CoreConfig
     public static class InternalAddons
     {
 
-        public static List<String> disabled = Collections.emptyList();
+        public static List<String> disabled = new ArrayList<>();
     }
 
     public enum TemplatingEngine

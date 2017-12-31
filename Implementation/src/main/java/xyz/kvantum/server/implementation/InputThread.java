@@ -124,7 +124,7 @@ public final class InputThread extends Thread
                 }
             } catch ( UserInterruptException e )
             {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().stopServer();
             } catch ( EndOfFileException e )
             {
                 return;

@@ -56,10 +56,13 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,8 +78,6 @@ public final class StandaloneServer extends SimpleServer
     @Getter
     private final Map<String, Class<? extends View>> viewBindings = new HashMap<>();
     private ConfigurationFile configViews;
-    @SuppressWarnings("ALL")
-    private AddOnManager internalAddonManager;
 
     /**
      * @param serverContext ServerContext that will be used to initialize the server
@@ -256,8 +257,27 @@ public final class StandaloneServer extends SimpleServer
             try
             {
                 @NonNull final URL url = StandaloneServer.class.getResource( "/addons" );
-                @NonNull final URI uri = url.toURI();
-                @NonNull final File file = new File( uri );
+                if ( CoreConfig.debug )
+                {
+                    Logger.debug( "Trying to load addons from {}", url );
+                }
+                final java.nio.file.Path addonFolderPath;
+                if ( url.getFile().contains( "!" ) )
+                {
+                    // inside of jar
+                    // MyClass.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+                    final java.nio.file.Path jarPath = Paths.get( StandaloneServer.class.getProtectionDomain()
+                            .getCodeSource().getLocation().getPath() );
+                    final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem( jarPath, null );
+                    addonFolderPath = fileSystem.getPath( "/addons" );
+                } else
+                {
+                    // loading from IDE
+                    @NonNull final File file = new File( url.getFile() );
+                    addonFolderPath = file.toPath();
+                }
+
+
                 Logger.info( "Loading internal addons..." );
                 Logger.info( "Skipping: " );
                 final Collection<String> skipping = CoreConfig.InternalAddons.disabled;
@@ -267,36 +287,41 @@ public final class StandaloneServer extends SimpleServer
                 //
                 if ( !CoreConfig.Templates.engine.equals( "CRUSH" ) )
                 {
-                    skipping.add( "CrushTemplates" );
+                    skipping.add( "Crush.zip" );
                 }
                 if ( !CoreConfig.Templates.engine.equals( "JTWIG" ) )
                 {
-                    skipping.add( "JTwigTemplates" );
+                    skipping.add( "JTwig.zip" );
                 }
                 if ( !CoreConfig.Templates.engine.equals( "VELOCITY" ) )
                 {
-                    skipping.add( "VelocityTemplates" );
+                    skipping.add( "Velocity.zip" );
                 }
                 for ( final String disabled : skipping )
                 {
                     Logger.info( "- {}", disabled );
                 }
-                this.internalAddonManager = new AddOnManager( file, skipping );
-                this.internalAddonManager.load();
-                Logger.info( "Loaded {} internal addons", this.internalAddonManager.getAddOns().size() );
-                Logger.info( "Enabling internal addons..." );
-                this.internalAddonManager.enableAddOns();
+
+                Files.list( addonFolderPath ).filter( file -> !skipping.contains( file.getFileName().toString() ) )
+                        .forEach( file -> {
+                            try
+                            {
+                                Files.copy( file,
+                                        new File( new File( getCoreFolder(), "plugins" ), file.getFileName().toString() )
+                                                .toPath(), StandardCopyOption.REPLACE_EXISTING );
+                            } catch ( IOException e )
+                            {
+                                e.printStackTrace();
+                            }
+                        } );
             } catch ( final Exception e )
             {
                 e.printStackTrace();
             }
         }
 
-        // Load Plugins
-        if ( CoreConfig.enablePlugins )
-        {
-            this.loadPlugins();
-        }
+        this.loadPlugins();
+
         // Validating views
         this.log( Message.VALIDATING_VIEWS );
         this.validateViews();
@@ -306,15 +331,27 @@ public final class StandaloneServer extends SimpleServer
             try
             {
                 @NonNull final URL url = StandaloneServer.class.getResource( "/META-INF/resources/webjars" );
-                @NonNull final URI uri = url.toURI();
-                @NonNull final File file = new File( uri );
-                @NonNull final java.nio.file.Path resourcePath = file.toPath();
-                if ( !Files.exists( resourcePath ) )
+                final java.nio.file.Path webjarsFolderPath;
+                if ( url.getFile().contains( "!" ) )
+                {
+                    // inside of jar
+                    // MyClass.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+                    final java.nio.file.Path jarPath = Paths.get( StandaloneServer.class.getProtectionDomain()
+                            .getCodeSource().getLocation().getPath() );
+                    final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem( jarPath, null );
+                    webjarsFolderPath = fileSystem.getPath( "/META-INF/resources/webjars" );
+                } else
+                {
+                    // loading from IDE
+                    @NonNull final File file = new File( url.getFile() );
+                    webjarsFolderPath = file.toPath();
+                }
+                if ( !Files.exists( webjarsFolderPath ) )
                 {
                     Logger.warn( "`loadWebJars`= true, but no webjars resources present..." );
                     break loadWebJars;
                 }
-                final FileSystem webjarsFileSystem = new FileSystem( resourcePath, getFileSystem()
+                final FileSystem webjarsFileSystem = new FileSystem( webjarsFolderPath, getFileSystem()
                         .getFileCacheManager() );
                 if ( CoreConfig.debug )
                 {

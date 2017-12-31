@@ -2,7 +2,7 @@
 set +v
 
 # Configuration
-version=1.1-SNAPSHOT
+version=1.2-SNAPSHOT
 minRam=256
 maxRam=1024
 # End of configuration
