@@ -145,6 +145,10 @@ subprojects {
         exclude group: 'jcuda', module: 'jcuda'
 
     }
+    
+    configurations.archives.with {
+        artifacts.remove artifacts.find { it.archiveTask.is distZip }
+    }
 }
 
 description = """"""
