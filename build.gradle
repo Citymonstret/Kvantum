@@ -145,19 +145,6 @@ subprojects {
         exclude group: 'jcuda', module: 'jcuda'
 
     }
-    
-    configurations.archives.artifacts.with { archives ->
-        def zipArtifact = []
-        archives.each {
-            if (it.file =~ 'zip') {
-                zipArtifact << it
-            }
-        }
-        zipArtifact.each {
-            println "ZIP to delete: ${it}"
-            archives.remove(it)
-        }
-    }
 }
 
 description = """"""
