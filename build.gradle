@@ -146,8 +146,17 @@ subprojects {
 
     }
     
-    configurations.archives.with {
-        artifacts.remove artifacts.find { it.archiveTask.is distZip }
+    configurations.archives.artifacts.with { archives ->
+        def zipArtifact = []
+        archives.each {
+            if (it.file =~ 'zip') {
+                zipArtifact << it
+            }
+        }
+        zipArtifact.each {
+            println "ZIP to delete: ${it}"
+            archives.remove(it)
+        }
     }
 }
 
