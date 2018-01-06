@@ -203,7 +203,7 @@ final public class SQLiteAccountManager implements IAccountManager
     public void deleteAccount(@NonNull final IAccount account)
     {
         try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
-                .prepareStatement( "DELETE * FROM `account` WHERE `id` = ?" ) )
+                .prepareStatement( "DELETE FROM `account` WHERE `id` = ?" ) )
         {
             statement.setInt( 1, account.getId() );
             statement.executeUpdate();
