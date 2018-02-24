@@ -30,7 +30,7 @@ import pw.stamina.causam.EventBus;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.server.api.cache.ICacheManager;
-import xyz.kvantum.server.api.config.ConfigurationFile;
+import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
 import xyz.kvantum.server.api.logging.LogModes;
@@ -121,7 +121,7 @@ public interface Kvantum extends CommandCaller<Kvantum>
      */
     FileWatcher getFileWatcher();
 
-    ConfigurationFile getTranslations();
+    ITranslationManager getTranslationManager();
 
     /**
      * Create a simple request handler

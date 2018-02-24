@@ -112,7 +112,7 @@ public enum Message
     public String toString()
     {
         if ( ServerImplementation.getImplementation() != null && ( ServerImplementation
-                .getImplementation().getTranslations() != null ) )
+                .getImplementation().getTranslationManager() != null ) )
         {
             String nameSpace;
             switch ( this.getMode() )
@@ -133,10 +133,12 @@ public enum Message
                     nameSpace = "info";
                     break;
             }
-            if ( ServerImplementation.getImplementation().getTranslations().contains( nameSpace + "." + this.name().toLowerCase( Locale.ENGLISH )
+            if ( ServerImplementation.getImplementation().getTranslationManager().containsTranslation( nameSpace + "." + this
+                    .name().toLowerCase( Locale.ENGLISH )
             ) )
             {
-                return ( ServerImplementation.getImplementation().getTranslations().get( nameSpace + "." + this.name
+                return ( ServerImplementation.getImplementation().getTranslationManager().getTranslation( nameSpace + "." +
+                        this.name
                         ().toLowerCase( Locale.ENGLISH ) ) );
             }
         }

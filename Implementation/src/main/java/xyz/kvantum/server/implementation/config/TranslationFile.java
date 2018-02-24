@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.implementation.config;
 
+import lombok.NonNull;
+import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.logging.LogModes;
@@ -28,7 +30,7 @@ import xyz.kvantum.server.api.logging.LogModes;
 import java.io.File;
 import java.util.Locale;
 
-final public class TranslationFile extends YamlConfiguration
+final public class TranslationFile extends YamlConfiguration implements ITranslationManager
 {
 
     public TranslationFile(final File folder) throws Exception
@@ -61,4 +63,15 @@ final public class TranslationFile extends YamlConfiguration
         this.saveFile();
     }
 
+    @Override
+    public boolean containsTranslation(@NonNull final String translation)
+    {
+        return this.contains( translation );
+    }
+
+    @Override
+    public String getTranslation(@NonNull final String translation)
+    {
+        return this.get( translation );
+    }
 }

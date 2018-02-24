@@ -42,8 +42,8 @@ import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.ConfigVariableProvider;
-import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -142,7 +142,7 @@ public class SimpleServer implements Kvantum
     @Getter
     private ApplicationStructure applicationStructure;
     @Getter
-    private ConfigurationFile translations;
+    private ITranslationManager translationManager;
     @Getter
     private EventBus eventBus;
     //endregion
@@ -185,7 +185,7 @@ public class SimpleServer implements Kvantum
         //
         try
         {
-            translations = new TranslationFile( new File( getCoreFolder(), "config" ) );
+            translationManager = new TranslationFile( new File( getCoreFolder(), "config" ) );
         } catch ( final Exception e )
         {
             log( Message.CANNOT_LOAD_TRANSLATIONS );

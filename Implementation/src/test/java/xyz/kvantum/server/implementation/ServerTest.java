@@ -96,7 +96,7 @@ class ServerTest extends GenericServerTest
     @Test
     void getTranslations()
     {
-        assertNotNull( serverInstance.getTranslations() );
+        assertNotNull( serverInstance.getTranslationManager() );
     }
 
     @Test
