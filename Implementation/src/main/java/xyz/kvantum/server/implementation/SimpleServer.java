@@ -168,9 +168,25 @@ public class SimpleServer implements Kvantum
         {
             throw new KvantumInitializationException( "Failed to create the core folder: " + getCoreFolder() );
         }
+
+        //
+        // Watches for file updates and invalidates cache
+        //
         this.fileWatcher = new FileWatcher();
+
+        //
+        // Virtual filesystem
+        //
         this.fileSystem = new IntellectualFileSystem( serverContext.getCoreFolder().toPath() );
+
+        //
+        // Log->File
+        //
         final File logFolder = FileUtils.attemptFolderCreation( new File( getCoreFolder(), "log" ) );
+
+        //
+        // Compress old zip files
+        //
         try
         {
             FileUtils.addToZip( new File( logFolder, "old.zip" ),
@@ -204,6 +220,9 @@ public class SimpleServer implements Kvantum
             e.printStackTrace();
         }
 
+        //
+        // Replace the netty logger
+        //
         InternalLoggerFactory.setDefaultFactory( new NettyLoggerFactory() );
 
         //
@@ -228,7 +247,7 @@ public class SimpleServer implements Kvantum
         //
         if ( serverContext.isStandalone() )
         {
-            // Makes the application closable in ze terminal
+            // Makes the application closable in the terminal
             Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
 
             this.commandManager = new CommandManager( '/' );
