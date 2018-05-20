@@ -262,6 +262,60 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         return this;
     }
 
+    /**
+     * Get the integer value of the string. Does not verify whether
+     * the string contains non-integer characters or not. Supports
+     * negative values.
+     *
+     * @return Parsed integer
+     */
+    public int toInteger()
+    {
+        int index = 0;
+        int value = 0;
+        boolean negative = this.value[ 0 ] == 45 /* - */;
+        if ( negative )
+        {
+            index = 1;
+        }
+        for ( ; index < this.value.length; index++ )
+        {
+            value = ( value * 10 ) + ( this.value[ index ] - 48 /* 0 */ );
+        }
+        if ( negative )
+        {
+            return -value;
+        }
+        return value;
+    }
+
+    /**
+     * Get the long value of the string. Does not verify whether
+     * the string contains non-long characters or not. Supports
+     * negative values.
+     *
+     * @return Parsed long
+     */
+    public long toLong()
+    {
+        int index = 0;
+        long value = 0;
+        boolean negative = this.value[ 0 ] == 45 /* - */;
+        if ( negative )
+        {
+            index = 1;
+        }
+        for ( ; index < this.value.length; index++ )
+        {
+            value = ( value * 10 ) + ( this.value[ index ] - 48 /* 0 */ );
+        }
+        if ( negative )
+        {
+            return -value;
+        }
+        return value;
+    }
+    
     @Override
     public int compareTo(@NonNull final CharSequence sequence)
     {

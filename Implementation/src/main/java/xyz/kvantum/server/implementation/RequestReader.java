@@ -164,7 +164,7 @@ final class RequestReader
                 }
                 try
                 {
-                    this.contentLength = Integer.parseInt( contentLength.toString() );
+                    this.contentLength = contentLength.toInteger();
                 } catch ( final Exception e )
                 {
                     throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null );
