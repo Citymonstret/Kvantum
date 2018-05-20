@@ -276,15 +276,14 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         }
 
         final byte[] lowercase = new byte[ this.value.length ];
+        System.arraycopy( this.value, 0, lowercase, 0, this.value.length );
+
         for ( int i = 0; i < this.value.length; i++ )
         {
             byte character = this.value[ i ];
             if ( character >= 65 && character <= 90 ) // uppercase A-Z
             {
                 lowercase[ i ] = (byte) ( character + 32 );
-            } else
-            {
-                lowercase[ i ] = character;
             }
         }
 
@@ -299,15 +298,14 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         }
 
         final byte[] uppercase = new byte[ this.value.length ];
+        System.arraycopy( this.value, 0, uppercase, 0, this.value.length );
+
         for ( int i = 0; i < this.value.length; i++ )
         {
             byte character = this.value[ i ];
             if ( character >= 97 && character <= 122 ) // lowercase a-z
             {
                 uppercase[ i ] = (byte) ( character - 32 );
-            } else
-            {
-                uppercase[ i ] = character;
             }
         }
 
