@@ -345,6 +345,27 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         return value;
     }
 
+    public boolean isInteger()
+    {
+        for ( int i = 0; i < this.value.length; i++ )
+        {
+            final byte b = this.value[ i ];
+
+            if ( b >= 48 && b <= 57 )
+            {
+                continue;
+            }
+
+            if ( i == 0 && b == 45 )
+            {
+                continue;
+            }
+
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Get the long value of the string. Does not verify whether
      * the string contains non-long characters or not. Supports
