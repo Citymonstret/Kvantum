@@ -55,8 +55,23 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         this.value = value.getBytes( Charsets.US_ASCII );
         this.string = value;
         this.hashCode = this.string.hashCode();
-        this.lowercase = this.string.toLowerCase( Locale.ENGLISH ).equals( this.string );
-        this.uppercase = this.string.toUpperCase( Locale.ENGLISH ).equals( this.string );
+
+        boolean lowercase = true;
+        boolean uppercase = true;
+
+        for ( final byte b : this.value )
+        {
+            if ( b >= 97 && b <= 122 ) // lowercase a-z
+            {
+                uppercase = false;
+            } else if ( b >= 65 && b <= 90 ) // uppercase A-Z
+            {
+                lowercase = false;
+            }
+        }
+
+        this.uppercase = uppercase;
+        this.lowercase = lowercase;
     }
 
     private AsciiString(@NonNull final byte[] value)
@@ -64,8 +79,23 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         this.value = value;
         this.string = new String( value, StandardCharsets.US_ASCII );
         this.hashCode = this.string.hashCode();
-        this.lowercase = this.string.toLowerCase( Locale.ENGLISH ).equals( this.string );
-        this.uppercase = this.string.toUpperCase( Locale.ENGLISH ).equals( this.string );
+
+        boolean lowercase = true;
+        boolean uppercase = true;
+
+        for ( final byte b : this.value )
+        {
+            if ( b >= 97 && b <= 122 ) // lowercase a-z
+            {
+                uppercase = false;
+            } else if ( b >= 65 && b <= 90 ) // uppercase A-Z
+            {
+                lowercase = false;
+            }
+        }
+
+        this.uppercase = uppercase;
+        this.lowercase = lowercase;
     }
 
     public static AsciiString randomUUIDAsciiString()
@@ -244,7 +274,21 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         {
             return this;
         }
-        return of( this.string.toLowerCase( Locale.ENGLISH ), false );
+
+        final byte[] lowercase = new byte[ this.value.length ];
+        for ( int i = 0; i < this.value.length; i++ )
+        {
+            byte character = this.value[ i ];
+            if ( character >= 65 && character <= 90 ) // uppercase A-Z
+            {
+                lowercase[ i ] = (byte) ( character + 32 );
+            } else
+            {
+                lowercase[ i ] = character;
+            }
+        }
+
+        return of( lowercase );
     }
 
     public AsciiString toUpperCase()
@@ -253,7 +297,21 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         {
             return this;
         }
-        return of( this.string.toUpperCase( Locale.ENGLISH ), false );
+
+        final byte[] uppercase = new byte[ this.value.length ];
+        for ( int i = 0; i < this.value.length; i++ )
+        {
+            byte character = this.value[ i ];
+            if ( character >= 97 && character <= 122 ) // lowercase a-z
+            {
+                uppercase[ i ] = (byte) ( character - 32 );
+            } else
+            {
+                uppercase[ i ] = character;
+            }
+        }
+
+        return of( uppercase );
     }
 
     @Override
