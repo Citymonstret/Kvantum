@@ -205,7 +205,7 @@ public final class Account implements IAccount
     }
 
     @Override
-    public void addRole(final AccountRole role)
+    public void addRole(@NonNull final AccountRole role)
     {
         if ( this.roleList == null )
         {
@@ -221,7 +221,7 @@ public final class Account implements IAccount
     }
 
     @Override
-    public void removeRole(final AccountRole role)
+    public void removeRole(@NonNull final AccountRole role)
     {
         if ( this.roleList == null )
         {
@@ -242,7 +242,7 @@ public final class Account implements IAccount
     }
 
     @Override
-    public boolean isPermitted(final String permissionKey)
+    public boolean isPermitted(@NonNull final String permissionKey)
     {
         if ( this.roleList == null )
         {

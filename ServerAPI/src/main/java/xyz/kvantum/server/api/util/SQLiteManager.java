@@ -33,8 +33,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Utility class for dealing with common SQLite operations
@@ -44,15 +42,11 @@ import java.util.Set;
 public class SQLiteManager extends AutoCloseable
 {
 
-    private static Set<SQLiteManager> sessions = new HashSet<>();
-
     private final Connection connection;
     private final String name;
 
     public SQLiteManager(final String name) throws IOException, SQLException
     {
-        sessions.add( this );
-
         this.name = name + ".db";
         File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "storage" ),
                 this.name );

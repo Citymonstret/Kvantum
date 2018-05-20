@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import com.intellectualsites.configurable.ConfigurationFactory;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -90,14 +89,6 @@ public final class StandaloneServer extends SimpleServer
 
         this.printLicenseInfo();
         this.addDefaultViewBindings();
-
-        //
-        // Load the configuration file
-        //
-        if ( !CoreConfig.isPreConfigured() )
-        {
-            ConfigurationFactory.load( CoreConfig.class, new File( getCoreFolder(), "config" ) ).get();
-        }
 
         //
         // Check through the configuration file and make sure that the values

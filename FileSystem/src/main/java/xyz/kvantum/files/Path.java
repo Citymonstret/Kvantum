@@ -21,6 +21,9 @@
  */
 package xyz.kvantum.files;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -503,5 +506,19 @@ public class Path
                 e.printStackTrace();
             }
         }
+    }
+
+    public FileReader getReader() throws FileNotFoundException
+    {
+        if ( !this.exists() )
+        {
+            return null;
+        }
+        return new FileReader( getJavaPath().toFile() );
+    }
+
+    public FileWriter getWriter() throws IOException
+    {
+        return new FileWriter( getJavaPath().toFile() );
     }
 }

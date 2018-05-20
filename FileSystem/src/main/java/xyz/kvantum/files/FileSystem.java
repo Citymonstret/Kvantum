@@ -33,8 +33,8 @@ public class FileSystem
     private final FileCacheManager fileCacheManager;
 
     /**
-     * @param coreFolder The core folder (zero point) for this file system,
-     *                   you cannot access any paths below it
+     * @param coreFolder       The core folder (zero point) for this file system,
+     *                         you cannot access any paths below it
      * @param fileCacheManager Cache manager implementation
      */
     public FileSystem(final java.nio.file.Path coreFolder, final FileCacheManager fileCacheManager)
@@ -59,6 +59,7 @@ public class FileSystem
 
     /**
      * Get a path from a string, using the core folder as the parent
+     *
      * @param rawPath The raw path to the file
      * @return The created path
      * @throws IllegalPathException If the path tries to access a file outside of the allowed scope (such as ../)
@@ -97,7 +98,8 @@ public class FileSystem
 
     /**
      * Get a path from a string
-     * @param parent Parent path (folder), use {@link #getPath(String)} to access files within the core folder
+     *
+     * @param parent  Parent path (folder), use {@link #getPath(String)} to access files within the core folder
      * @param rawPath The raw path to the file (relative to the parent)
      * @return The created path
      * @throws IllegalPathException If the path tries to access a file outside of the allowed scope (such as ../)

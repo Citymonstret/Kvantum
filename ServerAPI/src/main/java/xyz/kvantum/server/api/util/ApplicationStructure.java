@@ -43,7 +43,6 @@ public abstract class ApplicationStructure
 
     public abstract IAccountManager createNewAccountManager();
 
-
     @Override
     public String toString()
     {

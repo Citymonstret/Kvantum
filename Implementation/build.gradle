@@ -53,8 +53,12 @@ dependencies {
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
     // Makes code pretty
     compileOnly 'org.projectlombok:lombok:1.16.18'
+    // HikariCP, SQL connection pooling
+    compile 'com.zaxxer:HikariCP:2.7.8'
     // SQLite Driver
     runtime group: 'org.xerial', name: 'sqlite-jdbc', version: '3.21.0.1'
+    // MySQL Driver
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
     // Program argument parser
     compile group: 'com.beust', name: 'jcommander', version: '1.72'
     // Netty

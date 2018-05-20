@@ -89,7 +89,7 @@ final public class KvantumFileUploadContext implements UploadContext
     @Override
     public long contentLength()
     {
-        return Long.parseLong( this.request.getHeader( "content-length" ).toString() );
+        return this.request.getHeader( "content-length" ).toLong();
     }
 
     @Override

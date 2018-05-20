@@ -24,6 +24,7 @@ package xyz.kvantum.server.implementation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
+import com.intellectualsites.configurable.ConfigurationFactory;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.NonNull;
@@ -82,6 +83,8 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 import xyz.kvantum.server.implementation.error.KvantumStartException;
 import xyz.kvantum.server.implementation.mongo.MongoAccountManager;
 import xyz.kvantum.server.implementation.mongo.MongoSessionDatabase;
+import xyz.kvantum.server.implementation.mysql.MySQLAccountManager;
+import xyz.kvantum.server.implementation.mysql.MySQLSessionDatabase;
 import xyz.kvantum.server.implementation.netty.NettyLoggerFactory;
 import xyz.kvantum.server.implementation.sqlite.SQLiteAccountManager;
 import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
@@ -243,6 +246,14 @@ public class SimpleServer implements Kvantum
         this.cacheManager = new CacheManager();
 
         //
+        // Load the configuration file
+        //
+        if ( !CoreConfig.isPreConfigured() )
+        {
+            ConfigurationFactory.load( CoreConfig.class, new File( getCoreFolder(), "config" ) ).get();
+        }
+
+        //
         // Setup the internal application
         //
         if ( serverContext.isStandalone() )
@@ -273,6 +284,16 @@ public class SimpleServer implements Kvantum
                         public IAccountManager createNewAccountManager()
                         {
                             return new MongoAccountManager( this );
+                        }
+                    };
+                    break;
+                case "mysql":
+                    applicationStructure = new MySQLApplicationStructure( "core" )
+                    {
+                        @Override
+                        public IAccountManager createNewAccountManager()
+                        {
+                            return new MySQLAccountManager( this );
                         }
                     };
                     break;
@@ -331,6 +352,11 @@ public class SimpleServer implements Kvantum
                     break;
                 case "mongo":
                     sessionDatabase = new MongoSessionDatabase( (MongoApplicationStructure) this
+                            .getApplicationStructure().getAccountManager()
+                            .getApplicationStructure() );
+                    break;
+                case "mysql":
+                    sessionDatabase = new MySQLSessionDatabase( (MySQLApplicationStructure) this
                             .getApplicationStructure().getAccountManager()
                             .getApplicationStructure() );
                     break;
@@ -607,7 +633,10 @@ public class SimpleServer implements Kvantum
         //
         // Emit the shut down event
         //
-        getEventBus().emit( new ServerShutdownEvent( this ) );
+        if ( getEventBus() != null )
+        {
+            getEventBus().emit( new ServerShutdownEvent( this ) );
+        }
 
         //
         // Gracefully shutdown the file watcher

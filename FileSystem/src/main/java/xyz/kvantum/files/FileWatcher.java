@@ -32,6 +32,10 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
+/**
+ * Utility that watches directories for file updates.
+ * A single instance is able to watch multiple directories.
+ */
 @SuppressWarnings({ "WeakerAccess", "unused" })
 public final class FileWatcher extends Thread
 {
@@ -39,6 +43,9 @@ public final class FileWatcher extends Thread
     private final Collection<FileWatchingContext> contexts;
     private boolean shouldStop = false;
 
+    /**
+     * Construct a new file watcher and start the daemon thread
+     */
     public FileWatcher()
     {
         this.contexts = new CopyOnWriteArrayList<>();
@@ -62,11 +69,20 @@ public final class FileWatcher extends Thread
         return this::setShouldStop;
     }
 
+    /**
+     * Register a path that should be watched.
+     *
+     * @param path     Path to watch
+     * @param reaction Reaction to file changes
+     * @return Created context
+     * @throws IllegalArgumentException If the specified path isn't a folder
+     * @throws IOException              IOException thrown when registering the path.
+     */
     public FileWatchingContext registerPath(final Path path,
                                             final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
             throws IllegalArgumentException, IOException
     {
-        if ( !path.isFolder() )
+        if ( path == null || !path.isFolder() )
         {
             throw new IllegalArgumentException( "Supplied path is not a directory" );
         }

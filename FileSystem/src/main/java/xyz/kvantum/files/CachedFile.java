@@ -23,6 +23,9 @@ package xyz.kvantum.files;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Class that represents the content of a file
+ */
 public final class CachedFile
 {
 
