@@ -273,6 +273,11 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
                     final AbstractRequest redirectRequest = (AbstractRequest) redirect;
                     redirectRequest.removeMeta( "internalRedirect" );
                     workerContext.setRequest( redirectRequest );
+                    if ( CoreConfig.debug )
+                    {
+                        Logger.debug( "Redirect is to " + redirectRequest.getQuery().getResource() );
+                    }
+                    this.determineRequestHandler();
                     this.writeResponse();
                 }
                 return;
@@ -365,7 +370,7 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         workerContext.setBytes( bytes );
     }
 
-    private void handleResponse(final ChannelHandlerContext context) throws Throwable
+    private void determineRequestHandler() throws Throwable
     {
         workerContext.setRequestHandler( ServerImplementation.getImplementation().getRouter().match( workerContext.getRequest() ) );
         if ( workerContext.getRequestHandler() == null )
@@ -387,6 +392,11 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
             }
             workerContext.setRequestHandler( HTTPSRedirectHandler.getInstance() );
         }
+    }
+
+    private void handleResponse(final ChannelHandlerContext context) throws Throwable
+    {
+        this.determineRequestHandler();
         this.writeResponse();
         this.sendResponse( context );
     }
