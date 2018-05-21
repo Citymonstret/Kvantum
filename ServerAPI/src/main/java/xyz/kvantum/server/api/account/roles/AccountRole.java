@@ -30,9 +30,9 @@ import lombok.RequiredArgsConstructor;
  * Roles are attached to accounts and may be used to check
  * whether or not an user is permitted to perform certain actions
  */
-@EqualsAndHashCode( of = "roleIdentifier" )
-@RequiredArgsConstructor( access = AccessLevel.PROTECTED )
-@SuppressWarnings( { "unused", "WeakerAccess" } )
+@EqualsAndHashCode(of = "roleIdentifier")
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public abstract class AccountRole
 {
 
@@ -41,22 +41,29 @@ public abstract class AccountRole
 
     /**
      * Check if the role is permitted to perform an action
+     *
      * @param permissionKey Permission key
      * @return boolean indicating whether or not the account has a certain
-     *         permission
+     *          permission
      */
     public abstract boolean hasPermission(String permissionKey);
 
     /**
      * Add a permission to the role
+     *
      * @param permissionKey Permission key
+     * @return boolean indicating whether the permission
+     *          was successfully added or not
      */
-    public abstract void addPermission(String permissionKey);
+    public abstract boolean addPermission(String permissionKey);
 
     /**
      * Remove a permission from the role
+     *
      * @param permissionKey Permission key
+     * @return boolean indicating whether the permission
+     *          was successfully removed or not
      */
-    public abstract void removePermission(String permissionKey);
+    public abstract boolean removePermission(String permissionKey);
 
 }

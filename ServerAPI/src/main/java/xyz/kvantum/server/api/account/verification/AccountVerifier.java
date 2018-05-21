@@ -113,7 +113,7 @@ public class AccountVerifier
      * @return True if the account passes all checks,
      * false if not
      */
-    public final boolean isValid(final IAccount account)
+    public final boolean isValid(@NonNull final IAccount account)
     {
         return this.verifyAccount( account ).isEmpty();
     }
@@ -126,7 +126,7 @@ public class AccountVerifier
      * @return Collection containing all violations,
      * An empty collection if the account is valid
      */
-    public final Collection<Rule<IAccount>> verifyAccount(final IAccount account)
+    public final Collection<Rule<IAccount>> verifyAccount(@NonNull final IAccount account)
     {
         return this.internalVerifier.verify( account );
     }

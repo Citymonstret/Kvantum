@@ -50,21 +50,14 @@ public class SimpleAccountRole extends AccountRole
     }
 
     @Override
-    public void addPermission(final String permissionKey)
+    public boolean addPermission(final String permissionKey)
     {
-        if ( this.hasPermission( permissionKey ) )
-        {
-            return;
-        }
-        this.permissionSet.add( permissionKey );
+        return !this.hasPermission( permissionKey ) && this.permissionSet.add( permissionKey );
     }
 
     @Override
-    public void removePermission(final String permissionKey)
+    public boolean removePermission(final String permissionKey)
     {
-        if ( this.hasPermission( permissionKey ) )
-        {
-            this.permissionSet.remove( permissionKey );
-        }
+        return this.hasPermission( permissionKey ) && this.permissionSet.remove( permissionKey );
     }
 }
