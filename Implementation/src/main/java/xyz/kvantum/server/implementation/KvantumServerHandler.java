@@ -501,8 +501,20 @@ final class KvantumServerHandler extends ChannelInboundHandlerAdapter
         //
         workerContext.getRequest().setValid( false );
 
-        final FinalizedResponse finalizedResponse = FinalizedResponse.builder()
-                .address( this.workerContext.getSocketContext().getIP() )
+        final FinalizedResponse.FinalizedResponseBuilder finalizedResponse = FinalizedResponse.builder();
+
+        //
+        // Safety measure taken to make sure that IPs are not logged
+        // in production mode. This is is to ensure GDPR compliance
+        //
+        if ( CoreConfig.debug )
+        {
+            finalizedResponse.address( this.workerContext.getSocketContext().getIP() );
+        } else
+        {
+            finalizedResponse.address( "external" );
+        }
+        finalizedResponse
                 .authorization( this.workerContext.getRequest().getAuthorization().orElse( null ) )
                 .length( bytes.length )
                 .status( body.getHeader().getStatus().toString() )

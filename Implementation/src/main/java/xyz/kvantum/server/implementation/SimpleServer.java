@@ -26,6 +26,16 @@ import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -35,6 +45,7 @@ import pw.stamina.causam.event.EventEmitter;
 import pw.stamina.causam.publish.Publisher;
 import pw.stamina.causam.registry.SetBasedSubscriptionRegistry;
 import pw.stamina.causam.registry.SubscriptionRegistry;
+import pw.stamina.causam.scan.method.model.Subscriber;
 import pw.stamina.causam.select.CachingSubscriptionSelectorServiceDecorator;
 import pw.stamina.causam.select.SubscriptionSelectorService;
 import sun.misc.Signal;
@@ -49,6 +60,7 @@ import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.events.ServerStartedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
@@ -89,14 +101,6 @@ import xyz.kvantum.server.implementation.netty.NettyLoggerFactory;
 import xyz.kvantum.server.implementation.sqlite.SQLiteAccountManager;
 import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
 import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.Locale;
-import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Main {@link Kvantum} implementation.
@@ -398,6 +402,14 @@ public class SimpleServer implements Kvantum
         this.eventBus.register( new AccessLogStream( logFolder ) );
 
         //
+        // Register connection denier
+        //
+        if ( CoreConfig.debug )
+        {
+            this.getEventBus().register( this );
+        }
+
+        //
         // Setup the connection throttler
         //
         ConnectionThrottle.initialize();
@@ -686,6 +698,42 @@ public class SimpleServer implements Kvantum
     {
         return SimpleRequestHandler.builder().pattern( filter ).generator( generator ).build()
                 .addToRouter( getRouter() );
+    }
+
+
+    @Subscriber
+    @SuppressWarnings("unused")
+    private void listenForConnections(final ConnectionEstablishedEvent establishedEvent)
+    {
+        Logger.debug( "Checking for external connection {}", establishedEvent.getIp() );
+        boolean shouldCancel = true;
+        final InetAddress address;
+        try
+        {
+            address = InetAddress.getByName( establishedEvent.getIp() );
+        } catch (final UnknownHostException e)
+        {
+            Logger.error( "Failed to get InetAddress... ");
+            e.printStackTrace();
+            return;
+        }
+        if ( address.isAnyLocalAddress() || address.isLoopbackAddress() )
+        {
+            shouldCancel = false;
+        } else
+        {
+            try
+            {
+                shouldCancel = NetworkInterface.getByInetAddress( address ) == null;
+            } catch ( final Exception ignored )
+            {
+            }
+        }
+        if ( shouldCancel )
+        {
+            Logger.debug( "Cancelling connection because it isn't local..." );
+            establishedEvent.setCancelled( true );
+        }
     }
 
 }
