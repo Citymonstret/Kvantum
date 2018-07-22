@@ -65,9 +65,10 @@ public abstract class Router
      *
      * @param handlers RequestHandlers that are to be registered
      */
-    public final void addAll(@NonNull final Collection<? extends RequestHandler> handlers)
+    public final Collection<? extends RequestHandler> addAll(@NonNull final Collection<? extends RequestHandler> handlers)
     {
         handlers.forEach( this::add );
+        return handlers;
     }
 
     /**
@@ -76,9 +77,9 @@ public abstract class Router
      *
      * @param instance Instance to be scanned
      */
-    public final <T> void scanAndAdd(final T instance)
+    public final <T> Collection<? extends RequestHandler> scanAndAdd(final T instance)
     {
-        this.addAll( this.scan( instance ) );
+        return this.addAll( this.scan( instance ) );
     }
 
     /**
