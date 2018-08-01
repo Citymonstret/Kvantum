@@ -12,7 +12,6 @@ buildscript {
 
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'application'
-
 mainClassName = 'xyz.kvantum.server.implementation.KvantumMain'
 
 // Disable ZIP artifacts

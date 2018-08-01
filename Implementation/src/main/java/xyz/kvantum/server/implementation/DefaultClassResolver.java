@@ -26,6 +26,9 @@ import io.netty.channel.ServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+/**
+ * Class resolver that returns standard Netty NIO classes
+ */
 final class DefaultClassResolver implements NioClassResolver.ClassProvider
 {
 

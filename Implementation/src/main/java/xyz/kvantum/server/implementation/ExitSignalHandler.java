@@ -26,6 +26,9 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
+/**
+ * Signal handler listening for a stop signal
+ */
 final class ExitSignalHandler implements SignalHandler
 {
 
@@ -37,5 +40,4 @@ final class ExitSignalHandler implements SignalHandler
             ServerImplementation.getImplementation().stopServer();
         }
     }
-
 }

@@ -26,6 +26,9 @@ import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 
+/**
+ * Class resolver that returns native Epoll implementations
+ */
 final class EpollClassResolver implements NioClassResolver.ClassProvider
 {
 

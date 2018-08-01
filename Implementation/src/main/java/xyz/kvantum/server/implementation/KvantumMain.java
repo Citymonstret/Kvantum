@@ -37,6 +37,9 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Optional;
 
+/**
+ * Application entry point
+ */
 @SuppressWarnings("ALL")
 final public class KvantumMain
 {
@@ -48,8 +51,14 @@ final public class KvantumMain
      */
     public static void main(final String[] args) throws Throwable
     {
+        //
+        // Determine whether or not the server is running with extended
+        // privileges. Not doing this will affect port binding
+        // to the reserved port range.
+        //
+        // This only matters if the server is run on a linux system
+        //
         final String osName = System.getProperty( "os.name" );
-
         if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
         {
             System.out.println( "Server running on Linux! Checking privileges..." );
@@ -77,11 +86,14 @@ final public class KvantumMain
             }
         }
 
+        //
+        // Here we parse command line arguments
+        //
         final Options options = new Options();
         final JCommander jCommander = new JCommander( options );
         jCommander.parse( args );
-
         jCommander.setProgramName( "Kvantum" );
+
         if ( options.help )
         {
             final LogWrapper logWrapper = new DefaultLogWrapper();
@@ -160,6 +172,10 @@ final public class KvantumMain
      */
     public static Optional<? extends Kvantum> start(final ServerContext serverContext)
     {
+        if ( serverContext == null )
+        {
+            throw new NullPointerException( "Supplied server context cannot be null!" );
+        }
         Optional<? extends Kvantum> server = serverContext.create();
         try
         {

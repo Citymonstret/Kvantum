@@ -49,6 +49,13 @@ final public class TemplateManager
 
     public void addProviderFactory(@NonNull final ProviderFactory<? extends VariableProvider> factory)
     {
+        for ( final ProviderFactory<?> registeredFactory : this.providers )
+        {
+            if ( registeredFactory.providerName().equals( factory.providerName() ) )
+            {
+                throw new IllegalArgumentException( "Cannot register a provider factory twice" );
+            }
+        }
         this.providers.add( factory );
     }
 

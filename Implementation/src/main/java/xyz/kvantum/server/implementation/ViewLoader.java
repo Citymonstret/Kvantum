@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.server.api.config.ConfigurationFile;
@@ -75,10 +76,18 @@ final class ViewLoader
         this.views.entrySet().forEach( this::loadView );
     }
 
-    private void visitMembers(final Map<String, Object> views)
+    private void visitMembers(@Nullable final Map<String, Object> views)
     {
+        if ( views == null || views.isEmpty() )
+        {
+            return;
+        }
         for ( final Map.Entry<String, Object> viewEntry : views.entrySet() )
         {
+            if ( viewEntry.getValue() == null )
+            {
+                continue;
+            }
             if ( viewEntry.getValue() instanceof String )
             {
                 final String object = viewEntry.getValue().toString();
@@ -96,7 +105,7 @@ final class ViewLoader
                         }
                     } catch ( Exception e )
                     {
-                        e.printStackTrace();
+                        new RuntimeException( "Failed to include views file", e ).printStackTrace();
                         continue;
                     }
                 } else
@@ -117,18 +126,30 @@ final class ViewLoader
         }
     }
 
-    private void loadView(final Map.Entry<String, Map<String, Object>> viewEntry)
+    private void loadView(@Nullable final Map.Entry<String, Map<String, Object>> viewEntry)
     {
+        if ( viewEntry == null || viewEntry.getValue() == null )
+        {
+            return;
+        }
+
         final Map<String, Object> viewBody = viewEntry.getValue();
+
         if ( !validateView( viewBody ) )
         {
             Logger.warn( "Invalid view declaration: {}", viewEntry.getKey() );
             return;
         }
+
         final String type = viewBody.get( "type" ).toString().toLowerCase( Locale.ENGLISH );
         final String filter = viewBody.get( "filter" ).toString();
         final Map<String, Object> options = (Map<String, Object>) viewBody.getOrDefault( "options", new HashMap<>() );
+
+        //
+        // Store internal reference to view entry name
+        //
         options.put( "internalName", viewEntry.getKey() );
+
         if ( viewBindings.containsKey( type ) )
         {
             final Class<? extends View> vc = viewBindings.get( type.toLowerCase( Locale.ENGLISH ) );
@@ -145,7 +166,7 @@ final class ViewLoader
                 ServerImplementation.getImplementation().getRouter().add( vv );
             } catch ( final Exception e )
             {
-                e.printStackTrace();
+                new RuntimeException( "Failed to add view '" + viewEntry.getKey() + "' to router", e ).printStackTrace();
             }
         } else
         {
@@ -154,14 +175,22 @@ final class ViewLoader
         }
     }
 
-    private boolean validateView(final Map<String, Object> viewBody)
+    private boolean validateView(@NonNull final Map<String, Object> viewBody)
     {
         return viewBody.containsKey( "type" ) && viewBody.containsKey( "filter" );
     }
 
-    private void addViews(final ConfigurationFile file)
+    private void addViews(@Nullable final ConfigurationFile file)
     {
+        if ( file == null || file.getAll().isEmpty() )
+        {
+            return;
+        }
         final Map<String, Object> rawEntries = file.get( "views" );
+        if ( rawEntries == null || rawEntries.isEmpty() )
+        {
+            return;
+        }
         this.visitMembers( rawEntries );
     }
 }

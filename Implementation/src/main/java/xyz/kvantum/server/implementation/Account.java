@@ -248,6 +248,10 @@ public final class Account implements IAccount
         {
             this.getAccountRoles();
         }
+        //
+        // Loop through every role, and return on first match.
+        // We do not cache the results, as roles are hot-swappable
+        //
         for ( final AccountRole role : this.getAccountRoles() )
         {
             if ( role.hasPermission( permissionKey ) )

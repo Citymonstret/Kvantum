@@ -26,6 +26,9 @@ import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
 import xyz.kvantum.server.api.util.AsciiString;
 
+/**
+ * Session database without any functionality
+ */
 public final class DumbSessionDatabase implements ISessionDatabase
 {
 
@@ -35,23 +38,23 @@ public final class DumbSessionDatabase implements ISessionDatabase
     }
 
     @Override
-    public SessionLoad getSessionLoad(AsciiString sessionID)
+    public SessionLoad getSessionLoad(final AsciiString sessionID)
     {
         return null;
     }
 
     @Override
-    public void storeSession(ISession session)
+    public void storeSession(final ISession session)
     {
     }
 
     @Override
-    public void updateSession(AsciiString session)
+    public void updateSession(final AsciiString session)
     {
     }
 
     @Override
-    public void deleteSession(AsciiString session)
+    public void deleteSession(final AsciiString session)
     {
     }
 }

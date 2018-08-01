@@ -28,7 +28,7 @@ import xyz.kvantum.server.api.util.AutoCloseable;
 import java.io.IOException;
 
 /**
- * This class is responsible for the GZIP compression
+ * Handler for Gzip compression
  */
 final class GzipHandler extends AutoCloseable
 {

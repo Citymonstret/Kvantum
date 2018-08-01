@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.views;
 
+import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -31,14 +32,13 @@ import xyz.kvantum.server.api.util.IgnoreSyntax;
 import java.util.Map;
 
 /**
- * Created 2015-05-01 for Kvantum
- *
- * @author Citymonstret
+ * Static file view that will server all files as attachments
  */
-public class DownloadView extends StaticFileView implements IgnoreSyntax
+public final class DownloadView extends StaticFileView implements IgnoreSyntax
 {
 
-    public DownloadView(String filter, Map<String, Object> options)
+    public DownloadView(@NonNull final String filter,
+                        @NonNull final Map<String, Object> options)
     {
         super( filter, options, "download", FileExtension.DOWNLOADABLE );
         super.relatedFolderPath = "/assets/downloads";
