@@ -37,7 +37,7 @@ import java.util.Optional;
  * @author Citymonstret
  */
 @NoArgsConstructor
-final public class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider
+public final class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider
 {
 
     private PostRequest p;

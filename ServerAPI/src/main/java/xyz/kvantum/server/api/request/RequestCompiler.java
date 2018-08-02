@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings({ "unused", "WeakerAccess" })
 @UtilityClass
-public class RequestCompiler
+public final class RequestCompiler
 {
 
     private static final Pattern PATTERN_QUERY = Pattern.compile(

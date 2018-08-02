@@ -21,16 +21,17 @@
  */
 package xyz.kvantum.server.api.views.requesthandler;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-public class AuthenticationRequiredMiddleware extends Middleware
+public final class AuthenticationRequiredMiddleware extends Middleware
 {
 
     @Override
-    public void handle(AbstractRequest request, MiddlewareQueue queue)
+    public void handle(@NonNull final AbstractRequest request, @NonNull final MiddlewareQueue queue)
     {
         final IAccountManager accountManager = ServerImplementation.getImplementation()
                 .getApplicationStructure().getAccountManager();

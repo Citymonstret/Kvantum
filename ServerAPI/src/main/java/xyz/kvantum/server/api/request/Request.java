@@ -37,7 +37,7 @@ import xyz.kvantum.server.api.util.ProtocolType;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final public class Request extends AbstractRequest
+public final class Request extends AbstractRequest
 {
 
     private static final AsciiString HEADER_AUTHORIZATION = AsciiString.of( "Authorization" );

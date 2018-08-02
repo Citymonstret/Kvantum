@@ -27,7 +27,7 @@ import java.util.Collection;
 public final class MiddlewareQueuePopulator
 {
 
-    private final Collection<Class<? extends Middleware>> middlewares = new ArrayList<>();
+    private final Collection<Class<? extends Middleware>> middleware = new ArrayList<>();
 
     public void add(final Class<? extends Middleware> middleware)
     {
@@ -43,13 +43,13 @@ public final class MiddlewareQueuePopulator
             e.printStackTrace();
             return;
         }
-        this.middlewares.add( middleware );
+        this.middleware.add( middleware );
     }
 
     public MiddlewareQueue generateQueue()
     {
         final MiddlewareQueue queue = new MiddlewareQueue();
-        middlewares.forEach( clazz ->
+        middleware.forEach( clazz ->
         {
             try
             {

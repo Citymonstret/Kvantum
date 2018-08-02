@@ -93,7 +93,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  */
 @RequiredArgsConstructor
-final public class KvantumObjectFactory<T>
+public final class KvantumObjectFactory<T>
 {
 
     private static final Map<Class<?>, KvantumObjectFactory<?>> factoryCache = new ConcurrentHashMap<>();

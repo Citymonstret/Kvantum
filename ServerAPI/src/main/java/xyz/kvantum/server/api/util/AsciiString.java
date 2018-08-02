@@ -23,8 +23,6 @@ package xyz.kvantum.server.api.util;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.HashBiMap;
-import lombok.NonNull;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 
 /**
  * Utility object for dealing with US-ASCII encoded strings.
@@ -130,7 +129,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         return asciiString;
     }
 
-    public static AsciiString of(final byte[] string)
+    public static AsciiString of(@NonNull final byte[] string)
     {
         return new AsciiString( string );
     }
@@ -184,6 +183,10 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
     @Override
     public boolean equals(final Object object)
     {
+        if ( object == null )
+        {
+            return false;
+        }
         if ( object instanceof AsciiString )
         {
             return this.string.equals( ( (AsciiString) object ).string );
@@ -263,6 +266,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
     /**
      * Delegate for {@link String#endsWith(String)}
      */
+    @SuppressWarnings( "WeakerAccess" )
     public boolean endsWith(@NonNull final String string)
     {
         return this.string.endsWith( string );
@@ -270,7 +274,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
 
     public AsciiString toLowerCase()
     {
-        if ( this.lowercase )
+        if ( this.lowercase || this.isEmpty() )
         {
             return this;
         }
@@ -290,6 +294,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
         return of( lowercase );
     }
 
+    @SuppressWarnings( "WeakerAccess" )
     public AsciiString toUpperCase()
     {
         if ( this.uppercase )
@@ -394,6 +399,7 @@ public final class AsciiString implements CharSequence, AsciiStringable, Compara
     }
     
     @Override
+    @SuppressWarnings( "ALL" )
     public int compareTo(@NonNull final CharSequence sequence)
     {
         if ( this == sequence || sequence.equals( this ) )

@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.matching;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import xyz.kvantum.server.api.util.Assert;
@@ -360,6 +361,7 @@ public class ViewPattern
             }
         }
 
+        @SuppressWarnings( "ALL" )
         void replaceLastIf(char c, char k)
         {
             replaceIf( length - 1, c, k );
@@ -466,6 +468,7 @@ public class ViewPattern
         }
 
         @Override
+        @NonNull
         public Iterator<Character> iterator()
         {
             return new Iterator<Character>()
@@ -491,11 +494,13 @@ public class ViewPattern
             };
         }
 
+        @SuppressWarnings( "ALL" )
         void replaceFirstIf(char c1, char c2)
         {
             replaceIf( 0, c1, c2 );
         }
 
+        @SuppressWarnings( "ALL" )
         void replaceAllButLast(char search, char replacement)
         {
             final int[] indices = search( search );
@@ -543,7 +548,7 @@ public class ViewPattern
             this( name, type, null );
         }
 
-        public boolean hasDefaultValue()
+        boolean hasDefaultValue()
         {
             return this.getDefaultValue() != null;
         }

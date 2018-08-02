@@ -77,7 +77,7 @@ public abstract class Router
      *
      * @param instance Instance to be scanned
      */
-    public final <T> Collection<? extends RequestHandler> scanAndAdd(final T instance)
+    public final <T> Collection<? extends RequestHandler> scanAndAdd(@NonNull final T instance)
     {
         return this.addAll( this.scan( instance ) );
     }
@@ -119,7 +119,7 @@ public abstract class Router
      * @param server Server instance
      */
     @SneakyThrows
-    public void dump(final Kvantum server)
+    public void dump(@NonNull final Kvantum server)
     {
         throw new NotImplementedException( "Dump has not been overridden by the Router implementation" );
     }

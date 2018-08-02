@@ -25,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 
+@SuppressWarnings( "WeakerAccess" )
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PojoJsonFactory<Pojo>
 {

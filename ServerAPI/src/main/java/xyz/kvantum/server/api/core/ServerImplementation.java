@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.core;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 
 /**
@@ -38,7 +39,7 @@ public final class ServerImplementation
      * @param intellectualServer Server instance
      * @throws KvantumException if the instance is already set
      */
-    public static void registerServerImplementation(final Kvantum intellectualServer)
+    public static void registerServerImplementation(@NonNull final Kvantum intellectualServer)
     {
         if ( ServerImplementation.intellectualServer != null )
         {

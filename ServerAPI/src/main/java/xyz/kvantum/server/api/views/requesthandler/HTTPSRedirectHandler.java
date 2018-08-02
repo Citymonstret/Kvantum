@@ -37,7 +37,7 @@ import java.util.function.BiConsumer;
  * responsible for {@link ProtocolType#HTTP HTTP} ->
  * {@link ProtocolType#HTTP HTTPS } rerouting
  */
-final public class HTTPSRedirectHandler extends SimpleRequestHandler
+public final class HTTPSRedirectHandler extends SimpleRequestHandler
 {
 
     private static final BiConsumer<AbstractRequest, Response> responseGenerator = (request, response) ->

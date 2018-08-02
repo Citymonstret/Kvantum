@@ -24,11 +24,6 @@ package xyz.kvantum.server.api.views.errors;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.response.Header;
 
-/**
- * Created 2015-04-19 for Kvantum
- *
- * @author Citymonstret
- */
 public class View404 extends xyz.kvantum.server.api.views.errors.Error
 {
 

@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.matching;
 import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.VariableHolder;
 
@@ -32,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-final public class FilePattern
+public final class FilePattern
 {
 
     private static final Pattern PATTERN_VARIABLE = Pattern.compile( "\\$\\{(?<variable>[A-Za-z0-9]*)}" );
@@ -40,7 +41,7 @@ final public class FilePattern
     private final String pattern;
     private final Map<String, String> variableMap;
 
-    public static FilePattern compile(final String in)
+    public static FilePattern compile(@NonNull final String in)
     {
         final Matcher matcher = PATTERN_VARIABLE.matcher( in );
         final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
@@ -63,7 +64,7 @@ final public class FilePattern
         private final Map<String, String> variableMapping;
         private String compiledName = null;
 
-        private FileMatcher(final VariableHolder variableHolder)
+        private FileMatcher(@NonNull final VariableHolder variableHolder)
         {
             final ImmutableMap.Builder<String, String> variableMappingBuilder = ImmutableMap.builder();
             final Map<String, String> requestVariables = variableHolder.getVariables();

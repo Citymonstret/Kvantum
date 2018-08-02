@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.core;
 
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.Synchronized;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.Assert;
@@ -49,7 +50,7 @@ public final class WorkerProcedure
      * @param handler Procedure Handler
      */
     @Synchronized
-    public void addProcedure(final String name, final StringHandler handler)
+    public void addProcedure(@NonNull final String name, @NonNull final StringHandler handler)
     {
         this.handlers.put( name, handler );
         this.setChanged();

@@ -31,11 +31,6 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.views.View;
 
-/**
- * Created 2015-04-19 for Kvantum
- *
- * @author Citymonstret
- */
 public class Error extends View
 {
 

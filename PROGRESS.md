@@ -141,3 +141,7 @@ automatically generate objects based on these parameters
 
 ### 4.11 POJO
 Kvantum includes its own POJO utilities.
+
+### 4.12 Quick Start Utilities
+Different utility methods to make launching a server instance and registering routes very simple. This
+is done using (with many others not mentioned here) the ServerContextBuilder, QuickStart and Routes.

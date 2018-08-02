@@ -78,7 +78,7 @@ public final class AnnotatedViewManager
                 {
                     declaration.setCache( matcher.cache() );
                     declaration.setFilter( matcher.filter() );
-                    declaration.setMiddlewares( matcher.middlewares() );
+                    declaration.setMiddleware( matcher.middlewares() );
                     declaration.setForceHttps( matcher.forceHTTPS() );
                     declaration.setHttpMethod( matcher.httpMethod() );
                     if ( !matcher.outputType().isEmpty() && converters.containsKey( matcher.outputType()

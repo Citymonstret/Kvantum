@@ -31,7 +31,7 @@ final class ViewDeclaration
 
     private String filter;
     private String name;
-    private Class<? extends Middleware>[] middlewares;
+    private Class<? extends Middleware>[] middleware;
     private boolean cache = true;
     private boolean forceHttps = true;
     private HttpMethod httpMethod = HttpMethod.ALL;
