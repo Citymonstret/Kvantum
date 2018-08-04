@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,15 @@
 package xyz.kvantum.server.api.session;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class SessionLoad
+public final class SessionLoad
 {
 
-    private final String sessionKey;
-    private final long lastActive;
+    @NonNull private final String sessionKey;
+    @NonNull private final long lastActive;
 
 }

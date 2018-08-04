@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ import java.nio.charset.StandardCharsets;
 @Getter
 @Setter
 @RequiredArgsConstructor
-class WorkerContext
+final class WorkerContext
 {
 
     private static final String CONTENT_TYPE = "content_type";
@@ -61,6 +61,8 @@ class WorkerContext
     private byte[] bytes;
 
     /**
+     * TODO: I am fairly confident this would be better somewhere else
+     *
      * <p>
      * Determine whether or not GZIP compression should be used.
      * This depends on two things:

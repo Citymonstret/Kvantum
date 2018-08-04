@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
- * Read a HTTPabstractRequest until the first clear line. Does
+ * Read a HTTP request until the first clear line. Does
  * not read the HTTP message. The reader uses {@link java.nio.charset.StandardCharsets#US_ASCII}
  * as the charset, as defined by the HTTP protocol.
  */
@@ -71,7 +71,7 @@ final class RequestReader
     /**
      * Check whether the reader is done reading theabstractRequest
      *
-     * @return true if theabstractRequest is read, false if not
+     * @return true if the HTTP request is read, false if not
      */
     boolean isDone()
     {

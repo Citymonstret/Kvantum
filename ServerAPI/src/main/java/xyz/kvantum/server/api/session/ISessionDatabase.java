@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,42 +21,72 @@
  */
 package xyz.kvantum.server.api.session;
 
+import javax.annotation.Nullable;
 import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.util.AsciiString;
 
+/**
+ * Database handling for {@link ISession sessions}
+ */
 public interface ISessionDatabase
 {
 
-    void setup() throws Exception;
+	void setup() throws Exception;
 
-    SessionLoad getSessionLoad(AsciiString sessionID);
+	/**
+	 * Get the session load (used to verify session validity before letting the client access the session data)
+	 *
+	 * @param sessionID Session ID
+	 * @return session load if found, else null
+	 */
+	@Nullable SessionLoad getSessionLoad(AsciiString sessionID);
 
-    default SessionLoad isValid(final AsciiString session)
-    {
-        final SessionLoad sessionLoad = getSessionLoad( session );
-        if ( sessionLoad == null )
-        {
-            return null;
-        }
+	/**
+	 * Check if a session is valid
+	 *
+	 * @param session Session ID
+	 * @return the session load for the given session if valid, else null
+	 */
+	@Nullable default SessionLoad isValid(final AsciiString session)
+	{
+		final SessionLoad sessionLoad = getSessionLoad( session );
+		if ( sessionLoad == null )
+		{
+			return null;
+		}
+		final long difference = ( System.currentTimeMillis() - sessionLoad.getLastActive() ) / 1000;
+		if ( difference >= CoreConfig.Sessions.sessionTimeout )
+		{
+			if ( CoreConfig.debug )
+			{
+				Message.SESSION_DELETED_OUTDATED.log( session );
+			}
+			deleteSession( session );
+			return null;
+		}
+		return sessionLoad;
+	}
 
-        long difference = ( System.currentTimeMillis() - sessionLoad.getLastActive() ) / 1000;
-        if ( difference >= CoreConfig.Sessions.sessionTimeout )
-        {
-            if ( CoreConfig.debug )
-            {
-                Logger.debug( "Deleted outdated session: {}", session );
-            }
-            deleteSession( session );
-            return null;
-        }
-        return sessionLoad;
-    }
+	/**
+	 * Store a session in the database
+	 *
+	 * @param session Session to store
+	 */
+	void storeSession(ISession session);
 
-    void storeSession(ISession session);
+	/**
+	 * Update a session in the database
+	 *
+	 * @param session Session ID to update
+	 */
+	void updateSession(AsciiString session);
 
-    void updateSession(AsciiString session);
-
-    void deleteSession(AsciiString session);
+	/**
+	 * Delete a session from the database
+	 *
+	 * @param session Session ID to delete
+	 */
+	void deleteSession(AsciiString session);
 
 }

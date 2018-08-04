@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,12 +81,18 @@ public enum Message
     CLEARED_VIEWS( "Cleared views ( {} )", LogModes.MODE_INFO ),
     SESSION_SET( "Set session ({0}={1})", LogModes.MODE_DEBUG ),
     SESSION_FOUND( "Found session ({0}={1}) for request {2}", LogModes.MODE_DEBUG ),
+    SESSION_DELETED_OUTDATED( "Deleted outdated session: {}", LogModes.MODE_DEBUG ),
+    SESSION_DELETED_OTHER( "Deleted session: {} (Cause: {})", LogModes.MODE_DEBUG ),
+    SESSION_KEY_INVALID( "Wrong session key", LogModes.MODE_INFO ),
     CMD_HELP_HEADER( "# Available Commands ( Page {0}/{1} ) " ),
     CMD_HELP_ITEM( "> Command: /{0} | Usage: {1} | Description: {2} " ),
     CMD_HELP_FOOTER( "# Type '/help {0}' to see the next page" ),
     ACCOUNT_ADMIN_FAILED( "Failed to create admin account", LogModes.MODE_ERROR ),
     ACCOUNT_ADMIN_CREATED( "Created admin account with password: \"{}\"", LogModes.MODE_INFO ),
     WORKER_FAILED_HANDLING( "Error when handling request: {}", LogModes.MODE_ERROR ),
+    SERVER_START_FAILED( "Failed to start server..." ),
+    SERVER_START_PORT_CHANGED_PRIVILEGED( "Failed to bind to privileged port, trying 1024 instead", LogModes.MODE_ERROR ),
+    SERVER_START_PORT_CHANGED_OCCUPIED( "Port {0} is occupied. Trying {1}...", LogModes.MODE_ERROR ),
     REQUEST_HANDLER_DUMP( "> RequestHandler - Class '{0}', Pattern: '{1}'", LogModes.MODE_DEBUG );
 
     private final String message;

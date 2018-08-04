@@ -30,7 +30,7 @@ allprojects {
     license {
         header rootProject.file('HEADER')
         mapping 'java', 'SLASHSTAR_STYLE'
-        ext.year = 2017
+        ext.year = 2018
     }
     repositories {
         maven { url "https://jitpack.io" }

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.request;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -173,7 +174,7 @@ public abstract class AbstractRequest implements
         this.addMeta( ALTERNATE_OUTCOME, Assert.notNull( identifier ) );
     }
 
-    public void addModel(final String name, final VariableProvider provider)
+    public void addModel(@NonNull final String name, @NonNull final VariableProvider provider)
     {
         final ProviderFactory<VariableProvider> providerFactory = new ProviderFactory<VariableProvider>()
         {
@@ -215,10 +216,8 @@ public abstract class AbstractRequest implements
      * @param name Header Name
      * @return The header value, if the header exists. Otherwise an empty string will be returned.
      */
-    public AsciiString getHeader(final AsciiString name)
+    public AsciiString getHeader(@NonNull final AsciiString name)
     {
-        Assert.notNull( name );
-
         if ( this.headers.containsKey( name.toLowerCase() ) )
         {
             return this.headers.get( name.toLowerCase() );
@@ -227,7 +226,7 @@ public abstract class AbstractRequest implements
         return AsciiString.empty;
     }
 
-    public AsciiString getHeader(final String name)
+    public AsciiString getHeader(@NonNull final String name)
     {
         return getHeader( AsciiString.of( name ) );
     }
@@ -279,10 +278,9 @@ public abstract class AbstractRequest implements
      * @return Meta value if exists, else null
      * @see #addMeta(String, Object) To set a meta value
      */
-    public Object getMeta(final String name)
+    @Nullable
+    public Object getMeta(@NonNull final String name)
     {
-        Assert.notNull( name );
-
         if ( !meta.containsKey( name ) )
         {
             return null;
@@ -353,10 +351,8 @@ public abstract class AbstractRequest implements
          * @param method   Request Method
          * @param resource The requested resource
          */
-        public Query(final HttpMethod method, final ProtocolType protocolType, final String resource)
+        public Query(@NonNull final HttpMethod method, @NonNull final ProtocolType protocolType, @NonNull final String resource)
         {
-            Assert.notNull( method, resource );
-
             String resourceName = resource;
 
             final String illegalBeginning = protocolType == ProtocolType.HTTP ? "http" : "https";
@@ -437,7 +433,7 @@ public abstract class AbstractRequest implements
         @Getter
         private final AsciiString password;
 
-        Authorization(final AsciiString input)
+        Authorization(@NonNull final AsciiString input)
         {
             final List<AsciiString> parts = input.split( "\\s" );
             this.mechanism = parts.get( 1 );

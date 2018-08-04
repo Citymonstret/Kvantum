@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ public abstract class RequestHandler
      * @return True if the request can be served by this handler
      * False if not
      */
-    abstract public boolean matches(AbstractRequest request);
+    public abstract boolean matches(AbstractRequest request);
 
     /**
      * Attempt to serve a request

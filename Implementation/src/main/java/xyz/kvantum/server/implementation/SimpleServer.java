@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -489,7 +489,7 @@ public class SimpleServer implements Kvantum
 			this.httpThread = new HTTPThread( new ServerSocketFactory(), classResolver );
 		} catch ( KvantumInitializationException e )
 		{
-			Logger.error( "Failed to start server..." );
+			Message.SERVER_START_FAILED.log();
 			ServerImplementation.getImplementation().stopServer();
 			return false;
 		}
@@ -655,15 +655,15 @@ public class SimpleServer implements Kvantum
 		}
 	}
 
-	@Override public final RequestHandler createSimpleRequestHandler(final String filter,
-			final BiConsumer<AbstractRequest, Response> generator)
+	@Override public final RequestHandler createSimpleRequestHandler(
+			@NonNull final String filter, @NonNull final BiConsumer<AbstractRequest, Response> generator)
 	{
 		return SimpleRequestHandler.builder().pattern( filter ).generator( generator ).build()
 				.addToRouter( getRouter() );
 	}
 
-	@Subscriber @SuppressWarnings("unused") private void listenForConnections(
-			final ConnectionEstablishedEvent establishedEvent)
+	@Subscriber @SuppressWarnings("unused") private void
+			listenForConnections(@NonNull final ConnectionEstablishedEvent establishedEvent)
 	{
 		Logger.debug( "Checking for external connection {}", establishedEvent.getIp() );
 		boolean shouldCancel = true;

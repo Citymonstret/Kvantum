@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.function.Function;
 
+/**
+ * Represents a client session. Managed using
+ * a {@link SessionManager}
+ */
 @SuppressWarnings("unused")
 public interface ISession extends VariableProvider
 {

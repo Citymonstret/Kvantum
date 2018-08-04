@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2017 IntellectualSites
+ *    Copyright (C) 2018 IntellectualSites
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,19 @@
  */
 package xyz.kvantum.server.api.request;
 
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.QueryException;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.AsciiString;
-import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CookieManager;
 import xyz.kvantum.server.api.util.DebugTree;
 import xyz.kvantum.server.api.util.ProtocolType;
-
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Request extends AbstractRequest
@@ -43,9 +42,8 @@ public final class Request extends AbstractRequest
     private static final AsciiString HEADER_AUTHORIZATION = AsciiString.of( "Authorization" );
     private boolean hasBeenRequested = false;
 
-    public Request(final SocketContext socket)
+    public Request(@NonNull final SocketContext socket)
     {
-        Assert.notNull( socket );
         this.setSocket( socket );
         if ( socket.isSSL() )
         {
@@ -71,11 +69,9 @@ public final class Request extends AbstractRequest
     }
 
     @Override
-    protected AbstractRequest newRequest(final String query)
+    protected AbstractRequest newRequest(@NonNull final String query)
     {
-        Assert.notNull( query );
-
-        AbstractRequest request = new Request();
+        final AbstractRequest request = new Request();
         request.setPostRequest( this.getPostRequest() );
         request.getHeaders().putAll( this.getHeaders() );
         request.setSocket( this.getSocket() );
@@ -84,7 +80,6 @@ public final class Request extends AbstractRequest
         request.setCookies( this.getCookies() );
         request.setProtocolType( this.getProtocolType() );
         request.setSession( this.getSession() );
-
         return request;
     }
 
