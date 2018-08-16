@@ -50,37 +50,27 @@ import lombok.NonNull;
 
 	private AsciiString(@NonNull final String value)
 	{
-		this.value = value.getBytes( Charsets.US_ASCII );
-		this.string = value;
-		this.hashCode = this.string.hashCode();
-
-		boolean lowercase = true;
-		boolean uppercase = true;
-
-		for ( final byte b : this.value )
-		{
-			if ( b >= 97 && b <= 122 ) // lowercase a-z
-			{
-				uppercase = false;
-			} else if ( b >= 65 && b <= 90 ) // uppercase A-Z
-			{
-				lowercase = false;
-			}
-		}
-
-		this.uppercase = uppercase;
-		this.lowercase = lowercase;
+		this( value, value.getBytes( Charsets.US_ASCII ) );
 	}
 
 	private AsciiString(@NonNull final byte[] value)
 	{
-		this.value = value;
-		this.string = new String( value, StandardCharsets.US_ASCII );
-		this.hashCode = this.string.hashCode();
+		this( new String( value, StandardCharsets.US_ASCII ), value );
+	}
 
+	private AsciiString(@NonNull final String string, @NonNull final byte[] bytes)
+	{
+		this.value = bytes;
+		this.string = string;
+		this.hashCode = this.string.hashCode();
 		boolean lowercase = true;
 		boolean uppercase = true;
 
+		//
+		// Pre-calculated values that determine
+		// how the string behaves in case dependent
+		// methods
+		//
 		for ( final byte b : this.value )
 		{
 			if ( b >= 97 && b <= 122 ) // lowercase a-z
@@ -179,14 +169,32 @@ import lombok.NonNull;
 		}
 		if ( object instanceof AsciiString )
 		{
-			return this.string.equals( ( ( AsciiString ) object ).string );
+			final AsciiString other = (AsciiString) object;
+			return compareBytes( other.value );
 		} else if ( object instanceof String )
 		{
 			return this.string.equals( object );
-		} else
+		} else if ( object instanceof byte[] )
 		{
-			return object instanceof byte[] && this.value.equals( object );
+			return compareBytes( (byte[]) object );
 		}
+		return false;
+	}
+
+	private boolean compareBytes(@NonNull final byte[] other)
+	{
+		if ( this.value.length != other.length )
+		{
+			return false;
+		}
+		for ( int i = 0; 0 < this.value.length; i++ )
+		{
+			if ( this.value[i] != other[i] )
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -383,7 +391,7 @@ import lombok.NonNull;
 
 	@Override @SuppressWarnings("ALL") public int compareTo(@NonNull final CharSequence sequence)
 	{
-		if ( this == sequence || sequence.equals( this ) )
+		if ( this == sequence || this.equals( sequence ) )
 		{
 			return 0;
 		}
