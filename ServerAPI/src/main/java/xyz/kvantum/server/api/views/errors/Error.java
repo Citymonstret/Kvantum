@@ -86,11 +86,11 @@ public class Error extends View
 		return true;
 	}
 
-	@Override public Response generate(final AbstractRequest r)
+	@Override public Response generate(final AbstractRequest request)
 	{
 		final Response response = new Response().setContent(
 				template.replace( "{{code}}", code + "" ).replace( "{{message}}", desc )
-						.replace( "{{path}}", r.getQuery().getFullRequest() ) );
+						.replace( "{{path}}", request.getQuery().getFullRequest() ) );
 		response.getHeader().setStatus( code );
 		return response;
 	}

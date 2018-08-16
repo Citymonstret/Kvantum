@@ -81,7 +81,7 @@ public class MultipartPostRequest extends PostRequest
 							Logger.warn( "FileItem simple field line count is not 0 (Request: {})", getParent() );
 							continue;
 						}
-						this.getVariables().put( item.getFieldName(), lines.get( 0 ).toString() );
+						this.getVariables().put( item.getFieldName(), lines.get( 0 ) );
 					}
 				}
 			} catch ( final FileUploadException | IOException e )

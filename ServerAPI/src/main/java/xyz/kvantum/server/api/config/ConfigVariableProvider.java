@@ -25,6 +25,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
@@ -85,7 +86,7 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
 		return false;
 	}
 
-	@Override public Object get(final String variable)
+	@Nullable @Override public Object get(final String variable)
 	{
 		String[] parts = variable.split( "@" );
 		final WeakReference<ConfigProvider> reference = configurations.get( parts[ 0 ] );
@@ -97,7 +98,7 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
 		{
 			this.configurations.remove( parts[ 0 ] );
 		}
-		return null;
+		return null; // Nullable
 	}
 
 	@Override public Map<String, Object> getAll()
@@ -110,7 +111,7 @@ public class ConfigVariableProvider implements ProviderFactory<ConfigVariablePro
 			{
 				continue;
 			}
-			for ( Map.Entry<String, Object> entry2 : provider.getAll().entrySet() )
+			for ( final Map.Entry<String, Object> entry2 : provider.getAll().entrySet() )
 			{
 				all.put( entry1.getKey() + "@" + entry2.getKey(), entry2.getValue() );
 			}

@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.request.post;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -80,7 +81,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param key Parameter key
 	 * @return Parameter value if found, else null
 	 */
-	public String get(final String key)
+	@Nullable public String get(final String key)
 	{
 		Assert.notNull( key );
 
@@ -88,7 +89,7 @@ import xyz.kvantum.server.api.util.Assert;
 
 		if ( !this.getVariables().containsKey( key ) )
 		{
-			return null;
+			return null; // Nullable
 		}
 		return this.getVariables().get( key );
 	}
@@ -102,9 +103,7 @@ import xyz.kvantum.server.api.util.Assert;
 	public boolean contains(final String key)
 	{
 		Assert.notNull( key );
-
 		this.checkIfShouldLoad();
-
 		return this.getVariables().containsKey( key );
 	}
 

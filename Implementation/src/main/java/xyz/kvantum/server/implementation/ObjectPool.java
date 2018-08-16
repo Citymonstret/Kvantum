@@ -22,6 +22,7 @@
 package xyz.kvantum.server.implementation;
 
 import java.util.concurrent.LinkedBlockingDeque;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import xyz.kvantum.server.api.util.LambdaUtil;
 import xyz.kvantum.server.api.util.Provider;
@@ -65,14 +66,14 @@ final class ObjectPool<T>
 	 *
 	 * @return next object | null
 	 */
-	final T getNullable()
+	@Nullable final T getNullable()
 	{
 		try
 		{
 			return getAvailable();
 		} catch ( final InterruptedException e )
 		{
-			return null;
+			return null; // Nullable
 		}
 	}
 

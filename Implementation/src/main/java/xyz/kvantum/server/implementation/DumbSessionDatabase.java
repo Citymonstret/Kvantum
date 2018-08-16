@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import javax.annotation.Nullable;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
@@ -36,9 +37,9 @@ public final class DumbSessionDatabase implements ISessionDatabase
 	{
 	}
 
-	@Override public SessionLoad getSessionLoad(final AsciiString sessionID)
+	@Nullable @Override public SessionLoad getSessionLoad(final AsciiString sessionID)
 	{
-		return null;
+		return null; // Nullable
 	}
 
 	@Override public void storeSession(final ISession session)

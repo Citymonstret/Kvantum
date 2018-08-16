@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.views.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -67,12 +68,12 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
 		return false;
 	}
 
-	@Override public Response generate(AbstractRequest request)
+	@Nullable @Override public Response generate(AbstractRequest request)
 	{
 		final RestResponse restResponse = ( RestResponse ) request.getMeta( "restResponse" );
 		if ( restResponse == null )
 		{
-			return null;
+			return null; // Nullable
 		}
 
 		if ( !restResponse.methodMatches( request ) )

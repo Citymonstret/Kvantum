@@ -21,13 +21,13 @@
  */
 package xyz.kvantum.server.api.views;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,6 +56,15 @@ import xyz.kvantum.server.api.util.Assert;
 @SuppressWarnings("ALL") @EqualsAndHashCode(of = "internalName", callSuper = false) public class View
 		extends RequestHandler
 {
+
+	private static final String INTERNAL_NAME = "internalName";
+	private static final String EXTENSION_REWRITE = "extensionRewrite";
+	private static final String FORCE_HTTPS = "forceHTTPS";
+	private static final String HEADERS = "headers";
+	private static final String METHOD = "method";
+	private static final String FILE_PATTERN = "filePattern";
+	private static final String FOLDER = "folder";
+	private static final String FILE_MATCHER = "fileMatcher";
 
 	/**
 	 * Variable corrensponding to {@link #PATTERN_VARIABLE_FILE}
@@ -157,11 +166,11 @@ import xyz.kvantum.server.api.util.Assert;
 		{
 			this.options = options;
 		}
-		this.internalName = this.options.getOrDefault( "internalName", internalName ).toString();
-		this.forceHTTPS = ( boolean ) this.options.getOrDefault( "forceHTTPS", false );
-		if ( this.options.containsKey( "headers" ) )
+		this.internalName = this.options.getOrDefault( INTERNAL_NAME, internalName ).toString();
+		this.forceHTTPS = ( boolean ) this.options.getOrDefault( FORCE_HTTPS, false );
+		if ( this.options.containsKey( HEADERS ) )
 		{
-			( ( Map<String, String> ) this.options.get( "headers" ) ).forEach(
+			( ( Map<String, String> ) this.options.get( HEADERS ) ).forEach(
 					(key, value) -> headers.put( HeaderOption.getOrCreate( AsciiString.of( key, false ) ), value ) );
 		}
 		this.viewPattern = new ViewPattern( pattern );
@@ -169,9 +178,9 @@ import xyz.kvantum.server.api.util.Assert;
 		this.uuid = UUID.randomUUID();
 		if ( httpMethod == null )
 		{
-			if ( options.containsKey( "method" ) )
+			if ( options.containsKey( METHOD ) )
 			{
-				this.httpMethod = HttpMethod.valueOf( options.get( "method" ).toString() );
+				this.httpMethod = HttpMethod.valueOf( options.get( METHOD ).toString() );
 			} else
 			{
 				this.httpMethod = HttpMethod.ALL;
@@ -186,9 +195,9 @@ import xyz.kvantum.server.api.util.Assert;
 	{
 		if ( this.filePattern == null )
 		{
-			if ( this.options.containsKey( "filePattern" ) )
+			if ( this.options.containsKey( FILE_PATTERN ) )
 			{
-				this.filePattern = FilePattern.compile( this.options.get( "filePattern" ).toString() );
+				this.filePattern = FilePattern.compile( this.options.get( FILE_PATTERN ).toString() );
 			} else
 			{
 				this.filePattern = FilePattern.compile( defaultFilePattern );
@@ -205,7 +214,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @return (Type Casted) Value
 	 * @see #containsOption(String) Check if the option exists before getting it
 	 */
-	@SuppressWarnings("ALL") final public <T> T getOption(@NonNull final String s)
+	@SuppressWarnings("ALL") public final <T> T getOption(@NonNull final String s)
 	{
 		return ( ( T ) options.get( s ) );
 	}
@@ -217,15 +226,12 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param <T> Option type (Casts to this type)
 	 * @return Value
 	 */
-	final public <T> Optional<T> getOptionSafe(final String s)
+	public final <T> Optional<T> getOptionSafe(@NonNull final String s)
 	{
-		Assert.notNull( s );
-
 		if ( options.containsKey( s ) )
 		{
 			return Optional.of( ( T ) options.get( s ) );
 		}
-
 		return Optional.empty();
 	}
 
@@ -234,12 +240,12 @@ import xyz.kvantum.server.api.util.Assert;
 	 *
 	 * @return options as string
 	 */
-	final public String getOptionString()
+	public final String getOptionString()
 	{
 		final StringBuilder b = new StringBuilder();
 		for ( final Map.Entry<String, Object> e : options.entrySet() )
 		{
-			b.append( ";" ).append( e.getKey() ).append( "=" ).append( e.getValue().toString() );
+			b.append( ';' ).append( e.getKey() ).append( '=' ).append( e.getValue().toString() );
 		}
 		return b.toString();
 	}
@@ -250,10 +256,8 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param s Key
 	 * @return True if the option is stored, False if it isn't
 	 */
-	final public boolean containsOption(final String s)
+	final public boolean containsOption(@NonNull final String s)
 	{
-		Assert.notNull( s );
-
 		return options.containsKey( s );
 	}
 
@@ -284,15 +288,15 @@ import xyz.kvantum.server.api.util.Assert;
 	{
 		if ( this.folder == null )
 		{
-			if ( containsOption( "folder" ) )
+			if ( containsOption( FOLDER ) )
 			{
-				this.folder = fileSystemSupplier.get().getPath( getOption( "folder" ).toString() );
+				this.folder = fileSystemSupplier.get().getPath( getOption( FOLDER ).toString() );
 			} else if ( relatedFolderPath != null )
 			{
 				this.folder = fileSystemSupplier.get().getPath( relatedFolderPath );
 			} else
 			{
-				this.folder = fileSystemSupplier.get().getPath( "/" + internalName );
+				this.folder = fileSystemSupplier.get().getPath( String.format( "/%s", internalName ) );
 			}
 			if ( !folder.exists() && !folder.create() )
 			{
@@ -318,16 +322,16 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @see #VARIABLE_FOLDER
 	 * @see #getFolder()
 	 */
-	protected Path getFile(final AbstractRequest request)
+	protected Path getFile(@NonNull final AbstractRequest request)
 	{
 		Assert.isValid( request );
 
-		if ( request.getMeta( "fileMatcher" ) == null )
+		if ( request.getMeta( FILE_MATCHER ) == null )
 		{
 			throw new KvantumException( "fileMatcher isn't set" );
 		}
 
-		final FilePattern.FileMatcher fileMatcher = ( FilePattern.FileMatcher ) request.getMeta( "fileMatcher" );
+		final FilePattern.FileMatcher fileMatcher = ( FilePattern.FileMatcher ) request.getMeta( FILE_MATCHER );
 
 		if ( !fileMatcher.matches() )
 		{
@@ -341,7 +345,7 @@ import xyz.kvantum.server.api.util.Assert;
 
 		String fileName = fileMatcher.getFileName();
 
-		if ( containsOption( "extensionRewrite" ) )
+		if ( containsOption( EXTENSION_REWRITE ) )
 		{
 			if ( CoreConfig.debug )
 			{
@@ -350,7 +354,7 @@ import xyz.kvantum.server.api.util.Assert;
 
 			final String variableExtension = request.getVariables().get( VARIABLE_EXTENSION );
 
-			final Map<String, Object> rewrite = getOption( "extensionRewrite" );
+			final Map<String, Object> rewrite = getOption( EXTENSION_REWRITE );
 			if ( rewrite.containsKey( variableExtension ) )
 			{
 				final String rewritten = rewrite.get( variableExtension ).toString();
@@ -376,7 +380,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 *
 	 * @return file buffer
 	 */
-	final protected int getBuffer()
+	protected final int getBuffer()
 	{
 		if ( this.buffer == -1 )
 		{
@@ -398,7 +402,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @return True if the request Matches, False if not
 	 * @see #passes(AbstractRequest) - This is called!
 	 */
-	@Override final public boolean matches(final AbstractRequest request)
+	@Override final public boolean matches(@NonNull final AbstractRequest request)
 	{
 		Assert.isValid( request );
 
@@ -435,7 +439,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param request The request from which the URL is fetches
 	 * @return True if the request matches, false if not
 	 */
-	protected boolean passes(final AbstractRequest request)
+	protected boolean passes(@Nullable final AbstractRequest request)
 	{
 		return true;
 	}
@@ -448,19 +452,19 @@ import xyz.kvantum.server.api.util.Assert;
 	/**
 	 * Generate a response
 	 *
-	 * @param r Incoming request
+	 * @param request Incoming request
 	 * @return Either the view generated by the configured view return, or a generated response.
 	 */
-	@Override public Response generate(final AbstractRequest r)
+	@Override public Response generate(@NonNull final AbstractRequest request)
 	{
 		if ( viewReturn != null )
 		{
-			return viewReturn.get( r );
+			return viewReturn.get( request );
 		} else
 		{
 			final Response response = new Response( this );
 			this.applyDefaultHeaders( response );
-			this.handle( r, response );
+			this.handle( request, response );
 			return response;
 		}
 	}
@@ -470,7 +474,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 *
 	 * @param response Working response
 	 */
-	final protected void applyDefaultHeaders(final Response response)
+	protected final void applyDefaultHeaders(@NonNull final Response response)
 	{
 		if ( !headers.isEmpty() )
 		{
@@ -484,7 +488,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param request Incoming request
 	 * @param response Working response
 	 */
-	protected void handle(final AbstractRequest request, final Response response)
+	protected void handle(@Nullable final AbstractRequest request, @NonNull final Response response)
 	{
 		response.setContent( DEFAULT_RESPONSE );
 	}
@@ -495,11 +499,8 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param key Option key
 	 * @param value Option value
 	 */
-	public void setOption(final String key, final Object value)
+	public void setOption(@NonNull final String key, @NonNull final Object value)
 	{
-		Assert.notNull( key );
-		Assert.notNull( value );
-
 		this.options.put( key, value );
 	}
 }

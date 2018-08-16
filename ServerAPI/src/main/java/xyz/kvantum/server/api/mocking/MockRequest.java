@@ -22,6 +22,8 @@
 package xyz.kvantum.server.api.mocking;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.HttpMethod;
+import xyz.kvantum.server.api.util.ProtocolType;
 
 public class MockRequest extends AbstractRequest
 {
@@ -37,7 +39,7 @@ public class MockRequest extends AbstractRequest
 
 	@Override protected AbstractRequest newRequest(String query)
 	{
-		return null;
+		return new MockRequest( new Query( HttpMethod.GET, ProtocolType.HTTP, query ) );
 	}
 
 	@Override public void requestSession()

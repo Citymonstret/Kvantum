@@ -48,6 +48,8 @@ import xyz.kvantum.server.api.util.AsciiString;
 
 	private static final AsciiString CONTENT_TYPE = AsciiString.of( "content-type" );
 	private static final AsciiString CONTENT_LENGTH = AsciiString.of( "content-length" );
+	private static final AsciiString CONTENT_TYPE_URL_ENCODED = AsciiString.of( "application/x-www-form-urlencoded" );
+	private static final AsciiString CONTENT_TYPE_MULTIPART = AsciiString.of( "multipart" );
 
 	@Getter private final StringBuilder builder;
 	private final AbstractRequest abstractRequest;
@@ -109,8 +111,8 @@ import xyz.kvantum.server.api.util.AsciiString;
 				final AsciiString contentType = abstractRequest.getHeader( CONTENT_TYPE );
 				boolean isFormURLEncoded;
 
-				if ( ( isFormURLEncoded = contentType.startsWith( "application/x-www-form-urlencoded" ) )
-						|| ( EntityType.JSON.getContentType().startsWith( contentType.toString() ) ) )
+				if ( ( isFormURLEncoded = contentType.startsWith( CONTENT_TYPE_URL_ENCODED ) ) || ( EntityType.JSON
+						.getContentType().startsWith( contentType.toString() ) ) )
 				{
 					try
 					{
@@ -129,7 +131,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 						Logger.warn( "Failed to read url encoded postAbstractRequest (Request: {0}): {1}",
 								abstractRequest, e.getMessage() );
 					}
-				} else if ( contentType.startsWith( "multipart" ) )
+				} else if ( contentType.startsWith( CONTENT_TYPE_MULTIPART ) )
 				{
 					byte[] bytes = new byte[ contentLength ];
 					overloadBuffer.readBytes( bytes );

@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import xyz.kvantum.server.api.exceptions.KvantumException;
@@ -171,7 +172,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
 		return this.get( key );
 	}
 
-	@SuppressWarnings("ALL") @Override public final <T> T get(final String key)
+	@Nullable @SuppressWarnings("ALL") @Override public final <T> T get(final String key)
 	{
 		Assert.notNull( key );
 
@@ -200,7 +201,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
 				}
 			}
 		}
-		return null;
+		return null; // Nullable
 	}
 
 	@Override public final Map<String, Object> getAll()

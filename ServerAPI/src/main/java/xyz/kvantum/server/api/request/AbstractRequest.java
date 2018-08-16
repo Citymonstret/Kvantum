@@ -112,7 +112,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 
 	@Override public String providerName()
 	{
-		return null;
+		return null; // Nullable
 	}
 
 	@Override public boolean contains(final String variable)
@@ -235,7 +235,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 	{
 		if ( !meta.containsKey( name ) )
 		{
-			return null;
+			return null; // Nullable
 		}
 		return meta.get( name );
 	}

@@ -32,6 +32,11 @@ import xyz.kvantum.server.api.util.TimeUtil;
 @EqualsAndHashCode @Getter @Builder public final class ResponseCookie implements AsciiStringable
 {
 
+	private static final String ELEMENT_PATH = "; Path=";
+	private static final String ELEMENT_EXPIRES = "; Expires=";
+	private static final String ELEMENT_SECURE = "; Secure";
+	private static final String ELEMENT_HTTP_ONLY = "; HttpOnly";
+
 	@Builder.Default public AsciiString path = AsciiString.of( "/" );
 	private AsciiString cookie;
 	private AsciiString value;
@@ -39,23 +44,28 @@ import xyz.kvantum.server.api.util.TimeUtil;
 	@Builder.Default private boolean httpOnly = false;
 	@Builder.Default private boolean secure = false;
 
+	private String cache;
+
 	@Override public String toString()
 	{
-		final StringBuilder builder = new StringBuilder( this.cookie ).append( "=" ).append( value ).append( "; Path=" )
-				.append( path );
-		if ( this.expires != null )
+		if ( this.cache == null )
 		{
-			builder.append( "; Expires=" ).append( TimeUtil.getHTTPTimeStamp( this.expires ) );
+			final StringBuilder builder = new StringBuilder( this.cookie ).append( '=' ).append( value ).append( ELEMENT_PATH ).append( path );
+			if ( this.expires != null )
+			{
+				builder.append( ELEMENT_EXPIRES ).append( TimeUtil.getHTTPTimeStamp( this.expires ) );
+			}
+			if ( this.secure )
+			{
+				builder.append( ELEMENT_SECURE );
+			}
+			if ( this.httpOnly )
+			{
+				builder.append( ELEMENT_HTTP_ONLY );
+			}
+			this.cache = builder.toString();
 		}
-		if ( this.secure )
-		{
-			builder.append( "; Secure" );
-		}
-		if ( this.httpOnly )
-		{
-			builder.append( "; HttpOnly" );
-		}
-		return builder.toString();
+		return this.cache;
 	}
 
 	@Override public AsciiString toAsciiString()

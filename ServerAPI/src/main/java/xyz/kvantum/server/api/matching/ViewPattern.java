@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import xyz.kvantum.server.api.util.Assert;
@@ -127,7 +128,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 * @param in String to test for
 	 * @return A map containing the variables extracted from the string. If there was no match, the map will be null
 	 */
-	public Map<String, String> matches(final String in)
+	@Nullable public Map<String, String> matches(final String in)
 	{
 		Assert.notNull( in );
 
@@ -155,7 +156,7 @@ import xyz.kvantum.server.api.util.Assert;
 				return new HashMap<>();
 			} else
 			{
-				return null;
+				return null; // Nullable
 			}
 		}
 
@@ -201,10 +202,10 @@ import xyz.kvantum.server.api.util.Assert;
 				{
 					if ( part instanceof Split && currentDelimiter != 1 )
 					{
-						return null;
+						return null; // Nullable
 					} else if ( part instanceof Dot && currentDelimiter != 0 )
 					{
-						return null;
+						return null; // Nullable
 					}
 				}
 				continue;
@@ -221,28 +222,28 @@ import xyz.kvantum.server.api.util.Assert;
 				{
 					if ( !has )
 					{
-						return null;
+						return null; // Nullable
 					}
 				} else if ( has )
 				{
 					if ( lastPart instanceof Split && currentDelimiter != 1 )
 					{
-						return null;
+						return null; // Nullable
 					} else if ( lastPart instanceof Dot && currentDelimiter != 0 )
 					{
-						return null;
+						return null; // Nullable
 					}
 				}
 			} else if ( part instanceof Static )
 			{
 				if ( !has )
 				{
-					return null;
+					return null; // Nullable
 				} else
 				{
 					if ( !next.equalsIgnoreCase( part.toString() ) )
 					{
-						return null;
+						return null; // Nullable
 					}
 				}
 			}
@@ -267,7 +268,7 @@ import xyz.kvantum.server.api.util.Assert;
 
 		if ( stringTokenizer.hasMoreTokens() )
 		{
-			return null;
+			return null; // Nullable
 		}
 		return variables;
 	}

@@ -404,6 +404,23 @@ import lombok.NonNull;
 				.collect( Collectors.toList() );
 	}
 
+	public boolean startsWith(@NonNull final AsciiString part)
+	{
+		final byte[] other = part.value;
+		if ( this.value.length < other.length )
+		{
+			return false;
+		}
+		for ( int i = 0; i < other.length; i++ )
+		{
+			if ( this.value[i] != other[i] )
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public boolean startsWith(@NonNull final String part)
 	{
 		return this.string.startsWith( part );

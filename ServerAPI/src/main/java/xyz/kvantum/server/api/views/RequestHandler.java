@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -147,7 +148,7 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 	 * @param request Requested to serve
 	 * @return Generated response
 	 */
-	public final Response handle(final AbstractRequest request)
+	@Nullable public final Response handle(final AbstractRequest request)
 	{
 		Assert.isValid( request );
 
@@ -159,7 +160,7 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 		if ( !middlewareQueue.finished() )
 		{
 			ServerImplementation.getImplementation().log( "Skipping request as a middleware broke the chain!" );
-			return null;
+			return null; // Nullable
 		}
 
 		final Response response;
@@ -220,7 +221,7 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 	 * @param request The incoming request
 	 * @return The generated response
 	 */
-	abstract public Response generate(final AbstractRequest request);
+	@Nullable abstract public Response generate(final AbstractRequest request);
 
 	/**
 	 * Get the view specific factory (if it exists)
@@ -228,9 +229,9 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 	 * @param r Request IN
 	 * @return Null by default, or the ProviderFactory (if set by the view)
 	 */
-	public ProviderFactory<? extends VariableProvider> getFactory(final AbstractRequest r)
+	@Nullable public ProviderFactory<? extends VariableProvider> getFactory(final AbstractRequest r)
 	{
-		return null;
+		return null; // Nullable
 	}
 
 	/**

@@ -26,6 +26,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -51,7 +52,7 @@ import xyz.kvantum.server.implementation.MongoApplicationStructure;
 		this.collection = database.getCollection( CoreConfig.MongoDB.collectionSessions );
 	}
 
-	@Override public SessionLoad getSessionLoad(final AsciiString sessionID)
+	@Nullable @Override public SessionLoad getSessionLoad(final AsciiString sessionID)
 	{
 		final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
 		final DBCursor cursor = collection.find( object );
@@ -64,7 +65,7 @@ import xyz.kvantum.server.implementation.MongoApplicationStructure;
 					( long ) session.get( FIELD_LAST_ACTIVE ) );
 		}
 
-		return null;
+		return null; // Nullable
 	}
 
 	@Override public void storeSession(final ISession session)

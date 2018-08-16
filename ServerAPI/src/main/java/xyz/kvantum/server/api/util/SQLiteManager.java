@@ -29,6 +29,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -72,7 +73,7 @@ import xyz.kvantum.server.api.exceptions.KvantumException;
 		return connection.prepareStatement( statement );
 	}
 
-	public Blob createBlob()
+	@Nullable public Blob createBlob()
 	{
 		try
 		{
@@ -81,7 +82,7 @@ import xyz.kvantum.server.api.exceptions.KvantumException;
 		{
 			e.printStackTrace();
 		}
-		return null;
+		return null; // Nullable
 	}
 
 	@Override public void handleClose()

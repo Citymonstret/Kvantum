@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.matching;
 
 import java.util.Collection;
 import java.util.Collections;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -55,7 +56,7 @@ import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 	 * @param handler RequestHandler that is to be registered
 	 * @return The added {@link RequestHandler}
 	 */
-	public abstract <T extends RequestHandler> T add(T handler);
+	@Nullable public abstract <T extends RequestHandler> T add(T handler);
 
 	/**
 	 * Add a collection containing {@link RequestHandler RequestHandlers} to the router

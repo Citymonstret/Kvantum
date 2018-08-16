@@ -53,7 +53,7 @@ public interface ISessionDatabase
 		final SessionLoad sessionLoad = getSessionLoad( session );
 		if ( sessionLoad == null )
 		{
-			return null;
+			return null; // Nullable
 		}
 		final long difference = ( System.currentTimeMillis() - sessionLoad.getLastActive() ) / 1000;
 		if ( difference >= CoreConfig.Sessions.sessionTimeout )
@@ -63,7 +63,7 @@ public interface ISessionDatabase
 				Message.SESSION_DELETED_OUTDATED.log( session );
 			}
 			deleteSession( session );
-			return null;
+			return null; // Nullable
 		}
 		return sessionLoad;
 	}

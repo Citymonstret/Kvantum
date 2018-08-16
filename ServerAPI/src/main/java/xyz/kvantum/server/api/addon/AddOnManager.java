@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.kvantum.server.api.util.AutoCloseable;
@@ -89,7 +90,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 		fileList.stream().filter( file -> !this.isLibrary( file ) ).forEach( this::loadAddon );
 	}
 
-	private Properties getAddOnProperties(@NonNull final File file) throws AddOnManagerException
+	@Nullable private Properties getAddOnProperties(@NonNull final File file) throws AddOnManagerException
 	{
 		final JarFile jar;
 		try
@@ -102,7 +103,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 		final JarEntry desc = jar.getJarEntry( "addon.properties" );
 		if ( desc == null )
 		{
-			return null;
+			return null; // Nullable
 		}
 		final Properties properties = new Properties();
 		try ( final InputStream stream = jar.getInputStream( desc ) )
@@ -120,7 +121,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 		this.globalClassMap.put( name, clazz );
 	}
 
-	Class<?> findClass(@NonNull final String name)
+	@Nullable Class<?> findClass(@NonNull final String name)
 	{
 		if ( this.globalClassMap.containsKey( name ) )
 		{
@@ -140,7 +141,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 			{
 			}
 		}
-		return null;
+		return null; // Nullable
 	}
 
 	/**
@@ -270,7 +271,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 	 * @param file AddOn jar file
 	 * @throws AddOnManagerException If anything goes wrong during the loading
 	 */
-	@SuppressWarnings("WeakerAccess") public AddOnClassLoader loadAddon(@NonNull final File file)
+	@Nullable @SuppressWarnings("WeakerAccess") public AddOnClassLoader loadAddon(@NonNull final File file)
 			throws AddOnManagerException
 	{
 		final Properties properties;
@@ -280,7 +281,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 		} catch ( final Exception e )
 		{
 			e.printStackTrace();
-			return null;
+			return null; // Nullable
 		}
 		if ( properties == null )
 		{
@@ -291,13 +292,13 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 			{
 				new AddOnManagerException( "\"addon.properties\" for " + file.getName() + " has no \"main\" key" )
 						.printStackTrace();
-				return null;
+				return null; // Nullable
 			}
 			if ( !properties.containsKey( "name" ) )
 			{
 				new AddOnManagerException( "\"addon.properties\" for " + file.getName() + " has no \"name\" key" )
 						.printStackTrace();
-				return null;
+				return null; // Nullable
 			}
 			@NonNull final String addOnName = properties.get( "name" ).toString();
 			if ( this.classLoaders.containsKey( addOnName ) )
@@ -306,7 +307,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 			}
 			if ( CollectionUtil.containsIgnoreCase( this.disabledAddons, addOnName ) )
 			{
-				return null;
+				return null; // Nullable
 			}
 			@NonNull final String main = properties.get( "main" ).toString();
 			if ( this.globalClassMap.containsKey( main ) )
@@ -320,14 +321,14 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 			} catch ( final Exception e )
 			{
 				new AddOnManagerException( "Failed to load " + file.getName(), e ).printStackTrace();
-				return null;
+				return null; // Nullable
 			}
 			this.classLoaders.put( addOnName, loader );
 			return loader;
 		}
 	}
 
-	private AddOnClassLoader loadLibrary(@NonNull final File file)
+	@Nullable private AddOnClassLoader loadLibrary(@NonNull final File file)
 	{
 		final AddOnClassLoader loader;
 		try
@@ -336,7 +337,7 @@ import xyz.kvantum.server.api.util.CollectionUtil;
 		} catch ( final Exception e )
 		{
 			new AddOnManagerException( "Failed to load " + file.getName(), e ).printStackTrace();
-			return null;
+			return null; // Nullable
 		}
 		this.classLoaders.put( loader.getName(), loader );
 		return loader;

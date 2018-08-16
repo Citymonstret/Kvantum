@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,7 +59,7 @@ import xyz.kvantum.server.api.views.errors.View404;
 	 * @param view The view to register
 	 * @return The request handler if it was created, null otherwise
 	 */
-	@Override @SuppressWarnings("all") public RequestHandler add(@NonNull final RequestHandler view)
+	@Nullable @Override @SuppressWarnings("all") public RequestHandler add(@NonNull final RequestHandler view)
 	{
 		//
 		// make sure the view pattern isn't registered yet
@@ -77,7 +78,7 @@ import xyz.kvantum.server.api.views.errors.View404;
 		ServerImplementation.getImplementation().getEventBus().emit( requestHandlerAddedEvent );
 		if ( requestHandlerAddedEvent.isCancelled() )
 		{
-			return null;
+			return null; // Nullable
 		}
 
 		//

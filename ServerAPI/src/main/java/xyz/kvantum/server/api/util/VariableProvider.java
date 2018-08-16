@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.util;
 
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * The variable provider class - Can get quite confusing. <p> This generates a variable based on a key, and is accessed
@@ -51,7 +52,7 @@ public interface VariableProvider
 	 * @return The object (or null)
 	 * @see #contains(String) Use this to check if it exists
 	 */
-	Object get(String variable);
+	@Nullable Object get(String variable);
 
 	/**
 	 * Get all variables stored in the provider

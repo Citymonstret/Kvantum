@@ -21,7 +21,7 @@
  */
 package xyz.kvantum.server.api.response;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
