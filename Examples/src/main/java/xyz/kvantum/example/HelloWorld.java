@@ -33,108 +33,101 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters;
 
 /**
- * Different examples of how to construct the well known "Hello World"
- * example in Kvantum
+ * Different examples of how to construct the well known "Hello World" example in Kvantum
  */
-@SuppressWarnings("unused")
-public final class HelloWorld
+@SuppressWarnings("unused") public final class HelloWorld
 {
 
-    private static final KvantumPojoFactory<HelloDO> factory = KvantumPojoFactory.forClass( HelloDO.class );
+	private static final KvantumPojoFactory<HelloDO> factory = KvantumPojoFactory.forClass( HelloDO.class );
 
-    HelloWorld()
-    {
-        ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
-        //
-        // Load the function-based view constructor
-        //
-        this.helloWorld6();
-        //
-        // OOP-based view
-        //
-        ServerImplementation.getImplementation().getRouter().add( new HelloHandler() );
-    }
+	HelloWorld()
+	{
+		ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
+		//
+		// Load the function-based view constructor
+		//
+		this.helloWorld6();
+		//
+		// OOP-based view
+		//
+		ServerImplementation.getImplementation().getRouter().add( new HelloHandler() );
+	}
 
-    @ViewMatcher(filter = "hello1")
-    public void helloWorld1(final AbstractRequest request, final Response response)
-    {
-        response.setContent( "<h1>Hello World!</h1>" );
-    }
+	@ViewMatcher(filter = "hello1") public void helloWorld1(final AbstractRequest request, final Response response)
+	{
+		response.setContent( "<h1>Hello World!</h1>" );
+	}
 
-    @ViewMatcher(filter = "hello2")
-    public Response helloWorld2(final AbstractRequest request)
-    {
-        final Response response = new Response();
-        response.setContent( "<b>Hello World!</b>" );
-        return response;
-    }
+	@ViewMatcher(filter = "hello2") public Response helloWorld2(final AbstractRequest request)
+	{
+		final Response response = new Response();
+		response.setContent( "<b>Hello World!</b>" );
+		return response;
+	}
 
-    @ViewMatcher(filter = "hello3", outputType = StandardConverters.HTML)
-    public String helloWorld3(final AbstractRequest request)
-    {
-        return "Hello World!";
-    }
+	@ViewMatcher(filter = "hello3", outputType = StandardConverters.HTML) public String helloWorld3(
+			final AbstractRequest request)
+	{
+		return "Hello World!";
+	}
 
-    @ViewMatcher(filter = "hello4", outputType = StandardConverters.JSON)
-    public JSONObject helloWorld4(final AbstractRequest request)
-    {
-        return new JSONObject( MapBuilder.<String, Object>newHashMap()
-                .put( "Hello", "World" ).get() );
-    }
+	@ViewMatcher(filter = "hello4", outputType = StandardConverters.JSON) public JSONObject helloWorld4(
+			final AbstractRequest request)
+	{
+		return new JSONObject( MapBuilder.<String, Object>newHashMap().put( "Hello", "World" ).get() );
+	}
 
-    @ViewMatcher(filter = "hello5")
-    public void helloWorld5(final AbstractRequest request, final Response response)
-    {
-        final KvantumPojo<HelloDO> hello = factory.of( new HelloDO() );
-        hello.set( "hello", "world" );
-        request.addModel( "pojo", hello );
-        response.setContent( "Hello {{pojo.hello}}!" );
-    }
+	@ViewMatcher(filter = "hello5") public void helloWorld5(final AbstractRequest request, final Response response)
+	{
+		final KvantumPojo<HelloDO> hello = factory.of( new HelloDO() );
+		hello.set( "hello", "world" );
+		request.addModel( "pojo", hello );
+		response.setContent( "Hello {{pojo.hello}}!" );
+	}
 
-    private void helloWorld6()
-    {
-        ServerImplementation.getImplementation().createSimpleRequestHandler( "hello6", ( (request, response) ->
-                response.setContent( "Hello World :)" ) ) );
-    }
+	private void helloWorld6()
+	{
+		ServerImplementation.getImplementation().createSimpleRequestHandler( "hello6",
+				( (request, response) -> response.setContent( "Hello World :)" ) ) );
+	}
 
-    public static final class HelloHandler extends View
-    {
+	public static final class HelloHandler extends View
+	{
 
-        HelloHandler()
-        {
-            super( "hello7", "hello7handler" );
-        }
+		HelloHandler()
+		{
+			super( "hello7", "hello7handler" );
+		}
 
-        @Override
-        protected void handle(AbstractRequest request, Response response)
-        {
-            response.setContent( "Hello World!!!!" );
-        }
-    }
+		@Override protected void handle(AbstractRequest request, Response response)
+		{
+			response.setContent( "Hello World!!!!" );
+		}
+	}
 
-    public static final class HelloDO
-    {
+	public static final class HelloDO
+	{
 
-        String hello;
+		String hello;
 
-        HelloDO()
-        {
-        }
+		HelloDO()
+		{
+		}
 
-        public HelloDO(final String string)
-        {
-            this.hello = string;
-        }
+		public HelloDO(final String string)
+		{
+			this.hello = string;
+		}
 
-        public void setHello(final String string)
-        {
-            this.hello = string;
-        }
+		public String getHello()
+		{
+			return this.hello;
+		}
 
-        public String getHello()
-        {
-            return this.hello;
-        }
-    }
+		public void setHello(final String string)
+		{
+			this.hello = string;
+		}
+	}
 
 }

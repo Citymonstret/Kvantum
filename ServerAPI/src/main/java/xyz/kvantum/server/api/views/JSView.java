@@ -21,13 +21,12 @@
  */
 package xyz.kvantum.server.api.views;
 
-import xyz.kvantum.server.api.cache.CacheApplicable;
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.util.FileExtension;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import xyz.kvantum.server.api.cache.CacheApplicable;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.util.FileExtension;
 
 /**
  * Created 2015-04-22 for Kvantum
@@ -37,19 +36,18 @@ import java.util.Optional;
 public class JSView extends StaticFileView implements CacheApplicable
 {
 
-    public JSView(String filter, Map<String, Object> options)
-    {
-        super( filter, options, "javascript", Collections.singletonList( FileExtension.JAVASCRIPT ) );
-        super.relatedFolderPath = "/assets/js";
-        super.setOption( "extension", "js" );
-        super.defaultFilePattern = "${file}.js";
-    }
+	public JSView(String filter, Map<String, Object> options)
+	{
+		super( filter, options, "javascript", Collections.singletonList( FileExtension.JAVASCRIPT ) );
+		super.relatedFolderPath = "/assets/js";
+		super.setOption( "extension", "js" );
+		super.defaultFilePattern = "${file}.js";
+	}
 
-    @Override
-    public boolean isApplicable(AbstractRequest r)
-    {
-        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
-        return cacheApplicableBoolean.orElse( true );
-    }
+	@Override public boolean isApplicable(AbstractRequest r)
+	{
+		final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
+		return cacheApplicableBoolean.orElse( true );
+	}
 
 }

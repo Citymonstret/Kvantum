@@ -21,10 +21,9 @@
  */
 package xyz.kvantum.server.api.logging;
 
-@FunctionalInterface
-public interface LogFormatted
+@FunctionalInterface public interface LogFormatted
 {
 
-    String getLogFormatted();
+	String getLogFormatted();
 
 }

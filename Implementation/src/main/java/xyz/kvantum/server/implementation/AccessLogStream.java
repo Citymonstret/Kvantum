@@ -22,14 +22,13 @@
 package xyz.kvantum.server.implementation;
 
 import de.jungblut.datastructure.AsyncBufferedOutputStream;
-import lombok.NonNull;
-import pw.stamina.causam.scan.method.model.Subscriber;
-import xyz.kvantum.server.api.response.FinalizedResponse;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import lombok.NonNull;
+import pw.stamina.causam.scan.method.model.Subscriber;
+import xyz.kvantum.server.api.response.FinalizedResponse;
 
 /**
  * Streams to log/access.log
@@ -37,17 +36,15 @@ import java.io.PrintStream;
 final class AccessLogStream extends PrintStream
 {
 
-    AccessLogStream(@NonNull final File logFolder) throws FileNotFoundException
-    {
-        super( new AsyncBufferedOutputStream( new FileOutputStream( new File( logFolder, "access.log" ), true ) ) );
-    }
+	AccessLogStream(@NonNull final File logFolder) throws FileNotFoundException
+	{
+		super( new AsyncBufferedOutputStream( new FileOutputStream( new File( logFolder, "access.log" ), true ) ) );
+	}
 
-    @Subscriber
-    @SuppressWarnings("unused")
-    private void onRequestFinish(@NonNull final FinalizedResponse response)
-    {
-        this.println( response.toLogString() );
-        this.flush();
-    }
+	@Subscriber @SuppressWarnings("unused") private void onRequestFinish(@NonNull final FinalizedResponse response)
+	{
+		this.println( response.toLogString() );
+		this.flush();
+	}
 
 }

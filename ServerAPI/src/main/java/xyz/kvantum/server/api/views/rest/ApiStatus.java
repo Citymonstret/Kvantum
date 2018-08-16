@@ -21,22 +21,19 @@
  */
 package xyz.kvantum.server.api.views.rest;
 
-import org.json.simple.JSONObject;
-
 import java.util.Locale;
+import org.json.simple.JSONObject;
 
 public enum ApiStatus
 {
-    SUCCESS,
-    FAILURE,
-    ERROR, PENDING;
+	SUCCESS, FAILURE, ERROR, PENDING;
 
-    public JSONObject getJSONObject()
-    {
-        final JSONObject object = new JSONObject();
-        object.put( "statusCode", this.ordinal() );
-        object.put( "status", this.toString().toLowerCase( Locale.ENGLISH ) );
-        return object;
-    }
+	public JSONObject getJSONObject()
+	{
+		final JSONObject object = new JSONObject();
+		object.put( "statusCode", this.ordinal() );
+		object.put( "status", this.toString().toLowerCase( Locale.ENGLISH ) );
+		return object;
+	}
 
 }

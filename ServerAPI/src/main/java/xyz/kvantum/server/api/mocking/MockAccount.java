@@ -21,6 +21,13 @@
  */
 package xyz.kvantum.server.api.mocking;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import lombok.Data;
 import lombok.Getter;
 import xyz.kvantum.server.api.account.IAccount;
@@ -29,88 +36,67 @@ import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-
-@Data
-@SuppressWarnings("unused")
-public class MockAccount implements IAccount
+@Data @SuppressWarnings("unused") public class MockAccount implements IAccount
 {
 
-    @Getter
-    private static final KvantumPojoFactory<IAccount> kvantumPojoFactory =
-            KvantumPojoFactory.forClass( IAccount.class );
+	@Getter private static final KvantumPojoFactory<IAccount> kvantumPojoFactory = KvantumPojoFactory
+			.forClass( IAccount.class );
 
-    private static final Random random = new Random();
+	private static final Random random = new Random();
 
-    private Map<String, String> rawData = new HashMap<>();
-    private int id = random.nextInt( 10000 );
-    private String username = UUID.randomUUID().toString();
-    private IAccountManager manager;
-    private Collection<AccountRole> accountRoles = new HashSet<>();
+	private Map<String, String> rawData = new HashMap<>();
+	private int id = random.nextInt( 10000 );
+	private String username = UUID.randomUUID().toString();
+	private IAccountManager manager;
+	private Collection<AccountRole> accountRoles = new HashSet<>();
 
-    @Override
-    public void internalMetaUpdate(final String key, final String value)
-    {
-        this.rawData.put( "meta." + key, value );
-    }
+	@Override public void internalMetaUpdate(final String key, final String value)
+	{
+		this.rawData.put( "meta." + key, value );
+	}
 
-    @Override
-    public boolean passwordMatches(final String password)
-    {
-        return true;
-    }
+	@Override public boolean passwordMatches(final String password)
+	{
+		return true;
+	}
 
-    @Override
-    public Optional<String> getData(final String key)
-    {
-        return Optional.ofNullable( rawData.getOrDefault( key, null ) );
-    }
+	@Override public Optional<String> getData(final String key)
+	{
+		return Optional.ofNullable( rawData.getOrDefault( key, null ) );
+	}
 
-    @Override
-    public void setData(final String key, final String value)
-    {
-        this.rawData.put( key, value );
-    }
+	@Override public void setData(final String key, final String value)
+	{
+		this.rawData.put( key, value );
+	}
 
-    @Override
-    public void removeData(final String key)
-    {
-        this.rawData.remove( key );
-    }
+	@Override public void removeData(final String key)
+	{
+		this.rawData.remove( key );
+	}
 
-    @Override
-    public void addRole(final AccountRole role)
-    {
-        this.accountRoles.add( role );
-    }
+	@Override public void addRole(final AccountRole role)
+	{
+		this.accountRoles.add( role );
+	}
 
-    @Override
-    public void removeRole(final AccountRole role)
-    {
-        this.accountRoles.remove( role );
-    }
+	@Override public void removeRole(final AccountRole role)
+	{
+		this.accountRoles.remove( role );
+	}
 
-    @Override
-    public String getSuppliedPassword()
-    {
-        return "";
-    }
+	@Override public String getSuppliedPassword()
+	{
+		return "";
+	}
 
-    @Override
-    public boolean isPermitted(final String permissionKey)
-    {
-        return true;
-    }
+	@Override public boolean isPermitted(final String permissionKey)
+	{
+		return true;
+	}
 
-    @Override
-    public KvantumPojo<IAccount> toKvantumPojo()
-    {
-        return kvantumPojoFactory.of( this );
-    }
+	@Override public KvantumPojo<IAccount> toKvantumPojo()
+	{
+		return kvantumPojoFactory.of( this );
+	}
 }

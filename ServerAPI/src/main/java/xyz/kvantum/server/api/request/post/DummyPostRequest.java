@@ -26,20 +26,18 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 final public class DummyPostRequest extends PostRequest
 {
 
-    public DummyPostRequest(final AbstractRequest parent, final String rawRequest)
-    {
-        super( parent, rawRequest, false );
-    }
+	public DummyPostRequest(final AbstractRequest parent, final String rawRequest)
+	{
+		super( parent, rawRequest, false );
+	}
 
-    @Override
-    protected void parseRequest(String rawRequest)
-    {
-    }
+	@Override protected void parseRequest(String rawRequest)
+	{
+	}
 
-    @Override
-    public EntityType getEntityType()
-    {
-        return EntityType.NONE;
-    }
+	@Override public EntityType getEntityType()
+	{
+		return EntityType.NONE;
+	}
 
 }

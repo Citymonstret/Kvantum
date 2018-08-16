@@ -21,11 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import xyz.kvantum.server.api.config.Message;
-import xyz.kvantum.server.api.logging.Logger;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,117 +35,119 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import xyz.kvantum.server.api.config.Message;
+import xyz.kvantum.server.api.logging.Logger;
 
 /**
  * Utility class for common File operations (both NIO and IO types)
  */
-@UtilityClass
-public class FileUtils
+@UtilityClass public class FileUtils
 {
 
-    /**
-     * Copy a resource into a specified path, will use the system resource loader
-     *
-     * @param resourcePath Resource Path
-     * @param path         Path where the resource should be pasted
-     * @throws Exception All exceptions are thrown
-     */
-    public static void copyResource(@NonNull final String resourcePath, @NonNull final Path path) throws Exception
-    {
-        if ( !Files.exists( path.getParent() ) )
-        {
-            Files.createDirectory( path.getParent() );
-        }
-        if ( !Files.exists( path ) )
-        {
-            Files.createFile( path );
-        }
-        try ( BufferedReader reader = new BufferedReader(
-                new InputStreamReader( ClassLoader.getSystemResourceAsStream( resourcePath ) ) ) )
-        {
-            String line;
-            try ( BufferedWriter writer = Files.newBufferedWriter( path ) )
-            {
-                while ( ( line = reader.readLine() ) != null )
-                {
-                    writer.write( line + "\r\n" );
-                }
-            }
-        }
-        Logger.info( "Successfully copied '{0}' to '{1}'", resourcePath, path.getFileName() );
-    }
+	/**
+	 * Copy a resource into a specified path, will use the system resource loader
+	 *
+	 * @param resourcePath Resource Path
+	 * @param path Path where the resource should be pasted
+	 * @throws Exception All exceptions are thrown
+	 */
+	public static void copyResource(@NonNull final String resourcePath, @NonNull final Path path) throws Exception
+	{
+		if ( !Files.exists( path.getParent() ) )
+		{
+			Files.createDirectory( path.getParent() );
+		}
+		if ( !Files.exists( path ) )
+		{
+			Files.createFile( path );
+		}
+		try ( BufferedReader reader = new BufferedReader(
+				new InputStreamReader( ClassLoader.getSystemResourceAsStream( resourcePath ) ) ) )
+		{
+			String line;
+			try ( BufferedWriter writer = Files.newBufferedWriter( path ) )
+			{
+				while ( ( line = reader.readLine() ) != null )
+				{
+					writer.write( line + "\r\n" );
+				}
+			}
+		}
+		Logger.info( "Successfully copied '{0}' to '{1}'", resourcePath, path.getFileName() );
+	}
 
-    /**
-     * Add files to a zip file
-     *
-     * @param zipFile Zip File
-     * @param files   Files to add to the zip
-     * @throws Exception If anything goes wrong
-     */
-    public static void addToZip(@NonNull final File zipFile, @NonNull final File[] files) throws Exception
-    {
-        Assert.notNull( zipFile, files );
+	/**
+	 * Add files to a zip file
+	 *
+	 * @param zipFile Zip File
+	 * @param files Files to add to the zip
+	 * @throws Exception If anything goes wrong
+	 */
+	public static void addToZip(@NonNull final File zipFile, @NonNull final File[] files) throws Exception
+	{
+		Assert.notNull( zipFile, files );
 
-        final Map<String, String> env = new HashMap<String, String>()
-        {
-            {
-                put( "create", "true" );
-            }
-        };
-        final Path path = zipFile.toPath();
-        final URI uri = URI.create( "jar:" + path.toUri() );
-        try ( FileSystem fileSystem = FileSystems.newFileSystem( uri, env ) )
-        {
-            for ( final File file : files )
-            {
-                Files.move( file.toPath(), fileSystem.getPath( file.getName() ), StandardCopyOption.REPLACE_EXISTING );
-            }
-        }
-    }
+		final Map<String, String> env = new HashMap<String, String>()
+		{
+			{
+				put( "create", "true" );
+			}
+		};
+		final Path path = zipFile.toPath();
+		final URI uri = URI.create( "jar:" + path.toUri() );
+		try ( FileSystem fileSystem = FileSystems.newFileSystem( uri, env ) )
+		{
+			for ( final File file : files )
+			{
+				Files.move( file.toPath(), fileSystem.getPath( file.getName() ), StandardCopyOption.REPLACE_EXISTING );
+			}
+		}
+	}
 
-    public static File attemptFolderCreation(@NonNull final File folder)
-    {
-        if ( !folder.exists() && !folder.mkdirs() )
-        {
-            Message.COULD_NOT_CREATE_FOLDER.log( folder );
-        }
-        return folder;
-    }
+	public static File attemptFolderCreation(@NonNull final File folder)
+	{
+		if ( !folder.exists() && !folder.mkdirs() )
+		{
+			Message.COULD_NOT_CREATE_FOLDER.log( folder );
+		}
+		return folder;
+	}
 
-    /**
-     * Copy a file from one location to another
-     *
-     * @param in   Ingoing File
-     * @param out  Outgoing File
-     * @param size Byte Buffer Size (in bytes)
-     */
-    public static void copyFile(@NonNull final InputStream in, @NonNull final OutputStream out,
-                                final int size)
-    {
-        Assert.notNull( in );
-        Assert.notNull( out );
-        try
-        {
-            final byte[] buffer = new byte[ size ];
-            int length;
-            while ( ( length = in.read( buffer ) ) > 0 )
-            {
-                out.write( buffer, 0, length );
-            }
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        } finally
-        {
-            try
-            {
-                in.close();
-                out.close();
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
-    }
+	/**
+	 * Copy a file from one location to another
+	 *
+	 * @param in Ingoing File
+	 * @param out Outgoing File
+	 * @param size Byte Buffer Size (in bytes)
+	 */
+	public static void copyFile(@NonNull final InputStream in, @NonNull final OutputStream out, final int size)
+	{
+		Assert.notNull( in );
+		Assert.notNull( out );
+		try
+		{
+			final byte[] buffer = new byte[ size ];
+			int length;
+			while ( ( length = in.read( buffer ) ) > 0 )
+			{
+				out.write( buffer, 0, length );
+			}
+		} catch ( final Exception e )
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				in.close();
+				out.close();
+			} catch ( final Exception e )
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 
 }

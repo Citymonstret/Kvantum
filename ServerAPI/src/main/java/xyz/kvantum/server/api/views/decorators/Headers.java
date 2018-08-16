@@ -22,35 +22,32 @@
 package xyz.kvantum.server.api.views.decorators;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.views.HeaderDecorator;
 
-import java.util.Map;
-
 /**
- * {@link xyz.kvantum.server.api.views.Decorator} that will apply a
- * set of {@link HeaderOption}-{@link String} pairs to a {@link Header}
+ * {@link xyz.kvantum.server.api.views.Decorator} that will apply a set of {@link HeaderOption}-{@link String} pairs to
+ * a {@link Header}
  */
 public final class Headers extends HeaderDecorator
 {
 
-    private final Map<HeaderOption, String> headers;
+	private final Map<HeaderOption, String> headers;
 
-    @SuppressWarnings("WeakerAccess")
-    public Headers(@NonNull final Map<HeaderOption, String> headers)
-    {
-        this.headers = ImmutableMap.copyOf( headers );
-    }
+	@SuppressWarnings("WeakerAccess") public Headers(@NonNull final Map<HeaderOption, String> headers)
+	{
+		this.headers = ImmutableMap.copyOf( headers );
+	}
 
-    @Override
-    public void decorate(@NonNull final Header header)
-    {
-        //
-        // Only set the header if it isn't already set
-        //
-        headers.entrySet().stream().filter( entry -> !header.hasHeader( entry.getKey() ) )
-                .forEach( entry -> header.set( entry.getKey(), entry.getValue() ) );
-    }
+	@Override public void decorate(@NonNull final Header header)
+	{
+		//
+		// Only set the header if it isn't already set
+		//
+		headers.entrySet().stream().filter( entry -> !header.hasHeader( entry.getKey() ) )
+				.forEach( entry -> header.set( entry.getKey(), entry.getValue() ) );
+	}
 }

@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.response;
 
+import java.util.Date;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,48 +29,37 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AsciiStringable;
 import xyz.kvantum.server.api.util.TimeUtil;
 
-import java.util.Date;
-
-@EqualsAndHashCode
-@Getter
-@Builder
-public final class ResponseCookie implements AsciiStringable
+@EqualsAndHashCode @Getter @Builder public final class ResponseCookie implements AsciiStringable
 {
 
-    @Builder.Default
-    public AsciiString path = AsciiString.of( "/" );
-    private AsciiString cookie;
-    private AsciiString value;
-    @Builder.Default
-    private Date expires = null;
-    @Builder.Default
-    private boolean httpOnly = false;
-    @Builder.Default
-    private boolean secure = false;
+	@Builder.Default public AsciiString path = AsciiString.of( "/" );
+	private AsciiString cookie;
+	private AsciiString value;
+	@Builder.Default private Date expires = null;
+	@Builder.Default private boolean httpOnly = false;
+	@Builder.Default private boolean secure = false;
 
-    @Override
-    public String toString()
-    {
-        final StringBuilder builder = new StringBuilder( this.cookie )
-                .append( "=" ).append( value ).append( "; Path=" ).append( path );
-        if ( this.expires != null )
-        {
-            builder.append( "; Expires=" ).append( TimeUtil.getHTTPTimeStamp( this.expires ) );
-        }
-        if ( this.secure )
-        {
-            builder.append( "; Secure" );
-        }
-        if ( this.httpOnly )
-        {
-            builder.append( "; HttpOnly" );
-        }
-        return builder.toString();
-    }
+	@Override public String toString()
+	{
+		final StringBuilder builder = new StringBuilder( this.cookie ).append( "=" ).append( value ).append( "; Path=" )
+				.append( path );
+		if ( this.expires != null )
+		{
+			builder.append( "; Expires=" ).append( TimeUtil.getHTTPTimeStamp( this.expires ) );
+		}
+		if ( this.secure )
+		{
+			builder.append( "; Secure" );
+		}
+		if ( this.httpOnly )
+		{
+			builder.append( "; HttpOnly" );
+		}
+		return builder.toString();
+	}
 
-    @Override
-    public AsciiString toAsciiString()
-    {
-        return AsciiString.of( this.toString(), false );
-    }
+	@Override public AsciiString toAsciiString()
+	{
+		return AsciiString.of( this.toString(), false );
+	}
 }

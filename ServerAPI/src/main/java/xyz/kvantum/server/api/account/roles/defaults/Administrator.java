@@ -27,35 +27,31 @@ import xyz.kvantum.server.api.account.roles.SimpleAccountRole;
 /**
  * Default account role that is permitted to do everything
  */
-@SuppressWarnings( "ALL" )
-final public class Administrator extends SimpleAccountRole
+@SuppressWarnings("ALL") final public class Administrator extends SimpleAccountRole
 {
 
-    public static final String ADMIN_IDENTIFIER = "Administrator";
-    public static final Administrator instance = new Administrator();
+	public static final String ADMIN_IDENTIFIER = "Administrator";
+	public static final Administrator instance = new Administrator();
 
-    protected Administrator()
-    {
-        super( ADMIN_IDENTIFIER );
-    }
+	protected Administrator()
+	{
+		super( ADMIN_IDENTIFIER );
+	}
 
-    @Override
-    public boolean hasPermission(@NonNull final String permissionKey)
-    {
-        return true;
-    }
+	@Override public boolean hasPermission(@NonNull final String permissionKey)
+	{
+		return true;
+	}
 
-    @Override
-    public boolean addPermission(@NonNull final String permissionKey)
-    {
-        // Cannot add administrator permission
-        return false;
-    }
+	@Override public boolean addPermission(@NonNull final String permissionKey)
+	{
+		// Cannot add administrator permission
+		return false;
+	}
 
-    @Override
-    public boolean removePermission(@NonNull final String permissionKey)
-    {
-        // Cannot remove administrator permission
-        return false;
-    }
+	@Override public boolean removePermission(@NonNull final String permissionKey)
+	{
+		// Cannot remove administrator permission
+		return false;
+	}
 }

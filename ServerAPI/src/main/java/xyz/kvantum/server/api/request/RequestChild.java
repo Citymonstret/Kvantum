@@ -21,16 +21,14 @@
  */
 package xyz.kvantum.server.api.request;
 
-@FunctionalInterface
-public interface RequestChild
+@FunctionalInterface public interface RequestChild
 {
 
-    /**
-     * Get the parent {@link AbstractRequest}
-     *
-     * @return Parent request, or if the request is not a child
-     * it may return itself
-     */
-    AbstractRequest getParent();
+	/**
+	 * Get the parent {@link AbstractRequest}
+	 *
+	 * @return Parent request, or if the request is not a child it may return itself
+	 */
+	AbstractRequest getParent();
 
 }

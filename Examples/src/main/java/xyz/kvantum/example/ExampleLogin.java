@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.example;
 
+import java.util.Optional;
 import xyz.kvantum.example.object.LoginAttempt;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
@@ -33,82 +34,76 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
-import java.util.Optional;
-
 /**
- * Send a POST request to "/login",
- * required fields: username, password
- * <p>
- * Default admin account is Username: admin Password: admin
+ * Send a POST request to "/login", required fields: username, password <p> Default admin account is Username: admin
+ * Password: admin
  *
  * For registration, see {@link ExampleAccountRegistration}
  */
-@SuppressWarnings("unused")
-class ExampleLogin
+@SuppressWarnings("unused") class ExampleLogin
 {
 
-    ExampleLogin()
-    {
-        //
-        // Scan the current instance for @ViewMather annotations
-        //
-        ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
-    }
+	ExampleLogin()
+	{
+		//
+		// Scan the current instance for @ViewMather annotations
+		//
+		ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
+	}
 
-    //
-    // Match POST requests to /login
-    //
-    @ViewMatcher(filter = "login", httpMethod = HttpMethod.POST)
-    public final void debugAccounts(final AbstractRequest request, final Response response)
-    {
-        //
-        // Get the account manager implementation. This is also an account repository, and is
-        // responsible for account retrieving, creation and alike.
-        //
-        final IAccountManager accountManager = ServerImplementation.getImplementation().getApplicationStructure()
-                .getAccountManager();
-        if ( accountManager.getAccount( request.getSession() ).isPresent() )
-        {
-            response.setContent( "You are already logged in..." );
-            return;
-        }
+	//
+	// Match POST requests to /login
+	//
+	@ViewMatcher(filter = "login", httpMethod = HttpMethod.POST) public final void debugAccounts(
+			final AbstractRequest request, final Response response)
+	{
+		//
+		// Get the account manager implementation. This is also an account repository, and is
+		// responsible for account retrieving, creation and alike.
+		//
+		final IAccountManager accountManager = ServerImplementation.getImplementation().getApplicationStructure()
+				.getAccountManager();
+		if ( accountManager.getAccount( request.getSession() ).isPresent() )
+		{
+			response.setContent( "You are already logged in..." );
+			return;
+		}
 
-        //
-        // Setup a factory that parses request parameters into LoginAttempt instances
-        //
-        final KvantumObjectFactory<LoginAttempt> factory = KvantumObjectFactory.from( LoginAttempt
-                .class );
-        //
-        // Get the result of the parsing
-        //
-        final KvantumObjectParserResult<LoginAttempt> result
-                = factory.build( ParameterScope.POST ).parseRequest( request );
+		//
+		// Setup a factory that parses request parameters into LoginAttempt instances
+		//
+		final KvantumObjectFactory<LoginAttempt> factory = KvantumObjectFactory.from( LoginAttempt.class );
+		//
+		// Get the result of the parsing
+		//
+		final KvantumObjectParserResult<LoginAttempt> result = factory.build( ParameterScope.POST )
+				.parseRequest( request );
 
-        if ( !result.isSuccess() )
-        {
-            response.setContent( "Error: " + result.getError().getCause() );
-            return;
-        }
+		if ( !result.isSuccess() )
+		{
+			response.setContent( "Error: " + result.getError().getCause() );
+			return;
+		}
 
-        //
-        // Attempt to find the account in the repository
-        //
-        final Optional<IAccount> accountOptional = accountManager.getAccount( result.getParsedObject().getUsername() );
-        if ( !accountOptional.isPresent() )
-        {
-            response.setContent( "No such account..." );
-            return;
-        }
+		//
+		// Attempt to find the account in the repository
+		//
+		final Optional<IAccount> accountOptional = accountManager.getAccount( result.getParsedObject().getUsername() );
+		if ( !accountOptional.isPresent() )
+		{
+			response.setContent( "No such account..." );
+			return;
+		}
 
-        final IAccount account = accountOptional.get();
-        if ( account.passwordMatches( result.getParsedObject().getPassword() ) )
-        {
-            accountManager.bindAccount( account, request.getSession() );
-            response.setContent( "Success!" );
-        } else
-        {
-            response.setContent( "Password is wrong!" );
-        }
-    }
+		final IAccount account = accountOptional.get();
+		if ( account.passwordMatches( result.getParsedObject().getPassword() ) )
+		{
+			accountManager.bindAccount( account, request.getSession() );
+			response.setContent( "Success!" );
+		} else
+		{
+			response.setContent( "Password is wrong!" );
+		}
+	}
 
 }

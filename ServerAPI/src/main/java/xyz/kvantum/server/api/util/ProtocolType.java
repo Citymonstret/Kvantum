@@ -21,10 +21,9 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
-
 import java.util.Locale;
 import java.util.Optional;
+import lombok.NonNull;
 
 /**
  * Protocol implementation enum
@@ -32,20 +31,20 @@ import java.util.Optional;
 public enum ProtocolType
 {
 
-    HTTP,
-    HTTPS;
+	HTTP, HTTPS;
 
-    /**
-     * Match a string to a {@link ProtocolType}, if possible
-     * @param string String to match, may not be null
-     * @return matched protocol type if found
-     */
-    public static Optional<ProtocolType> getByName(@NonNull final String string)
-    {
-        Assert.notEmpty( string );
+	/**
+	 * Match a string to a {@link ProtocolType}, if possible
+	 *
+	 * @param string String to match, may not be null
+	 * @return matched protocol type if found
+	 */
+	public static Optional<ProtocolType> getByName(@NonNull final String string)
+	{
+		Assert.notEmpty( string );
 
-        final String fixed = string.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
-        return LambdaUtil.getFirst( values(), type -> type.name().equals( fixed ) );
-    }
+		final String fixed = string.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
+		return LambdaUtil.getFirst( values(), type -> type.name().equals( fixed ) );
+	}
 
 }

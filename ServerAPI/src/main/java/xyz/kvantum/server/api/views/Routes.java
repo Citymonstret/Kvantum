@@ -31,8 +31,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 
 /**
- * Utility method that aims to simplify the creation
- * of simple routes
+ * Utility method that aims to simplify the creation of simple routes
  */
 @UtilityClass public final class Routes
 {

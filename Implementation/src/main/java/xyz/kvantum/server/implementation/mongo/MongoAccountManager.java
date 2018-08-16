@@ -25,6 +25,8 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,157 +39,145 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.implementation.Account;
 import xyz.kvantum.server.implementation.MongoApplicationStructure;
 
-import java.util.List;
-import java.util.Optional;
-
-@RequiredArgsConstructor
-final public class MongoAccountManager implements IAccountManager
+@RequiredArgsConstructor final public class MongoAccountManager implements IAccountManager
 {
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static final Optional<IAccount> EMPTY_OPTIONAL = Optional.empty();
-    @Getter
-    private final MongoApplicationStructure applicationStructure;
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType") private static final Optional<IAccount> EMPTY_OPTIONAL = Optional
+			.empty();
+	@Getter private final MongoApplicationStructure applicationStructure;
 
-    private DBCollection counters;
+	private DBCollection counters;
 
-    private static String getNewSalt()
-    {
-        return BCrypt.gensalt();
-    }
+	private static String getNewSalt()
+	{
+		return BCrypt.gensalt();
+	}
 
-    private static String hashPassword(final String password, final String salt)
-    {
-        return BCrypt.hashpw( password, salt );
-    }
+	private static String hashPassword(final String password, final String salt)
+	{
+		return BCrypt.hashpw( password, salt );
+	}
 
-    @Override
-    public void setup() throws Exception
-    {
-        DB database = applicationStructure.getMongoClient().getDB( CoreConfig.MongoDB.dbMorphia );
-        this.counters = database.getCollection( "counters" );
-        if ( !this.counters.find( new BasicDBObject( "_id", "userId" ) ).hasNext() )
-        {
-            this.counters.insert( new BasicDBObject( "_id", "userId" ).append( "seq", 0 ) );
-        }
+	@Override public void setup() throws Exception
+	{
+		DB database = applicationStructure.getMongoClient().getDB( CoreConfig.MongoDB.dbMorphia );
+		this.counters = database.getCollection( "counters" );
+		if ( !this.counters.find( new BasicDBObject( "_id", "userId" ) ).hasNext() )
+		{
+			this.counters.insert( new BasicDBObject( "_id", "userId" ).append( "seq", 0 ) );
+		}
 
-        this.checkAdmin();
-    }
+		this.checkAdmin();
+	}
 
-    private int getNextId()
-    {
-        return (int) counters.findAndModify( new BasicDBObject( "_id", "userId" ), new BasicDBObject( "$inc",
-                new BasicDBObject( "seq", 1 ) ) ).get( "seq" );
-    }
+	private int getNextId()
+	{
+		return ( int ) counters.findAndModify( new BasicDBObject( "_id", "userId" ),
+				new BasicDBObject( "$inc", new BasicDBObject( "seq", 1 ) ) ).get( "seq" );
+	}
 
-    @Override
-    public Optional<IAccount> createAccount(final IAccount temporary)
-    {
-        final String username = temporary.getUsername();
-        final String password = temporary.getSuppliedPassword();
+	@Override public Optional<IAccount> createAccount(final IAccount temporary)
+	{
+		final String username = temporary.getUsername();
+		final String password = temporary.getSuppliedPassword();
 
-        Assert.notEmpty( username );
-        Assert.notEmpty( password );
+		Assert.notEmpty( username );
+		Assert.notEmpty( password );
 
-        if ( getAccount( username ).isPresent() )
-        {
-            return EMPTY_OPTIONAL;
-        }
+		if ( getAccount( username ).isPresent() )
+		{
+			return EMPTY_OPTIONAL;
+		}
 
-        final String hashedPassword = hashPassword( password, getNewSalt() );
-        final Account account = new Account( getNextId(), username, hashedPassword );
-        account.setManager( this );
-        this.applicationStructure.getMorphiaDatastore().save( account );
+		final String hashedPassword = hashPassword( password, getNewSalt() );
+		final Account account = new Account( getNextId(), username, hashedPassword );
+		account.setManager( this );
+		this.applicationStructure.getMorphiaDatastore().save( account );
 
-        return Optional.of( account );
-    }
+		return Optional.of( account );
+	}
 
-    @Override
-    public Optional<IAccount> createAccount(final String username, final String password)
-    {
-        return createAccount( new Account( -1, username, password ) );
-    }
+	@Override public Optional<IAccount> createAccount(final String username, final String password)
+	{
+		return createAccount( new Account( -1, username, password ) );
+	}
 
-    @Override
-    public Optional<IAccount> getAccount(final String username)
-    {
-        Assert.notEmpty( username );
+	@Override public Optional<IAccount> getAccount(final String username)
+	{
+		Assert.notEmpty( username );
 
-        Optional<Integer> accountId = ServerImplementation.getImplementation().getCacheManager().getCachedId( username );
-        Optional<IAccount> ret = EMPTY_OPTIONAL;
-        if ( accountId.isPresent() )
-        {
-            ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId.get() );
-        }
-        if ( ret.isPresent() )
-        {
-            return ret;
-        }
-        ret = Optional.ofNullable( applicationStructure.getMorphiaDatastore().createQuery( Account.class )
-                .field( "username" ).equal( username ).get() );
-        ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
-        ret.ifPresent( account -> account.setManager( this ) );
-        return ret;
-    }
+		Optional<Integer> accountId = ServerImplementation.getImplementation().getCacheManager()
+				.getCachedId( username );
+		Optional<IAccount> ret = EMPTY_OPTIONAL;
+		if ( accountId.isPresent() )
+		{
+			ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount( accountId.get() );
+		}
+		if ( ret.isPresent() )
+		{
+			return ret;
+		}
+		ret = Optional.ofNullable(
+				applicationStructure.getMorphiaDatastore().createQuery( Account.class ).field( "username" )
+						.equal( username ).get() );
+		ret.ifPresent(
+				account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
+		ret.ifPresent( account -> account.setManager( this ) );
+		return ret;
+	}
 
-    @Override
-    public Optional<IAccount> getAccount(final int accountId)
-    {
-        Optional<IAccount> ret = ServerImplementation.getImplementation().getCacheManager().getCachedAccount(
-                accountId );
-        if ( ret.isPresent() )
-        {
-            return ret;
-        }
+	@Override public Optional<IAccount> getAccount(final int accountId)
+	{
+		Optional<IAccount> ret = ServerImplementation.getImplementation().getCacheManager()
+				.getCachedAccount( accountId );
+		if ( ret.isPresent() )
+		{
+			return ret;
+		}
 
-        ret = Optional.ofNullable( applicationStructure.getMorphiaDatastore().createQuery( Account.class )
-                .field( "userId" ).equal( accountId ).get() );
-        ret.ifPresent( account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
-        ret.ifPresent( account -> account.setManager( this ) );
-        return ret;
-    }
+		ret = Optional.ofNullable(
+				applicationStructure.getMorphiaDatastore().createQuery( Account.class ).field( "userId" )
+						.equal( accountId ).get() );
+		ret.ifPresent(
+				account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
+		ret.ifPresent( account -> account.setManager( this ) );
+		return ret;
+	}
 
-    @Override
-    public void setData(final IAccount account, final String key, final String value)
-    {
-        applicationStructure.getMorphiaDatastore().update(
-                applicationStructure.getMorphiaDatastore().createQuery( Account.class )
-                        .field( "username" ).equal( account.getUsername() ),
-                applicationStructure.getMorphiaDatastore().createUpdateOperations( Account.class )
-                        .set( "data." + key, value )
-        );
-    }
+	@Override public void setData(final IAccount account, final String key, final String value)
+	{
+		applicationStructure.getMorphiaDatastore().update(
+				applicationStructure.getMorphiaDatastore().createQuery( Account.class ).field( "username" )
+						.equal( account.getUsername() ),
+				applicationStructure.getMorphiaDatastore().createUpdateOperations( Account.class )
+						.set( "data." + key, value ) );
+	}
 
-    @Override
-    public void removeData(final IAccount account, final String key)
-    {
-        applicationStructure.getMorphiaDatastore().update(
-                applicationStructure.getMorphiaDatastore().createQuery( Account.class )
-                        .field( "username" ).equal( account.getUsername() ),
-                applicationStructure.getMorphiaDatastore().createUpdateOperations( Account.class )
-                        .removeFirst( "data." + key )
-        );
-    }
+	@Override public void removeData(final IAccount account, final String key)
+	{
+		applicationStructure.getMorphiaDatastore().update(
+				applicationStructure.getMorphiaDatastore().createQuery( Account.class ).field( "username" )
+						.equal( account.getUsername() ),
+				applicationStructure.getMorphiaDatastore().createUpdateOperations( Account.class )
+						.removeFirst( "data." + key ) );
+	}
 
-    @Override
-    public void loadData(final IAccount account)
-    {
-        // Done automatically
-    }
+	@Override public void loadData(final IAccount account)
+	{
+		// Done automatically
+	}
 
-    @Override
-    public ImmutableList<? extends IAccount> findAll()
-    {
-        final List<? extends IAccount> list = applicationStructure.getMorphiaDatastore().find( Account.class ).asList();
-        final ImmutableList.Builder<IAccount> builder = ImmutableList.builderWithExpectedSize( list.size() );
-        return builder.addAll( list ).build();
-    }
+	@Override public ImmutableList<? extends IAccount> findAll()
+	{
+		final List<? extends IAccount> list = applicationStructure.getMorphiaDatastore().find( Account.class ).asList();
+		final ImmutableList.Builder<IAccount> builder = ImmutableList.builderWithExpectedSize( list.size() );
+		return builder.addAll( list ).build();
+	}
 
-    @Override
-    public void deleteAccount(@NonNull final IAccount account)
-    {
-        this.applicationStructure.getMorphiaDatastore().delete( account );
-        ServerImplementation.getImplementation().getCacheManager().deleteAccount( account );
-    }
+	@Override public void deleteAccount(@NonNull final IAccount account)
+	{
+		this.applicationStructure.getMorphiaDatastore().delete( account );
+		ServerImplementation.getImplementation().getCacheManager().deleteAccount( account );
+	}
 
 }

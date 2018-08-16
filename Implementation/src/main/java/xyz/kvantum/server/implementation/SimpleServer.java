@@ -120,8 +120,8 @@ public class SimpleServer implements Kvantum
 	@Getter private final Gson gson = new GsonBuilder().registerTypeAdapter( Account.class, new AccountSerializer() )
 			.create();
 	private final ServerContext serverContext;
-	PrintStream logStream;
 	@Getter protected ICacheManager cacheManager;
+	PrintStream logStream;
 	@Getter private boolean silent = false;
 	@Getter private SessionManager sessionManager;
 	@Getter private boolean paused = false;
@@ -655,15 +655,15 @@ public class SimpleServer implements Kvantum
 		}
 	}
 
-	@Override public final RequestHandler createSimpleRequestHandler(
-			@NonNull final String filter, @NonNull final BiConsumer<AbstractRequest, Response> generator)
+	@Override public final RequestHandler createSimpleRequestHandler(@NonNull final String filter,
+			@NonNull final BiConsumer<AbstractRequest, Response> generator)
 	{
 		return SimpleRequestHandler.builder().pattern( filter ).generator( generator ).build()
 				.addToRouter( getRouter() );
 	}
 
-	@Subscriber @SuppressWarnings("unused") private void
-			listenForConnections(@NonNull final ConnectionEstablishedEvent establishedEvent)
+	@Subscriber @SuppressWarnings("unused") private void listenForConnections(
+			@NonNull final ConnectionEstablishedEvent establishedEvent)
 	{
 		Logger.debug( "Checking for external connection {}", establishedEvent.getIp() );
 		boolean shouldCancel = true;

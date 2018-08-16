@@ -23,6 +23,5 @@ package xyz.kvantum.server.api.util;
 
 public enum ParameterScope
 {
-    GET,
-    POST
+	GET, POST
 }

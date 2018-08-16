@@ -26,11 +26,10 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 public final class DebugMiddleware extends Middleware
 {
 
-    @Override
-    public void handle(final AbstractRequest request, final MiddlewareQueue queue)
-    {
-        request.useAlternateOutcome( "debug" );
-        queue.handle( request );
-    }
+	@Override public void handle(final AbstractRequest request, final MiddlewareQueue queue)
+	{
+		request.useAlternateOutcome( "debug" );
+		queue.handle( request );
+	}
 
 }

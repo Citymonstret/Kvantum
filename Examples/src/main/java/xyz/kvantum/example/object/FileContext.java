@@ -26,41 +26,35 @@ import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumInsert;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 
-@KvantumObject
-public class FileContext
+@KvantumObject public class FileContext
 {
 
-    @KvantumField
-    private final String token;
+	@KvantumField private final String token;
 
-    @KvantumField
-    private final String type;
+	@KvantumField private final String type;
 
-    @KvantumField
-    private final String name;
+	@KvantumField private final String name;
 
-    @KvantumConstructor
-    public FileContext(@KvantumInsert("token") final String token,
-                       @KvantumInsert("type") final String type,
-                       @KvantumInsert("name") final String name)
-    {
-        this.token = token;
-        this.type = type;
-        this.name = name;
-    }
+	@KvantumConstructor public FileContext(@KvantumInsert("token") final String token,
+			@KvantumInsert("type") final String type, @KvantumInsert("name") final String name)
+	{
+		this.token = token;
+		this.type = type;
+		this.name = name;
+	}
 
-    public String getToken()
-    {
-        return token;
-    }
+	public String getToken()
+	{
+		return token;
+	}
 
-    public String getType()
-    {
-        return type;
-    }
+	public String getType()
+	{
+		return type;
+	}
 
-    public String getName()
-    {
-        return name;
-    }
+	public String getName()
+	{
+		return name;
+	}
 }

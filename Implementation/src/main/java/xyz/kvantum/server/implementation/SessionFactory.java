@@ -27,10 +27,9 @@ import xyz.kvantum.server.api.session.ISessionCreator;
 final class SessionFactory implements ISessionCreator
 {
 
-    @Override
-    public ISession createSession()
-    {
-        return new Session();
-    }
+	@Override public ISession createSession()
+	{
+		return new Session();
+	}
 
 }

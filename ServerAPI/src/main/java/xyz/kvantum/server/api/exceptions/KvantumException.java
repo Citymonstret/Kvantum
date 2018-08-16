@@ -24,19 +24,19 @@ package xyz.kvantum.server.api.exceptions;
 public class KvantumException extends RuntimeException
 {
 
-    public KvantumException(final String message)
-    {
-        super( "Kvantum threw an exception: " + message );
-    }
+	public KvantumException(final String message)
+	{
+		super( "Kvantum threw an exception: " + message );
+	}
 
-    public KvantumException(final String message, final Throwable cause)
-    {
-        super( "Kvantum threw an exception: " + message, cause );
-    }
+	public KvantumException(final String message, final Throwable cause)
+	{
+		super( "Kvantum threw an exception: " + message, cause );
+	}
 
-    public KvantumException(final Throwable cause)
-    {
-        super( cause );
-    }
+	public KvantumException(final Throwable cause)
+	{
+		super( cause );
+	}
 
 }

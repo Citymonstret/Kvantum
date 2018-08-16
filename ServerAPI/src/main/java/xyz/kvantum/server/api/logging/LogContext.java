@@ -26,29 +26,23 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@Getter
-@Builder
-@EqualsAndHashCode
-public class LogContext
+@Getter @Builder @EqualsAndHashCode public class LogContext
 {
 
-    private String applicationPrefix;
+	private String applicationPrefix;
 
-    private String logPrefix;
+	private String logPrefix;
 
-    private String thread;
+	private String thread;
 
-    private String timeStamp;
+	private String timeStamp;
 
-    private String message;
+	private String message;
 
-    public final ImmutableMap<String, String> toMap()
-    {
-        return ImmutableMap.<String, String>builder()
-                .put( "applicationPrefix", applicationPrefix )
-                .put( "logPrefix", logPrefix )
-                .put( "thread", thread )
-                .put( "timeStamp", timeStamp )
-                .put( "message", message ).build();
-    }
+	public final ImmutableMap<String, String> toMap()
+	{
+		return ImmutableMap.<String, String>builder().put( "applicationPrefix", applicationPrefix )
+				.put( "logPrefix", logPrefix ).put( "thread", thread ).put( "timeStamp", timeStamp )
+				.put( "message", message ).build();
+	}
 }

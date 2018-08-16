@@ -35,93 +35,88 @@ import xyz.kvantum.server.api.util.CookieManager;
 import xyz.kvantum.server.api.util.DebugTree;
 import xyz.kvantum.server.api.util.ProtocolType;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Request extends AbstractRequest
+@NoArgsConstructor(access = AccessLevel.PRIVATE) public final class Request extends AbstractRequest
 {
 
-    private static final AsciiString HEADER_AUTHORIZATION = AsciiString.of( "Authorization" );
-    private boolean hasBeenRequested = false;
+	private static final AsciiString HEADER_AUTHORIZATION = AsciiString.of( "Authorization" );
+	private boolean hasBeenRequested = false;
 
-    public Request(@NonNull final SocketContext socket)
-    {
-        this.setSocket( socket );
-        if ( socket.isSSL() )
-        {
-            this.setProtocolType( ProtocolType.HTTPS );
-        } else
-        {
-            this.setProtocolType( ProtocolType.HTTP );
-        }
-    }
+	public Request(@NonNull final SocketContext socket)
+	{
+		this.setSocket( socket );
+		if ( socket.isSSL() )
+		{
+			this.setProtocolType( ProtocolType.HTTPS );
+		} else
+		{
+			this.setProtocolType( ProtocolType.HTTP );
+		}
+	}
 
-    @Override
-    public void onCompileFinish()
-    {
-        if ( this.getQuery() == null )
-        {
-            throw new QueryException( "Couldn't find query header...", this );
-        }
-        this.setCookies( CookieManager.getCookies( this ) );
-        if ( this.getHeaders().containsKey( HEADER_AUTHORIZATION ) )
-        {
-            this.setAuthorization( new Authorization( this.getHeader( HEADER_AUTHORIZATION ) ) );
-        }
-    }
+	@Override public void onCompileFinish()
+	{
+		if ( this.getQuery() == null )
+		{
+			throw new QueryException( "Couldn't find query header...", this );
+		}
+		this.setCookies( CookieManager.getCookies( this ) );
+		if ( this.getHeaders().containsKey( HEADER_AUTHORIZATION ) )
+		{
+			this.setAuthorization( new Authorization( this.getHeader( HEADER_AUTHORIZATION ) ) );
+		}
+	}
 
-    @Override
-    protected AbstractRequest newRequest(@NonNull final String query)
-    {
-        final AbstractRequest request = new Request();
-        request.setPostRequest( this.getPostRequest() );
-        request.getHeaders().putAll( this.getHeaders() );
-        request.setSocket( this.getSocket() );
-        request.setQuery( new Query( HttpMethod.GET, this.getProtocolType(), query ) );
-        request.getMeta().putAll( this.getMeta() );
-        request.setCookies( this.getCookies() );
-        request.setProtocolType( this.getProtocolType() );
-        request.setSession( this.getSession() );
-        return request;
-    }
+	@Override protected AbstractRequest newRequest(@NonNull final String query)
+	{
+		final AbstractRequest request = new Request();
+		request.setPostRequest( this.getPostRequest() );
+		request.getHeaders().putAll( this.getHeaders() );
+		request.setSocket( this.getSocket() );
+		request.setQuery( new Query( HttpMethod.GET, this.getProtocolType(), query ) );
+		request.getMeta().putAll( this.getMeta() );
+		request.setCookies( this.getCookies() );
+		request.setProtocolType( this.getProtocolType() );
+		request.setSession( this.getSession() );
+		return request;
+	}
 
-    @Override
-    public void requestSession()
-    {
-        //
-        // Make sure we only request sessions once
-        //
-        if ( hasBeenRequested )
-        {
-            return;
-        }
-        hasBeenRequested = true;
+	@Override public void requestSession()
+	{
+		//
+		// Make sure we only request sessions once
+		//
+		if ( hasBeenRequested )
+		{
+			return;
+		}
+		hasBeenRequested = true;
 
-        final Optional<ISession> session = ServerImplementation.getImplementation().getSessionManager()
-                .getSession( this );
-        if ( session.isPresent() )
-        {
-            setSession( session.get() );
-            ServerImplementation.getImplementation().getSessionManager()
-                    .setSessionLastActive( (AsciiString) session.get().get( "id" ) );
-        } else
-        {
-            Logger.warn( "Could not initialize session!" );
-        }
-    }
+		final Optional<ISession> session = ServerImplementation.getImplementation().getSessionManager()
+				.getSession( this );
+		if ( session.isPresent() )
+		{
+			setSession( session.get() );
+			ServerImplementation.getImplementation().getSessionManager()
+					.setSessionLastActive( ( AsciiString ) session.get().get( "id" ) );
+		} else
+		{
+			Logger.warn( "Could not initialize session!" );
+		}
+	}
 
-    @Override
-    public void dumpRequest()
-    {
-        DebugTree.DebugTreeBuilder builder = DebugTree.builder().name( "Request Information" )
-                .entry( "Query", getQuery().getFullRequest() );
-        if ( getPostRequest() != null )
-        {
-            builder.entry( "Post Request", this.getPostRequest().get() );
-        } else
-        {
-            builder.entry( "Post Request", "None" );
-        }
-        builder.entry( "Get Parameters", this.getQuery().getParameters() );
-        builder.entry( "Headers", this.getHeaders() );
-        builder.build().collect().forEach( Logger::debug );
-    }
+	@Override public void dumpRequest()
+	{
+		DebugTree.DebugTreeBuilder builder = DebugTree.builder().name( "Request Information" )
+				.entry( "Query", getQuery().getFullRequest() );
+		if ( getPostRequest() != null )
+		{
+			builder.entry( "Post Request", this.getPostRequest().get() );
+		} else
+		{
+			builder.entry( "Post Request", "None" );
+		}
+		builder.entry( "Get Parameters", this.getQuery().getParameters() );
+		builder.entry( "Headers", this.getHeaders() );
+		builder.build().collect().forEach( Logger::debug );
+	}
 }

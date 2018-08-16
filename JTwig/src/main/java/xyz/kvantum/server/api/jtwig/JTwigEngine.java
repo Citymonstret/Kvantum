@@ -28,24 +28,24 @@ import xyz.kvantum.server.api.template.TemplateHandler;
 public class JTwigEngine extends TemplateHandler
 {
 
-    private static JTwigEngine instance;
+	private static JTwigEngine instance;
 
-    private JTwigEngine()
-    {
-        super( CoreConfig.TemplatingEngine.JTWIG, "JTwigEngine" );
-    }
+	private JTwigEngine()
+	{
+		super( CoreConfig.TemplatingEngine.JTWIG, "JTwigEngine" );
+	}
 
-    public static JTwigEngine getInstance()
-    {
-        if ( instance == null )
-        {
-            instance = new JTwigEngine();
-        }
-        return instance;
-    }
+	public static JTwigEngine getInstance()
+	{
+		if ( instance == null )
+		{
+			instance = new JTwigEngine();
+		}
+		return instance;
+	}
 
-    public void onLoad()
-    {
-        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
-    }
+	public void onLoad()
+	{
+		ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
+	}
 }

@@ -32,16 +32,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 final class DefaultClassResolver implements NioClassResolver.ClassProvider
 {
 
-    @Override
-    public MultithreadEventLoopGroup getEventLoopGroup(final int threads)
-    {
-        return new NioEventLoopGroup( threads );
-    }
+	@Override public MultithreadEventLoopGroup getEventLoopGroup(final int threads)
+	{
+		return new NioEventLoopGroup( threads );
+	}
 
-    @Override
-    public Class<? extends ServerChannel> getServerSocketChannelClass()
-    {
-        return NioServerSocketChannel.class;
-    }
+	@Override public Class<? extends ServerChannel> getServerSocketChannelClass()
+	{
+		return NioServerSocketChannel.class;
+	}
 
 }

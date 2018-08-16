@@ -22,21 +22,16 @@
 package xyz.kvantum.server.api.util;
 
 /**
- * Represents an object that is able to
- * provide a {@link AsciiString} representing
- * its internal state
+ * Represents an object that is able to provide a {@link AsciiString} representing its internal state
  */
-@FunctionalInterface
-public interface AsciiStringable
+@FunctionalInterface public interface AsciiStringable
 {
 
-    /**
-     * Return an ascii string representing the
-     * objects internal state
-     *
-     * @return AsciiString object.
-     * Cannot return null.
-     */
-    AsciiString toAsciiString();
+	/**
+	 * Return an ascii string representing the objects internal state
+	 *
+	 * @return AsciiString object. Cannot return null.
+	 */
+	AsciiString toAsciiString();
 
 }

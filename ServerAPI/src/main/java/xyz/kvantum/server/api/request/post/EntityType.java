@@ -25,14 +25,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public enum EntityType
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE) public enum EntityType
 {
-    FORM_URLENCODED( "application/x-www-form-urlencoded" ),
-    FORM_MULTIPART( "multipart" ),
-    JSON( "application/json" ),
-    NONE( "??" );
+	FORM_URLENCODED( "application/x-www-form-urlencoded" ), FORM_MULTIPART( "multipart" ), JSON(
+		"application/json" ), NONE( "??" );
 
-    @Getter
-    private final String contentType;
+	@Getter private final String contentType;
 }

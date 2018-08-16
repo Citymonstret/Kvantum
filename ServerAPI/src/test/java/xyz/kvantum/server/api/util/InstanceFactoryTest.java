@@ -27,19 +27,18 @@ import org.junit.jupiter.api.Test;
 class InstanceFactoryTest
 {
 
-    @Test
-    void setupInstanceAutomagic()
-    {
-        Assertions.assertNull( TestClass.instance );
-        final TestClass testClass = new TestClass();
-        InstanceFactory.setupInstanceAutomagic( testClass );
-        Assertions.assertEquals( testClass, TestClass.instance );
-    }
+	@Test void setupInstanceAutomagic()
+	{
+		Assertions.assertNull( TestClass.instance );
+		final TestClass testClass = new TestClass();
+		InstanceFactory.setupInstanceAutomagic( testClass );
+		Assertions.assertEquals( testClass, TestClass.instance );
+	}
 
-    private static final class TestClass
-    {
+	private static final class TestClass
+	{
 
-        private static TestClass instance;
-    }
+		private static TestClass instance;
+	}
 
 }

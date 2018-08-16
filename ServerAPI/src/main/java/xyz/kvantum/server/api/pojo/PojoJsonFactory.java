@@ -25,22 +25,19 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 
-@SuppressWarnings( "WeakerAccess" )
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class PojoJsonFactory<Pojo>
+@SuppressWarnings("WeakerAccess") @RequiredArgsConstructor(access = AccessLevel.PACKAGE) public final class PojoJsonFactory<Pojo>
 {
 
-    private final KvantumPojoFactory<Pojo> kvantumPojoFactory;
+	private final KvantumPojoFactory<Pojo> kvantumPojoFactory;
 
-    JSONObject toJson(final KvantumPojo<Pojo> kvantumPojo)
-    {
-        return new JSONObject( kvantumPojo.getAll() );
-    }
+	JSONObject toJson(final KvantumPojo<Pojo> kvantumPojo)
+	{
+		return new JSONObject( kvantumPojo.getAll() );
+	}
 
-    @SuppressWarnings("unused")
-    JSONObject toJson(final Pojo pojo)
-    {
-        return this.toJson( kvantumPojoFactory.of( pojo ) );
-    }
+	@SuppressWarnings("unused") JSONObject toJson(final Pojo pojo)
+	{
+		return this.toJson( kvantumPojoFactory.of( pojo ) );
+	}
 
 }

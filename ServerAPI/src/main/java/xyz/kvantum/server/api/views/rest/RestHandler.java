@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.views.rest;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -29,108 +31,101 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RestHandler extends RequestHandler implements IgnoreSyntax
 {
 
-    private static final Response RESPONSE_METHOD_NOT_ALLOWED = new Response()
-            .setHeader( new Header( Header.STATUS_NOT_ALLOWED ) );
-    private static final Response RESPONSE_NOT_ACCEPTABLE = new Response()
-            .setHeader( new Header( Header.STATUS_NOT_ACCEPTABLE ) );
+	private static final Response RESPONSE_METHOD_NOT_ALLOWED = new Response()
+			.setHeader( new Header( Header.STATUS_NOT_ALLOWED ) );
+	private static final Response RESPONSE_NOT_ACCEPTABLE = new Response()
+			.setHeader( new Header( Header.STATUS_NOT_ACCEPTABLE ) );
 
-    private final List<RestResponse> responseHandlers;
+	private final List<RestResponse> responseHandlers;
 
-    public RestHandler()
-    {
-        this.responseHandlers = new ArrayList<>();
-    }
+	public RestHandler()
+	{
+		this.responseHandlers = new ArrayList<>();
+	}
 
-    public void registerHandler(final RestResponse restResponse)
-    {
-        this.responseHandlers.add( restResponse );
-    }
+	public void registerHandler(final RestResponse restResponse)
+	{
+		this.responseHandlers.add( restResponse );
+	}
 
-    @Override
-    public boolean matches(final AbstractRequest request)
-    {
-        Assert.isValid( request );
+	@Override public boolean matches(final AbstractRequest request)
+	{
+		Assert.isValid( request );
 
-        for ( final RestResponse restResponse : responseHandlers )
-        {
-            if ( restResponse.matches( request ) )
-            {
-                request.addMeta( "restResponse", restResponse );
-                return true;
-            }
-        }
+		for ( final RestResponse restResponse : responseHandlers )
+		{
+			if ( restResponse.matches( request ) )
+			{
+				request.addMeta( "restResponse", restResponse );
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    @Override
-    public Response generate(AbstractRequest request)
-    {
-        final RestResponse restResponse = (RestResponse) request.getMeta( "restResponse" );
-        if ( restResponse == null )
-        {
-            return null;
-        }
+	@Override public Response generate(AbstractRequest request)
+	{
+		final RestResponse restResponse = ( RestResponse ) request.getMeta( "restResponse" );
+		if ( restResponse == null )
+		{
+			return null;
+		}
 
-        if ( !restResponse.methodMatches( request ) )
-        {
-            return RESPONSE_METHOD_NOT_ALLOWED;
-        }
+		if ( !restResponse.methodMatches( request ) )
+		{
+			return RESPONSE_METHOD_NOT_ALLOWED;
+		}
 
-        if ( !restResponse.contentTypeMatches( request ) )
-        {
-            return RESPONSE_NOT_ACCEPTABLE;
-        }
+		if ( !restResponse.contentTypeMatches( request ) )
+		{
+			return RESPONSE_NOT_ACCEPTABLE;
+		}
 
-        JSONObject jsonObject = null;
-        try
-        {
-            jsonObject = restResponse.generate( request );
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-            try
-            {
-                jsonObject = new JSONObject();
-                jsonObject.put( "status", "error" );
-                jsonObject.put( "error", e );
-            } catch ( final Exception ignored )
-            {
-            }
-        }
+		JSONObject jsonObject = null;
+		try
+		{
+			jsonObject = restResponse.generate( request );
+		} catch ( final Exception e )
+		{
+			e.printStackTrace();
+			try
+			{
+				jsonObject = new JSONObject();
+				jsonObject.put( "status", "error" );
+				jsonObject.put( "error", e );
+			} catch ( final Exception ignored )
+			{
+			}
+		}
 
-        assert jsonObject != null; // Bypass compilation warnings
+		assert jsonObject != null; // Bypass compilation warnings
 
-        final Response response = new Response( this );
-        response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
-        response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
-        response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
-        response.getHeader().set( Header.CONTENT_SECURITY_POLICY, "default-src 'none'" );
-        response.setContent( jsonObject.toString() );
-        return response;
-    }
+		final Response response = new Response( this );
+		response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
+		response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
+		response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
+		response.getHeader().set( Header.CONTENT_SECURITY_POLICY, "default-src 'none'" );
+		response.setContent( jsonObject.toString() );
+		return response;
+	}
 
-    @Override
-    public String getName()
-    {
-        return "RESTHandler";
-    }
+	@Override public String getName()
+	{
+		return "RESTHandler";
+	}
 
-    /**
-     * OVERRIDE ME
-     *
-     * @return false
-     */
-    @Override
-    public boolean forceHTTPS()
-    {
-        return false;
-    }
+	/**
+	 * OVERRIDE ME
+	 *
+	 * @return false
+	 */
+	@Override public boolean forceHTTPS()
+	{
+		return false;
+	}
 
 }

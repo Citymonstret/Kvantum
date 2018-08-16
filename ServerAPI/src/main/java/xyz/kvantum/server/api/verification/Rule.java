@@ -24,8 +24,8 @@ package xyz.kvantum.server.api.verification;
 public interface Rule<T>
 {
 
-    String getRuleDescription();
+	String getRuleDescription();
 
-    boolean test(T t);
+	boolean test(T t);
 
 }

@@ -30,21 +30,17 @@ import xyz.kvantum.server.api.views.RequestHandler;
 public final class RequestHandlerAddedEvent extends Event implements Cancellable
 {
 
-    @Getter
-    private final RequestHandler context;
-    @Getter
-    @Setter
-    private boolean cancelled = false;
+	@Getter private final RequestHandler context;
+	@Getter @Setter private boolean cancelled = false;
 
-    public RequestHandlerAddedEvent(@NonNull final RequestHandler context)
-    {
-        super( "requestHandlerAddedEvent" );
-        this.context = context;
-    }
+	public RequestHandlerAddedEvent(@NonNull final RequestHandler context)
+	{
+		super( "requestHandlerAddedEvent" );
+		this.context = context;
+	}
 
-    @Override
-    public void cancel()
-    {
-        this.setCancelled( true );
-    }
+	@Override public void cancel()
+	{
+		this.setCancelled( true );
+	}
 }

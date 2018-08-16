@@ -30,18 +30,17 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 public final class AuthenticationRequiredMiddleware extends Middleware
 {
 
-    @Override
-    public void handle(@NonNull final AbstractRequest request, @NonNull final MiddlewareQueue queue)
-    {
-        final IAccountManager accountManager = ServerImplementation.getImplementation()
-                .getApplicationStructure().getAccountManager();
-        if ( accountManager != null && accountManager.getAccount( request.getSession() ).isPresent() )
-        {
-            queue.handle( request );
-        } else
-        {
-            request.internalRedirect( CoreConfig.Middleware.loginRedirect );
-        }
-    }
+	@Override public void handle(@NonNull final AbstractRequest request, @NonNull final MiddlewareQueue queue)
+	{
+		final IAccountManager accountManager = ServerImplementation.getImplementation().getApplicationStructure()
+				.getAccountManager();
+		if ( accountManager != null && accountManager.getAccount( request.getSession() ).isPresent() )
+		{
+			queue.handle( request );
+		} else
+		{
+			request.internalRedirect( CoreConfig.Middleware.loginRedirect );
+		}
+	}
 
 }

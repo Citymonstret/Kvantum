@@ -21,33 +21,31 @@
  */
 package xyz.kvantum.server.implementation;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import lombok.Getter;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 import xyz.kvantum.server.api.util.SQLiteManager;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 public abstract class SQLiteApplicationStructure extends ApplicationStructure
 {
 
-    @Getter
-    private final SQLiteManager databaseManager;
+	@Getter private final SQLiteManager databaseManager;
 
-    SQLiteApplicationStructure(final String applicationName)
-    {
-        super( applicationName );
-        try
-        {
-            this.databaseManager = new SQLiteManager( this.applicationName );
-        } catch ( final IOException | SQLException e )
-        {
-            throw new KvantumException( e );
-        }
-        this.accountManager = createNewAccountManager();
-        Logger.info( "Initialized SQLiteApplicationStructure: {}", this.applicationName );
-    }
+	SQLiteApplicationStructure(final String applicationName)
+	{
+		super( applicationName );
+		try
+		{
+			this.databaseManager = new SQLiteManager( this.applicationName );
+		} catch ( final IOException | SQLException e )
+		{
+			throw new KvantumException( e );
+		}
+		this.accountManager = createNewAccountManager();
+		Logger.info( "Initialized SQLiteApplicationStructure: {}", this.applicationName );
+	}
 
 }

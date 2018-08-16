@@ -21,10 +21,9 @@
  */
 package xyz.kvantum.server.api.session;
 
-@FunctionalInterface
-public interface ISessionCreator
+@FunctionalInterface public interface ISessionCreator
 {
 
-    ISession createSession();
+	ISession createSession();
 
 }

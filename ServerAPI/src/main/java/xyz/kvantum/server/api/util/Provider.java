@@ -24,25 +24,23 @@ package xyz.kvantum.server.api.util;
 import java.util.function.Supplier;
 
 /**
- * A provider is any object that can provide an item.
- * Providers do not have to provide the same object
- * at every call, so the behavior depends on the
- * provider implementation
+ * A provider is any object that can provide an item. Providers do not have to provide the same object at every call, so
+ * the behavior depends on the provider implementation
+ *
  * @param <T> Type that the provider provides
  */
-@FunctionalInterface
-public interface Provider<T> extends Supplier<T>
+@FunctionalInterface public interface Provider<T> extends Supplier<T>
 {
 
-    /**
-     * Retrieve the item that the provider is providing
-     * @return Provided object
-     */
-    T provide();
+	/**
+	 * Retrieve the item that the provider is providing
+	 *
+	 * @return Provided object
+	 */
+	T provide();
 
-    @Override
-    default T get()
-    {
-        return this.provide();
-    }
+	@Override default T get()
+	{
+		return this.provide();
+	}
 }

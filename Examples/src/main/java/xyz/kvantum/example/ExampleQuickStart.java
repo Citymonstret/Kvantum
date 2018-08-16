@@ -32,7 +32,7 @@ public class ExampleQuickStart
 	{
 
 		QuickStart.newStandaloneServer();
-		get( "home", ( request, response ) -> response.setContent( "Home page!" ) );
+		get( "home", (request, response) -> response.setContent( "Home page!" ) );
 	}
 
 }

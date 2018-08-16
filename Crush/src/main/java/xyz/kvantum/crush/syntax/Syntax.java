@@ -21,84 +21,80 @@
  */
 package xyz.kvantum.crush.syntax;
 
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
- * This is used to create Crush syntax
- * such as {{variable.name}} or the foreach loop.
- * <p>
- * This has to be registered by the server in order to be used
+ * This is used to create Crush syntax such as {{variable.name}} or the foreach loop. <p> This has to be registered by
+ * the server in order to be used
  *
  * @author Citymonstret
  */
 public abstract class Syntax
 {
 
-    private final Pattern pattern;
+	private final Pattern pattern;
 
-    /**
-     * Constructor
-     *
-     * @param pattern The regex pattern used to match the code
-     */
-    public Syntax(final Pattern pattern)
-    {
-        this.pattern = pattern;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param pattern The regex pattern used to match the code
+	 */
+	public Syntax(final Pattern pattern)
+	{
+		this.pattern = pattern;
+	}
 
-    /**
-     * Process the input string
-     *
-     * @param in        Code Input
-     * @param matcher   RegEx ViewMatcher
-     * @param r         HTML Request
-     * @param factories Provider Factories
-     * @return Processed string
-     * @see #handle(String, AbstractRequest, Map) Simple wrapper
-     */
-    public abstract String process(String in, Matcher matcher, AbstractRequest r,
-                                   Map<String, ProviderFactory<? extends VariableProvider>> factories);
+	/**
+	 * Process the input string
+	 *
+	 * @param in Code Input
+	 * @param matcher RegEx ViewMatcher
+	 * @param r HTML Request
+	 * @param factories Provider Factories
+	 * @return Processed string
+	 * @see #handle(String, AbstractRequest, Map) Simple wrapper
+	 */
+	public abstract String process(String in, Matcher matcher, AbstractRequest r,
+			Map<String, ProviderFactory<? extends VariableProvider>> factories);
 
-    /**
-     * A simple wrapper for the process method
-     *
-     * @param in        String input
-     * @param r         HTML Request
-     * @param factories Provider Factories
-     * @return Processed Input
-     * @see #process(String, Matcher, AbstractRequest, Map) Wraps around this
-     */
-    public final String handle(final String in,
-                               final AbstractRequest r,
-                               final Map<String, ProviderFactory<? extends VariableProvider>> factories)
-    {
-        return process( in, pattern.matcher( in ), r, factories );
-    }
+	/**
+	 * A simple wrapper for the process method
+	 *
+	 * @param in String input
+	 * @param r HTML Request
+	 * @param factories Provider Factories
+	 * @return Processed Input
+	 * @see #process(String, Matcher, AbstractRequest, Map) Wraps around this
+	 */
+	public final String handle(final String in, final AbstractRequest r,
+			final Map<String, ProviderFactory<? extends VariableProvider>> factories)
+	{
+		return process( in, pattern.matcher( in ), r, factories );
+	}
 
-    /**
-     * Check if the regex pattern matches
-     *
-     * @param in Code Input
-     * @return True if the regex matches
-     */
-    public final boolean matches(final String in)
-    {
-        return this.pattern.matcher( in ).find();
-    }
+	/**
+	 * Check if the regex pattern matches
+	 *
+	 * @param in Code Input
+	 * @return True if the regex matches
+	 */
+	public final boolean matches(final String in)
+	{
+		return this.pattern.matcher( in ).find();
+	}
 
-    /**
-     * Get the identifier pattern object
-     *
-     * @return Pattern
-     */
-    public Pattern getPattern()
-    {
-        return this.pattern;
-    }
+	/**
+	 * Get the identifier pattern object
+	 *
+	 * @return Pattern
+	 */
+	public Pattern getPattern()
+	{
+		return this.pattern;
+	}
 }

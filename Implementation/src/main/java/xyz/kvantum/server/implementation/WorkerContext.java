@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import java.nio.charset.StandardCharsets;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -35,62 +36,49 @@ import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-import java.nio.charset.StandardCharsets;
-
-@Getter
-@Setter
-@RequiredArgsConstructor
-final class WorkerContext
+@Getter @Setter @RequiredArgsConstructor final class WorkerContext
 {
 
-    private static final String CONTENT_TYPE = "content_type";
-    private static final byte[] EMPTY = "NULL".getBytes( StandardCharsets.UTF_8 );
-    private static final AsciiString ACCEPT_ENCODING = AsciiString.of( "Accept-Encoding" );
-    private static final AsciiString GZIP = AsciiString.of( "gzip" );
+	private static final String CONTENT_TYPE = "content_type";
+	private static final byte[] EMPTY = "NULL".getBytes( StandardCharsets.UTF_8 );
+	private static final AsciiString ACCEPT_ENCODING = AsciiString.of( "Accept-Encoding" );
+	private static final AsciiString GZIP = AsciiString.of( "gzip" );
 
-    private final Kvantum server;
-    private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
+	private final Kvantum server;
+	private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
 
-    private final KvantumServerHandler kvantumServerHandler;
+	private final KvantumServerHandler kvantumServerHandler;
 
-    private RequestHandler requestHandler;
-    private AbstractRequest request;
-    private ResponseBody body;
-    private boolean gzip;
-    private SocketContext socketContext;
-    private byte[] bytes;
+	private RequestHandler requestHandler;
+	private AbstractRequest request;
+	private ResponseBody body;
+	private boolean gzip;
+	private SocketContext socketContext;
+	private byte[] bytes;
 
-    /**
-     * TODO: I am fairly confident this would be better somewhere else
-     *
-     * <p>
-     * Determine whether or not GZIP compression should be used.
-     * This depends on two things:
-     * <ol>
-     * <li>If GZIP compression is enabled in {@link CoreConfig}</li>
-     * <li>If the client has sent a "Accept-Encoding" header</li>
-     * </ol>
-     * </p>
-     * <p>
-     * The value can be fetched using {@link #isGzip()}
-     * </p>
-     */
-    void determineGzipStatus()
-    {
-        if ( CoreConfig.gzip )
-        {
-            if ( request.getHeader( ACCEPT_ENCODING ).contains( "gzip" ) )
-            {
-                this.gzip = true;
-                body.getHeader().set( Header.HEADER_CONTENT_ENCODING, GZIP );
-            } else if ( CoreConfig.debug )
-            {
-                Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
-            }
-        } else
-        {
-            this.gzip = false;
-        }
-    }
+	/**
+	 * TODO: I am fairly confident this would be better somewhere else
+	 *
+	 * <p> Determine whether or not GZIP compression should be used. This depends on two things: <ol> <li>If GZIP
+	 * compression is enabled in {@link CoreConfig}</li> <li>If the client has sent a "Accept-Encoding" header</li>
+	 * </ol> </p> <p> The value can be fetched using {@link #isGzip()} </p>
+	 */
+	void determineGzipStatus()
+	{
+		if ( CoreConfig.gzip )
+		{
+			if ( request.getHeader( ACCEPT_ENCODING ).contains( "gzip" ) )
+			{
+				this.gzip = true;
+				body.getHeader().set( Header.HEADER_CONTENT_ENCODING, GZIP );
+			} else if ( CoreConfig.debug )
+			{
+				Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
+			}
+		} else
+		{
+			this.gzip = false;
+		}
+	}
 
 }

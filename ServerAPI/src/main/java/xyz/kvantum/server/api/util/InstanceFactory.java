@@ -21,63 +21,60 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
 /**
  * Utility class for dealing with singleton instances
  */
-@SuppressWarnings( "ALL" )
-@UtilityClass
-public class InstanceFactory
+@SuppressWarnings("ALL") @UtilityClass public class InstanceFactory
 {
 
-    public static <T> void setupInstance(@NonNull final T t, @NonNull final String fieldName)
-    {
-        try
-        {
-            Field field = t.getClass().getDeclaredField( fieldName );
-            if ( !field.isAccessible() )
-            {
-                field.setAccessible( true );
-            }
-            field.set( null, t );
+	public static <T> void setupInstance(@NonNull final T t, @NonNull final String fieldName)
+	{
+		try
+		{
+			Field field = t.getClass().getDeclaredField( fieldName );
+			if ( !field.isAccessible() )
+			{
+				field.setAccessible( true );
+			}
+			field.set( null, t );
 
-            Assert.equals( field.get( null ).equals( t ), true );
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-    }
+			Assert.equals( field.get( null ).equals( t ), true );
+		} catch ( final Exception e )
+		{
+			e.printStackTrace();
+		}
+	}
 
-    public static <T> void setupInstance(@NonNull final T t)
-    {
-        setupInstance( t, "instance" );
-    }
+	public static <T> void setupInstance(@NonNull final T t)
+	{
+		setupInstance( t, "instance" );
+	}
 
-    public static <T> void setupInstanceAutomagic(@NonNull final T t)
-    {
-        for ( final Field field : t.getClass().getDeclaredFields() )
-        {
-            if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( t.getClass() ) )
-            {
-                try
-                {
-                    field.setAccessible( true );
-                    if ( field.get( null ) != null )
-                    {
-                        continue;
-                    }
-                    field.set( null, t );
-                } catch ( IllegalAccessException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+	public static <T> void setupInstanceAutomagic(@NonNull final T t)
+	{
+		for ( final Field field : t.getClass().getDeclaredFields() )
+		{
+			if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( t.getClass() ) )
+			{
+				try
+				{
+					field.setAccessible( true );
+					if ( field.get( null ) != null )
+					{
+						continue;
+					}
+					field.set( null, t );
+				} catch ( IllegalAccessException e )
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 }

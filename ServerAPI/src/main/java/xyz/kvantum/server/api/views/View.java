@@ -22,6 +22,12 @@
 package xyz.kvantum.server.api.views;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -43,492 +49,457 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
-
 /**
- * Higher level implementation of {@link RequestHandler} which
- * primarely focuses on static resource handling. Extended
+ * Higher level implementation of {@link RequestHandler} which primarely focuses on static resource handling. Extended
  * by {@link StaticFileView}
  */
-@SuppressWarnings("ALL")
-@EqualsAndHashCode(of = "internalName", callSuper = false)
-public class View extends RequestHandler
+@SuppressWarnings("ALL") @EqualsAndHashCode(of = "internalName", callSuper = false) public class View
+		extends RequestHandler
 {
 
-    /**
-     * Variable corrensponding to {@link #PATTERN_VARIABLE_FILE}
-     */
-    public static final String VARIABLE_FILE = "file";
-    /**
-     * Variable corrensponding to {@link #PATTERN_VARIABLE_FOLDER}
-     */
-    public static final String VARIABLE_FOLDER = "folder";
-    /**
-     * Variable corrensponding to {@link #PATTERN_VARIABLE_EXTENSION}
-     */
-    public static final String VARIABLE_EXTENSION = "extension";
-    /**
-     * Pattern corrensponding to {@link #VARIABLE_FILE}
-     */
-    public static final String PATTERN_VARIABLE_FILE = "{file}";
-    /**
-     * Pattern corrensponding to {@link #VARIABLE_FOLDER}
-     */
-    public static final String PATTERN_VARIABLE_FOLDER = "{folder}";
-    /**
-     * Pattern corrensponding to {@link #VARIABLE_EXTENSION}
-     */
-    public static final String PATTERN_VARIABLE_EXTENSION = "{extension}";
-    public static final String CONSTANT_BUFFER = "buffer";
-    public static final String CONSTANT_VARIABLES = "variables";
-    private static final String DEFAULT_RESPONSE = "<h1>Hello World!</h1>";
-    protected final Map<HeaderOption, String> headers = new HashMap<>();
-    protected final Map<String, Object> options;
-    private final String internalName;
-    private final UUID uuid;
-    private final ViewPattern viewPattern;
-    private final HttpMethod httpMethod;
-    public String relatedFolderPath;
-    protected boolean forceHTTPS;
-    protected String defaultFilePattern = "${file}.${extension}";
-    private Path folder;
-    private int buffer = -1;
-    private ViewReturn viewReturn;
-    private FilePattern filePattern;
-    @Getter
-    @Setter
-    private Supplier<FileSystem> fileSystemSupplier = ServerImplementation.getImplementation()::getFileSystem;
+	/**
+	 * Variable corrensponding to {@link #PATTERN_VARIABLE_FILE}
+	 */
+	public static final String VARIABLE_FILE = "file";
+	/**
+	 * Variable corrensponding to {@link #PATTERN_VARIABLE_FOLDER}
+	 */
+	public static final String VARIABLE_FOLDER = "folder";
+	/**
+	 * Variable corrensponding to {@link #PATTERN_VARIABLE_EXTENSION}
+	 */
+	public static final String VARIABLE_EXTENSION = "extension";
+	/**
+	 * Pattern corrensponding to {@link #VARIABLE_FILE}
+	 */
+	public static final String PATTERN_VARIABLE_FILE = "{file}";
+	/**
+	 * Pattern corrensponding to {@link #VARIABLE_FOLDER}
+	 */
+	public static final String PATTERN_VARIABLE_FOLDER = "{folder}";
+	/**
+	 * Pattern corrensponding to {@link #VARIABLE_EXTENSION}
+	 */
+	public static final String PATTERN_VARIABLE_EXTENSION = "{extension}";
+	public static final String CONSTANT_BUFFER = "buffer";
+	public static final String CONSTANT_VARIABLES = "variables";
+	private static final String DEFAULT_RESPONSE = "<h1>Hello World!</h1>";
+	protected final Map<HeaderOption, String> headers = new HashMap<>();
+	protected final Map<String, Object> options;
+	private final String internalName;
+	private final UUID uuid;
+	private final ViewPattern viewPattern;
+	private final HttpMethod httpMethod;
+	public String relatedFolderPath;
+	protected boolean forceHTTPS;
+	protected String defaultFilePattern = "${file}.${extension}";
+	private Path folder;
+	private int buffer = -1;
+	private ViewReturn viewReturn;
+	private FilePattern filePattern;
+	@Getter @Setter private Supplier<FileSystem> fileSystemSupplier = ServerImplementation
+			.getImplementation()::getFileSystem;
 
-    /**
-     * Delegate for {@link #View(String, String, HttpMethod)} with
-     * httpMethod = {@link HttpMethod#ALL}
-     *
-     * @param pattern      View pattern ({@link ViewPattern})
-     * @param internalName A unique internal name
-     */
-    public View(final String pattern, final String internalName)
-    {
-        this( pattern, internalName, HttpMethod.ALL );
-    }
+	/**
+	 * Delegate for {@link #View(String, String, HttpMethod)} with httpMethod = {@link HttpMethod#ALL}
+	 *
+	 * @param pattern View pattern ({@link ViewPattern})
+	 * @param internalName A unique internal name
+	 */
+	public View(final String pattern, final String internalName)
+	{
+		this( pattern, internalName, HttpMethod.ALL );
+	}
 
-    /**
-     * Constructor without prestored options
-     *
-     * @param pattern      View pattern ({@link ViewPattern})
-     * @param internalName A unique internal name
-     * @param httpMethod   The http method that will be served by this view
-     */
-    public View(final String pattern, final String internalName, final HttpMethod httpMethod)
-    {
-        this( pattern, internalName, null, httpMethod );
-    }
+	/**
+	 * Constructor without prestored options
+	 *
+	 * @param pattern View pattern ({@link ViewPattern})
+	 * @param internalName A unique internal name
+	 * @param httpMethod The http method that will be served by this view
+	 */
+	public View(final String pattern, final String internalName, final HttpMethod httpMethod)
+	{
+		this( pattern, internalName, null, httpMethod );
+	}
 
-    /**
-     * Delegate for {@link #View(String, String, Map, ViewReturn, HttpMethod)}
-     * with viewReturn = null
-     *
-     * @param pattern      View pattern ({@link ViewPattern})
-     * @param internalName A unique internal name
-     * @param options      Pre Stored options (Nullable)
-     * @param httpMethod   The http method that this view will serve
-     */
-    public View(final String pattern,
-                final String internalName,
-                final Map<String, Object> options,
-                final HttpMethod httpMethod)
-    {
-        this( pattern, internalName, options, null, httpMethod );
-    }
+	/**
+	 * Delegate for {@link #View(String, String, Map, ViewReturn, HttpMethod)} with viewReturn = null
+	 *
+	 * @param pattern View pattern ({@link ViewPattern})
+	 * @param internalName A unique internal name
+	 * @param options Pre Stored options (Nullable)
+	 * @param httpMethod The http method that this view will serve
+	 */
+	public View(final String pattern, final String internalName, final Map<String, Object> options,
+			final HttpMethod httpMethod)
+	{
+		this( pattern, internalName, options, null, httpMethod );
+	}
 
-    /**
-     * Primary constructor
-     *
-     * @param pattern      View pattern ({@link ViewPattern})
-     * @param internalName A unique internal name
-     * @param options      Pre Stored options (Nullable)
-     * @param viewReturn   {@link ViewReturn} which will be used to generate responses (Nullable)
-     * @param httpMethod   The http method that this view will serve
-     */
-    public View(@NonNull final String pattern,
-                @NonNull final String internalName,
-                @Nullable final Map<String, Object> options,
-                @Nullable final ViewReturn viewReturn,
-                @NonNull final HttpMethod httpMethod)
-    {
-        if ( options == null )
-        {
-            this.options = new HashMap<>();
-        } else
-        {
-            this.options = options;
-        }
-        this.internalName = this.options.getOrDefault( "internalName", internalName ).toString();
-        this.forceHTTPS = (boolean) this.options.getOrDefault( "forceHTTPS", false );
-        if ( this.options.containsKey( "headers" ) )
-        {
-            ( (Map<String, String>) this.options.get( "headers" ) ).forEach( (key, value) ->
-                    headers.put( HeaderOption.getOrCreate( AsciiString.of( key, false ) ), value ) );
-        }
-        this.viewPattern = new ViewPattern( pattern );
-        this.viewReturn = viewReturn;
-        this.uuid = UUID.randomUUID();
-        if ( httpMethod == null )
-        {
-            if ( options.containsKey( "method" ) )
-            {
-                this.httpMethod = HttpMethod.valueOf( options.get( "method" ).toString() );
-            } else
-            {
-                this.httpMethod = HttpMethod.ALL;
-            }
-        } else
-        {
-            this.httpMethod = httpMethod;
-        }
-    }
+	/**
+	 * Primary constructor
+	 *
+	 * @param pattern View pattern ({@link ViewPattern})
+	 * @param internalName A unique internal name
+	 * @param options Pre Stored options (Nullable)
+	 * @param viewReturn {@link ViewReturn} which will be used to generate responses (Nullable)
+	 * @param httpMethod The http method that this view will serve
+	 */
+	public View(@NonNull final String pattern, @NonNull final String internalName,
+			@Nullable final Map<String, Object> options, @Nullable final ViewReturn viewReturn,
+			@NonNull final HttpMethod httpMethod)
+	{
+		if ( options == null )
+		{
+			this.options = new HashMap<>();
+		} else
+		{
+			this.options = options;
+		}
+		this.internalName = this.options.getOrDefault( "internalName", internalName ).toString();
+		this.forceHTTPS = ( boolean ) this.options.getOrDefault( "forceHTTPS", false );
+		if ( this.options.containsKey( "headers" ) )
+		{
+			( ( Map<String, String> ) this.options.get( "headers" ) ).forEach(
+					(key, value) -> headers.put( HeaderOption.getOrCreate( AsciiString.of( key, false ) ), value ) );
+		}
+		this.viewPattern = new ViewPattern( pattern );
+		this.viewReturn = viewReturn;
+		this.uuid = UUID.randomUUID();
+		if ( httpMethod == null )
+		{
+			if ( options.containsKey( "method" ) )
+			{
+				this.httpMethod = HttpMethod.valueOf( options.get( "method" ).toString() );
+			} else
+			{
+				this.httpMethod = HttpMethod.ALL;
+			}
+		} else
+		{
+			this.httpMethod = httpMethod;
+		}
+	}
 
-    protected FilePattern getFilePattern()
-    {
-        if ( this.filePattern == null )
-        {
-            if ( this.options.containsKey( "filePattern" ) )
-            {
-                this.filePattern = FilePattern.compile( this.options.get( "filePattern" ).toString() );
-            } else
-            {
-                this.filePattern = FilePattern.compile( defaultFilePattern );
-            }
-        }
-        return this.filePattern;
-    }
+	protected FilePattern getFilePattern()
+	{
+		if ( this.filePattern == null )
+		{
+			if ( this.options.containsKey( "filePattern" ) )
+			{
+				this.filePattern = FilePattern.compile( this.options.get( "filePattern" ).toString() );
+			} else
+			{
+				this.filePattern = FilePattern.compile( defaultFilePattern );
+			}
+		}
+		return this.filePattern;
+	}
 
+	/**
+	 * Get a stored option
+	 *
+	 * @param <T> Type
+	 * @param s Key
+	 * @return (Type Casted) Value
+	 * @see #containsOption(String) Check if the option exists before getting it
+	 */
+	@SuppressWarnings("ALL") final public <T> T getOption(@NonNull final String s)
+	{
+		return ( ( T ) options.get( s ) );
+	}
 
-    /**
-     * Get a stored option
-     *
-     * @param <T> Type
-     * @param s   Key
-     * @return (Type Casted) Value
-     * @see #containsOption(String) Check if the option exists before getting it
-     */
-    @SuppressWarnings("ALL")
-    final public <T> T getOption(@NonNull final String s)
-    {
-        return ( (T) options.get( s ) );
-    }
+	/**
+	 * Get an option, if it exists
+	 *
+	 * @param s Option key
+	 * @param <T> Option type (Casts to this type)
+	 * @return Value
+	 */
+	final public <T> Optional<T> getOptionSafe(final String s)
+	{
+		Assert.notNull( s );
 
-    /**
-     * Get an option, if it exists
-     *
-     * @param s   Option key
-     * @param <T> Option type (Casts to this type)
-     * @return Value
-     */
-    final public <T> Optional<T> getOptionSafe(final String s)
-    {
-        Assert.notNull( s );
+		if ( options.containsKey( s ) )
+		{
+			return Optional.of( ( T ) options.get( s ) );
+		}
 
-        if ( options.containsKey( s ) )
-        {
-            return Optional.of( (T) options.get( s ) );
-        }
+		return Optional.empty();
+	}
 
-        return Optional.empty();
-    }
+	/**
+	 * Get all options as a string
+	 *
+	 * @return options as string
+	 */
+	final public String getOptionString()
+	{
+		final StringBuilder b = new StringBuilder();
+		for ( final Map.Entry<String, Object> e : options.entrySet() )
+		{
+			b.append( ";" ).append( e.getKey() ).append( "=" ).append( e.getValue().toString() );
+		}
+		return b.toString();
+	}
 
-    /**
-     * Get all options as a string
-     *
-     * @return options as string
-     */
-    final public String getOptionString()
-    {
-        final StringBuilder b = new StringBuilder();
-        for ( final Map.Entry<String, Object> e : options.entrySet() )
-        {
-            b.append( ";" ).append( e.getKey() ).append( "=" ).append( e.getValue().toString() );
-        }
-        return b.toString();
-    }
+	/**
+	 * Check if the option is stored
+	 *
+	 * @param s Key
+	 * @return True if the option is stored, False if it isn't
+	 */
+	final public boolean containsOption(final String s)
+	{
+		Assert.notNull( s );
 
-    /**
-     * Check if the option is stored
-     *
-     * @param s Key
-     * @return True if the option is stored, False if it isn't
-     */
-    final public boolean containsOption(final String s)
-    {
-        Assert.notNull( s );
+		return options.containsKey( s );
+	}
 
-        return options.containsKey( s );
-    }
+	@Override public final String getName()
+	{
+		return this.internalName;
+	}
 
-    @Override
-    public final String getName()
-    {
-        return this.internalName;
-    }
+	@Override public boolean forceHTTPS()
+	{
+		return this.forceHTTPS;
+	}
 
-    @Override
-    public boolean forceHTTPS()
-    {
-        return this.forceHTTPS;
-    }
+	/**
+	 * Register the view to the implemented {@link Router}
+	 */
+	final public void register()
+	{
+		ServerImplementation.getImplementation().getRouter().add( this );
+	}
 
-    /**
-     * Register the view to the implemented {@link Router}
-     */
-    final public void register()
-    {
-        ServerImplementation.getImplementation().getRouter().add( this );
-    }
+	/**
+	 * Get the folder used by this view, doesn't have to be used
+	 *
+	 * @return File
+	 */
+	protected Path getFolder()
+	{
+		if ( this.folder == null )
+		{
+			if ( containsOption( "folder" ) )
+			{
+				this.folder = fileSystemSupplier.get().getPath( getOption( "folder" ).toString() );
+			} else if ( relatedFolderPath != null )
+			{
+				this.folder = fileSystemSupplier.get().getPath( relatedFolderPath );
+			} else
+			{
+				this.folder = fileSystemSupplier.get().getPath( "/" + internalName );
+			}
+			if ( !folder.exists() && !folder.create() )
+			{
+				Message.COULD_NOT_CREATE_FOLDER.log( folder );
+			}
+		}
+		return this.folder;
+	}
 
-    /**
-     * Get the folder used
-     * by this view, doesn't
-     * have to be used
-     *
-     * @return File
-     */
-    protected Path getFolder()
-    {
-        if ( this.folder == null )
-        {
-            if ( containsOption( "folder" ) )
-            {
-                this.folder = fileSystemSupplier.get().getPath( getOption( "folder" ).toString() );
-            } else if ( relatedFolderPath != null )
-            {
-                this.folder = fileSystemSupplier.get().getPath( relatedFolderPath );
-            } else
-            {
-                this.folder = fileSystemSupplier.get().getPath( "/" + internalName );
-            }
-            if ( !folder.exists() && !folder.create() )
-            {
-                Message.COULD_NOT_CREATE_FOLDER.log( folder );
-            }
-        }
-        return this.folder;
-    }
+	/**
+	 * <p> Get a file from the {@link #getFolder()} folder, based on request variables and the {@link #fileName} or
+	 * {@link #getOption(String)} "filepattern", pattern </p> <p> This uses {@literal {pattern}}'s: {@literal {file}},
+	 * {@literal {folder}} and {@literal {extension}} <br>
+	 * For example: <pre>/{folder}/{filename}}.{extension}</pre>
+	 * </p>
+	 *
+	 * @return The file (use {@link File#exists()}!)
+	 * @see #PATTERN_VARIABLE_EXTENSION
+	 * @see #PATTERN_VARIABLE_FILE
+	 * @see #PATTERN_VARIABLE_FOLDER
+	 * @see #VARIABLE_EXTENSION
+	 * @see #VARIABLE_FILE
+	 * @see #VARIABLE_FOLDER
+	 * @see #getFolder()
+	 */
+	protected Path getFile(final AbstractRequest request)
+	{
+		Assert.isValid( request );
 
-    /**
-     * <p>
-     * Get a file from the {@link #getFolder()} folder, based on request
-     * variables and the {@link #fileName} or {@link #getOption(String)} "filepattern", pattern
-     * </p>
-     * <p>
-     * This uses {@literal {pattern}}'s: {@literal {file}}, {@literal {folder}} and {@literal {extension}}
-     * <br>
-     * For example: <pre>/{folder}/{filename}}.{extension}</pre>
-     * </p>
-     *
-     * @param request
-     * @return The file (use {@link File#exists()}!)
-     * @see #PATTERN_VARIABLE_EXTENSION
-     * @see #PATTERN_VARIABLE_FILE
-     * @see #PATTERN_VARIABLE_FOLDER
-     * @see #VARIABLE_EXTENSION
-     * @see #VARIABLE_FILE
-     * @see #VARIABLE_FOLDER
-     * @see #getFolder()
-     */
-    protected Path getFile(final AbstractRequest request)
-    {
-        Assert.isValid( request );
+		if ( request.getMeta( "fileMatcher" ) == null )
+		{
+			throw new KvantumException( "fileMatcher isn't set" );
+		}
 
-        if ( request.getMeta( "fileMatcher" ) == null )
-        {
-            throw new KvantumException( "fileMatcher isn't set" );
-        }
+		final FilePattern.FileMatcher fileMatcher = ( FilePattern.FileMatcher ) request.getMeta( "fileMatcher" );
 
-        final FilePattern.FileMatcher fileMatcher = (FilePattern.FileMatcher) request.getMeta( "fileMatcher" );
+		if ( !fileMatcher.matches() )
+		{
+			throw new KvantumException( "getFile called when matches = false" );
+		}
 
-        if ( !fileMatcher.matches() )
-        {
-            throw new KvantumException( "getFile called when matches = false" );
-        }
+		if ( CoreConfig.debug )
+		{
+			ServerImplementation.getImplementation().log( "Translated file name: '{}'", fileMatcher.getFileName() );
+		}
 
-        if ( CoreConfig.debug )
-        {
-            ServerImplementation.getImplementation().log( "Translated file name: '{}'", fileMatcher.getFileName() );
-        }
+		String fileName = fileMatcher.getFileName();
 
-        String fileName = fileMatcher.getFileName();
+		if ( containsOption( "extensionRewrite" ) )
+		{
+			if ( CoreConfig.debug )
+			{
+				Logger.debug( "Rewrite found for : " + toString() );
+			}
 
-        if ( containsOption( "extensionRewrite" ) )
-        {
-            if ( CoreConfig.debug )
-            {
-                Logger.debug( "Rewrite found for : " + toString() );
-            }
+			final String variableExtension = request.getVariables().get( VARIABLE_EXTENSION );
 
-            final String variableExtension = request.getVariables().get( VARIABLE_EXTENSION );
+			final Map<String, Object> rewrite = getOption( "extensionRewrite" );
+			if ( rewrite.containsKey( variableExtension ) )
+			{
+				final String rewritten = rewrite.get( variableExtension ).toString();
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Rewrote {} to {}", variableExtension, rewritten );
+				}
+				fileName = fileName.replace( variableExtension, rewritten );
+			}
 
-            final Map<String, Object> rewrite = getOption( "extensionRewrite" );
-            if ( rewrite.containsKey( variableExtension ) )
-            {
-                final String rewritten = rewrite.get( variableExtension ).toString();
-                if ( CoreConfig.debug )
-                {
-                    Logger.debug( "Rewrote {} to {}",
-                            variableExtension,
-                            rewritten
-                    );
-                }
-                fileName = fileName.replace( variableExtension, rewritten );
-            }
+		}
 
-        }
+		if ( CoreConfig.debug )
+		{
+			Logger.debug( "Final file name: " + fileName );
+		}
 
-        if ( CoreConfig.debug )
-        {
-            Logger.debug( "Final file name: " + fileName );
-        }
+		return getFolder().getPath( fileName );
+	}
 
-        return getFolder().getPath( fileName );
-    }
+	/**
+	 * Get the file buffer (if needed)
+	 *
+	 * @return file buffer
+	 */
+	final protected int getBuffer()
+	{
+		if ( this.buffer == -1 )
+		{
+			if ( containsOption( CONSTANT_BUFFER ) )
+			{
+				this.buffer = getOption( CONSTANT_BUFFER );
+			} else
+			{
+				this.buffer = 65536; // 64kb
+			}
+		}
+		return this.buffer;
+	}
 
-    /**
-     * Get the file buffer (if needed)
-     *
-     * @return file buffer
-     */
-    final protected int getBuffer()
-    {
-        if ( this.buffer == -1 )
-        {
-            if ( containsOption( CONSTANT_BUFFER ) )
-            {
-                this.buffer = getOption( CONSTANT_BUFFER );
-            } else
-            {
-                this.buffer = 65536; // 64kb
-            }
-        }
-        return this.buffer;
-    }
+	/**
+	 * Check if the request URL matches the regex pattern
+	 *
+	 * @param request Request, from which the URL should be checked
+	 * @return True if the request Matches, False if not
+	 * @see #passes(AbstractRequest) - This is called!
+	 */
+	@Override final public boolean matches(final AbstractRequest request)
+	{
+		Assert.isValid( request );
 
-    /**
-     * Check if the request URL matches the regex pattern
-     *
-     * @param request Request, from which the URL should be checked
-     * @return True if the request Matches, False if not
-     * @see #passes(AbstractRequest) - This is called!
-     */
-    @Override
-    final public boolean matches(final AbstractRequest request)
-    {
-        Assert.isValid( request );
+		final HttpMethod requestMethod = request.getQuery().getMethod();
+		if ( this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod )
+		{
+			if ( CoreConfig.debug )
+			{
+				Logger.debug( "Invalid http method {0}, expected {1} for request {2} in handler {3}", requestMethod,
+						this.httpMethod, request, this );
+			}
+			return false;
+		}
 
-        final HttpMethod requestMethod = request.getQuery().getMethod();
-        if ( this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod )
-        {
-            if ( CoreConfig.debug )
-            {
-                Logger.debug( "Invalid http method {0}, expected {1} for request {2} in handler {3}",
-                        requestMethod, this.httpMethod, request, this );
-            }
-            return false;
-        }
+		final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
+		if ( map != null )
+		{
+			request.addMeta( CONSTANT_VARIABLES, map );
+		}
 
-        final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
-        if ( map != null )
-        {
-            request.addMeta( CONSTANT_VARIABLES, map );
-        }
+		if ( CoreConfig.debug && map == null )
+		{
+			ServerImplementation.getImplementation()
+					.log( "Request: '{0}' failed to " + "pass '{1}'", request.getQuery().getFullRequest(),
+							viewPattern.toString() );
+		}
 
-        if ( CoreConfig.debug && map == null )
-        {
-            ServerImplementation.getImplementation().log( "Request: '{0}' failed to " +
-                            "pass '{1}'", request.getQuery().getFullRequest(),
-                    viewPattern.toString() );
-        }
+		return map != null && passes( request );
+	}
 
-        return map != null && passes( request );
-    }
+	/**
+	 * This is for further testing (... further than regex...) For example, check if a file exists etc.
+	 *
+	 * @param request The request from which the URL is fetches
+	 * @return True if the request matches, false if not
+	 */
+	protected boolean passes(final AbstractRequest request)
+	{
+		return true;
+	}
 
-    /**
-     * This is for further testing (... further than regex...)
-     * For example, check if a file exists etc.
-     *
-     * @param request The request from which the URL is fetches
-     * @return True if the request matches, false if not
-     */
-    protected boolean passes(final AbstractRequest request)
-    {
-        return true;
-    }
+	@Override public String toString()
+	{
+		return String.format( "{name:%s,uuid:%s,pattern:%s}", internalName, uuid.toString(), viewPattern.toString() );
+	}
 
-    @Override
-    public String toString()
-    {
-        return String.format( "{name:%s,uuid:%s,pattern:%s}",
-                internalName, uuid.toString(), viewPattern.toString() );
-    }
+	/**
+	 * Generate a response
+	 *
+	 * @param r Incoming request
+	 * @return Either the view generated by the configured view return, or a generated response.
+	 */
+	@Override public Response generate(final AbstractRequest r)
+	{
+		if ( viewReturn != null )
+		{
+			return viewReturn.get( r );
+		} else
+		{
+			final Response response = new Response( this );
+			this.applyDefaultHeaders( response );
+			this.handle( r, response );
+			return response;
+		}
+	}
 
-    /**
-     * Generate a response
-     *
-     * @param r Incoming request
-     * @return Either the view generated by the configured view return, or a generated response.
-     */
-    @Override
-    public Response generate(final AbstractRequest r)
-    {
-        if ( viewReturn != null )
-        {
-            return viewReturn.get( r );
-        } else
-        {
-            final Response response = new Response( this );
-            this.applyDefaultHeaders( response );
-            this.handle( r, response );
-            return response;
-        }
-    }
+	/**
+	 * Apply default headers
+	 *
+	 * @param response Working response
+	 */
+	final protected void applyDefaultHeaders(final Response response)
+	{
+		if ( !headers.isEmpty() )
+		{
+			headers.forEach( (header, value) -> response.getHeader().set( header, value ) );
+		}
+	}
 
-    /**
-     * Apply default headers
-     *
-     * @param response Working response
-     */
-    final protected void applyDefaultHeaders(final Response response)
-    {
-        if ( !headers.isEmpty() )
-        {
-            headers.forEach( (header, value) -> response.getHeader().set( header, value ) );
-        }
-    }
+	/**
+	 * OVERRIDE ME
+	 *
+	 * @param request Incoming request
+	 * @param response Working response
+	 */
+	protected void handle(final AbstractRequest request, final Response response)
+	{
+		response.setContent( DEFAULT_RESPONSE );
+	}
 
-    /**
-     * OVERRIDE ME
-     *
-     * @param request  Incoming request
-     * @param response Working response
-     */
-    protected void handle(final AbstractRequest request, final Response response)
-    {
-        response.setContent( DEFAULT_RESPONSE );
-    }
+	/**
+	 * Set an internal option
+	 *
+	 * @param key Option key
+	 * @param value Option value
+	 */
+	public void setOption(final String key, final Object value)
+	{
+		Assert.notNull( key );
+		Assert.notNull( value );
 
-    /**
-     * Set an internal option
-     *
-     * @param key   Option key
-     * @param value Option value
-     */
-    public void setOption(final String key, final Object value)
-    {
-        Assert.notNull( key );
-        Assert.notNull( value );
-
-        this.options.put( key, value );
-    }
+		this.options.put( key, value );
+	}
 }

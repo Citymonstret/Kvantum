@@ -39,8 +39,8 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	 * @param classes Request handlers to register in the router
 	 * @return Created instance
 	 */
-	@SuppressWarnings( "ALL" )
-	public static Kvantum newStandaloneServer(final Object... classes) throws ServerStartFailureException
+	@SuppressWarnings("ALL") public static Kvantum newStandaloneServer(final Object... classes)
+			throws ServerStartFailureException
 	{
 		final ServerContext kvantumContext = ServerContext.builder().coreFolder( new File( "./kvantum" ) )
 				.logWrapper( new DefaultLogWrapper() ).router( RequestManager.builder().build() ).standalone( true )

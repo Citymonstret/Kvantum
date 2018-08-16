@@ -26,8 +26,8 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 public class RequestException extends KvantumException
 {
 
-    public RequestException(final String message, final AbstractRequest request)
-    {
-        super( String.format( "Failed to handle request (%s): %s", request, message ) );
-    }
+	public RequestException(final String message, final AbstractRequest request)
+	{
+		super( String.format( "Failed to handle request (%s): %s", request, message ) );
+	}
 }

@@ -33,84 +33,79 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 
-@SuppressWarnings({ "WeakerAccess", "unused" })
-final class HTTPThread extends Thread
+@SuppressWarnings({ "WeakerAccess", "unused" }) final class HTTPThread extends Thread
 {
 
-    //
-    // Netty
-    //
-    private final EventLoopGroup bossGroup;
-    private final EventLoopGroup workerGroup;
-    private final ServerBootstrap serverBootstrap;
-    //
-    // Kvantum
-    //
-    private final int port;
-    private ChannelFuture future;
+	//
+	// Netty
+	//
+	private final EventLoopGroup bossGroup;
+	private final EventLoopGroup workerGroup;
+	private final ServerBootstrap serverBootstrap;
+	//
+	// Kvantum
+	//
+	private final int port;
+	private ChannelFuture future;
 
-    HTTPThread(@NonNull final ServerSocketFactory serverSocketFactory,
-               @NonNull final NioClassResolver classResolver)
-            throws KvantumInitializationException
-    {
-        super( "http" );
-        this.setPriority( Thread.MAX_PRIORITY );
+	HTTPThread(@NonNull final ServerSocketFactory serverSocketFactory, @NonNull final NioClassResolver classResolver)
+			throws KvantumInitializationException
+	{
+		super( "http" );
+		this.setPriority( Thread.MAX_PRIORITY );
 
-        this.workerGroup = classResolver.getClassProvider()
-                .getEventLoopGroup( CoreConfig.Pools.httpWorkerGroupThreads );
-        this.bossGroup = classResolver.getClassProvider().getEventLoopGroup( CoreConfig.Pools.httpBossGroupThreads );
+		this.workerGroup = classResolver.getClassProvider()
+				.getEventLoopGroup( CoreConfig.Pools.httpWorkerGroupThreads );
+		this.bossGroup = classResolver.getClassProvider().getEventLoopGroup( CoreConfig.Pools.httpBossGroupThreads );
 
-        if ( !serverSocketFactory.createServerSocket() )
-        {
-            throw new KvantumInitializationException( "Failed to start server..." );
-        }
+		if ( !serverSocketFactory.createServerSocket() )
+		{
+			throw new KvantumInitializationException( "Failed to start server..." );
+		}
 
-        this.port = serverSocketFactory.getServerSocketPort();
+		this.port = serverSocketFactory.getServerSocketPort();
 
-        this.serverBootstrap = new ServerBootstrap();
-        this.serverBootstrap.option( ChannelOption.SO_BACKLOG, 1024 );
-        serverBootstrap.group( bossGroup, workerGroup )
-                .channel( classResolver.getClassProvider().getServerSocketChannelClass() )
-                .childHandler( new ChannelInitializer<SocketChannel>()
-                {
-                    @Override
-                    protected void initChannel(final SocketChannel ch) throws Exception
-                    {
-                        ch.pipeline()
-                                .addLast( new KvantumReadTimeoutHandler() )
-                                .addLast( new KvantumServerHandler( ProtocolType.HTTP ) );
-                    }
-                } );
-    }
+		this.serverBootstrap = new ServerBootstrap();
+		this.serverBootstrap.option( ChannelOption.SO_BACKLOG, 1024 );
+		serverBootstrap.group( bossGroup, workerGroup )
+				.channel( classResolver.getClassProvider().getServerSocketChannelClass() )
+				.childHandler( new ChannelInitializer<SocketChannel>()
+				{
+					@Override protected void initChannel(final SocketChannel ch) throws Exception
+					{
+						ch.pipeline().addLast( new KvantumReadTimeoutHandler() )
+								.addLast( new KvantumServerHandler( ProtocolType.HTTP ) );
+					}
+				} );
+	}
 
-    void close()
-    {
-        try
-        {
-            if ( this.future != null )
-            {
-                Logger.info( "Closing boss group..." );
-                this.bossGroup.shutdownGracefully().sync();
-                Logger.info( "Closing worker group..." );
-                this.workerGroup.shutdownGracefully().sync();
-                Logger.info( "Closed!" );
-            }
-        } catch ( final InterruptedException e )
-        {
-            e.printStackTrace();
-        }
-    }
+	void close()
+	{
+		try
+		{
+			if ( this.future != null )
+			{
+				Logger.info( "Closing boss group..." );
+				this.bossGroup.shutdownGracefully().sync();
+				Logger.info( "Closing worker group..." );
+				this.workerGroup.shutdownGracefully().sync();
+				Logger.info( "Closed!" );
+			}
+		} catch ( final InterruptedException e )
+		{
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void run()
-    {
-        try
-        {
-            this.future = serverBootstrap.bind( this.port ).sync();
-        } catch ( final InterruptedException e )
-        {
-            e.printStackTrace();
-        }
-    }
+	@Override public void run()
+	{
+		try
+		{
+			this.future = serverBootstrap.bind( this.port ).sync();
+		} catch ( final InterruptedException e )
+		{
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -29,22 +29,19 @@ import xyz.kvantum.server.api.util.AsciiString;
 /**
  * A very simple representation of a cookie
  */
-@AllArgsConstructor
-@EqualsAndHashCode(of = { "name", "value" })
-public final class Cookie
+@AllArgsConstructor @EqualsAndHashCode(of = { "name", "value" }) public final class Cookie
 {
 
-    @Getter
-    private final AsciiString name;
-    @Getter
-    private final AsciiString value;
+	@Getter private final AsciiString name;
+	@Getter private final AsciiString value;
 
-    /**
-     * Get the full cookie, as per the HTTP protocol format
-     * @return name=value
-     */
-    public String toString()
-    {
-        return name + "=" + value;
-    }
+	/**
+	 * Get the full cookie, as per the HTTP protocol format
+	 *
+	 * @return name=value
+	 */
+	public String toString()
+	{
+		return name + "=" + value;
+	}
 }

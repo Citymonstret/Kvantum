@@ -26,15 +26,15 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 /**
  * Marks something that is able to save an instance for re-use
  */
-@FunctionalInterface
-public interface CacheApplicable
+@FunctionalInterface public interface CacheApplicable
 {
 
-    /**
-     * Test if the current instance allows caching
-     * @param r Incoming request
-     * @return True if cache can be saved, otherwise false
-     */
-    boolean isApplicable(AbstractRequest r);
+	/**
+	 * Test if the current instance allows caching
+	 *
+	 * @param r Incoming request
+	 * @return True if cache can be saved, otherwise false
+	 */
+	boolean isApplicable(AbstractRequest r);
 
 }

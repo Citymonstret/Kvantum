@@ -21,54 +21,51 @@
  */
 package xyz.kvantum.server.api.request.post;
 
-import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.request.AbstractRequest;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.request.AbstractRequest;
 
 final public class UrlEncodedPostRequest extends PostRequest
 {
 
-    public UrlEncodedPostRequest(final AbstractRequest parent, final String request)
-    {
-        super( parent, request, false );
-    }
+	public UrlEncodedPostRequest(final AbstractRequest parent, final String request)
+	{
+		super( parent, request, false );
+	}
 
-    @Override
-    protected void parseRequest(final String request)
-    {
-        String fixedRequest;
-        try
-        {
-            fixedRequest = URLDecoder.decode( request, StandardCharsets.US_ASCII.toString() );
-        } catch ( final Exception e )
-        {
-            if ( CoreConfig.debug )
-            {
-                e.printStackTrace();
-            }
-            fixedRequest = request;
-        }
-        this.setRequest( fixedRequest );
-        for ( final String s : fixedRequest.split( "&" ) )
-        {
-            if ( !s.isEmpty() )
-            {
-                final String[] p = s.split( "=" );
-                if ( p.length < 2 )
-                {
-                    continue;
-                }
-                getVariables().put( p[ 0 ], p[ 1 ].replace( "+", " " ) );
-            }
-        }
-    }
+	@Override protected void parseRequest(final String request)
+	{
+		String fixedRequest;
+		try
+		{
+			fixedRequest = URLDecoder.decode( request, StandardCharsets.US_ASCII.toString() );
+		} catch ( final Exception e )
+		{
+			if ( CoreConfig.debug )
+			{
+				e.printStackTrace();
+			}
+			fixedRequest = request;
+		}
+		this.setRequest( fixedRequest );
+		for ( final String s : fixedRequest.split( "&" ) )
+		{
+			if ( !s.isEmpty() )
+			{
+				final String[] p = s.split( "=" );
+				if ( p.length < 2 )
+				{
+					continue;
+				}
+				getVariables().put( p[ 0 ], p[ 1 ].replace( "+", " " ) );
+			}
+		}
+	}
 
-    @Override
-    public EntityType getEntityType()
-    {
-        return EntityType.FORM_URLENCODED;
-    }
+	@Override public EntityType getEntityType()
+	{
+		return EntityType.FORM_URLENCODED;
+	}
 
 }

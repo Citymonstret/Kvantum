@@ -23,11 +23,9 @@ package xyz.kvantum.server.api.views.rest.service;
 
 import xyz.kvantum.server.api.views.RequestHandler;
 
-@FunctionalInterface
-interface SearchEngine
+@FunctionalInterface interface SearchEngine
 {
 
-    @SuppressWarnings("ALL")
-    RequestHandler createService();
+	@SuppressWarnings("ALL") RequestHandler createService();
 
 }

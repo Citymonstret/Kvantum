@@ -22,6 +22,10 @@
 package xyz.kvantum.server.api.util;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,113 +39,101 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.View404;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
 /**
  * A simple {@link Router} implementation,
  */
-@SuppressWarnings("unused")
-@Builder
-final public class RequestManager extends Router
+@SuppressWarnings("unused") @Builder public final class RequestManager extends Router
 {
 
-    private static Generator<AbstractRequest, RequestHandler> DEFAULT_404_GENERATOR =
-            (request) -> View404.construct( request.getQuery().getFullRequest() );
+	private static final Generator<AbstractRequest, RequestHandler> DEFAULT_404_GENERATOR = (request) -> View404
+			.construct( request.getQuery().getFullRequest() );
 
-    @Builder.Default
-    private List<RequestHandler> views = new ArrayList<>();
+	@Builder.Default private List<RequestHandler> views = new ArrayList<>();
 
-    @Setter
-    @Getter
-    @NonNull
-    @Builder.Default
-    private Generator<AbstractRequest, RequestHandler> error404Generator = DEFAULT_404_GENERATOR;
+	@Setter @Getter @NonNull @Builder.Default private Generator<AbstractRequest, RequestHandler> error404Generator = DEFAULT_404_GENERATOR;
 
-    /**
-     * Register a view to the request manager
-     *
-     * @param view The view to register
-     */
-    @Override
-    @SuppressWarnings("all")
-    public RequestHandler add(@NonNull final RequestHandler view)
-    {
-        //
-        // make sure the view pattern isn't registered yet
-        //
-        final Optional<RequestHandler> illegalRequestHandler = LambdaUtil.getFirst( views, v -> v.toString()
-                .equalsIgnoreCase( view.toString() ) );
-        if ( illegalRequestHandler.isPresent() )
-        {
-            throw new IllegalArgumentException( "Duplicate view pattern: " + view.toString() );
-        }
+	/**
+	 * Register a view to the request manager
+	 *
+	 * @param view The view to register
+	 * @return The request handler if it was created, null otherwise
+	 */
+	@Override @SuppressWarnings("all") public RequestHandler add(@NonNull final RequestHandler view)
+	{
+		//
+		// make sure the view pattern isn't registered yet
+		//
+		final Optional<RequestHandler> illegalRequestHandler = LambdaUtil
+				.getFirst( views, v -> v.toString().equalsIgnoreCase( view.toString() ) );
+		if ( illegalRequestHandler.isPresent() )
+		{
+			throw new IllegalArgumentException( "Duplicate view pattern: " + view.toString() );
+		}
 
-        //
-        // Call event
-        //
-        final RequestHandlerAddedEvent requestHandlerAddedEvent = new RequestHandlerAddedEvent( view );
-        ServerImplementation.getImplementation().getEventBus().emit( requestHandlerAddedEvent );
-        if ( requestHandlerAddedEvent.isCancelled() )
-        {
-            return null;
-        }
+		//
+		// Call event
+		//
+		final RequestHandlerAddedEvent requestHandlerAddedEvent = new RequestHandlerAddedEvent( view );
+		ServerImplementation.getImplementation().getEventBus().emit( requestHandlerAddedEvent );
+		if ( requestHandlerAddedEvent.isCancelled() )
+		{
+			return null;
+		}
 
-        //
-        // register handler
-        //
-        views.add( view );
-        return view;
-    }
+		//
+		// register handler
+		//
+		views.add( view );
+		return view;
+	}
 
-    /**
-     * Try to find the request handler that matches the request
-     *
-     * @param request Incoming request
-     * @return Matching request handler, or {@link #getError404Generator()} if none was found
-     */
-    @Override
-    public RequestHandler match(final AbstractRequest request)
-    {
-        Assert.isValid( request );
-        for ( final RequestHandler handler : this.views )
-        {
-            if ( handler.matches( request ) )
-            {
-                return handler;
-            }
-        }
-        return error404Generator.generate( request );
-    }
+	/**
+	 * Try to find the request handler that matches the request
+	 *
+	 * @param request Incoming request
+	 * @return Matching request handler, or {@link #getError404Generator()} if none was found
+	 */
+	@Override public RequestHandler match(final AbstractRequest request)
+	{
+		Assert.isValid( request );
+		if ( !this.views.isEmpty() )
+		{
+			for ( final RequestHandler handler : this.views )
+			{
+				if ( handler.matches( request ) )
+				{
+					return handler;
+				}
+			}
+		}
+		return error404Generator.generate( request );
+	}
 
-    @Override
-    public void dump(@NonNull final Kvantum server)
-    {
-        ( (IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP.log( view.getClass().getSimpleName(),
-                view.toString() ) ).foreach( views );
-    }
+	@Override public void dump(@NonNull final Kvantum server)
+	{
+		( ( IConsumer<RequestHandler> ) view -> Message.REQUEST_HANDLER_DUMP
+				.log( view.getClass().getSimpleName(), view.toString() ) ).foreach( views );
+	}
 
-    @Override
-    public Collection<RequestHandler> getAll()
-    {
-        return ImmutableList.copyOf( this.views );
-    }
+	@Override public Collection<RequestHandler> getAll()
+	{
+		return ImmutableList.copyOf( this.views );
+	}
 
-    @Override
-    public void remove(@NonNull final RequestHandler view)
-    {
-        if ( this.views.contains( view ) )
-        {
-            this.views.remove( view );
-        }
-    }
+	@Override public void remove(@NonNull final RequestHandler view)
+	{
+		if ( this.views.contains( view ) )
+		{
+			this.views.remove( view );
+		} else
+		{
+			throw new IllegalArgumentException( "Cannot remove a view before registering it" );
+		}
+	}
 
-    @Override
-    public void clear()
-    {
-        Message.CLEARED_VIEWS.log( CollectionUtil.clear( this.views ) );
-    }
+	@Override public void clear()
+	{
+		Message.CLEARED_VIEWS.log( CollectionUtil.clear( this.views ) );
+	}
 
 }

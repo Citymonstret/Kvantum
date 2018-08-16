@@ -21,6 +21,11 @@
  */
 package xyz.kvantum.server.implementation;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,101 +38,77 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-
-@EqualsAndHashCode(of = { "sessionKey" })
-@SuppressWarnings("unused")
-public final class Session implements ISession, VariableProvider
+@EqualsAndHashCode(of = { "sessionKey" }) @SuppressWarnings("unused") public final class Session
+		implements ISession, VariableProvider
 {
 
-    @Getter
-    private static final KvantumPojoFactory<ISession> kvantumPojoFactory = KvantumPojoFactory
-            .forClass( ISession.class );
-    private static long id = 0L;
+	@Getter private static final KvantumPojoFactory<ISession> kvantumPojoFactory = KvantumPojoFactory
+			.forClass( ISession.class );
+	private static long id = 0L;
 
-    private final Map<String, Object> sessionStorage;
+	private final Map<String, Object> sessionStorage;
 
-    @Getter
-    private boolean deleted = false;
+	@Getter private boolean deleted = false;
 
-    @Setter
-    @Getter
-    private AsciiString sessionKey;
+	@Setter @Getter private AsciiString sessionKey;
 
-    Session()
-    {
-        this.sessionKey = AsciiString.randomUUIDAsciiString();
-        this.sessionStorage = new ConcurrentHashMap<>();
-        this.sessionStorage.put( "id", "n/a" );
-    }
+	Session()
+	{
+		this.sessionKey = AsciiString.randomUUIDAsciiString();
+		this.sessionStorage = new ConcurrentHashMap<>();
+		this.sessionStorage.put( "id", "n/a" );
+	}
 
-    @Override
-    @Synchronized
-    public boolean contains(final String variable)
-    {
-        return sessionStorage.containsKey( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
-    }
+	@Override @Synchronized public boolean contains(final String variable)
+	{
+		return sessionStorage.containsKey( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
+	}
 
-    @Override
-    @Synchronized
-    public Object get(final String variable)
-    {
-        return sessionStorage.get( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
-    }
+	@Override @Synchronized public Object get(final String variable)
+	{
+		return sessionStorage.get( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
+	}
 
-    @Override
-    public void setDeleted()
-    {
-        this.deleted = true;
-    }
+	@Override public void setDeleted()
+	{
+		this.deleted = true;
+	}
 
-    @Override
-    @Synchronized
-    public Map<String, Object> getAll()
-    {
-        return new HashMap<>( sessionStorage );
-    }
+	@Override @Synchronized public Map<String, Object> getAll()
+	{
+		return new HashMap<>( sessionStorage );
+	}
 
-    @Override
-    @Synchronized
-    public ISession set(@NonNull final String s,
-                        @NonNull final Object o)
-    {
-        if ( o == null )
-        {
-            sessionStorage.remove( s );
-        } else
-        {
-            sessionStorage.put( s.toLowerCase( Locale.ENGLISH ), o );
-        }
-        return this;
-    }
+	@Override @Synchronized public ISession set(@NonNull final String s, @NonNull final Object o)
+	{
+		if ( o == null )
+		{
+			sessionStorage.remove( s );
+		} else
+		{
+			sessionStorage.put( s.toLowerCase( Locale.ENGLISH ), o );
+		}
+		return this;
+	}
 
-    @Override
-    public KvantumPojo<ISession> toKvantumPojo()
-    {
-        return kvantumPojoFactory.of( this );
-    }
+	@Override public KvantumPojo<ISession> toKvantumPojo()
+	{
+		return kvantumPojoFactory.of( this );
+	}
 
-    @Override
-    @SuppressWarnings("ALL")
-    public <T> T getOrCompute(@NonNull final String key,
-                              @NonNull final Function<String, ? extends T> function)
-    {
-        final T object;
-        if ( !this.contains( key ) )
-        {
-            object = function.apply( key );
-            this.set( key, object );
-        } else
-        {
-            object = (T) get( key );
-        }
-        return object;
-    }
+	@Override @SuppressWarnings("ALL") public <T> T getOrCompute(@NonNull final String key,
+			@NonNull final Function<String, ? extends T> function)
+	{
+		final T object;
+		if ( !this.contains( key ) )
+		{
+			object = function.apply( key );
+			this.set( key, object );
+		} else
+		{
+			object = ( T ) get( key );
+		}
+		return object;
+	}
 
 }

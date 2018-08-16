@@ -32,29 +32,24 @@ import xyz.kvantum.server.api.util.AsciiString;
 public final class DumbSessionDatabase implements ISessionDatabase
 {
 
-    @Override
-    public void setup() throws Exception
-    {
-    }
+	@Override public void setup() throws Exception
+	{
+	}
 
-    @Override
-    public SessionLoad getSessionLoad(final AsciiString sessionID)
-    {
-        return null;
-    }
+	@Override public SessionLoad getSessionLoad(final AsciiString sessionID)
+	{
+		return null;
+	}
 
-    @Override
-    public void storeSession(final ISession session)
-    {
-    }
+	@Override public void storeSession(final ISession session)
+	{
+	}
 
-    @Override
-    public void updateSession(final AsciiString session)
-    {
-    }
+	@Override public void updateSession(final AsciiString session)
+	{
+	}
 
-    @Override
-    public void deleteSession(final AsciiString session)
-    {
-    }
+	@Override public void deleteSession(final AsciiString session)
+	{
+	}
 }

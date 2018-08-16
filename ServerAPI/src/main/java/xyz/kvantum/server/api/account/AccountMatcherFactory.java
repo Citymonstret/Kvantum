@@ -31,10 +31,9 @@ import xyz.kvantum.server.api.repository.MatcherFactory;
 public final class AccountMatcherFactory<A extends IAccount, B extends IAccount> implements MatcherFactory<A, B>
 {
 
-    @Override
-    public FieldComparator<? extends A, ? super B> createMatcher(@NonNull final A queryObject)
-    {
-        return new FieldComparator<>( queryObject, true, true );
-    }
+	@Override public FieldComparator<? extends A, ? super B> createMatcher(@NonNull final A queryObject)
+	{
+		return new FieldComparator<>( queryObject, true, true );
+	}
 
 }

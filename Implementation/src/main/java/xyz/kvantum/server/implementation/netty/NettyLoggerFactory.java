@@ -27,9 +27,8 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 public class NettyLoggerFactory extends InternalLoggerFactory
 {
 
-    @Override
-    protected InternalLogger newInstance(final String name)
-    {
-        return NettyLogger.instance;
-    }
+	@Override protected InternalLogger newInstance(final String name)
+	{
+		return NettyLogger.instance;
+	}
 }

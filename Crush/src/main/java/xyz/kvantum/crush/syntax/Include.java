@@ -21,76 +21,73 @@
  */
 package xyz.kvantum.crush.syntax;
 
-import xyz.kvantum.server.api.cache.ICacheManager;
-import xyz.kvantum.server.api.core.ServerImplementation;
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.util.ProviderFactory;
-import xyz.kvantum.server.api.util.VariableProvider;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import xyz.kvantum.server.api.cache.ICacheManager;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
 
 final public class Include extends Syntax
 {
 
-    public Include()
-    {
-        super( Pattern.compile( "\\{\\{include:([/A-Za-z\\.\\-]*)\\}\\}" ) );
-    }
+	public Include()
+	{
+		super( Pattern.compile( "\\{\\{include:([/A-Za-z\\.\\-]*)\\}\\}" ) );
+	}
 
-    @Override
-    public String process(final String in,
-                          final Matcher matcher,
-                          final AbstractRequest r,
-                          final Map<String, ProviderFactory<? extends VariableProvider>> factories)
-    {
-        String out = in;
-        while ( matcher.find() )
-        {
-            ICacheManager manager = ServerImplementation.getImplementation().getCacheManager();
-            String s = manager.getCachedInclude( matcher.group() );
-            if ( s != null )
-            {
-                out = out.replace( matcher.group(), s );
-                continue;
-            }
+	@Override public String process(final String in, final Matcher matcher, final AbstractRequest r,
+			final Map<String, ProviderFactory<? extends VariableProvider>> factories)
+	{
+		String out = in;
+		while ( matcher.find() )
+		{
+			ICacheManager manager = ServerImplementation.getImplementation().getCacheManager();
+			String s = manager.getCachedInclude( matcher.group() );
+			if ( s != null )
+			{
+				out = out.replace( matcher.group(), s );
+				continue;
+			}
 
-            File file = new File( ServerImplementation.getImplementation().getCoreFolder(), matcher.group( 1 ) );
-            if ( file.exists() )
-            {
-                StringBuilder c = new StringBuilder();
-                String line;
-                try
-                {
-                    BufferedReader reader = new BufferedReader( new FileReader( file ) );
-                    while ( ( line = reader.readLine() ) != null )
-                        c.append( line ).append( "\n" );
-                    reader.close();
-                } catch ( final Exception e )
-                {
-                    e.printStackTrace();
-                }
+			File file = new File( ServerImplementation.getImplementation().getCoreFolder(), matcher.group( 1 ) );
+			if ( file.exists() )
+			{
+				StringBuilder c = new StringBuilder();
+				String line;
+				try
+				{
+					BufferedReader reader = new BufferedReader( new FileReader( file ) );
+					while ( ( line = reader.readLine() ) != null )
+					{
+						c.append( line ).append( "\n" );
+					}
+					reader.close();
+				} catch ( final Exception e )
+				{
+					e.printStackTrace();
+				}
 
-                ServerImplementation.getImplementation().getCacheManager().setCachedInclude( matcher.group(), file.getName().endsWith
-                        ( ".css" ) ?
-                        "<style>\n" + c + "<style>" : c.toString() );
+				ServerImplementation.getImplementation().getCacheManager().setCachedInclude( matcher.group(),
+						file.getName().endsWith( ".css" ) ? "<style>\n" + c + "<style>" : c.toString() );
 
-                if ( file.getName().endsWith( ".css" ) )
-                {
-                    out = out.replace( matcher.group(), "<style>\n" + c + "</style>" );
-                } else
-                {
-                    out = out.replace( matcher.group(), c.toString() );
-                }
-            } else
-            {
-                ServerImplementation.getImplementation().log( "Couldn't find file for '{}'", matcher.group() );
-            }
-        }
-        return out;
-    }
+				if ( file.getName().endsWith( ".css" ) )
+				{
+					out = out.replace( matcher.group(), "<style>\n" + c + "</style>" );
+				} else
+				{
+					out = out.replace( matcher.group(), c.toString() );
+				}
+			} else
+			{
+				ServerImplementation.getImplementation().log( "Couldn't find file for '{}'", matcher.group() );
+			}
+		}
+		return out;
+	}
 }

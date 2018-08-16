@@ -33,38 +33,34 @@ import xyz.kvantum.server.api.response.ResponseBody;
 final public class CachedResponse implements ResponseBody
 {
 
-    @Getter
-    public final Header header;
-    @Getter
-    private final byte[] bytes;
+	@Getter public final Header header;
+	@Getter private final byte[] bytes;
 
-    /**
-     * The parent response body
-     *
-     * @param parent parent body
-     */
-    public CachedResponse(@NonNull final ResponseBody parent)
-    {
-        this.header = parent.getHeader();
-        if ( parent.isText() )
-        {
-            this.bytes = parent.getContent().getBytes();
-        } else
-        {
-            this.bytes = parent.getBytes();
-        }
-    }
+	/**
+	 * The parent response body
+	 *
+	 * @param parent parent body
+	 */
+	public CachedResponse(@NonNull final ResponseBody parent)
+	{
+		this.header = parent.getHeader();
+		if ( parent.isText() )
+		{
+			this.bytes = parent.getContent().getBytes();
+		} else
+		{
+			this.bytes = parent.getBytes();
+		}
+	}
 
-    @Override
-    public String getContent()
-    {
-        throw new KvantumException( "Cannot access text content in cached response" );
-    }
+	@Override public String getContent()
+	{
+		throw new KvantumException( "Cannot access text content in cached response" );
+	}
 
-    @Override
-    public boolean isText()
-    {
-        return false;
-    }
+	@Override public boolean isText()
+	{
+		return false;
+	}
 
 }

@@ -24,9 +24,8 @@ package xyz.kvantum.server.api.util;
 import java.util.Map;
 
 /**
- * The variable provider class - Can get quite confusing.
- * <p>
- * This generates a variable based on a key, and is accessed like
+ * The variable provider class - Can get quite confusing. <p> This generates a variable based on a key, and is accessed
+ * like
  * <pre>
  * {@code
  * {{PROVIDER.NAME}}
@@ -37,27 +36,28 @@ import java.util.Map;
 public interface VariableProvider
 {
 
-    /**
-     * Does the provider contain this variable?
-     *
-     * @param variable Variable Key
-     * @return True if the variable exists
-     */
-    boolean contains(String variable);
+	/**
+	 * Does the provider contain this variable?
+	 *
+	 * @param variable Variable Key
+	 * @return True if the variable exists
+	 */
+	boolean contains(String variable);
 
-    /**
-     * Get the variable
-     *
-     * @param variable Variable Key
-     * @return The object (or null)
-     * @see #contains(String) Use this to check if it exists
-     */
-    Object get(String variable);
+	/**
+	 * Get the variable
+	 *
+	 * @param variable Variable Key
+	 * @return The object (or null)
+	 * @see #contains(String) Use this to check if it exists
+	 */
+	Object get(String variable);
 
-    /**
-     * Get all variables stored in the provider
-     * @return map containing all the stored variables
-     */
-    Map<String, Object> getAll();
+	/**
+	 * Get all variables stored in the provider
+	 *
+	 * @return map containing all the stored variables
+	 */
+	Map<String, Object> getAll();
 
 }

@@ -24,15 +24,13 @@ package xyz.kvantum.server.api.views;
 import xyz.kvantum.server.api.response.Response;
 
 /**
- * A {@link Decorator} can be used to decorate
- * a response after it has been generated, which
- * allows for forced headers (example of this is {@link xyz.kvantum.server.api.views.decorators.CacheDecorator})
- * and other changes to the generated response
+ * A {@link Decorator} can be used to decorate a response after it has been generated, which allows for forced headers
+ * (example of this is {@link xyz.kvantum.server.api.views.decorators.CacheDecorator}) and other changes to the
+ * generated response
  */
-@FunctionalInterface
-public interface Decorator
+@FunctionalInterface public interface Decorator
 {
 
-    void decorate(Response response);
+	void decorate(Response response);
 
 }

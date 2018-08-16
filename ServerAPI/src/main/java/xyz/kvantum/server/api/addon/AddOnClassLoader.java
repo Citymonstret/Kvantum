@@ -21,148 +21,138 @@
  */
 package xyz.kvantum.server.api.addon;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 final class AddOnClassLoader extends URLClassLoader
 {
 
-    private final AddOnManager addOnManager;
-    private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
+	private final AddOnManager addOnManager;
+	private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
-    @Getter
-    private final AddOn addOn;
-    @Getter
-    private final File file;
-    @Getter
-    private final String name;
+	@Getter private final AddOn addOn;
+	@Getter private final File file;
+	@Getter private final String name;
 
-    @Getter
-    @Setter(AccessLevel.PROTECTED)
-    private boolean disabling;
+	@Getter @Setter(AccessLevel.PROTECTED) private boolean disabling;
 
-    AddOnClassLoader(@NonNull final AddOnManager addOnManager,
-                     @NonNull final File file,
-                     @NonNull final String name) throws AddOnLoaderException, MalformedURLException
-    {
-        super( new URL[]{ file.toURI().toURL() }, addOnManager.getClass().getClassLoader() );
+	AddOnClassLoader(@NonNull final AddOnManager addOnManager, @NonNull final File file, @NonNull final String name)
+			throws AddOnLoaderException, MalformedURLException
+	{
+		super( new URL[] { file.toURI().toURL() }, addOnManager.getClass().getClassLoader() );
 
-        this.addOnManager = addOnManager;
-        this.file = file;
-        this.name = name;
-        this.addOn = null; // This is a library
+		this.addOnManager = addOnManager;
+		this.file = file;
+		this.name = name;
+		this.addOn = null; // This is a library
 
-        if ( !file.toPath().getFileName().toString().equalsIgnoreCase( name ) )
-        {
-            throw new AddOnLoaderException( "File name does not match addon name..." );
-        }
-    }
+		if ( !file.toPath().getFileName().toString().equalsIgnoreCase( name ) )
+		{
+			throw new AddOnLoaderException( "File name does not match addon name..." );
+		}
+	}
 
-    AddOnClassLoader(@NonNull final AddOnManager addOnManager,
-                     @NonNull final File file,
-                     @NonNull final String mainFile,
-                     @NonNull final String name) throws AddOnLoaderException, MalformedURLException
-    {
-        super( new URL[]{ file.toURI().toURL() }, addOnManager.getClass().getClassLoader() );
+	AddOnClassLoader(@NonNull final AddOnManager addOnManager, @NonNull final File file, @NonNull final String mainFile,
+			@NonNull final String name) throws AddOnLoaderException, MalformedURLException
+	{
+		super( new URL[] { file.toURI().toURL() }, addOnManager.getClass().getClassLoader() );
 
-        this.addOnManager = addOnManager;
-        this.file = file;
+		this.addOnManager = addOnManager;
+		this.file = file;
 
-        Class<?> mainClass;
-        try
-        {
-            mainClass = Class.forName( mainFile, true, this );
-            this.classes.put( mainClass.getName(), mainClass );
-        } catch ( final ClassNotFoundException e )
-        {
-            throw new AddOnLoaderException( "Could not find main class for addOn " + name );
-        }
-        Class<? extends AddOn> addOnMain;
-        try
-        {
-            addOnMain = mainClass.asSubclass( AddOn.class );
-        } catch ( final Exception e )
-        {
-            throw new AddOnLoaderException( mainFile + " does not implement AddOn" );
-        }
-        try
-        {
-            this.addOn = addOnMain.newInstance();
-            this.addOn.setClassLoader( this );
-            this.addOn.setName( name );
-            this.name = name;
-        } catch ( final Exception e )
-        {
-            throw new AddOnLoaderException( "Failed to load main class for " + name, e );
-        }
-    }
+		Class<?> mainClass;
+		try
+		{
+			mainClass = Class.forName( mainFile, true, this );
+			this.classes.put( mainClass.getName(), mainClass );
+		} catch ( final ClassNotFoundException e )
+		{
+			throw new AddOnLoaderException( "Could not find main class for addOn " + name );
+		}
+		Class<? extends AddOn> addOnMain;
+		try
+		{
+			addOnMain = mainClass.asSubclass( AddOn.class );
+		} catch ( final Exception e )
+		{
+			throw new AddOnLoaderException( mainFile + " does not implement AddOn" );
+		}
+		try
+		{
+			this.addOn = addOnMain.newInstance();
+			this.addOn.setClassLoader( this );
+			this.addOn.setName( name );
+			this.name = name;
+		} catch ( final Exception e )
+		{
+			throw new AddOnLoaderException( "Failed to load main class for " + name, e );
+		}
+	}
 
-    @Override
-    protected Class<?> findClass(final String name) throws ClassNotFoundException
-    {
-        return findClass( name, true );
-    }
+	@Override protected Class<?> findClass(final String name) throws ClassNotFoundException
+	{
+		return findClass( name, true );
+	}
 
-    Class<?> findClass(final String name, final boolean global) throws ClassNotFoundException
-    {
-        if ( this.isDisabling() )
-        {
-            throw new ClassNotFoundException( "This class loader is disabling..." );
-        }
-        if ( classes.containsKey( name ) )
-        {
-            return classes.get( name );
-        } else
-        {
-            Class<?> clazz = null;
-            if ( global )
-            {
-                clazz = addOnManager.findClass( name );
-            }
-            if ( clazz == null )
-            {
-                clazz = super.findClass( name );
-                if ( clazz != null )
-                {
-                    addOnManager.setClass( name, clazz );
-                }
-            }
-            return clazz;
-        }
-    }
+	Class<?> findClass(final String name, final boolean global) throws ClassNotFoundException
+	{
+		if ( this.isDisabling() )
+		{
+			throw new ClassNotFoundException( "This class loader is disabling..." );
+		}
+		if ( classes.containsKey( name ) )
+		{
+			return classes.get( name );
+		} else
+		{
+			Class<?> clazz = null;
+			if ( global )
+			{
+				clazz = addOnManager.findClass( name );
+			}
+			if ( clazz == null )
+			{
+				clazz = super.findClass( name );
+				if ( clazz != null )
+				{
+					addOnManager.setClass( name, clazz );
+				}
+			}
+			return clazz;
+		}
+	}
 
-    void removeClasses()
-    {
-        if ( !this.isDisabling() )
-        {
-            throw new IllegalStateException( "Cannot remove class when the loader isn't disabling..." );
-        }
-        this.addOnManager.removeAll( this.classes );
-        this.classes.clear();
-    }
+	void removeClasses()
+	{
+		if ( !this.isDisabling() )
+		{
+			throw new IllegalStateException( "Cannot remove class when the loader isn't disabling..." );
+		}
+		this.addOnManager.removeAll( this.classes );
+		this.classes.clear();
+	}
 
-    private static class AddOnLoaderException extends RuntimeException
-    {
+	private static class AddOnLoaderException extends RuntimeException
+	{
 
-        private AddOnLoaderException(String error)
-        {
-            super( error );
-        }
+		private AddOnLoaderException(String error)
+		{
+			super( error );
+		}
 
-        private AddOnLoaderException(String error, Throwable cause)
-        {
-            super( error, cause );
-        }
+		private AddOnLoaderException(String error, Throwable cause)
+		{
+			super( error, cause );
+		}
 
-    }
+	}
 
 }

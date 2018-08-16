@@ -26,15 +26,11 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.kvantum.server.api.util.AsciiString;
 
-@AllArgsConstructor
-final class ReturnStatus extends Throwable
+@AllArgsConstructor final class ReturnStatus extends Throwable
 {
 
-    @Getter
-    private AsciiString status;
+	@Getter private AsciiString status;
 
-    @Setter
-    @Getter
-    private WorkerContext applicableContext;
+	@Setter @Getter private WorkerContext applicableContext;
 
 }

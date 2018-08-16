@@ -33,181 +33,172 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
 /**
- * Utility that watches directories for file updates.
- * A single instance is able to watch multiple directories.
+ * Utility that watches directories for file updates. A single instance is able to watch multiple directories.
  */
-@SuppressWarnings({ "WeakerAccess", "unused" })
-public final class FileWatcher extends Thread
+@SuppressWarnings({ "WeakerAccess", "unused" }) public final class FileWatcher extends Thread
 {
 
-    private final Collection<FileWatchingContext> contexts;
-    private boolean shouldStop = false;
+	private final Collection<FileWatchingContext> contexts;
+	private boolean shouldStop = false;
 
-    /**
-     * Construct a new file watcher and start the daemon thread
-     */
-    public FileWatcher()
-    {
-        this.contexts = new CopyOnWriteArrayList<>();
-        this.setDaemon( true );
-        this.start();
-    }
+	/**
+	 * Construct a new file watcher and start the daemon thread
+	 */
+	public FileWatcher()
+	{
+		this.contexts = new CopyOnWriteArrayList<>();
+		this.setDaemon( true );
+		this.start();
+	}
 
-    @SuppressWarnings("unchecked")
-    private static WatchEvent<java.nio.file.Path> cast(WatchEvent<?> event)
-    {
-        return (WatchEvent<java.nio.file.Path>) event;
-    }
+	@SuppressWarnings("unchecked") private static WatchEvent<java.nio.file.Path> cast(WatchEvent<?> event)
+	{
+		return ( WatchEvent<java.nio.file.Path> ) event;
+	}
 
-    private void setShouldStop()
-    {
-        this.shouldStop = true;
-    }
+	private void setShouldStop()
+	{
+		this.shouldStop = true;
+	}
 
-    public StopSignal getStopSignal()
-    {
-        return this::setShouldStop;
-    }
+	public StopSignal getStopSignal()
+	{
+		return this::setShouldStop;
+	}
 
-    /**
-     * Register a path that should be watched.
-     *
-     * @param path     Path to watch
-     * @param reaction Reaction to file changes
-     * @return Created context
-     * @throws IllegalArgumentException If the specified path isn't a folder
-     * @throws IOException              IOException thrown when registering the path.
-     */
-    public FileWatchingContext registerPath(final Path path,
-                                            final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
-            throws IllegalArgumentException, IOException
-    {
-        if ( path == null || !path.isFolder() )
-        {
-            throw new IllegalArgumentException( "Supplied path is not a directory" );
-        }
-        final WatchService watchService = FileSystems.getDefault().newWatchService();
-        path.getJavaPath().register( watchService, StandardWatchEventKinds.ENTRY_MODIFY,
-                StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE );
-        final FileWatchingContext context = new FileWatchingContext( path, watchService, reaction );
-        this.contexts.add( context );
-        return context;
-    }
+	/**
+	 * Register a path that should be watched.
+	 *
+	 * @param path Path to watch
+	 * @param reaction Reaction to file changes
+	 * @return Created context
+	 * @throws IllegalArgumentException If the specified path isn't a folder
+	 * @throws IOException IOException thrown when registering the path.
+	 */
+	public FileWatchingContext registerPath(final Path path, final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
+			throws IllegalArgumentException, IOException
+	{
+		if ( path == null || !path.isFolder() )
+		{
+			throw new IllegalArgumentException( "Supplied path is not a directory" );
+		}
+		final WatchService watchService = FileSystems.getDefault().newWatchService();
+		path.getJavaPath()
+				.register( watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE,
+						StandardWatchEventKinds.ENTRY_CREATE );
+		final FileWatchingContext context = new FileWatchingContext( path, watchService, reaction );
+		this.contexts.add( context );
+		return context;
+	}
 
-    @Override
-    public void run()
-    {
-        for ( ; ; )
-        {
-            if ( shouldStop )
-            {
-                break;
-            }
-            final Collection<FileWatchingContext> invalid = new ArrayList<>();
-            for ( final FileWatchingContext context : contexts )
-            {
-                final WatchKey key = context.watchService.poll();
-                if ( key == null )
-                {
-                    continue;
-                }
-                for ( final WatchEvent<?> event : key.pollEvents() )
-                {
-                    final WatchEvent<java.nio.file.Path> pathEvent = cast( event );
-                    final java.nio.file.Path javaPath = pathEvent.context();
-                    try
-                    {
-                        final Path path = context.path.getPath( javaPath.getFileName().toString() );
-                        if ( path == null )
-                        {
-                            new RuntimeException( "Path could not be resolved: '" + javaPath.getFileName().toString()
-                                    + "' in path '" + context.path.toString() + "'" ).printStackTrace();
-                            continue;
-                        }
-                        context.reaction.accept( path, event.kind() );
-                    } catch ( final Exception ignore )
-                    {
-                    }
-                }
-                boolean valid = key.reset();
-                if ( !valid )
-                {
-                    invalid.add( context );
-                }
-            }
-            this.contexts.removeAll( invalid );
-        }
-    }
+	@Override public void run()
+	{
+		for ( ; ; )
+		{
+			if ( shouldStop )
+			{
+				break;
+			}
+			final Collection<FileWatchingContext> invalid = new ArrayList<>();
+			for ( final FileWatchingContext context : contexts )
+			{
+				final WatchKey key = context.watchService.poll();
+				if ( key == null )
+				{
+					continue;
+				}
+				for ( final WatchEvent<?> event : key.pollEvents() )
+				{
+					final WatchEvent<java.nio.file.Path> pathEvent = cast( event );
+					final java.nio.file.Path javaPath = pathEvent.context();
+					try
+					{
+						final Path path = context.path.getPath( javaPath.getFileName().toString() );
+						if ( path == null )
+						{
+							new RuntimeException(
+									"Path could not be resolved: '" + javaPath.getFileName().toString() + "' in path '"
+											+ context.path.toString() + "'" ).printStackTrace();
+							continue;
+						}
+						context.reaction.accept( path, event.kind() );
+					} catch ( final Exception ignore )
+					{
+					}
+				}
+				boolean valid = key.reset();
+				if ( !valid )
+				{
+					invalid.add( context );
+				}
+			}
+			this.contexts.removeAll( invalid );
+		}
+	}
 
-    @FunctionalInterface
-    public interface StopSignal
-    {
+	@FunctionalInterface public interface StopSignal
+	{
 
-        void stop();
-    }
+		void stop();
+	}
 
-    public static final class FileWatchingContext
-    {
+	public static final class FileWatchingContext
+	{
 
-        private final Path path;
-        private final WatchService watchService;
-        private BiConsumer<Path, WatchEvent.Kind<?>> reaction;
+		private final Path path;
+		private final WatchService watchService;
+		private BiConsumer<Path, WatchEvent.Kind<?>> reaction;
 
-        private FileWatchingContext(final Path path,
-                                    final WatchService service,
-                                    final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
-                throws IllegalArgumentException
-        {
-            if ( path == null )
-            {
-                throw new IllegalArgumentException( "Supplied path was null" );
-            }
-            if ( service == null )
-            {
-                throw new IllegalArgumentException( "Supplied watch service was null" );
-            }
-            this.path = path;
-            this.watchService = service;
-            if ( reaction == null )
-            {
-                this.reaction = (file, kind) -> {
-                };
-            } else
-            {
-                this.reaction = reaction;
-            }
-        }
+		private FileWatchingContext(final Path path, final WatchService service,
+				final BiConsumer<Path, WatchEvent.Kind<?>> reaction) throws IllegalArgumentException
+		{
+			if ( path == null )
+			{
+				throw new IllegalArgumentException( "Supplied path was null" );
+			}
+			if ( service == null )
+			{
+				throw new IllegalArgumentException( "Supplied watch service was null" );
+			}
+			this.path = path;
+			this.watchService = service;
+			if ( reaction == null )
+			{
+				this.reaction = (file, kind) -> {
+				};
+			} else
+			{
+				this.reaction = reaction;
+			}
+		}
 
-        @Override
-        public int hashCode()
-        {
-            return this.path.hashCode();
-        }
+		@Override public int hashCode()
+		{
+			return this.path.hashCode();
+		}
 
-        @Override
-        public String toString()
-        {
-            return this.path.toString();
-        }
+		@Override public String toString()
+		{
+			return this.path.toString();
+		}
 
-        @Override
-        public boolean equals(final Object o)
-        {
-            return o != null && o instanceof FileWatchingContext &&
-                    ( (FileWatchingContext) o ).path.equals( this.path );
-        }
+		@Override public boolean equals(final Object o)
+		{
+			return o != null && o instanceof FileWatchingContext && ( ( FileWatchingContext ) o ).path
+					.equals( this.path );
+		}
 
-        public void setReaction(final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
-        {
-            if ( reaction == null )
-            {
-                this.reaction = (file, kind) -> {
-                };
-            } else
-            {
-                this.reaction = reaction;
-            }
-        }
-    }
+		public void setReaction(final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
+		{
+			if ( reaction == null )
+			{
+				this.reaction = (file, kind) -> {
+				};
+			} else
+			{
+				this.reaction = reaction;
+			}
+		}
+	}
 
 }

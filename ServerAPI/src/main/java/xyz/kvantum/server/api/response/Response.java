@@ -27,101 +27,92 @@ import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 
 /**
- * The HTTP response,
- * this includes all headers
- * and the actual bytecode.
+ * The HTTP response, this includes all headers and the actual bytecode.
  *
  * @author Citymonstret
  */
-@SuppressWarnings("unused")
-public class Response implements ResponseBody
+@SuppressWarnings("unused") public class Response implements ResponseBody
 {
 
-    @Getter
-    private Header header;
-    @Getter
-    private String content;
-    private RequestHandler parent;
-    @Getter
-    private boolean text;
-    @Getter
-    private byte[] bytes;
+	@Getter private Header header;
+	@Getter private String content;
+	private RequestHandler parent;
+	@Getter private boolean text;
+	@Getter private byte[] bytes;
 
-    /**
-     * Constructor
-     *
-     * @param parent The view that generated this response
-     */
-    public Response(final RequestHandler parent)
-    {
-        this.parent = parent;
-        this.header = new Header( Header.STATUS_OK )
-                .set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML )
-                .set( Header.HEADER_SERVER, Header.POWERED_BY )
-                .set( Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp() )
-                .set( Header.HEADER_STATUS, Header.STATUS_OK );
-        this.content = "";
-        this.bytes = new byte[ 0 ];
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param parent The view that generated this response
+	 */
+	public Response(final RequestHandler parent)
+	{
+		this.parent = parent;
+		this.header = new Header( Header.STATUS_OK ).set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML )
+				.set( Header.HEADER_SERVER, Header.POWERED_BY ).set( Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp() )
+				.set( Header.HEADER_STATUS, Header.STATUS_OK );
+		this.content = "";
+		this.bytes = new byte[ 0 ];
+	}
 
-    public Response()
-    {
-        this( null );
-    }
+	public Response()
+	{
+		this( null );
+	}
 
-    public void copyFrom(final Response handle)
-    {
-        this.header = handle.header;
-        this.content = handle.content;
-        this.parent = handle.parent;
-        this.text = handle.text;
-        this.bytes = handle.bytes;
-    }
+	public void copyFrom(final Response handle)
+	{
+		this.header = handle.header;
+		this.content = handle.content;
+		this.parent = handle.parent;
+		this.text = handle.text;
+		this.bytes = handle.bytes;
+	}
 
-    /**
-     * Use raw bytes, rather than text
-     *
-     * @param bytes Bytes to send to the client
-     */
-    public void setBytes(final byte[] bytes)
-    {
-        this.bytes = Assert.notNull( bytes );
-        this.text = false;
-    }
+	/**
+	 * Use raw bytes, rather than text
+	 *
+	 * @param bytes Bytes to send to the client
+	 */
+	public void setBytes(final byte[] bytes)
+	{
+		this.bytes = Assert.notNull( bytes );
+		this.text = false;
+	}
 
-    /**
-     * Set the header file
-     *
-     * @param header Header file
-     */
-    public Response setHeader(final Header header)
-    {
-        this.header = Assert.notNull( header );
-        return this;
-    }
+	/**
+	 * Set the header file
+	 *
+	 * @param header Header file
+	 */
+	public Response setHeader(final Header header)
+	{
+		this.header = Assert.notNull( header );
+		return this;
+	}
 
-    /**
-     * Set the text content
-     *
-     * @param content The string content
-     * @see #setBytes(byte[]) to send raw bytes
-     */
-    public Response setContent(final String content)
-    {
-        this.content = Assert.notNull( content );
-        this.text = true;
-        return this;
-    }
+	/**
+	 * Set the text content
+	 *
+	 * @param content The string content
+	 * @see #setBytes(byte[]) to send raw bytes
+	 */
+	public Response setContent(final String content)
+	{
+		this.content = Assert.notNull( content );
+		this.text = true;
+		return this;
+	}
 
-    public Response setParent(final RequestHandler parent)
-    {
-        this.parent = Assert.notNull( parent );
-        return this;
-    }
+	public Response setParent(final RequestHandler parent)
+	{
+		this.parent = Assert.notNull( parent );
+		return this;
+	}
 
-    public boolean hasParent()
-    {
-        return this.parent != null;
-    }
+	public boolean hasParent()
+	{
+		return this.parent != null;
+	}
 
 }

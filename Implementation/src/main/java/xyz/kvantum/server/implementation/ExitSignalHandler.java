@@ -32,12 +32,11 @@ import xyz.kvantum.server.api.core.ServerImplementation;
 final class ExitSignalHandler implements SignalHandler
 {
 
-    @Override
-    public void handle(@NonNull final Signal signal)
-    {
-        if ( signal.toString().equals( "SIGINT" ) )
-        {
-            ServerImplementation.getImplementation().stopServer();
-        }
-    }
+	@Override public void handle(@NonNull final Signal signal)
+	{
+		if ( signal.toString().equals( "SIGINT" ) )
+		{
+			ServerImplementation.getImplementation().stopServer();
+		}
+	}
 }

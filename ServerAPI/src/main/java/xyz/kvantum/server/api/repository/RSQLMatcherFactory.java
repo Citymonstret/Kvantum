@@ -26,10 +26,9 @@ import lombok.NonNull;
 public final class RSQLMatcherFactory<V> implements MatcherFactory<String, V>
 {
 
-    @Override
-    public RSQLMatcher<V> createMatcher(@NonNull final String queryObject)
-    {
-        return new RSQLMatcher<>( queryObject );
-    }
+	@Override public RSQLMatcher<V> createMatcher(@NonNull final String queryObject)
+	{
+		return new RSQLMatcher<>( queryObject );
+	}
 
 }

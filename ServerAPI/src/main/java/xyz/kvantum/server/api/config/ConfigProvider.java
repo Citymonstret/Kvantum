@@ -25,35 +25,32 @@ import lombok.EqualsAndHashCode;
 import xyz.kvantum.server.api.util.Assert;
 
 /**
- * This is the configuration file that allows
- * us to access configuration file variables
+ * This is the configuration file that allows us to access configuration file variables
  *
  * @author Citymonstret
  */
-@EqualsAndHashCode(of = "name")
-@SuppressWarnings("WeakerAccess")
-public abstract class ConfigProvider implements ConfigurationFile
+@EqualsAndHashCode(of = "name") @SuppressWarnings("WeakerAccess") public abstract class ConfigProvider
+		implements ConfigurationFile
 {
 
-    private final String name;
+	private final String name;
 
-    /**
-     * ConfigurationProvider Constructor
-     *
-     * @param name Configuration file name
-     */
-    public ConfigProvider(final String name)
-    {
-        Assert.notEmpty( name );
+	/**
+	 * ConfigurationProvider Constructor
+	 *
+	 * @param name Configuration file name
+	 */
+	public ConfigProvider(final String name)
+	{
+		Assert.notEmpty( name );
 
-        this.name = name;
-        ConfigVariableProvider.getInstance().add( this );
-    }
+		this.name = name;
+		ConfigVariableProvider.getInstance().add( this );
+	}
 
-    @Override
-    public String toString()
-    {
-        return this.name;
-    }
+	@Override public String toString()
+	{
+		return this.name;
+	}
 
 }

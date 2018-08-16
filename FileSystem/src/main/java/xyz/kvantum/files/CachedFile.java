@@ -29,39 +29,38 @@ import java.nio.charset.StandardCharsets;
 public final class CachedFile
 {
 
-    private final byte[] bytes;
+	private final byte[] bytes;
 
-    CachedFile(final String content)
-    {
-        if ( content == null )
-        {
-            throw new NullPointerException( "Given string content was null" );
-        }
-        this.bytes = content.getBytes( StandardCharsets.UTF_8 );
-    }
+	CachedFile(final String content)
+	{
+		if ( content == null )
+		{
+			throw new NullPointerException( "Given string content was null" );
+		}
+		this.bytes = content.getBytes( StandardCharsets.UTF_8 );
+	}
 
-    CachedFile(final byte[] bytes)
-    {
-        if ( bytes == null )
-        {
-            throw new NullPointerException( "Given byte[] content was null" );
-        }
-        this.bytes = bytes;
-    }
+	CachedFile(final byte[] bytes)
+	{
+		if ( bytes == null )
+		{
+			throw new NullPointerException( "Given byte[] content was null" );
+		}
+		this.bytes = bytes;
+	}
 
-    @Override
-    public String toString()
-    {
-        return this.getAsString();
-    }
+	@Override public String toString()
+	{
+		return this.getAsString();
+	}
 
-    String getAsString()
-    {
-        return new String( bytes, StandardCharsets.UTF_8 );
-    }
+	String getAsString()
+	{
+		return new String( bytes, StandardCharsets.UTF_8 );
+	}
 
-    byte[] getAsByteArray()
-    {
-        return this.bytes;
-    }
+	byte[] getAsByteArray()
+	{
+		return this.bytes;
+	}
 }

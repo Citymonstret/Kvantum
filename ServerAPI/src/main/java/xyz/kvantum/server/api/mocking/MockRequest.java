@@ -26,29 +26,25 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 public class MockRequest extends AbstractRequest
 {
 
-    public MockRequest(final Query query)
-    {
-        this.setQuery( query );
-    }
+	public MockRequest(final Query query)
+	{
+		this.setQuery( query );
+	}
 
-    @Override
-    public void onCompileFinish()
-    {
-    }
+	@Override public void onCompileFinish()
+	{
+	}
 
-    @Override
-    protected AbstractRequest newRequest(String query)
-    {
-        return null;
-    }
+	@Override protected AbstractRequest newRequest(String query)
+	{
+		return null;
+	}
 
-    @Override
-    public void requestSession()
-    {
-    }
+	@Override public void requestSession()
+	{
+	}
 
-    @Override
-    public void dumpRequest()
-    {
-    }
+	@Override public void dumpRequest()
+	{
+	}
 }

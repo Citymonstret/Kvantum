@@ -24,194 +24,172 @@ package xyz.kvantum.server.api.config;
 import com.intellectualsites.configurable.ConfigurationImplementation;
 import com.intellectualsites.configurable.annotations.ConfigSection;
 import com.intellectualsites.configurable.annotations.Configuration;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * This is the configuration implementation that is
- * meant to control all easily accessible variables
- * for the web server. This is generated into
- * ".kvantum\config\server.yml" and is loaded on runtime
+ * This is the configuration implementation that is meant to control all easily accessible variables for the web server.
+ * This is generated into ".kvantum\config\server.yml" and is loaded on runtime
  */
-@SuppressWarnings("WeakerAccess")
-@Configuration(implementation = ConfigurationImplementation.YAML, name = "server")
-public class CoreConfig
+@SuppressWarnings("WeakerAccess") @Configuration(implementation = ConfigurationImplementation.YAML, name = "server") public class CoreConfig
 {
 
-    public static int port = 80;
-    public static String webAddress = "localhost";
-    public static String logPrefix = "Web";
-    public static boolean verbose = false;
-    public static boolean disableViews = false;
-    public static boolean loadWebJars = true;
-    public static boolean autoDetectViews = false;
-    public static boolean debug = true;
-    public static boolean gzip = true;
-    public static boolean enableSecurityManager = true;
-    public static boolean enableInputThread = true;
-    public static boolean exitOnStop = true;
+	public static int port = 80;
+	public static String webAddress = "localhost";
+	public static String logPrefix = "Web";
+	public static boolean verbose = false;
+	public static boolean disableViews = false;
+	public static boolean loadWebJars = true;
+	public static boolean autoDetectViews = false;
+	public static boolean debug = true;
+	public static boolean gzip = true;
+	public static boolean enableSecurityManager = true;
+	public static boolean enableInputThread = true;
+	public static boolean exitOnStop = true;
 
-    public static long timeout = 15;
-    public static String timeoutUnit = "SECONDS";
+	public static long timeout = 15;
+	public static String timeoutUnit = "SECONDS";
+	// Transient makes sure that this is ignored by the config factory
+	private transient static boolean preConfigured = false;
 
-    @ConfigSection(name = "Throttling")
-    public static class Throttle
-    {
+	public static boolean isPreConfigured()
+	{
+		return preConfigured;
+	}
 
-        public static String timeUnit = "MINUTES";
-        public static int limit = 1000;
-        public static long timeSpan = 1;
-    }
+	public static void setPreConfigured(final boolean preConfigured)
+	{
+		CoreConfig.preConfigured = preConfigured;
+	}
 
-    @ConfigSection(name = "internalAddons")
-    public static class InternalAddons
-    {
+	public enum TemplatingEngine
+	{
+		CRUSH, VELOCITY, JTWIG, NONE
+	}
 
-        public static List<String> disabled = new ArrayList<>();
-    }
+	@ConfigSection(name = "Throttling") public static class Throttle
+	{
 
-    public enum TemplatingEngine
-    {
-        CRUSH, VELOCITY, JTWIG, NONE
-    }
+		public static String timeUnit = "MINUTES";
+		public static int limit = 1000;
+		public static long timeSpan = 1;
+	}
 
-    @ConfigSection(name = "logging")
-    public static class Logging
-    {
+	@ConfigSection(name = "internalAddons") public static class InternalAddons
+	{
 
-        public static String logFormat = "&0[&c${applicationPrefix}&0]" +
-                "&0[&c${logPrefix}&0]" +
-                "&0[&c${thread}&0]" +
-                "&0[&c${timeStamp}&0] " +
-                "&r${message}";
-    }
+		public static List<String> disabled = new ArrayList<>();
+	}
 
-    @ConfigSection(name = "MemoryGuard")
-    public static class MemoryGuard
-    {
+	@ConfigSection(name = "logging") public static class Logging
+	{
 
-        public static long runEveryMillis = 600000; // Every 10 minutes
-    }
+		public static String logFormat =
+				"&0[&c${applicationPrefix}&0]" + "&0[&c${logPrefix}&0]" + "&0[&c${thread}&0]" + "&0[&c${timeStamp}&0] "
+						+ "&r${message}";
+	}
 
-    @ConfigSection(name = "sessions")
-    public static class Sessions
-    {
-        public static boolean enableDb = true;
-        public static int sessionTimeout = 86400;
-    }
+	@ConfigSection(name = "MemoryGuard") public static class MemoryGuard
+	{
 
-    // Transient makes sure that this is ignored by the config factory
-    private transient static boolean preConfigured = false;
+		public static long runEveryMillis = 600000; // Every 10 minutes
+	}
 
-    public static boolean isPreConfigured()
-    {
-        return preConfigured;
-    }
+	@ConfigSection(name = "sessions") public static class Sessions
+	{
+		public static boolean enableDb = true;
+		public static int sessionTimeout = 86400;
+	}
 
-    public static void setPreConfigured(final boolean preConfigured)
-    {
-        CoreConfig.preConfigured = preConfigured;
-    }
+	@ConfigSection(name = "Pools") public static class Pools
+	{
 
-    @ConfigSection(name = "Pools")
-    public static class Pools
-    {
+		public static int httpBossGroupThreads = 0;
+		public static int httpWorkerGroupThreads = 0;
 
-        public static int httpBossGroupThreads = 0;
-        public static int httpWorkerGroupThreads = 0;
+		public static int httpsBossGroupThreads = 0;
+		public static int httpsWorkerGroupThreads = 0;
 
-        public static int httpsBossGroupThreads = 0;
-        public static int httpsWorkerGroupThreads = 0;
+		public static int gzipHandlers = 2;
+		public static int md5Handlers = 2;
+	}
 
-        public static int gzipHandlers = 2;
-        public static int md5Handlers = 2;
-    }
+	@ConfigSection(name = "templates") public static class Templates
+	{
 
-    @ConfigSection(name = "templates")
-    public static class Templates
-    {
+		public static String engine = TemplatingEngine.CRUSH.name();
 
-        public static String engine = TemplatingEngine.CRUSH.name();
+		public static List<String> applyTemplates = Collections.singletonList( "ALL" );
 
-        public static List<String> applyTemplates = Collections.singletonList( "ALL" );
+		public static boolean status(final TemplatingEngine engine)
+		{
+			return CoreConfig.TemplatingEngine.valueOf( Templates.engine ).equals( engine );
+		}
+	}
 
-        public static boolean status(final TemplatingEngine engine)
-        {
-            return CoreConfig.TemplatingEngine.valueOf( Templates.engine ).equals( engine );
-        }
-    }
+	@ConfigSection(name = "ssl") public static class SSL
+	{
 
-    @ConfigSection(name = "ssl")
-    public static class SSL
-    {
+		public static boolean enable = false;
+		public static int port = 443;
+		public static String keyStore = "keyStore";
+		public static String keyStorePassword = "password";
 
-        public static boolean enable = false;
-        public static int port = 443;
-        public static String keyStore = "keyStore";
-        public static String keyStorePassword = "password";
+	}
 
-    }
+	@ConfigSection(name = "buffer") public static class Buffer
+	{
 
-    @ConfigSection(name = "buffer")
-    public static class Buffer
-    {
+		public static int in = 100_000;
+		public static int out = 100_000;
+	}
 
-        public static int in = 100_000;
-        public static int out = 100_000;
-    }
+	@ConfigSection(name = "limits") public static class Limits
+	{
 
-    @ConfigSection(name = "limits")
-    public static class Limits
-    {
+		public static int limitRequestLineSize = 8190;
+		public static int limitPostBasicSize = 8190;
 
-        public static int limitRequestLineSize = 8190;
-        public static int limitPostBasicSize = 8190;
+	}
 
-    }
+	@ConfigSection(name = "cache") public static class Cache
+	{
+		public static int cachedIncludesExpiry = 60 * 60; // 1h
+		public static int cachedIncludesMaxItems = 1000;
+		public static int cachedAccountsExpiry = 60 * 30;
+		public static int cachedAccountsMaxItems = 1000;
+		public static int cachedAccountIdsExpiry = 60 * 60 * 24;
+		public static int cachedAccountIdsMaxItems = 1000;
+		public static int cachedBodiesExpiry = 60 * 60;
+		public static int cachedBodiesMaxItems = 1000;
+		public static int cachedFilesExpiry = 60 * 60 * 24;
+		public static int cachedFilesMaxItems = 1000;
+		public static int cachedSessionsMaxItems = 1000;
+	}
 
-    @ConfigSection(name = "cache")
-    public static class Cache
-    {
-        public static int cachedIncludesExpiry = 60 * 60; // 1h
-        public static int cachedIncludesMaxItems = 1000;
-        public static int cachedAccountsExpiry = 60 * 30;
-        public static int cachedAccountsMaxItems = 1000;
-        public static int cachedAccountIdsExpiry = 60 * 60 * 24;
-        public static int cachedAccountIdsMaxItems = 1000;
-        public static int cachedBodiesExpiry = 60 * 60;
-        public static int cachedBodiesMaxItems = 1000;
-        public static int cachedFilesExpiry = 60 * 60 * 24;
-        public static int cachedFilesMaxItems = 1000;
-        public static int cachedSessionsMaxItems = 1000;
-    }
+	@ConfigSection(name = "mongodb") public static class MongoDB
+	{
 
-    @ConfigSection(name = "mongodb")
-    public static class MongoDB
-    {
+		public static boolean enabled = false;
+		public static String uri = "mongodb://localhost:27017";
 
-        public static boolean enabled = false;
-        public static String uri = "mongodb://localhost:27017";
+		public static String dbSessions = "isites";
+		public static String dbMorphia = "isites";
+		public static String collectionSessions = "sessions";
+	}
 
-        public static String dbSessions = "isites";
-        public static String dbMorphia = "isites";
-        public static String collectionSessions = "sessions";
-    }
+	@ConfigSection(name = "application") public static class Application
+	{
+		public static String main = "";
+		public static String databaseImplementation = "sqlite";
+	}
 
-    @ConfigSection(name = "application")
-    public static class Application
-    {
-        public static String main = "";
-        public static String databaseImplementation = "sqlite";
-    }
+	@ConfigSection(name = "middleware") public static class Middleware
+	{
 
-    @ConfigSection(name = "middleware")
-    public static class Middleware
-    {
+		public static String loginRedirect = "login";
 
-        public static String loginRedirect = "login";
-
-    }
+	}
 
 }

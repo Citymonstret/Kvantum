@@ -24,67 +24,61 @@ package xyz.kvantum.server.api.util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Cookie;
 
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
- * This is an utility class
- * created to handle all
- * request cookie related actions
+ * This is an utility class created to handle all request cookie related actions
  *
  * @author Citymonstret
  */
-@UtilityClass
-public final class CookieManager
+@UtilityClass public final class CookieManager
 {
 
-    private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" +
-            "(?<value>.*)?" );
-    private static final ListMultimap<AsciiString, Cookie> EMPTY_COOKIES =
-            ArrayListMultimap.create( 0, 0 );
+	private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" + "(?<value>.*)?" );
+	private static final ListMultimap<AsciiString, Cookie> EMPTY_COOKIES = ArrayListMultimap.create( 0, 0 );
 
-    /**
-     * Get all cookies from a HTTP Request
-     *
-     * @param r HTTP Request
-     * @return an array containing the cookies
-     */
-    public static ListMultimap<AsciiString, Cookie> getCookies(@NonNull final AbstractRequest r)
-    {
-        Assert.isValid( r );
+	/**
+	 * Get all cookies from a HTTP Request
+	 *
+	 * @param r HTTP Request
+	 * @return an array containing the cookies
+	 */
+	public static ListMultimap<AsciiString, Cookie> getCookies(@NonNull final AbstractRequest r)
+	{
+		Assert.isValid( r );
 
-        final String raw = r.getHeader( "Cookie" ).toString().replaceAll( "\\s", "" );
+		final String raw = r.getHeader( "Cookie" ).toString().replaceAll( "\\s", "" );
 
-        if ( raw.isEmpty() )
-        {
-            return EMPTY_COOKIES;
-        }
+		if ( raw.isEmpty() )
+		{
+			return EMPTY_COOKIES;
+		}
 
-        final ListMultimap<AsciiString, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues().build();
+		final ListMultimap<AsciiString, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues().build();
 
-        final StringTokenizer cookieTokenizer = new StringTokenizer( raw, ";" );
-        while ( cookieTokenizer.hasMoreTokens() )
-        {
-            final String cookieString = cookieTokenizer.nextToken();
+		final StringTokenizer cookieTokenizer = new StringTokenizer( raw, ";" );
+		while ( cookieTokenizer.hasMoreTokens() )
+		{
+			final String cookieString = cookieTokenizer.nextToken();
 
-            final Matcher matcher = PATTERN_COOKIE.matcher( cookieString );
-            if ( matcher.matches() )
-            {
-                final AsciiString key = AsciiString.of( matcher.group( "key" ) );
-                final AsciiString value = matcher.groupCount() < 2 ?
-                        AsciiString.empty :
-                        AsciiString.of( matcher.group( "value" ), false );
-                cookies.put( key, new Cookie( key, value ) );
-            }
-        }
+			final Matcher matcher = PATTERN_COOKIE.matcher( cookieString );
+			if ( matcher.matches() )
+			{
+				final AsciiString key = AsciiString.of( matcher.group( "key" ) );
+				final AsciiString value = matcher.groupCount() < 2
+						? AsciiString.empty
+						: AsciiString.of( matcher.group( "value" ), false );
+				cookies.put( key, new Cookie( key, value ) );
+			}
+		}
 
-        return cookies;
-    }
+		return cookies;
+	}
 
 }

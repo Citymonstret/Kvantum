@@ -21,27 +21,23 @@
  */
 package xyz.kvantum.server.implementation;
 
+import java.util.Optional;
 import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.FileCacheManager;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
-import java.util.Optional;
-
 final class FileCacheImplementation implements FileCacheManager
 {
 
-    @Override
-    public Optional<CachedFile> readCachedFile(@NonNull final Path path)
-    {
-        return ServerImplementation.getImplementation().getCacheManager().getCachedFile( path );
-    }
+	@Override public Optional<CachedFile> readCachedFile(@NonNull final Path path)
+	{
+		return ServerImplementation.getImplementation().getCacheManager().getCachedFile( path );
+	}
 
-    @Override
-    public void writeCachedFile(@NonNull final Path path,
-                                @NonNull final CachedFile content)
-    {
-        ServerImplementation.getImplementation().getCacheManager().setCachedFile( path, content );
-    }
+	@Override public void writeCachedFile(@NonNull final Path path, @NonNull final CachedFile content)
+	{
+		ServerImplementation.getImplementation().getCacheManager().setCachedFile( path, content );
+	}
 }

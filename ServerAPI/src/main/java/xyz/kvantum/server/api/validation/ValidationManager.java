@@ -21,92 +21,89 @@
  */
 package xyz.kvantum.server.api.validation;
 
-import lombok.SneakyThrows;
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.request.HttpMethod;
-import xyz.kvantum.server.api.request.post.PostRequest;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.SneakyThrows;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.HttpMethod;
+import xyz.kvantum.server.api.request.post.PostRequest;
 
-@SuppressWarnings({ "unused", "WeakerAccess " })
-public class ValidationManager
+@SuppressWarnings({ "unused", "WeakerAccess " }) public class ValidationManager
 {
 
-    private final Map<RequestValidation.ValidationStage, List<RequestValidation>> validators;
-    private boolean empty = true;
+	private final Map<RequestValidation.ValidationStage, List<RequestValidation>> validators;
+	private boolean empty = true;
 
-    public ValidationManager()
-    {
-        this.validators = new HashMap<>();
-        for ( final RequestValidation.ValidationStage stage : RequestValidation.ValidationStage.values() )
-        {
-            validators.put( stage, new ArrayList<>() );
-        }
-    }
+	public ValidationManager()
+	{
+		this.validators = new HashMap<>();
+		for ( final RequestValidation.ValidationStage stage : RequestValidation.ValidationStage.values() )
+		{
+			validators.put( stage, new ArrayList<>() );
+		}
+	}
 
-    @SneakyThrows
-    @SuppressWarnings("ALL")
-    private static <T> RequestValidation<T> castValidator(final RequestValidation validator)
-    {
-        return (RequestValidation<T>) validator;
-    }
+	@SneakyThrows @SuppressWarnings("ALL") private static <T> RequestValidation<T> castValidator(
+			final RequestValidation validator)
+	{
+		return ( RequestValidation<T> ) validator;
+	}
 
-    private static RequestValidation<PostRequest> asPostRequestValidator(final RequestValidation validator)
-    {
-        return castValidator( validator );
-    }
+	private static RequestValidation<PostRequest> asPostRequestValidator(final RequestValidation validator)
+	{
+		return castValidator( validator );
+	}
 
-    private static RequestValidation<AbstractRequest.Query> asQueryValidator(final RequestValidation validator)
-    {
-        return castValidator( validator );
-    }
+	private static RequestValidation<AbstractRequest.Query> asQueryValidator(final RequestValidation validator)
+	{
+		return castValidator( validator );
+	}
 
-    public boolean isEmpty()
-    {
-        return this.empty;
-    }
+	public boolean isEmpty()
+	{
+		return this.empty;
+	}
 
-    public List<RequestValidation> getValidators(final RequestValidation.ValidationStage stage)
-    {
-        return Collections.unmodifiableList( validators.get( stage ) );
-    }
+	public List<RequestValidation> getValidators(final RequestValidation.ValidationStage stage)
+	{
+		return Collections.unmodifiableList( validators.get( stage ) );
+	}
 
-    public void addValidator(final RequestValidation validator)
-    {
-        this.empty = false;
-        this.validators.get( validator.getStage() ).add( validator );
-    }
+	public void addValidator(final RequestValidation validator)
+	{
+		this.empty = false;
+		this.validators.get( validator.getStage() ).add( validator );
+	}
 
-    public void validate(final AbstractRequest request) throws ValidationException
-    {
-        if ( request.getQuery().getMethod() == HttpMethod.POST )
-        {
-            for ( final RequestValidation<?> validator :
-                    this.getValidators( RequestValidation.ValidationStage.POST_PARAMETERS ) )
-            {
-                final RequestValidation.ValidationResult result = asPostRequestValidator( validator )
-                        .validate( request.getPostRequest() );
-                if ( !result.isSuccess() )
-                {
-                    throw new ValidationException( result );
-                }
-            }
-        } else
-        {
-            for ( final RequestValidation<?> validator :
-                    this.getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
-            {
-                final RequestValidation.ValidationResult result = asQueryValidator( validator )
-                        .validate( request.getQuery() );
-                if ( !result.isSuccess() )
-                {
-                    throw new ValidationException( result );
-                }
-            }
-        }
-    }
+	public void validate(final AbstractRequest request) throws ValidationException
+	{
+		if ( request.getQuery().getMethod() == HttpMethod.POST )
+		{
+			for ( final RequestValidation<?> validator : this
+					.getValidators( RequestValidation.ValidationStage.POST_PARAMETERS ) )
+			{
+				final RequestValidation.ValidationResult result = asPostRequestValidator( validator )
+						.validate( request.getPostRequest() );
+				if ( !result.isSuccess() )
+				{
+					throw new ValidationException( result );
+				}
+			}
+		} else
+		{
+			for ( final RequestValidation<?> validator : this
+					.getValidators( RequestValidation.ValidationStage.GET_PARAMETERS ) )
+			{
+				final RequestValidation.ValidationResult result = asQueryValidator( validator )
+						.validate( request.getQuery() );
+				if ( !result.isSuccess() )
+				{
+					throw new ValidationException( result );
+				}
+			}
+		}
+	}
 }

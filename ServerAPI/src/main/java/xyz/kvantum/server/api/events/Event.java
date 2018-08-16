@@ -27,21 +27,16 @@ import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.core.Kvantum;
 
 /**
- * An event represents something that may occur
- * in the server, and that can be broadcasted to
- * {@link pw.stamina.causam.scan.method.model.Subscriber subscribers}
- * <p>
- * One can subscribe to these events using {@link Kvantum#getEventBus()}
+ * An event represents something that may occur in the server, and that can be broadcasted to {@link
+ * pw.stamina.causam.scan.method.model.Subscriber subscribers} <p> One can subscribe to these events using {@link
+ * Kvantum#getEventBus()}
  */
-@RequiredArgsConstructor
-abstract class Event
+@RequiredArgsConstructor abstract class Event
 {
 
-    /**
-     * The name of the event
-     */
-    @NonNull
-    @Getter
-    private final String name;
+	/**
+	 * The name of the event
+	 */
+	@NonNull @Getter private final String name;
 
 }

@@ -21,67 +21,59 @@
  */
 package xyz.kvantum.server.api.util;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Utility class for dealing with reflection
  */
-@UtilityClass
-final public class ReflectionUtils
+@UtilityClass final public class ReflectionUtils
 {
 
-    /**
-     * Generate a list of {@code @Annotated} methods from a class
-     *
-     * @param a     Annotation to search for
-     * @param clazz Class in which the annotations are to be searched for
-     * @return List containing the found annotations
-     */
-    public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(
-            @NonNull final Class<A> a, @NonNull final Class<?> clazz)
-    {
-        Assert.notNull( a, clazz );
+	/**
+	 * Generate a list of {@code @Annotated} methods from a class
+	 *
+	 * @param a Annotation to search for
+	 * @param clazz Class in which the annotations are to be searched for
+	 * @return List containing the found annotations
+	 */
+	public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(@NonNull final Class<A> a,
+			@NonNull final Class<?> clazz)
+	{
+		Assert.notNull( a, clazz );
 
-        final List<AnnotatedMethod<A>> annotatedMethods = new ArrayList<>();
-        Class<?> c = clazz;
-        while ( c != Object.class )
-        {
-            final List<Method> allMethods = new ArrayList<>( Arrays.asList( c.getDeclaredMethods() ) );
+		final List<AnnotatedMethod<A>> annotatedMethods = new ArrayList<>();
+		Class<?> c = clazz;
+		while ( c != Object.class )
+		{
+			final List<Method> allMethods = new ArrayList<>( Arrays.asList( c.getDeclaredMethods() ) );
 
-            allMethods.stream()
-                    .filter( method -> method.isAnnotationPresent( a ) )
-                    .forEach( method -> annotatedMethods
-                            .add( new AnnotatedMethod<>( method.getAnnotation( a ), method ) ) );
+			allMethods.stream().filter( method -> method.isAnnotationPresent( a ) ).forEach(
+					method -> annotatedMethods.add( new AnnotatedMethod<>( method.getAnnotation( a ), method ) ) );
 
-            c = c.getSuperclass();
-        }
+			c = c.getSuperclass();
+		}
 
-        return annotatedMethods;
-    }
+		return annotatedMethods;
+	}
 
-    /**
-     * Value class for {@code @Annotated} methods
-     */
-    @Getter
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class AnnotatedMethod<A extends Annotation>
-    {
+	/**
+	 * Value class for {@code @Annotated} methods
+	 */
+	@Getter @RequiredArgsConstructor(access = AccessLevel.PRIVATE) public static final class AnnotatedMethod<A extends Annotation>
+	{
 
-        @NonNull
-        private final A annotation;
-        @NonNull
-        private final Method method;
+		@NonNull private final A annotation;
+		@NonNull private final Method method;
 
-    }
+	}
 
 }

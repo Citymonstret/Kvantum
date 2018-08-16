@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.orm;
 
 import com.intellectualsites.commands.parser.ParserResult;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,85 +32,70 @@ import net.sf.oval.ConstraintViolation;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.util.CollectionUtil;
 
-import java.util.List;
-
-@Getter
-@AllArgsConstructor( access = AccessLevel.PACKAGE )
-@RequiredArgsConstructor( access = AccessLevel.PACKAGE )
-final public class KvantumObjectParserResult<T>
+@Getter @AllArgsConstructor(access = AccessLevel.PACKAGE) @RequiredArgsConstructor(access = AccessLevel.PACKAGE) final public class KvantumObjectParserResult<T>
 {
 
-    private final T parsedObject;
-    private final boolean success;
-    private KvantumObjectParserError error;
+	private final T parsedObject;
+	private final boolean success;
+	private KvantumObjectParserError error;
 
-    @AllArgsConstructor( access = AccessLevel.PACKAGE )
-    public static class KvantumObjectParserCouldNotParse extends KvantumObjectParserError
-    {
+	@AllArgsConstructor(access = AccessLevel.PACKAGE) public static class KvantumObjectParserCouldNotParse
+			extends KvantumObjectParserError
+	{
 
-        @Getter
-        private final KvantumField missingField;
+		@Getter private final KvantumField missingField;
 
-        @Getter
-        private final ParserResult parserResult;
+		@Getter private final ParserResult parserResult;
 
-        @Override
-        public String getCause()
-        {
-            return String.format( "Could not parse field: \"%s\". Reason: %s", missingField.kvantumName(),
-                    parserResult.getError() );
-        }
-    }
+		@Override public String getCause()
+		{
+			return String.format( "Could not parse field: \"%s\". Reason: %s", missingField.kvantumName(),
+					parserResult.getError() );
+		}
+	}
 
-    @AllArgsConstructor( access = AccessLevel.PACKAGE )
-    public static class KvantumObjectParserInitializedFailed extends KvantumObjectParserError
-    {
+	@AllArgsConstructor(access = AccessLevel.PACKAGE) public static class KvantumObjectParserInitializedFailed
+			extends KvantumObjectParserError
+	{
 
-        @Getter
-        private final Throwable exception;
+		@Getter private final Throwable exception;
 
-        @Override
-        public String getCause()
-        {
-            return "Failed to create new instance: \"" + exception.getMessage() + "\"";
-        }
+		@Override public String getCause()
+		{
+			return "Failed to create new instance: \"" + exception.getMessage() + "\"";
+		}
 
-    }
+	}
 
-    @AllArgsConstructor(access = AccessLevel.PACKAGE)
-    public static class KvantumObjectParserValidationFailed extends KvantumObjectParserError
-    {
+	@AllArgsConstructor(access = AccessLevel.PACKAGE) public static class KvantumObjectParserValidationFailed
+			extends KvantumObjectParserError
+	{
 
-        @Getter
-        private final List<ConstraintViolation> violations;
+		@Getter private final List<ConstraintViolation> violations;
 
-        @Override
-        public String getCause()
-        {
-            return "Violations failed: " + CollectionUtil.join( violations, ", " );
-        }
-    }
+		@Override public String getCause()
+		{
+			return "Violations failed: " + CollectionUtil.join( violations, ", " );
+		}
+	}
 
-    @AllArgsConstructor( access = AccessLevel.PACKAGE )
-    public static class KvantumObjectParserMissingParameter extends KvantumObjectParserError
-    {
+	@AllArgsConstructor(access = AccessLevel.PACKAGE) public static class KvantumObjectParserMissingParameter
+			extends KvantumObjectParserError
+	{
 
-        @Getter
-        private final KvantumField missingField;
+		@Getter private final KvantumField missingField;
 
-        @Override
-        public String getCause()
-        {
-            return "Missing field: \"" + missingField.kvantumName() + "\"";
-        }
-    }
+		@Override public String getCause()
+		{
+			return "Missing field: \"" + missingField.kvantumName() + "\"";
+		}
+	}
 
-    @NoArgsConstructor( access = AccessLevel.PRIVATE )
-    public static abstract class KvantumObjectParserError
-    {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE) public static abstract class KvantumObjectParserError
+	{
 
-        public abstract String getCause();
+		public abstract String getCause();
 
-    }
+	}
 
 }

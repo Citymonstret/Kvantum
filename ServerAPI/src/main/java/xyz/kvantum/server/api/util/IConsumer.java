@@ -33,18 +33,18 @@ import java.util.function.Predicate;
 public interface IConsumer<T> extends Consumer<T>
 {
 
-    default void foreach(final Predicate<T> predicate, final Collection<T> collection)
-    {
-        Assert.notNull( predicate, collection );
+	default void foreach(final Predicate<T> predicate, final Collection<T> collection)
+	{
+		Assert.notNull( predicate, collection );
 
-        collection.stream().filter( predicate ).forEach( this );
-    }
+		collection.stream().filter( predicate ).forEach( this );
+	}
 
-    default void foreach(final Collection<T> collection)
-    {
-        Assert.notNull( collection );
+	default void foreach(final Collection<T> collection)
+	{
+		Assert.notNull( collection );
 
-        collection.forEach( this );
-    }
+		collection.forEach( this );
+	}
 
 }

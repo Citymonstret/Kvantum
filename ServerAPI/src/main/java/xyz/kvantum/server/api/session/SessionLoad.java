@@ -25,12 +25,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
-public final class SessionLoad
+@Getter @RequiredArgsConstructor public final class SessionLoad
 {
 
-    @NonNull private final String sessionKey;
-    @NonNull private final long lastActive;
+	@NonNull private final String sessionKey;
+	@NonNull private final long lastActive;
 
 }

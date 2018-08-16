@@ -26,22 +26,12 @@ import xyz.kvantum.server.api.views.View;
 import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
 /**
- * <p>
- * Middleware is a class responsible for filtering out, and acting on requests,
- * before they are handled by the appropriate views. They can be used to redirect
- * non-authenticated users, or make sure a requested object exists in the database
- * (and much, much more)
- * </p>
- * <p>
- * Middleware is lined up in a sort of chain, by using a special queue.
- * If a middleware breaks the queue, the request will not be served by the view.
- * ( Middleware can redirect requests to other views without continuing the chain )
- * </p>
- * <p>
- * <h1>Creation</h1></br>
- * You just have to extend {@link Middleware}. Your class must have a public no-args
- * constructor
- * </br>
+ * <p> Middleware is a class responsible for filtering out, and acting on requests, before they are handled by the
+ * appropriate views. They can be used to redirect non-authenticated users, or make sure a requested object exists in
+ * the database (and much, much more) </p> <p> Middleware is lined up in a sort of chain, by using a special queue. If a
+ * middleware breaks the queue, the request will not be served by the view. ( Middleware can redirect requests to other
+ * views without continuing the chain ) </p> <p> <h1>Creation</h1></br> You just have to extend {@link Middleware}. Your
+ * class must have a public no-args constructor </br>
  * <pre>
  * public class ExampleMiddleware extends Middleware
  * {
@@ -60,22 +50,17 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
  *      }
  * }
  * </pre>
- * </p>
- * <p>
- * <h1>Registration</h1></br>
- * You can register your Middleware class to a RequestHandler (such as {@link SimpleRequestHandler} or
- * ({@link View}) by doing:
+ * </p> <p> <h1>Registration</h1></br> You can register your Middleware class to a RequestHandler (such as {@link
+ * SimpleRequestHandler} or ({@link View}) by doing:
  * <pre>
  * requestHandler.getMiddlewareQueuePopulator().add( ExampleMiddleware.class );
  * </pre>
  * Or add it to your {@literal @}{@link ViewMatcher} like this:
  * <pre>
- * {@literal @}ViewMatcher(filter = "your/filter", cache = false, name = "Identifier", middlewares = { YourMiddleware.class }
+ * {@literal @}ViewMatcher(filter = "your/filter", cache = false, name = "Identifier", middlewares = {
+ * YourMiddleware.class }
  * </pre>
- * </p>
- * <p>
- * <h1>Redirects</h1></br>
- * Middlewares can redirect a request to another view
+ * </p> <p> <h1>Redirects</h1></br> Middlewares can redirect a request to another view
  * <pre>
  * {@literal @}Override
  *  public void handle(Request request, MiddlewareQueue queue)
@@ -83,12 +68,9 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
  *     request.internalRedirect("new/request/query");
  *  }
  * </pre>
- * </p>
- * <p>
- * <h1>Change response generator</h1></br>
- * RequestHandlers has a special system called Alternate outcomes, which means that they can
- * specify other methods than the ordinary handling methods. Your middleware can tell
- * Kvantum to use those methods
+ * </p> <p> <h1>Change response generator</h1></br> RequestHandlers has a special system called Alternate outcomes,
+ * which means that they can specify other methods than the ordinary handling methods. Your middleware can tell Kvantum
+ * to use those methods
  * <pre>
  * // Inside your RequestHandler constructor
  * registerAlternateOutcome( "identifier", "methodName" );
@@ -115,6 +97,6 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 public abstract class Middleware
 {
 
-    public abstract void handle(final AbstractRequest request, final MiddlewareQueue queue);
+	public abstract void handle(final AbstractRequest request, final MiddlewareQueue queue);
 
 }

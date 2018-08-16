@@ -21,33 +21,30 @@
  */
 package xyz.kvantum.server.api.request.post;
 
+import java.util.Map;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.KvantumJsonFactory;
 
-import java.util.Map;
-
 public class JsonPostRequest extends PostRequest
 {
 
-    public JsonPostRequest(final AbstractRequest parent, final String rawRequest)
-    {
-        super( parent, rawRequest, false );
-    }
+	public JsonPostRequest(final AbstractRequest parent, final String rawRequest)
+	{
+		super( parent, rawRequest, false );
+	}
 
-    @Override
-    protected void parseRequest(final String rawRequest)
-    {
-        final JSONObject jsonObject = KvantumJsonFactory.parseJSONObject( rawRequest );
-        for ( final Map.Entry<String, Object> entry : jsonObject.entrySet() )
-        {
-            this.getVariables().put( entry.getKey(), entry.getValue().toString() );
-        }
-    }
+	@Override protected void parseRequest(final String rawRequest)
+	{
+		final JSONObject jsonObject = KvantumJsonFactory.parseJSONObject( rawRequest );
+		for ( final Map.Entry<String, Object> entry : jsonObject.entrySet() )
+		{
+			this.getVariables().put( entry.getKey(), entry.getValue().toString() );
+		}
+	}
 
-    @Override
-    public EntityType getEntityType()
-    {
-        return EntityType.JSON;
-    }
+	@Override public EntityType getEntityType()
+	{
+		return EntityType.JSON;
+	}
 }

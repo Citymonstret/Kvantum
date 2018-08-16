@@ -31,33 +31,30 @@ import java.util.Set;
 public class SimpleAccountRole extends AccountRole
 {
 
-    private final Set<String> permissionSet = new HashSet<>();
+	private final Set<String> permissionSet = new HashSet<>();
 
-    /**
-     * Construct a new account role
-     *
-     * @param roleIdentifier Unique role identifier
-     */
-    protected SimpleAccountRole(final String roleIdentifier)
-    {
-        super( roleIdentifier );
-    }
+	/**
+	 * Construct a new account role
+	 *
+	 * @param roleIdentifier Unique role identifier
+	 */
+	protected SimpleAccountRole(final String roleIdentifier)
+	{
+		super( roleIdentifier );
+	}
 
-    @Override
-    public boolean hasPermission(final String permissionKey)
-    {
-        return this.permissionSet.contains( permissionKey.toLowerCase( Locale.ENGLISH ) );
-    }
+	@Override public boolean hasPermission(final String permissionKey)
+	{
+		return this.permissionSet.contains( permissionKey.toLowerCase( Locale.ENGLISH ) );
+	}
 
-    @Override
-    public boolean addPermission(final String permissionKey)
-    {
-        return !this.hasPermission( permissionKey ) && this.permissionSet.add( permissionKey );
-    }
+	@Override public boolean addPermission(final String permissionKey)
+	{
+		return !this.hasPermission( permissionKey ) && this.permissionSet.add( permissionKey );
+	}
 
-    @Override
-    public boolean removePermission(final String permissionKey)
-    {
-        return this.hasPermission( permissionKey ) && this.permissionSet.remove( permissionKey );
-    }
+	@Override public boolean removePermission(final String permissionKey)
+	{
+		return this.hasPermission( permissionKey ) && this.permissionSet.remove( permissionKey );
+	}
 }

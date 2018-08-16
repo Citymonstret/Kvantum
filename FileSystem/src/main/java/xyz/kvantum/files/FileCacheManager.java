@@ -29,20 +29,20 @@ import java.util.Optional;
 public interface FileCacheManager
 {
 
-    /**
-     * Read a file from the file cache if it exists in the cache
-     *
-     * @param path (Unique) File identifier
-     * @return Optional file content
-     */
-    Optional<CachedFile> readCachedFile(Path path);
+	/**
+	 * Read a file from the file cache if it exists in the cache
+	 *
+	 * @param path (Unique) File identifier
+	 * @return Optional file content
+	 */
+	Optional<CachedFile> readCachedFile(Path path);
 
-    /**
-     * Write a file to the file cache
-     *
-     * @param path       (Unique) File identifier
-     * @param cachedFile File content
-     */
-    void writeCachedFile(Path path, CachedFile cachedFile);
+	/**
+	 * Write a file to the file cache
+	 *
+	 * @param path (Unique) File identifier
+	 * @param cachedFile File content
+	 */
+	void writeCachedFile(Path path, CachedFile cachedFile);
 
 }

@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.request;
 
+import java.util.Map;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import xyz.kvantum.server.api.request.post.PostRequest;
 import xyz.kvantum.server.api.util.Assert;
@@ -28,62 +30,54 @@ import xyz.kvantum.server.api.util.MapUtil;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * Created 2015-04-25 for Kvantum
  *
  * @author Citymonstret
  */
-@NoArgsConstructor
-public final class PostProviderFactory implements ProviderFactory<PostProviderFactory>, VariableProvider
+@NoArgsConstructor public final class PostProviderFactory
+		implements ProviderFactory<PostProviderFactory>, VariableProvider
 {
 
-    private PostRequest p;
+	private PostRequest p;
 
-    private PostProviderFactory(final PostRequest p)
-    {
-        this.p = p;
-    }
+	private PostProviderFactory(final PostRequest p)
+	{
+		this.p = p;
+	}
 
-    @Override
-    public Optional<PostProviderFactory> get(final AbstractRequest r)
-    {
-        Assert.notNull( r );
+	@Override public Optional<PostProviderFactory> get(final AbstractRequest r)
+	{
+		Assert.notNull( r );
 
-        if ( r.getPostRequest() == null )
-        {
-            return Optional.empty();
-        }
-        return Optional.of( new PostProviderFactory( r.getPostRequest() ) );
-    }
+		if ( r.getPostRequest() == null )
+		{
+			return Optional.empty();
+		}
+		return Optional.of( new PostProviderFactory( r.getPostRequest() ) );
+	}
 
-    @Override
-    public String providerName()
-    {
-        return "post";
-    }
+	@Override public String providerName()
+	{
+		return "post";
+	}
 
-    @Override
-    public boolean contains(final String variable)
-    {
-        Assert.notNull( variable );
+	@Override public boolean contains(final String variable)
+	{
+		Assert.notNull( variable );
 
-        return p.contains( variable );
-    }
+		return p.contains( variable );
+	}
 
-    @Override
-    public Object get(final String variable)
-    {
-        Assert.notNull( variable );
+	@Override public Object get(final String variable)
+	{
+		Assert.notNull( variable );
 
-        return p.get( variable );
-    }
+		return p.get( variable );
+	}
 
-    @Override
-    public Map<String, Object> getAll()
-    {
-        return MapUtil.convertMap( this.p.get(), (s) -> s );
-    }
+	@Override public Map<String, Object> getAll()
+	{
+		return MapUtil.convertMap( this.p.get(), (s) -> s );
+	}
 }

@@ -26,10 +26,9 @@ import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 final class AnnotatedView<C> extends SimpleRequestHandler
 {
 
-    AnnotatedView(final ViewDeclaration declaration,
-                  final ResponseMethod<?, C> method)
-    {
-        super( declaration.getFilter(), method, declaration.isForceHttps(), declaration.getHttpMethod() );
-    }
+	AnnotatedView(final ViewDeclaration declaration, final ResponseMethod<?, C> method)
+	{
+		super( declaration.getFilter(), method, declaration.isForceHttps(), declaration.getHttpMethod() );
+	}
 
 }

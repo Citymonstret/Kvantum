@@ -24,8 +24,8 @@ package xyz.kvantum.server.api.config;
 public interface ITranslationManager
 {
 
-    boolean containsTranslation(final String translation);
+	boolean containsTranslation(final String translation);
 
-    String getTranslation(final String translation);
+	String getTranslation(final String translation);
 
 }

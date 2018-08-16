@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.crush;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import xyz.kvantum.crush.syntax.Comment;
 import xyz.kvantum.crush.syntax.ForEachBlock;
 import xyz.kvantum.crush.syntax.IfStatement;
@@ -33,39 +35,36 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.template.TemplateHandler;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
 public final class CrushEngine extends TemplateHandler
 {
 
-    private static CrushEngine instance;
-    final Collection<Syntax> syntaxCollection = new LinkedHashSet<>();
+	private static CrushEngine instance;
+	final Collection<Syntax> syntaxCollection = new LinkedHashSet<>();
 
-    private CrushEngine()
-    {
-        super( CoreConfig.TemplatingEngine.CRUSH, "CrushEngine" );
-    }
+	private CrushEngine()
+	{
+		super( CoreConfig.TemplatingEngine.CRUSH, "CrushEngine" );
+	}
 
-    static CrushEngine getInstance()
-    {
-        if ( instance == null )
-        {
-            instance = new CrushEngine();
-        }
-        return instance;
-    }
+	static CrushEngine getInstance()
+	{
+		if ( instance == null )
+		{
+			instance = new CrushEngine();
+		}
+		return instance;
+	}
 
-    public void onLoad()
-    {
-        this.syntaxCollection.add( new Include() );
-        this.syntaxCollection.add( new Comment() );
-        this.syntaxCollection.add( new MetaBlock() );
-        this.syntaxCollection.add( new IfStatement() );
-        this.syntaxCollection.add( new ForEachBlock() );
-        this.syntaxCollection.add( new Variable() );
-        this.syntaxCollection.add( new Macro() );
+	public void onLoad()
+	{
+		this.syntaxCollection.add( new Include() );
+		this.syntaxCollection.add( new Comment() );
+		this.syntaxCollection.add( new MetaBlock() );
+		this.syntaxCollection.add( new IfStatement() );
+		this.syntaxCollection.add( new ForEachBlock() );
+		this.syntaxCollection.add( new Variable() );
+		this.syntaxCollection.add( new Macro() );
 
-        ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
-    }
+		ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
+	}
 }

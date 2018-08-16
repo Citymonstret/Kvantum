@@ -27,44 +27,44 @@ package xyz.kvantum.server.api.logging;
 public interface LogWrapper
 {
 
-    /**
-     * Log a constructed context
-     *
-     * @param logContext Context to log
-     */
-    void log(LogContext logContext);
+	/**
+	 * Log a constructed context
+	 *
+	 * @param logContext Context to log
+	 */
+	void log(LogContext logContext);
 
-    /**
-     * Log a message
-     *
-     * @param s Log message
-     */
-    void log(String s);
+	/**
+	 * Log a message
+	 *
+	 * @param s Log message
+	 */
+	void log(String s);
 
-    /**
-     * Send a line break
-     */
-    void breakLine();
+	/**
+	 * Send a line break
+	 */
+	void breakLine();
 
-    /**
-     * Log an empty string
-     */
-    default void log()
-    {
-        log( "" );
-    }
+	/**
+	 * Log an empty string
+	 */
+	default void log()
+	{
+		log( "" );
+	}
 
-    default void log(final LogEntryFormatter formatter, final String s)
-    {
-        if ( formatter != null )
-        {
-            log( formatter.process( s ) );
-        }
-    }
+	default void log(final LogEntryFormatter formatter, final String s)
+	{
+		if ( formatter != null )
+		{
+			log( formatter.process( s ) );
+		}
+	}
 
-    interface LogEntryFormatter
-    {
+	interface LogEntryFormatter
+	{
 
-        String process(String in);
-    }
+		String process(String in);
+	}
 }

@@ -21,33 +21,29 @@
  */
 package xyz.kvantum.crush.syntax;
 
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 final public class MetaBlockStatement extends Syntax
 {
 
-    MetaBlockStatement()
-    {
-        super( Pattern.compile( "\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]" ) );
-    }
+	MetaBlockStatement()
+	{
+		super( Pattern.compile( "\\[([A-Za-z0-9]*):[ ]?([\\S\\s]*?)\\]" ) );
+	}
 
-    @Override
-    public String process(String in,
-                          Matcher matcher,
-                          AbstractRequest r,
-                          Map<String, ProviderFactory<? extends VariableProvider>> factories)
-    {
-        while ( matcher.find() )
-        {
-            // Document meta :D
-            r.addMeta( matcher.group( 1 ), matcher.group( 2 ) );
-        }
-        return in;
-    }
+	@Override public String process(String in, Matcher matcher, AbstractRequest r,
+			Map<String, ProviderFactory<? extends VariableProvider>> factories)
+	{
+		while ( matcher.find() )
+		{
+			// Document meta :D
+			r.addMeta( matcher.group( 1 ), matcher.group( 2 ) );
+		}
+		return in;
+	}
 }

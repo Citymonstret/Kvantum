@@ -21,42 +21,40 @@
  */
 package xyz.kvantum.server.api.views.requesthandler;
 
-
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.util.Assert;
-
 import java.util.ArrayDeque;
 import java.util.Queue;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.util.Assert;
 
 public final class MiddlewareQueue
 {
 
-    private final Queue<Middleware> queue = new ArrayDeque<>();
+	private final Queue<Middleware> queue = new ArrayDeque<>();
 
-    private boolean finished = false;
+	private boolean finished = false;
 
-    public void add(final Middleware middleware)
-    {
-        this.queue.add( middleware );
-    }
+	public void add(final Middleware middleware)
+	{
+		this.queue.add( middleware );
+	}
 
-    public void handle(final AbstractRequest request)
-    {
-        Assert.isValid( request );
+	public void handle(final AbstractRequest request)
+	{
+		Assert.isValid( request );
 
-        final Middleware next = this.queue.poll();
-        if ( next != null )
-        {
-            next.handle( request, this );
-        } else
-        {
-            finished = true;
-        }
-    }
+		final Middleware next = this.queue.poll();
+		if ( next != null )
+		{
+			next.handle( request, this );
+		} else
+		{
+			finished = true;
+		}
+	}
 
-    public final boolean finished()
-    {
-        return finished;
-    }
+	public final boolean finished()
+	{
+		return finished;
+	}
 
 }

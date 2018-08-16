@@ -27,28 +27,23 @@ import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 
-@SuppressWarnings({ "WeakerAccess", "unused" })
-@RequiredArgsConstructor
-@EqualsAndHashCode(of = { "engineName" })
-public abstract class TemplateHandler
+@SuppressWarnings({ "WeakerAccess", "unused" }) @RequiredArgsConstructor @EqualsAndHashCode(of = {
+		"engineName" }) public abstract class TemplateHandler
 {
 
-    @Getter
-    private final CoreConfig.TemplatingEngine engineEnum;
-    @Getter
-    private final String engineName;
+	@Getter private final CoreConfig.TemplatingEngine engineEnum;
+	@Getter private final String engineName;
 
-    public final void load()
-    {
-        Message.TEMPLATING_ENGINE_STATUS.log( engineName,
-                CoreConfig.Templates.status( engineEnum ) );
-        if ( !CoreConfig.Templates.status( engineEnum ) )
-        {
-            return;
-        }
-        this.onLoad();
-    }
+	public final void load()
+	{
+		Message.TEMPLATING_ENGINE_STATUS.log( engineName, CoreConfig.Templates.status( engineEnum ) );
+		if ( !CoreConfig.Templates.status( engineEnum ) )
+		{
+			return;
+		}
+		this.onLoad();
+	}
 
-    protected abstract void onLoad();
+	protected abstract void onLoad();
 
 }

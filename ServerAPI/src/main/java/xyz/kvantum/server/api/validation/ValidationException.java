@@ -21,13 +21,12 @@
  */
 package xyz.kvantum.server.api.validation;
 
-@SuppressWarnings("WeakerAccess")
-public class ValidationException extends Exception
+@SuppressWarnings("WeakerAccess") public class ValidationException extends Exception
 {
 
-    public ValidationException(RequestValidation.ValidationResult result)
-    {
-        super( "Validation Failed: " + result.getRequest() + " failed validation: " + result.getMessage() );
-    }
+	public ValidationException(RequestValidation.ValidationResult result)
+	{
+		super( "Validation Failed: " + result.getRequest() + " failed validation: " + result.getMessage() );
+	}
 
 }

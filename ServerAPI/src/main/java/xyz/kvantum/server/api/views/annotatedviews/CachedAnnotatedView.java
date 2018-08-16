@@ -28,23 +28,19 @@ import xyz.kvantum.server.api.views.View;
 final class CachedAnnotatedView<C> extends View implements CacheApplicable
 {
 
-    CachedAnnotatedView(final ViewDeclaration viewDeclaration,
-                        final ResponseMethod<?, C> method)
-    {
-        super( viewDeclaration.getFilter(), viewDeclaration.getName(),
-                null, method, viewDeclaration.getHttpMethod() );
-        this.forceHTTPS = viewDeclaration.isForceHttps();
-    }
+	CachedAnnotatedView(final ViewDeclaration viewDeclaration, final ResponseMethod<?, C> method)
+	{
+		super( viewDeclaration.getFilter(), viewDeclaration.getName(), null, method, viewDeclaration.getHttpMethod() );
+		this.forceHTTPS = viewDeclaration.isForceHttps();
+	}
 
-    @Override
-    public boolean passes(final AbstractRequest request)
-    {
-        return true;
-    }
+	@Override public boolean passes(final AbstractRequest request)
+	{
+		return true;
+	}
 
-    @Override
-    public boolean isApplicable(final AbstractRequest r)
-    {
-        return true;
-    }
+	@Override public boolean isApplicable(final AbstractRequest r)
+	{
+		return true;
+	}
 }

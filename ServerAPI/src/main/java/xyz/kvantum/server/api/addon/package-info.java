@@ -20,8 +20,7 @@
  * limitations under the License.
  */
 /**
- * Plugin system allowing developers to extend the
- * server behavior without changing the internal
- * application code and functionality
+ * Plugin system allowing developers to extend the server behavior without changing the internal application code and
+ * functionality
  */
 package xyz.kvantum.server.api.addon;

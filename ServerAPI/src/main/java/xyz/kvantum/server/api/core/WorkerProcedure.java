@@ -21,13 +21,6 @@
  */
 package xyz.kvantum.server.api.core;
 
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.Synchronized;
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.util.Assert;
-import xyz.kvantum.server.api.views.RequestHandler;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,175 +29,177 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.Synchronized;
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.views.RequestHandler;
 
-@SuppressWarnings("unused")
-public final class WorkerProcedure
+@SuppressWarnings("unused") public final class WorkerProcedure
 {
 
-    private final List<WeakReference<WorkerProcedureInstance>> instances = new ArrayList<>();
-    private volatile Map<String, StringHandler> handlers = new LinkedHashMap<>();
+	private final List<WeakReference<WorkerProcedureInstance>> instances = new ArrayList<>();
+	private volatile Map<String, StringHandler> handlers = new LinkedHashMap<>();
 
-    /**
-     * Add a procedure, and allow the Worker to use it
-     * @param name Procedure name
-     * @param handler Procedure Handler
-     */
-    @Synchronized
-    public void addProcedure(@NonNull final String name, @NonNull final StringHandler handler)
-    {
-        this.handlers.put( name, handler );
-        this.setChanged();
-    }
+	/**
+	 * Add a procedure, and allow the Worker to use it
+	 *
+	 * @param name Procedure name
+	 * @param handler Procedure Handler
+	 */
+	@Synchronized public void addProcedure(@NonNull final String name, @NonNull final StringHandler handler)
+	{
+		this.handlers.put( name, handler );
+		this.setChanged();
+	}
 
-    /**
-     * Add a procedure before another procedure. If there is no procedure with the specified name, it will be
-     * added to the last position of the queue
-     * @param name Procedure Name
-     * @param before Name of procedure that the current procedure should be placed before
-     * @param handler Procedure handler
-     */
-    @Synchronized
-    public void addProcedureBefore(final String name, final String before, final StringHandler handler)
-    {
-        Assert.notEmpty( name );
-        Assert.notEmpty( before );
-        Assert.notNull( handler );
+	/**
+	 * Add a procedure before another procedure. If there is no procedure with the specified name, it will be added to
+	 * the last position of the queue
+	 *
+	 * @param name Procedure Name
+	 * @param before Name of procedure that the current procedure should be placed before
+	 * @param handler Procedure handler
+	 */
+	@Synchronized public void addProcedureBefore(final String name, final String before, final StringHandler handler)
+	{
+		Assert.notEmpty( name );
+		Assert.notEmpty( before );
+		Assert.notNull( handler );
 
-        final Map<String, StringHandler> temporaryMap = new HashMap<>();
-        for ( final Map.Entry<String, StringHandler> entry : handlers.entrySet() )
-        {
-            if ( entry.getKey().equalsIgnoreCase( before ) )
-            {
-                temporaryMap.put( name, handler );
-            }
-            temporaryMap.put( entry.getKey(), entry.getValue() );
-        }
-        if ( !temporaryMap.containsKey( name ) )
-        {
-            temporaryMap.put( name, handler );
-        }
-        this.handlers = temporaryMap;
-        this.setChanged();
-    }
+		final Map<String, StringHandler> temporaryMap = new HashMap<>();
+		for ( final Map.Entry<String, StringHandler> entry : handlers.entrySet() )
+		{
+			if ( entry.getKey().equalsIgnoreCase( before ) )
+			{
+				temporaryMap.put( name, handler );
+			}
+			temporaryMap.put( entry.getKey(), entry.getValue() );
+		}
+		if ( !temporaryMap.containsKey( name ) )
+		{
+			temporaryMap.put( name, handler );
+		}
+		this.handlers = temporaryMap;
+		this.setChanged();
+	}
 
-    public boolean hasHandlers()
-    {
-        return !this.handlers.isEmpty();
-    }
+	public boolean hasHandlers()
+	{
+		return !this.handlers.isEmpty();
+	}
 
-    /**
-     * Add a procedure after another procedure. If there is no procedure with the specified name, it will be
-     * added to the last position of the queue
-     * @param name Procedure Name
-     * @param after Name of procedure that the current procedure should be placed behind
-     * @param handler Procedure handler
-     */
-    @Synchronized
-    public void addProcedureAfter(final String name, final String after, final StringHandler handler)
-    {
-        Assert.notEmpty( name );
-        Assert.notEmpty( after );
-        Assert.notNull( handler );
+	/**
+	 * Add a procedure after another procedure. If there is no procedure with the specified name, it will be added to
+	 * the last position of the queue
+	 *
+	 * @param name Procedure Name
+	 * @param after Name of procedure that the current procedure should be placed behind
+	 * @param handler Procedure handler
+	 */
+	@Synchronized public void addProcedureAfter(final String name, final String after, final StringHandler handler)
+	{
+		Assert.notEmpty( name );
+		Assert.notEmpty( after );
+		Assert.notNull( handler );
 
-        final Map<String, StringHandler> temporaryMap = new HashMap<>();
-        for ( final Map.Entry<String, StringHandler> entry : handlers.entrySet() )
-        {
-            temporaryMap.put( entry.getKey(), entry.getValue() );
-            if ( entry.getKey().equalsIgnoreCase( after ) )
-            {
-                temporaryMap.put( name, handler );
-            }
-        }
-        if ( !temporaryMap.containsKey( name ) )
-        {
-            temporaryMap.put( name, handler );
-        }
-        this.handlers = temporaryMap;
-        this.setChanged();
-    }
+		final Map<String, StringHandler> temporaryMap = new HashMap<>();
+		for ( final Map.Entry<String, StringHandler> entry : handlers.entrySet() )
+		{
+			temporaryMap.put( entry.getKey(), entry.getValue() );
+			if ( entry.getKey().equalsIgnoreCase( after ) )
+			{
+				temporaryMap.put( name, handler );
+			}
+		}
+		if ( !temporaryMap.containsKey( name ) )
+		{
+			temporaryMap.put( name, handler );
+		}
+		this.handlers = temporaryMap;
+		this.setChanged();
+	}
 
-    @Synchronized
-    private void setChanged()
-    {
-        final Collection<StringHandler> stringHandlers = new ArrayList<>();
+	@Synchronized private void setChanged()
+	{
+		final Collection<StringHandler> stringHandlers = new ArrayList<>();
 
-        for ( final Handler handler : handlers.values() )
-        {
-            if ( handler instanceof StringHandler )
-            {
-                stringHandlers.add( (StringHandler) handler );
-            }
-        }
+		for ( final Handler handler : handlers.values() )
+		{
+			if ( handler instanceof StringHandler )
+			{
+				stringHandlers.add( ( StringHandler ) handler );
+			}
+		}
 
-        for ( final WeakReference<WorkerProcedureInstance> instanceReference : instances )
-        {
-            final WorkerProcedureInstance instance = instanceReference.get();
-            if ( instance != null )
-            {
-                instance.stringHandlers = stringHandlers;
-            }
-        }
-    }
+		for ( final WeakReference<WorkerProcedureInstance> instanceReference : instances )
+		{
+			final WorkerProcedureInstance instance = instanceReference.get();
+			if ( instance != null )
+			{
+				instance.stringHandlers = stringHandlers;
+			}
+		}
+	}
 
-    /**
-     * @return A new WorkerProcedureInstance
-     */
-    public final WorkerProcedureInstance getInstance()
-    {
-        return new WorkerProcedureInstance();
-    }
+	/**
+	 * @return A new WorkerProcedureInstance
+	 */
+	public final WorkerProcedureInstance getInstance()
+	{
+		return new WorkerProcedureInstance();
+	}
 
-    public interface Handler<T>
-    {
+	public interface Handler<T>
+	{
 
-        T act(RequestHandler requestHandler, AbstractRequest request, T in);
+		T act(RequestHandler requestHandler, AbstractRequest request, T in);
 
-        Class<T> getType();
+		Class<T> getType();
 
-    }
+	}
 
-    @EqualsAndHashCode(of = "uniqueID")
-    public static abstract class StringHandler implements Handler<String>
-    {
+	@EqualsAndHashCode(of = "uniqueID") public static abstract class StringHandler implements Handler<String>
+	{
 
-        private final String uniqueID = UUID.randomUUID().toString();
+		private final String uniqueID = UUID.randomUUID().toString();
 
-        @Override
-        public final Class<String> getType()
-        {
-            return String.class;
-        }
+		@Override public final Class<String> getType()
+		{
+			return String.class;
+		}
 
-    }
+	}
 
-    /**
-     * An instance containing the handlers from the WorkerProcedure, that
-     * are split into Byte & String Handlers (to make them easier to use in the worker)
-     *
-     * The instance gets updated automatically when the WorkerProcedure is updated
-     */
-    public final class WorkerProcedureInstance
-    {
+	/**
+	 * An instance containing the handlers from the WorkerProcedure, that are split into Byte & String Handlers (to make
+	 * them easier to use in the worker)
+	 *
+	 * The instance gets updated automatically when the WorkerProcedure is updated
+	 */
+	public final class WorkerProcedureInstance
+	{
 
-        private volatile Collection<StringHandler> stringHandlers = new ArrayList<>();
-        private boolean containsHandlers;
+		private volatile Collection<StringHandler> stringHandlers = new ArrayList<>();
+		private boolean containsHandlers;
 
-        WorkerProcedureInstance()
-        {
-            instances.add( new WeakReference<>( this ) );
-            this.stringHandlers.addAll( handlers.values() );
-            this.containsHandlers = !stringHandlers.isEmpty();
-        }
+		WorkerProcedureInstance()
+		{
+			instances.add( new WeakReference<>( this ) );
+			this.stringHandlers.addAll( handlers.values() );
+			this.containsHandlers = !stringHandlers.isEmpty();
+		}
 
-        public Collection<StringHandler> getStringHandlers()
-        {
-            return this.stringHandlers;
-        }
+		public Collection<StringHandler> getStringHandlers()
+		{
+			return this.stringHandlers;
+		}
 
-        public boolean containsHandlers()
-        {
-            return hasHandlers();
-        }
-    }
+		public boolean containsHandlers()
+		{
+			return hasHandlers();
+		}
+	}
 
 }

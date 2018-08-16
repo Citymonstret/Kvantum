@@ -27,11 +27,10 @@ import org.junit.jupiter.api.Test;
 class ColorUtilTest
 {
 
-    @Test
-    void getStripped()
-    {
-        final String coloredString = "&9Hello &cWorld!";
-        Assertions.assertEquals( "Hello World!", ColorUtil.getStripped( coloredString ) );
-    }
+	@Test void getStripped()
+	{
+		final String coloredString = "&9Hello &cWorld!";
+		Assertions.assertEquals( "Hello World!", ColorUtil.getStripped( coloredString ) );
+	}
 
 }

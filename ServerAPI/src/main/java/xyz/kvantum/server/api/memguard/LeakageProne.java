@@ -22,19 +22,17 @@
 package xyz.kvantum.server.api.memguard;
 
 /**
- * A {@link LeakageProne} object is prone to memory leaks,
- * this can be used together with utility classes to prevent
+ * A {@link LeakageProne} object is prone to memory leaks, this can be used together with utility classes to prevent
  * long-term memory leakage.
  *
  * Don't forget to register the instance, using {@link MemoryGuard#register(LeakageProne)}
  */
-@FunctionalInterface
-public interface LeakageProne
+@FunctionalInterface public interface LeakageProne
 {
 
-    /**
-     * Clean up memory leakage
-     */
-    void cleanUp();
+	/**
+	 * Clean up memory leakage
+	 */
+	void cleanUp();
 
 }

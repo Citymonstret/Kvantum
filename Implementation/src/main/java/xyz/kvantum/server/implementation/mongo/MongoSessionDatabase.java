@@ -35,68 +35,60 @@ import xyz.kvantum.server.api.session.SessionLoad;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.implementation.MongoApplicationStructure;
 
-@RequiredArgsConstructor
-final public class MongoSessionDatabase implements ISessionDatabase
+@RequiredArgsConstructor final public class MongoSessionDatabase implements ISessionDatabase
 {
 
-    private static final String FIELD_SESSION_ID = "sessionId";
-    private static final String FIELD_LAST_ACTIVE = "lastActive";
-    private static final String FIELD_SESSION_KEY = "sessionKey";
+	private static final String FIELD_SESSION_ID = "sessionId";
+	private static final String FIELD_LAST_ACTIVE = "lastActive";
+	private static final String FIELD_SESSION_KEY = "sessionKey";
 
-    @Getter
-    private final MongoApplicationStructure applicationStructure;
-    private DBCollection collection;
+	@Getter private final MongoApplicationStructure applicationStructure;
+	private DBCollection collection;
 
-    @Override
-    public void setup() throws Exception
-    {
-        DB database = applicationStructure.getMongoClient().getDB( CoreConfig.MongoDB.dbSessions );
-        this.collection = database.getCollection( CoreConfig.MongoDB.collectionSessions );
-    }
+	@Override public void setup() throws Exception
+	{
+		DB database = applicationStructure.getMongoClient().getDB( CoreConfig.MongoDB.dbSessions );
+		this.collection = database.getCollection( CoreConfig.MongoDB.collectionSessions );
+	}
 
-    @Override
-    public SessionLoad getSessionLoad(final AsciiString sessionID)
-    {
-        final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
-        final DBCursor cursor = collection.find( object );
+	@Override public SessionLoad getSessionLoad(final AsciiString sessionID)
+	{
+		final DBObject object = new BasicDBObject( FIELD_SESSION_ID, sessionID );
+		final DBCursor cursor = collection.find( object );
 
-        if ( cursor.hasNext() )
-        {
-            final DBObject session = cursor.next();
+		if ( cursor.hasNext() )
+		{
+			final DBObject session = cursor.next();
 
-            return new SessionLoad( session.get( FIELD_SESSION_KEY ).toString(),
-                    (long) session.get( FIELD_LAST_ACTIVE ) );
-        }
+			return new SessionLoad( session.get( FIELD_SESSION_KEY ).toString(),
+					( long ) session.get( FIELD_LAST_ACTIVE ) );
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public void storeSession(final ISession session)
-    {
-        if ( getSessionLoad( (AsciiString) session.get( "id" ) ) != null )
-        {
-            updateSession( (AsciiString) session.get( "id" ) );
-        } else
-        {
-            final DBObject object = new BasicDBObject()
-                    .append( FIELD_SESSION_ID, session.get( "id" ).toString() )
-                    .append( FIELD_LAST_ACTIVE, System.currentTimeMillis() )
-                    .append( FIELD_SESSION_KEY, session.getSessionKey() );
-            collection.insert( object );
-        }
-    }
+	@Override public void storeSession(final ISession session)
+	{
+		if ( getSessionLoad( ( AsciiString ) session.get( "id" ) ) != null )
+		{
+			updateSession( ( AsciiString ) session.get( "id" ) );
+		} else
+		{
+			final DBObject object = new BasicDBObject().append( FIELD_SESSION_ID, session.get( "id" ).toString() )
+					.append( FIELD_LAST_ACTIVE, System.currentTimeMillis() )
+					.append( FIELD_SESSION_KEY, session.getSessionKey() );
+			collection.insert( object );
+		}
+	}
 
-    @Override
-    public void updateSession(final AsciiString session)
-    {
-        collection.update( new BasicDBObject( FIELD_SESSION_ID, session ), new BasicDBObject( "$set",
-                new BasicDBObject( FIELD_LAST_ACTIVE, System.currentTimeMillis() ) ) );
-    }
+	@Override public void updateSession(final AsciiString session)
+	{
+		collection.update( new BasicDBObject( FIELD_SESSION_ID, session ),
+				new BasicDBObject( "$set", new BasicDBObject( FIELD_LAST_ACTIVE, System.currentTimeMillis() ) ) );
+	}
 
-    @Override
-    public void deleteSession(final AsciiString session)
-    {
-        collection.remove( new BasicDBObject( FIELD_SESSION_ID, session ) );
-    }
+	@Override public void deleteSession(final AsciiString session)
+	{
+		collection.remove( new BasicDBObject( FIELD_SESSION_ID, session ) );
+	}
 }

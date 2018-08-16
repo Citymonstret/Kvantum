@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.views;
 
+import java.util.Map;
 import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -29,32 +30,28 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 
-import java.util.Map;
-
 /**
  * Static file view that will server all files as attachments
  */
 public final class DownloadView extends StaticFileView implements IgnoreSyntax
 {
 
-    public DownloadView(@NonNull final String filter,
-                        @NonNull final Map<String, Object> options)
-    {
-        super( filter, options, "download", FileExtension.DOWNLOADABLE );
-        super.relatedFolderPath = "/assets/downloads";
-    }
+	public DownloadView(@NonNull final String filter, @NonNull final Map<String, Object> options)
+	{
+		super( filter, options, "download", FileExtension.DOWNLOADABLE );
+		super.relatedFolderPath = "/assets/downloads";
+	}
 
-    @Override
-    public void handle(final AbstractRequest r, final Response response)
-    {
-        final Path path = r.getMetaUnsafe( "path" );
-        final String fileName = path.getEntityName();
-        final FileExtension extension = r.getMetaUnsafe( "extension" );
+	@Override public void handle(final AbstractRequest r, final Response response)
+	{
+		final Path path = r.getMetaUnsafe( "path" );
+		final String fileName = path.getEntityName();
+		final FileExtension extension = r.getMetaUnsafe( "extension" );
 
-        response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION,
-                String.format( "attachment; filename=\"%s.%s\"", fileName, extension.getOption() ) );
-        response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
-        response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
-    }
+		response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION,
+				String.format( "attachment; filename=\"%s.%s\"", fileName, extension.getOption() ) );
+		response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
+		response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
+	}
 
 }

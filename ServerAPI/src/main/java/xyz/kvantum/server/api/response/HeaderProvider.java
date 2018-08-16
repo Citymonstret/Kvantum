@@ -21,10 +21,9 @@
  */
 package xyz.kvantum.server.api.response;
 
-@FunctionalInterface
-public interface HeaderProvider
+@FunctionalInterface public interface HeaderProvider
 {
 
-    Header getHeader();
+	Header getHeader();
 
 }

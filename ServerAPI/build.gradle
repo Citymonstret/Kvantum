@@ -7,7 +7,7 @@ dependencies {
     // Mostly used for its awesome map implementations
     compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // rest query engine
-    compile ('com.github.rutledgepaulv:rest-query-engine:0.7.1') {
+    compile('com.github.rutledgepaulv:rest-query-engine:0.7.1') {
         // TODO: Re-introduce this exclusion
         // exclude group: 'org.springframework', module: '*'
     }

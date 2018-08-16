@@ -21,74 +21,68 @@
  */
 package xyz.kvantum.server.api.request;
 
+import java.util.Locale;
+import java.util.Optional;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.LambdaUtil;
 
-import java.util.Locale;
-import java.util.Optional;
-
-@SuppressWarnings("ALL")
-public enum HttpMethod
+@SuppressWarnings("ALL") public enum HttpMethod
 {
 
-    /**
-     * Post requests are used
-     * to handle data
-     */
-    POST,
+	/**
+	 * Post requests are used to handle data
+	 */
+	POST,
 
-    /**
-     * Get requests are handled
-     * for getting resources
-     */
-    GET,
+	/**
+	 * Get requests are handled for getting resources
+	 */
+	GET,
 
-    /**
-     *
-     */
-    PUT,
+	/**
+	 *
+	 */
+	PUT,
 
-    PATCH,
+	PATCH,
 
-    /**
-     * Retrieve the headers for a request
-     * Uses {@link #GET} but ignores any content
-     */
-    HEAD( false ),
+	/**
+	 * Retrieve the headers for a request Uses {@link #GET} but ignores any content
+	 */
+	HEAD( false ),
 
-    /**
-     *
-     */
-    DELETE,
+	/**
+	 *
+	 */
+	DELETE,
 
-    /**
-     * Used to indicate that ALL methods
-     * are applicable
-     */
-    ALL;
+	/**
+	 * Used to indicate that ALL methods are applicable
+	 */
+	ALL;
 
-    private final boolean hasBody;
+	private final boolean hasBody;
 
-    HttpMethod(final boolean hasBody)
-    {
-        this.hasBody = hasBody;
-    }
+	HttpMethod(final boolean hasBody)
+	{
+		this.hasBody = hasBody;
+	}
 
-    HttpMethod()
-    {
-        this( true );
-    }
+	HttpMethod()
+	{
+		this( true );
+	}
 
-    public static Optional<HttpMethod> getByName(final String name)
-    {
-        Assert.notEmpty( name );
+	public static Optional<HttpMethod> getByName(final String name)
+	{
+		Assert.notEmpty( name );
 
-        final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
-        return LambdaUtil.getFirst( values(), method -> method.name().equals( fixed ) );
-    }
+		final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
+		return LambdaUtil.getFirst( values(), method -> method.name().equals( fixed ) );
+	}
 
-    public boolean hasBody()
-    {
-        return this.hasBody;
-    }
+	public boolean hasBody()
+	{
+		return this.hasBody;
+	}
 }

@@ -29,37 +29,35 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-@RequiredArgsConstructor
-public abstract class TemplateSyntaxHandler extends WorkerProcedure.StringHandler
+@RequiredArgsConstructor public abstract class TemplateSyntaxHandler extends WorkerProcedure.StringHandler
 {
 
-    private final TemplateHandler templateHandler;
+	private final TemplateHandler templateHandler;
 
-    @Override
-    public final String act(RequestHandler requestHandler, AbstractRequest request, String in)
-    {
-        String out = in;
-        if ( !( requestHandler instanceof IgnoreSyntax ) )
-        {
-            if ( !CoreConfig.Templates.applyTemplates.contains( "ALL" ) && !CoreConfig.Templates.applyTemplates
-                    .contains( requestHandler.getName() ) )
-            {
-                if ( CoreConfig.debug )
-                {
-                    Message.TEMPLATING_ENGINE_DEBUG_NOT_ENABLED.log( requestHandler.getName() );
-                }
-            } else
-            {
-                if ( CoreConfig.debug )
-                {
-                    Message.TEMPLATING_ENGINE_REACTING.log( templateHandler.getEngineName(), request );
-                }
-                out = this.handle( requestHandler, request, in );
-            }
-        }
-        return out;
-    }
+	@Override public final String act(RequestHandler requestHandler, AbstractRequest request, String in)
+	{
+		String out = in;
+		if ( !( requestHandler instanceof IgnoreSyntax ) )
+		{
+			if ( !CoreConfig.Templates.applyTemplates.contains( "ALL" ) && !CoreConfig.Templates.applyTemplates
+					.contains( requestHandler.getName() ) )
+			{
+				if ( CoreConfig.debug )
+				{
+					Message.TEMPLATING_ENGINE_DEBUG_NOT_ENABLED.log( requestHandler.getName() );
+				}
+			} else
+			{
+				if ( CoreConfig.debug )
+				{
+					Message.TEMPLATING_ENGINE_REACTING.log( templateHandler.getEngineName(), request );
+				}
+				out = this.handle( requestHandler, request, in );
+			}
+		}
+		return out;
+	}
 
-    protected abstract String handle(RequestHandler requestHandler, AbstractRequest request, String in);
+	protected abstract String handle(RequestHandler requestHandler, AbstractRequest request, String in);
 
 }

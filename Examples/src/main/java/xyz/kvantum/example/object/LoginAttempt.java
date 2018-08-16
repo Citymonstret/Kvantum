@@ -27,33 +27,25 @@ import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 
-@KvantumObject(checkValidity = true)
-public final class LoginAttempt
+@KvantumObject(checkValidity = true) public final class LoginAttempt
 {
 
-    @NotNull
-    @NotEmpty
-    @KvantumField
-    private String username;
+	@NotNull @NotEmpty @KvantumField private String username;
 
-    @NotNull
-    @NotEmpty
-    @KvantumField
-    private String password;
+	@NotNull @NotEmpty @KvantumField private String password;
 
-    @KvantumConstructor
-    private LoginAttempt()
-    {
-    }
+	@KvantumConstructor private LoginAttempt()
+	{
+	}
 
-    public String getUsername()
-    {
-        return this.username;
-    }
+	public String getUsername()
+	{
+		return this.username;
+	}
 
-    public String getPassword()
-    {
-        return this.password;
-    }
+	public String getPassword()
+	{
+		return this.password;
+	}
 
 }

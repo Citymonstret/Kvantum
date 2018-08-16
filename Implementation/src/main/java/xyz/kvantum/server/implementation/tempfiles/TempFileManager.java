@@ -21,10 +21,6 @@
  */
 package xyz.kvantum.server.implementation.tempfiles;
 
-import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.util.AutoCloseable;
-import xyz.kvantum.server.api.util.ITempFileManager;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.Files;
@@ -32,50 +28,50 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.util.AutoCloseable;
+import xyz.kvantum.server.api.util.ITempFileManager;
 
 final public class TempFileManager extends AutoCloseable implements ITempFileManager
 {
 
-    private final Set<WeakReference<Path>> pathReferences = new HashSet<>();
+	private final Set<WeakReference<Path>> pathReferences = new HashSet<>();
 
-    @Override
-    public Optional<Path> createTempFile()
-    {
-        try
-        {
-            final Path path = Files.createTempFile( null, null );
-            path.toFile().deleteOnExit();
-            this.pathReferences.add( new WeakReference<>( path ) );
-            return Optional.of( path );
-        } catch ( final IOException e )
-        {
-            Logger.error( "Failed to create temp file: {}", e.getMessage() );
-        }
-        return Optional.empty();
-    }
+	@Override public Optional<Path> createTempFile()
+	{
+		try
+		{
+			final Path path = Files.createTempFile( null, null );
+			path.toFile().deleteOnExit();
+			this.pathReferences.add( new WeakReference<>( path ) );
+			return Optional.of( path );
+		} catch ( final IOException e )
+		{
+			Logger.error( "Failed to create temp file: {}", e.getMessage() );
+		}
+		return Optional.empty();
+	}
 
-    @Override
-    public void clearTempFiles()
-    {
-        for ( final WeakReference<Path> weakReference : this.pathReferences )
-        {
-            final Path path;
-            if ( ( path = weakReference.get() ) != null )
-            {
-                try
-                {
-                    Files.delete( path );
-                } catch ( final IOException e )
-                {
-                    Logger.error( "Failed to delete temp file [{}]: {}", path.getFileName(), e.getMessage() );
-                }
-            }
-        }
-    }
+	@Override public void clearTempFiles()
+	{
+		for ( final WeakReference<Path> weakReference : this.pathReferences )
+		{
+			final Path path;
+			if ( ( path = weakReference.get() ) != null )
+			{
+				try
+				{
+					Files.delete( path );
+				} catch ( final IOException e )
+				{
+					Logger.error( "Failed to delete temp file [{}]: {}", path.getFileName(), e.getMessage() );
+				}
+			}
+		}
+	}
 
-    @Override
-    protected void handleClose()
-    {
-        this.clearTempFiles();
-    }
+	@Override protected void handleClose()
+	{
+		this.clearTempFiles();
+	}
 }

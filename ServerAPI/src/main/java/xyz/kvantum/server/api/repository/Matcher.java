@@ -21,10 +21,9 @@
  */
 package xyz.kvantum.server.api.repository;
 
+import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.function.Predicate;
 
 /**
  * Matcher for queries
@@ -32,30 +31,27 @@ import java.util.function.Predicate;
  * @param <Q> Query Type
  * @param <V> Value type
  */
-@RequiredArgsConstructor
-public abstract class Matcher<Q, V> implements Predicate<V>
+@RequiredArgsConstructor public abstract class Matcher<Q, V> implements Predicate<V>
 {
 
-    @NonNull
-    private final Q queryObject;
+	@NonNull private final Q queryObject;
 
-    abstract protected boolean matches(Q query, V value);
+	abstract protected boolean matches(Q query, V value);
 
-    /**
-     * Check if an object matches the query
-     *
-     * @param value Value
-     * @return True it there is a match
-     */
-    public final boolean matches(@NonNull final V value)
-    {
-        return this.matches( queryObject, value );
-    }
+	/**
+	 * Check if an object matches the query
+	 *
+	 * @param value Value
+	 * @return True it there is a match
+	 */
+	public final boolean matches(@NonNull final V value)
+	{
+		return this.matches( queryObject, value );
+	}
 
-    @Override
-    public final boolean test(@NonNull final V value)
-    {
-        return this.matches( value );
-    }
+	@Override public final boolean test(@NonNull final V value)
+	{
+		return this.matches( value );
+	}
 
 }

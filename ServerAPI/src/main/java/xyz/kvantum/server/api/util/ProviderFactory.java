@@ -21,9 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
-import xyz.kvantum.server.api.request.AbstractRequest;
-
 import java.util.Optional;
+import xyz.kvantum.server.api.request.AbstractRequest;
 
 /**
  * Factory class for generating per-request {@link VariableProvider}
@@ -33,20 +32,19 @@ import java.util.Optional;
 public interface ProviderFactory<T extends VariableProvider>
 {
 
-    /**
-     * Get a variable provider, may be unique for
-     * the given request; this depends entirely
-     * on the implementation
-     *
-     * @param r Request
-     * @return May return the request; or null
-     */
-    Optional<T> get(AbstractRequest r);
+	/**
+	 * Get a variable provider, may be unique for the given request; this depends entirely on the implementation
+	 *
+	 * @param r Request
+	 * @return May return the request; or null
+	 */
+	Optional<T> get(AbstractRequest r);
 
-    /**
-     * Get the provider name (used in variable mapping)
-     * @return unique provider name
-     */
-    String providerName();
+	/**
+	 * Get the provider name (used in variable mapping)
+	 *
+	 * @return unique provider name
+	 */
+	String providerName();
 
 }

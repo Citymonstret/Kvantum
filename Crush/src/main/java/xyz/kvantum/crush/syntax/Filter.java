@@ -26,18 +26,17 @@ import java.util.Locale;
 public abstract class Filter
 {
 
-    private final String key;
+	private final String key;
 
-    public Filter(final String key)
-    {
-        this.key = key.toUpperCase( Locale.ENGLISH );
-    }
+	public Filter(final String key)
+	{
+		this.key = key.toUpperCase( Locale.ENGLISH );
+	}
 
-    public abstract Object handle(final String objectName, final Object in);
+	public abstract Object handle(final String objectName, final Object in);
 
-    @Override
-    public final String toString()
-    {
-        return this.key;
-    }
+	@Override public final String toString()
+	{
+		return this.key;
+	}
 }

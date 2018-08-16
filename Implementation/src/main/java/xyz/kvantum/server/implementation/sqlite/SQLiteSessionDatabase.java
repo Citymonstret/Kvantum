@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.implementation.sqlite;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.session.ISession;
@@ -29,98 +31,86 @@ import xyz.kvantum.server.api.session.SessionLoad;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
-@RequiredArgsConstructor
-final public class SQLiteSessionDatabase implements ISessionDatabase
+@RequiredArgsConstructor final public class SQLiteSessionDatabase implements ISessionDatabase
 {
 
-    private final SQLiteApplicationStructure applicationStructure;
+	private final SQLiteApplicationStructure applicationStructure;
 
-    @Override
-    public void setup() throws Exception
-    {
-        this.applicationStructure.getDatabaseManager().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS sessions (" +
-                        " session_id INTEGER PRIMARY KEY," +
-                        " id VARCHAR (64) UNIQUE NOT NULL," +
-                        " last_active TIME DEFAULT (CURRENT_TIMESTAMP)," +
-                        " session_key VARCHAR (64) NOT NULL )"
-        );
-    }
+	@Override public void setup() throws Exception
+	{
+		this.applicationStructure.getDatabaseManager().executeUpdate(
+				"CREATE TABLE IF NOT EXISTS sessions (" + " session_id INTEGER PRIMARY KEY,"
+						+ " id VARCHAR (64) UNIQUE NOT NULL," + " last_active TIME DEFAULT (CURRENT_TIMESTAMP),"
+						+ " session_key VARCHAR (64) NOT NULL )" );
+	}
 
-    @Override
-    public SessionLoad getSessionLoad(@NonNull final AsciiString sessionID)
-    {
-        SessionLoad sessionLoad = null;
-        try ( final PreparedStatement statement = this.applicationStructure
-                .getDatabaseManager().prepareStatement( "SELECT * FROM sessions WHERE id = ?" ) )
-        {
-            statement.setString( 1, sessionID.toString() );
-            try ( final ResultSet resultSet = statement.executeQuery() )
-            {
-                if ( resultSet.next() )
-                {
-                    sessionLoad = new SessionLoad( resultSet.getString( "session_key" ),
-                            resultSet.getLong( "last_active" ) );
-                }
-            }
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-        return sessionLoad;
-    }
+	@Override public SessionLoad getSessionLoad(@NonNull final AsciiString sessionID)
+	{
+		SessionLoad sessionLoad = null;
+		try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
+				.prepareStatement( "SELECT * FROM sessions WHERE id = ?" ) )
+		{
+			statement.setString( 1, sessionID.toString() );
+			try ( final ResultSet resultSet = statement.executeQuery() )
+			{
+				if ( resultSet.next() )
+				{
+					sessionLoad = new SessionLoad( resultSet.getString( "session_key" ),
+							resultSet.getLong( "last_active" ) );
+				}
+			}
+		} catch ( final Exception e )
+		{
+			e.printStackTrace();
+		}
+		return sessionLoad;
+	}
 
-    @Override
-    public void storeSession(final ISession session)
-    {
-        if ( getSessionLoad( (AsciiString) session.get( "id" ) ) != null )
-        {
-            updateSession( (AsciiString) session.get( "id" ) );
-        } else
-        {
-            try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
-                    .prepareStatement( "INSERT INTO sessions(`id`,`last_active`, `session_key`) VALUES(?, ?, ?)" ) )
-            {
-                statement.setString( 1, session.get( "id" ).toString() );
-                statement.setLong( 2, System.currentTimeMillis() );
-                statement.setString( 3, session.getSessionKey().toString() );
-                statement.executeUpdate();
-            } catch ( final Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
-    }
+	@Override public void storeSession(final ISession session)
+	{
+		if ( getSessionLoad( ( AsciiString ) session.get( "id" ) ) != null )
+		{
+			updateSession( ( AsciiString ) session.get( "id" ) );
+		} else
+		{
+			try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
+					.prepareStatement( "INSERT INTO sessions(`id`,`last_active`, `session_key`) VALUES(?, ?, ?)" ) )
+			{
+				statement.setString( 1, session.get( "id" ).toString() );
+				statement.setLong( 2, System.currentTimeMillis() );
+				statement.setString( 3, session.getSessionKey().toString() );
+				statement.executeUpdate();
+			} catch ( final Exception e )
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 
-    @Override
-    public void deleteSession(@NonNull final AsciiString session)
-    {
-        try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
-                .prepareStatement( "DELETE FROM sessions WHERE id = ?" ) )
-        {
-            statement.setString( 1, session.toString() );
-            statement.executeUpdate();
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-    }
+	@Override public void deleteSession(@NonNull final AsciiString session)
+	{
+		try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
+				.prepareStatement( "DELETE FROM sessions WHERE id = ?" ) )
+		{
+			statement.setString( 1, session.toString() );
+			statement.executeUpdate();
+		} catch ( final Exception e )
+		{
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void updateSession(final AsciiString session)
-    {
-        try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
-                .prepareStatement( "UPDATE sessions SET last_active = ? WHERE id = ?" ) )
-        {
-            statement.setLong( 1, System.currentTimeMillis() );
-            statement.setString( 2, session.toString() );
-            statement.executeUpdate();
-        } catch ( final Exception e )
-        {
-            e.printStackTrace();
-        }
-    }
+	@Override public void updateSession(final AsciiString session)
+	{
+		try ( final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
+				.prepareStatement( "UPDATE sessions SET last_active = ? WHERE id = ?" ) )
+		{
+			statement.setLong( 1, System.currentTimeMillis() );
+			statement.setString( 2, session.toString() );
+			statement.executeUpdate();
+		} catch ( final Exception e )
+		{
+			e.printStackTrace();
+		}
+	}
 }

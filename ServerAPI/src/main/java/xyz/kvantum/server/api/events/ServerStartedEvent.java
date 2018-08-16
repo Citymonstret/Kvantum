@@ -26,8 +26,8 @@ import xyz.kvantum.server.api.core.Kvantum;
 public final class ServerStartedEvent extends ServerEvent
 {
 
-    public ServerStartedEvent(Kvantum instance)
-    {
-        super( instance, "serverStartEvent" );
-    }
+	public ServerStartedEvent(Kvantum instance)
+	{
+		super( instance, "serverStartEvent" );
+	}
 }

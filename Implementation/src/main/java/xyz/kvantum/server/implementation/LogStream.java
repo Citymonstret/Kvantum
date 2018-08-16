@@ -22,21 +22,20 @@
 package xyz.kvantum.server.implementation;
 
 import de.jungblut.datastructure.AsyncBufferedOutputStream;
-import xyz.kvantum.server.api.util.TimeUtil;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
+import xyz.kvantum.server.api.util.TimeUtil;
 
 final class LogStream extends PrintStream
 {
 
-    LogStream(final File logFolder) throws FileNotFoundException
-    {
-        super( new AsyncBufferedOutputStream( new FileOutputStream(
-                new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat, new Date() ) + ".log" ) ) ) );
-    }
+	LogStream(final File logFolder) throws FileNotFoundException
+	{
+		super( new AsyncBufferedOutputStream( new FileOutputStream(
+				new File( logFolder, TimeUtil.getTimeStamp( TimeUtil.logFileFormat, new Date() ) + ".log" ) ) ) );
+	}
 
 }

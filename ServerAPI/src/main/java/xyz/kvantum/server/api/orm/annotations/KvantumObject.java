@@ -26,17 +26,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface KvantumObject
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface KvantumObject
 {
 
-    /**
-     * Indicates whether the object should be checked for
-     * validity, using a {@link net.sf.oval.Validator}
-     *
-     * @return True if the object should be validated
-     */
-    boolean checkValidity() default false;
+	/**
+	 * Indicates whether the object should be checked for validity, using a {@link net.sf.oval.Validator}
+	 *
+	 * @return True if the object should be validated
+	 */
+	boolean checkValidity() default false;
 
 }

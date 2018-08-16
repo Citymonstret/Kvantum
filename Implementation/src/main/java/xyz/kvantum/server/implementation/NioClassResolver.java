@@ -23,36 +23,34 @@ package xyz.kvantum.server.implementation;
 
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.ServerChannel;
+import java.util.Locale;
 import lombok.Getter;
 import xyz.kvantum.server.api.logging.Logger;
-
-import java.util.Locale;
 
 final class NioClassResolver
 {
 
-    @Getter
-    private final ClassProvider classProvider;
+	@Getter private final ClassProvider classProvider;
 
-    NioClassResolver()
-    {
-        final String osName = System.getProperty( "os.name" );
-        if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
-        {
-            Logger.info( "Using EpollClassResolver" );
-            this.classProvider = new EpollClassResolver();
-        } else
-        {
-            Logger.info( "Using DefaultClassResolver" );
-            this.classProvider = new DefaultClassResolver();
-        }
-    }
+	NioClassResolver()
+	{
+		final String osName = System.getProperty( "os.name" );
+		if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
+		{
+			Logger.info( "Using EpollClassResolver" );
+			this.classProvider = new EpollClassResolver();
+		} else
+		{
+			Logger.info( "Using DefaultClassResolver" );
+			this.classProvider = new DefaultClassResolver();
+		}
+	}
 
-    interface ClassProvider
-    {
+	interface ClassProvider
+	{
 
-        MultithreadEventLoopGroup getEventLoopGroup(final int threads);
+		MultithreadEventLoopGroup getEventLoopGroup(final int threads);
 
-        Class<? extends ServerChannel> getServerSocketChannelClass();
-    }
+		Class<? extends ServerChannel> getServerSocketChannelClass();
+	}
 }

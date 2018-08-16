@@ -22,184 +22,165 @@
 package xyz.kvantum.server.api.util;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
-import lombok.NonNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import lombok.NonNull;
 
 /**
- * Represents a list of strings, that is stored inside of a string,
- * with the format: string1,string2,string3,string4...
+ * Represents a list of strings, that is stored inside of a string, with the format: string1,string2,string3,string4...
  */
-@SuppressWarnings("unused")
-public final class StringList implements Collection<String>, AsciiStringable
+@SuppressWarnings("unused") public final class StringList implements Collection<String>, AsciiStringable
 {
 
-    private final Collection<String> content;
+	private final Collection<String> content;
 
-    /**
-     * Initialize a new string list
-     *
-     * @param string Initial content
-     */
-    public StringList(@Nullable final String string)
-    {
-        this.content = new ArrayList<>();
-        if ( string != null && !string.isEmpty() )
-        {
-            final StringTokenizer tokenizer = new StringTokenizer( string, "," );
-            while ( tokenizer.hasMoreTokens() )
-            {
-                this.content.add( tokenizer.nextToken() );
-            }
-        }
-    }
+	/**
+	 * Initialize a new string list
+	 *
+	 * @param string Initial content
+	 */
+	public StringList(@Nullable final String string)
+	{
+		this.content = new ArrayList<>();
+		if ( !this.addAll( string ) )
+		{
+			throw new IllegalArgumentException( "Failed to add all elements provided to the list" );
+		}
+	}
 
-    /**
-     * Remove an item from the list
-     *
-     * @param string Item to be removed
-     * @return True if the item was removed, else false
-     */
-    public boolean remove(@NonNull final String string)
-    {
-        return this.content.remove( string );
-    }
+	/**
+	 * Remove an item from the list
+	 *
+	 * @param string Item to be removed
+	 * @return True if the item was removed, else false
+	 */
+	public boolean remove(@NonNull final String string)
+	{
+		return this.content.remove( string );
+	}
 
-    public boolean addAll(@Nullable final String string)
-    {
-        if ( string != null && !string.isEmpty() )
-        {
-            final StringTokenizer tokenizer = new StringTokenizer( string, "," );
-            while ( tokenizer.hasMoreTokens() )
-            {
-                if ( !this.content.add( tokenizer.nextToken() ) )
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+	@SuppressWarnings("WeakerAccess") public boolean addAll(@Nullable final String string)
+	{
+		if ( string != null && !string.isEmpty() )
+		{
+			final StringTokenizer tokenizer = new StringTokenizer( string, "," );
+			while ( tokenizer.hasMoreTokens() )
+			{
+				final String element = tokenizer.nextToken();
+				if ( element == null || element.isEmpty() )
+				{
+					continue;
+				}
+				if ( !this.content.add( element ) )
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
-    /**
-     * Add an item to the list
-     *
-     * @param string Item to be added
-     * @return True if the item was added, else false
-     */
-    public boolean add(@NonNull final String string)
-    {
-        return this.content.add( string );
-    }
+	/**
+	 * Add an item to the list
+	 *
+	 * @param string Item to be added
+	 * @return True if the item was added, else false
+	 */
+	public boolean add(@NonNull final String string)
+	{
+		return this.content.add( string );
+	}
 
-    @Override
-    public boolean remove(@NonNull final Object o)
-    {
-        return o instanceof String && this.remove( (String) o );
-    }
+	@Override public boolean remove(@NonNull final Object o)
+	{
+		return o instanceof String && this.remove( ( String ) o );
+	}
 
-    @Override
-    @SuppressWarnings("ALL")
-    public boolean containsAll(@NonNull final Collection<?> collection)
-    {
-        return this.content.containsAll( collection );
-    }
+	@Override @SuppressWarnings("ALL") public boolean containsAll(@NonNull final Collection<?> collection)
+	{
+		return this.content.containsAll( collection );
+	}
 
-    @Override
-    @SuppressWarnings("ALL")
-    public boolean addAll(@NonNull final Collection<? extends String> collection)
-    {
-        return this.content.addAll( collection );
-    }
+	@Override @SuppressWarnings("ALL") public boolean addAll(@NonNull final Collection<? extends String> collection)
+	{
+		return this.content.addAll( collection );
+	}
 
-    @Override
-    @SuppressWarnings("ALL")
-    public boolean removeAll(@NonNull final Collection<?> collection)
-    {
-        return this.content.removeAll( collection );
-    }
+	@Override @SuppressWarnings("ALL") public boolean removeAll(@NonNull final Collection<?> collection)
+	{
+		return this.content.removeAll( collection );
+	}
 
-    @Override
-    @SuppressWarnings("ALL")
-    public boolean retainAll(@NonNull final Collection<?> collection)
-    {
-        return this.content.retainAll( collection );
-    }
+	@Override @SuppressWarnings("ALL") public boolean retainAll(@NonNull final Collection<?> collection)
+	{
+		return this.content.retainAll( collection );
+	}
 
-    @Override
-    public void clear()
-    {
-        this.content.clear();
-    }
+	@Override public void clear()
+	{
+		this.content.clear();
+	}
 
-    /**
-     * Check if the list contains an item
-     *
-     * @param string Item
-     * @return True if the list contains the item, else false
-     */
-    public boolean contains(@NonNull final String string)
-    {
-        return this.content.contains( string );
-    }
+	/**
+	 * Check if the list contains an item
+	 *
+	 * @param string Item
+	 * @return True if the list contains the item, else false
+	 */
+	public boolean contains(@NonNull final String string)
+	{
+		return this.content.contains( string );
+	}
 
-    /**
-     * Convert the list to a string, joining with ","
-     * @return Joined list
-     */
-    @Override
-    public String toString()
-    {
-        return CollectionUtil.join( this.content, "," );
-    }
+	/**
+	 * Convert the list to a string, joining with ","
+	 *
+	 * @return Joined list
+	 */
+	@Override public String toString()
+	{
+		return CollectionUtil.join( this.content, "," );
+	}
 
-    @Override
-    public AsciiString toAsciiString()
-    {
-        return AsciiString.of( this.toString(), false );
-    }
+	@Override public AsciiString toAsciiString()
+	{
+		return AsciiString.of( this.toString(), false );
+	}
 
-    @Override
-    public int size()
-    {
-        return this.content.size();
-    }
+	@Override public int size()
+	{
+		return this.content.size();
+	}
 
-    @Override
-    public boolean isEmpty()
-    {
-        return this.content.isEmpty();
-    }
+	@Override public boolean isEmpty()
+	{
+		return this.content.isEmpty();
+	}
 
-    @Override
-    public boolean contains(@NonNull final Object o)
-    {
-        return o instanceof String && this.contains( (String) o );
-    }
+	@Override public boolean contains(@NonNull final Object o)
+	{
+		return o instanceof String && this.contains( ( String ) o );
+	}
 
-    /**
-     * Provide the item iterator. Delegate for {@link ArrayList#iterator()}
-     * @return list iterator
-     */
-    @Override
-    public Iterator<String> iterator()
-    {
-        return this.content.iterator();
-    }
+	/**
+	 * Provide the item iterator. Delegate for {@link ArrayList#iterator()}
+	 *
+	 * @return list iterator
+	 */
+	@Override public Iterator<String> iterator()
+	{
+		return this.content.iterator();
+	}
 
-    @Override
-    public Object[] toArray()
-    {
-        return this.content.toArray();
-    }
+	@Override public Object[] toArray()
+	{
+		return this.content.toArray();
+	}
 
-    @Override
-    @SuppressWarnings("ALL")
-    public <T> T[] toArray(@NonNull final T[] ts)
-    {
-        return this.content.toArray( ts );
-    }
+	@Override @SuppressWarnings("ALL") public <T> T[] toArray(@NonNull final T[] ts)
+	{
+		return this.content.toArray( ts );
+	}
 }

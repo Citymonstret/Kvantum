@@ -21,14 +21,13 @@
  */
 package xyz.kvantum.server.implementation;
 
+import java.io.IOException;
+import java.net.BindException;
+import java.net.ServerSocket;
 import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.logging.Logger;
-
-import java.io.IOException;
-import java.net.BindException;
-import java.net.ServerSocket;
 
 /**
  * Class responsible for finding appropriate ports
@@ -36,55 +35,54 @@ import java.net.ServerSocket;
 class ServerSocketFactory
 {
 
-    @Getter
-    private int serverSocketPort;
+	@Getter private int serverSocketPort;
 
-    /**
-     * Attempt to create a new server socket
-     *
-     * @return true if the socket was created, false if not
-     */
-    boolean createServerSocket()
-    {
-        int port = CoreConfig.port;
-        boolean bound = false;
+	/**
+	 * Attempt to create a new server socket
+	 *
+	 * @return true if the socket was created, false if not
+	 */
+	boolean createServerSocket()
+	{
+		int port = CoreConfig.port;
+		boolean bound = false;
 
-        while ( !bound )
-        {
-            try
-            {
-                ServerSocket serverSocket = new ServerSocket( port );
-                serverSocket.close();
-                bound = true;
-            } catch ( final BindException e )
-            {
-                if ( e.getMessage().startsWith( "Permission denied" ) )
-                {
-                    Message.SERVER_START_PORT_CHANGED_PRIVILEGED.log();
-                    port = 1024;
-                } else if ( e.getMessage().startsWith( "Address already in use" ) )
-                {
-                    Message.SERVER_START_PORT_CHANGED_OCCUPIED.log( port, ++port );
-                } else
-                {
-                    Logger.error( e.getMessage() );
-                    return false;
-                }
-            } catch ( IOException e )
-            {
-                e.printStackTrace();
-                return false;
-            }
-        }
+		while ( !bound )
+		{
+			try
+			{
+				ServerSocket serverSocket = new ServerSocket( port );
+				serverSocket.close();
+				bound = true;
+			} catch ( final BindException e )
+			{
+				if ( e.getMessage().startsWith( "Permission denied" ) )
+				{
+					Message.SERVER_START_PORT_CHANGED_PRIVILEGED.log();
+					port = 1024;
+				} else if ( e.getMessage().startsWith( "Address already in use" ) )
+				{
+					Message.SERVER_START_PORT_CHANGED_OCCUPIED.log( port, ++port );
+				} else
+				{
+					Logger.error( e.getMessage() );
+					return false;
+				}
+			} catch ( IOException e )
+			{
+				e.printStackTrace();
+				return false;
+			}
+		}
 
-        if ( port != CoreConfig.port )
-        {
-            Message.PORT_SWITCHED.log( CoreConfig.port, port );
-            CoreConfig.port = port;
-        }
+		if ( port != CoreConfig.port )
+		{
+			Message.PORT_SWITCHED.log( CoreConfig.port, port );
+			CoreConfig.port = port;
+		}
 
-        this.serverSocketPort = port;
-        return true;
-    }
+		this.serverSocketPort = port;
+		return true;
+	}
 
 }

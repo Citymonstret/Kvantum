@@ -21,10 +21,6 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
-import xyz.kvantum.files.Path;
-import xyz.kvantum.server.api.util.MapBuilder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,163 +28,158 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import lombok.NonNull;
+import xyz.kvantum.files.Path;
+import xyz.kvantum.server.api.util.MapBuilder;
 
 /**
- * Can be used to detect file structures
- * that could be served by the standard
- * library of {@link View views}
+ * Can be used to detect file structures that could be served by the standard library of {@link View views}
  */
-@SuppressWarnings({ "unused", "WeakerAccess" })
-public final class ViewDetector
+@SuppressWarnings({ "unused", "WeakerAccess" }) public final class ViewDetector
 {
 
-    private final String basePath;
-    private final Collection<String> ignore;
-    private final Path basePathObject;
-    private final Set<Path> paths = new HashSet<>();
-    private final Map<String, Map<String, Object>> viewEntries = new HashMap<>();
+	private final String basePath;
+	private final Collection<String> ignore;
+	private final Path basePathObject;
+	private final Set<Path> paths = new HashSet<>();
+	private final Map<String, Map<String, Object>> viewEntries = new HashMap<>();
 
-    public ViewDetector(@NonNull final String basePath,
-                        @NonNull final Path basePathObject,
-                        @NonNull final Collection<String> ignore)
-    {
-        this.basePath = basePath;
-        this.ignore = ignore;
-        this.basePathObject = basePathObject;
-    }
+	public ViewDetector(@NonNull final String basePath, @NonNull final Path basePathObject,
+			@NonNull final Collection<String> ignore)
+	{
+		this.basePath = basePath;
+		this.ignore = ignore;
+		this.basePathObject = basePathObject;
+	}
 
-    public int loadPaths()
-    {
-        this.paths.add( this.basePathObject );
-        this.addSubPaths( this.basePathObject );
-        return this.paths.size();
-    }
+	public int loadPaths()
+	{
+		this.paths.add( this.basePathObject );
+		this.addSubPaths( this.basePathObject );
+		return this.paths.size();
+	}
 
-    public Collection<Path> getPaths()
-    {
-        return new ArrayList<>( this.paths );
-    }
+	public Collection<Path> getPaths()
+	{
+		return new ArrayList<>( this.paths );
+	}
 
-    public Map<String, Map<String, Object>> getViewEntries()
-    {
-        return new HashMap<>( this.viewEntries );
-    }
+	public Map<String, Map<String, Object>> getViewEntries()
+	{
+		return new HashMap<>( this.viewEntries );
+	}
 
-    public void generateViewEntries()
-    {
-        this.paths.forEach( p -> loadSubPath( viewEntries, basePath, basePathObject.toString(), p ) );
-    }
+	public void generateViewEntries()
+	{
+		this.paths.forEach( p -> loadSubPath( viewEntries, basePath, basePathObject.toString(), p ) );
+	}
 
-    private void loadSubPath(final Map<String, Map<String, Object>> viewEntries,
-                             final String basePath,
-                             final String toRemove,
-                             final Path path)
-    {
-        String extension = null;
-        boolean moreThanOneType = false;
-        boolean hasIndex = false;
-        String indexExtension = "";
+	private void loadSubPath(final Map<String, Map<String, Object>> viewEntries, final String basePath,
+			final String toRemove, final Path path)
+	{
+		String extension = null;
+		boolean moreThanOneType = false;
+		boolean hasIndex = false;
+		String indexExtension = "";
 
-        for ( final Path subPath : path.getSubPaths( false ) )
-        {
-            if ( extension == null )
-            {
-                extension = subPath.getExtension();
-            } else if ( !extension.equalsIgnoreCase( subPath.getExtension() ) )
-            {
-                moreThanOneType = true;
-            }
-            if ( !hasIndex )
-            {
-                hasIndex = subPath.getEntityName().equals( "index" );
-                indexExtension = subPath.getExtension();
-            }
-        }
+		for ( final Path subPath : path.getSubPaths( false ) )
+		{
+			if ( extension == null )
+			{
+				extension = subPath.getExtension();
+			} else if ( !extension.equalsIgnoreCase( subPath.getExtension() ) )
+			{
+				moreThanOneType = true;
+			}
+			if ( !hasIndex )
+			{
+				hasIndex = subPath.getEntityName().equals( "index" );
+				indexExtension = subPath.getExtension();
+			}
+		}
 
-        if ( extension == null )
-        {
-            return;
-        }
+		if ( extension == null )
+		{
+			return;
+		}
 
-        final String type;
-        if ( moreThanOneType )
-        {
-            type = "std";
-        } else
-        {
-            switch ( extension )
-            {
-                case "html":
-                    type = "html";
-                    break;
-                case "js":
-                    type = "javascript";
-                    break;
-                case "css":
-                    type = "css";
-                    break;
-                case "png":
-                case "jpg":
-                case "jpeg":
-                case "ico":
-                    type = "img";
-                    break;
-                case "zip":
-                case "txt":
-                case "pdf":
-                    type = "download";
-                    break;
-                default:
-                    type = "std";
-                    break;
-            }
-        }
+		final String type;
+		if ( moreThanOneType )
+		{
+			type = "std";
+		} else
+		{
+			switch ( extension )
+			{
+			case "html":
+				type = "html";
+				break;
+			case "js":
+				type = "javascript";
+				break;
+			case "css":
+				type = "css";
+				break;
+			case "png":
+			case "jpg":
+			case "jpeg":
+			case "ico":
+				type = "img";
+				break;
+			case "zip":
+			case "txt":
+			case "pdf":
+				type = "download";
+				break;
+			default:
+				type = "std";
+				break;
+			}
+		}
 
-        final String folder = "./" + path.toString();
-        final String viewPattern;
-        if ( moreThanOneType )
-        {
-            if ( hasIndex )
-            {
-                viewPattern = ( path.toString().replace( toRemove, basePath ) ) +
-                        "[file=index].[extension=" + indexExtension + "]";
-            } else
-            {
-                viewPattern = ( path.toString().replace( toRemove, basePath ) ) + "<file>.<extension>";
-            }
-        } else
-        {
-            if ( hasIndex )
-            {
-                viewPattern = ( path.toString().replace( toRemove, basePath ) ) +
-                        "[file=index].[extension=" + indexExtension + "]";
-            } else
-            {
-                viewPattern = ( path.toString().replace( toRemove, basePath ) ) + "<file>." + extension;
-            }
-        }
+		final String folder = "./" + path.toString();
+		final String viewPattern;
+		if ( moreThanOneType )
+		{
+			if ( hasIndex )
+			{
+				viewPattern =
+						( path.toString().replace( toRemove, basePath ) ) + "[file=index].[extension=" + indexExtension
+								+ "]";
+			} else
+			{
+				viewPattern = ( path.toString().replace( toRemove, basePath ) ) + "<file>.<extension>";
+			}
+		} else
+		{
+			if ( hasIndex )
+			{
+				viewPattern =
+						( path.toString().replace( toRemove, basePath ) ) + "[file=index].[extension=" + indexExtension
+								+ "]";
+			} else
+			{
+				viewPattern = ( path.toString().replace( toRemove, basePath ) ) + "<file>." + extension;
+			}
+		}
 
-        final Map<String, Object> info = MapBuilder.<String, Object>newHashMap()
-                .put( "filter", viewPattern )
-                .put( "options", MapBuilder.newHashMap()
-                        .put( "folder", folder )
-                        .get() )
-                .put( "type", type ).get();
+		final Map<String, Object> info = MapBuilder.<String, Object>newHashMap().put( "filter", viewPattern )
+				.put( "options", MapBuilder.newHashMap().put( "folder", folder ).get() ).put( "type", type ).get();
 
-        viewEntries.put( UUID.randomUUID().toString(), info );
-    }
+		viewEntries.put( UUID.randomUUID().toString(), info );
+	}
 
-    private void addSubPaths(final Path path)
-    {
-        for ( final Path subPath : path.getSubPaths() )
-        {
-            if ( !subPath.isFolder() || ignore.contains( subPath.getEntityName() ) )
-            {
-                continue;
-            }
-            paths.add( subPath );
-            addSubPaths( subPath );
-        }
-    }
+	private void addSubPaths(final Path path)
+	{
+		for ( final Path subPath : path.getSubPaths() )
+		{
+			if ( !subPath.isFolder() || ignore.contains( subPath.getEntityName() ) )
+			{
+				continue;
+			}
+			paths.add( subPath );
+			addSubPaths( subPath );
+		}
+	}
 
 }
