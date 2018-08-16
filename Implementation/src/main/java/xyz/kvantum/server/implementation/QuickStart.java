@@ -33,7 +33,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 {
 
 	/**
-	 * Utility method that creates and starts a new standalone server. It will register any request handlers passed as
+	 * Utility method that creates a new standalone server instance. It will register any request handlers passed as
 	 * arguments, and scan for annotations in the case that non request handler objects are passed
 	 *
 	 * @param classes Request handlers to register in the router
@@ -68,18 +68,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 					throw new IllegalArgumentException( "No views declarations found in " + object );
 				}
 			}
-		}
-		final boolean status;
-		try
-		{
-			status = kvantum.start();
-		} catch ( final Exception e )
-		{
-			throw new ServerStartFailureException( e );
-		}
-		if ( !status )
-		{
-			throw new ServerStartFailureException();
 		}
 		return kvantum;
 	}

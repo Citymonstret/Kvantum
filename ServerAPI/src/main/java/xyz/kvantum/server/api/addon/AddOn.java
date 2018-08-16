@@ -33,7 +33,9 @@ import xyz.kvantum.server.api.logging.LogProvider;
 import java.util.UUID;
 
 /**
- * Abstract class used to declare an addon
+ * Abstract class used to declare an addon.
+ * All addons should have a main class that
+ * extends this class.
  */
 @SuppressWarnings("WeakerAccess")
 @EqualsAndHashCode
@@ -53,6 +55,9 @@ public abstract class AddOn implements LogProvider
     @Setter(AccessLevel.PACKAGE)
     private String name;
 
+    /**
+     * Enable the plugin
+     */
     void enable()
     {
         if ( this.isEnabled() )
@@ -63,6 +68,9 @@ public abstract class AddOn implements LogProvider
         this.setEnabled( true );
     }
 
+    /**
+     * Disable the plugin
+     */
     void disable()
     {
         if ( !this.isEnabled() )

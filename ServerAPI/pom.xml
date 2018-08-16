@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>Kvantum</groupId>
   <artifactId>ServerAPI</artifactId>
@@ -84,10 +83,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -140,10 +139,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -196,16 +195,16 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-        <groupId>com.github.rutledgepaulv</groupId>
-        <artifactId>rest-query-engine</artifactId>
-        <version>0.7.1</version>
+      <groupId>com.github.rutledgepaulv</groupId>
+      <artifactId>rest-query-engine</artifactId>
+      <version>0.7.1</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -252,16 +251,16 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-        <groupId>org.jline</groupId>
-        <artifactId>jline</artifactId>
-        <version>3.5.1</version>
+      <groupId>org.jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>3.5.1</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -308,10 +307,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -364,10 +363,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -420,10 +419,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -476,10 +475,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -532,10 +531,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -588,10 +587,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -644,10 +643,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -700,10 +699,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -756,16 +755,16 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-        <groupId>com.github.Hervian</groupId>
+      <groupId>com.github.Hervian</groupId>
       <artifactId>lambda-factory</artifactId>
-        <version>91bc62f8c2</version>
+      <version>91bc62f8c2</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -812,68 +811,68 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
-      <dependency>
-          <groupId>com.github.staminapw</groupId>
-          <artifactId>causam</artifactId>
-          <version>efb517dfaa</version>
-          <scope>compile</scope>
-          <exclusions>
-              <exclusion>
-                  <artifactId>hadoop-auth</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>hadoop-mapreduce-client-core</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>hadoop-hdfs</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>hadoop-annotations</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>netty</artifactId>
-                  <groupId>io.netty</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>hadoop-mapreduce-client-common</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>cglib-nodep</artifactId>
-                  <groupId>net.sf.cglib</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>servlet-api</artifactId>
-                  <groupId>tomcat</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>hadoop-common</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>netty</artifactId>
-                  <groupId>org.jboss.netty</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
-                  <groupId>org.apache.hadoop</groupId>
-              </exclusion>
-              <exclusion>
-                  <artifactId>jcuda</artifactId>
-                  <groupId>jcuda</groupId>
-              </exclusion>
-          </exclusions>
-      </dependency>
+    <dependency>
+      <groupId>com.github.staminapw</groupId>
+      <artifactId>causam</artifactId>
+      <version>efb517dfaa</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hadoop-auth</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hadoop-mapreduce-client-core</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hadoop-hdfs</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hadoop-annotations</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>netty</artifactId>
+          <groupId>io.netty</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hadoop-mapreduce-client-common</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>cglib-nodep</artifactId>
+          <groupId>net.sf.cglib</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>tomcat</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hadoop-common</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>netty</artifactId>
+          <groupId>org.jboss.netty</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+          <groupId>org.apache.hadoop</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>Kvantum</groupId>
       <artifactId>FileSystem</artifactId>
@@ -924,10 +923,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -980,10 +979,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -1036,10 +1035,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -1092,10 +1091,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -1148,10 +1147,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -1204,10 +1203,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -1260,10 +1259,10 @@
           <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
           <groupId>org.apache.hadoop</groupId>
         </exclusion>
-          <exclusion>
-              <artifactId>jcuda</artifactId>
-              <groupId>jcuda</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>jcuda</artifactId>
+          <groupId>jcuda</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
   </dependencies>
