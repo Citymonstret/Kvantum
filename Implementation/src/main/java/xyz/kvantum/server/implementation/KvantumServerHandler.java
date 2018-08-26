@@ -395,29 +395,38 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 	@SuppressWarnings("ALL") private void sendResponse(final ChannelHandlerContext context)
 	{
+		// Determine whether or not the responce should be compressed
 		workerContext.determineGzipStatus();
 
+		// Get the generated body
 		ResponseBody body = workerContext.getBody();
 		byte[] bytes = workerContext.getBytes();
 
-		final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
-
+		// Make sure that the generated response is valid (not null)
+		// TODO: Add more checks
 		Assert.notNull( bytes );
 		Assert.notNull( body );
 		Assert.notNull( body.getHeader() );
 
+		// Retrieve an Md5Handler from the handler pool
+		final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
+		// Generate the md5 checksum
 		final String checksum = md5Handler.generateChecksum( bytes );
 
+		// Update the headers to include the md5 checksum
 		body.getHeader().set( Header.HEADER_CONTENT_MD5, checksum );
 		body.getHeader().set( Header.HEADER_ETAG, checksum );
 
+		// Return the md5 handler to the pool
 		SimpleServer.md5HandlerPool.add( md5Handler );
 
+		// Add a Last-Modified if it isn't already present in the response
 		if ( !body.getHeader().get( Header.HEADER_LAST_MODIFIED ).isPresent() )
 		{
 			body.getHeader().set( Header.HEADER_LAST_MODIFIED, TimeUtil.getHTTPTimeStamp() );
 		}
 
+		// If gzip compression is supported, compress the response
 		if ( workerContext.isGzip() )
 		{
 			try
@@ -435,6 +444,7 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			}
 		}
 
+		// Output debug messages
 		if ( CoreConfig.debug )
 		{
 			DebugTree.builder().name( "Response Information" )
@@ -442,6 +452,7 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 					.entry( "Headers", body.getHeader().getHeaders() ).build().collect().forEach( Logger::debug );
 		}
 
+		// Determine whether to keep the connection alive
 		final boolean keepAlive;
 		if ( workerContext.getRequest().getHeaders().getOrDefault( CONNECTION, CLOSE ).equalsIgnoreCase( KEEP_ALIVE ) )
 		{
@@ -462,11 +473,11 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			body.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
 		}
 
+		// Alocate a byte buffer
+		// TODO: Make sure that we can fit the entire response in the buffer
 		final ByteBuf buf = context.alloc().buffer( CoreConfig.Buffer.out );
 
-		//
-		// Send the header to the client
-		//
+		// Write the header
 		buf.writeBytes( body.getHeader().getFormat().getValue() );
 		buf.writeBytes( SPACE );
 		buf.writeBytes( body.getHeader().getStatus().getValue() );
@@ -485,17 +496,14 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		// Write body
 		buf.writeBytes( bytes );
 
-		//
 		// Invalidate request to make sure that it isn't handled anywhere else, again (wouldn't work)
-		//
 		workerContext.getRequest().setValid( false );
 
+		// Intialize a finalized response builder (used for logging)
 		final FinalizedResponse.FinalizedResponseBuilder finalizedResponse = FinalizedResponse.builder();
 
-		//
 		// Safety measure taken to make sure that IPs are not logged
 		// in production mode. This is is to ensure GDPR compliance
-		//
 		if ( CoreConfig.debug )
 		{
 			finalizedResponse.address( this.workerContext.getSocketContext().getIP() );
@@ -508,9 +516,7 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 				.query( this.workerContext.getRequest().getQuery() ).timeFinished( System.currentTimeMillis() ).build();
 		ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse );
 
-		//
 		// Make sure everything is written
-		//
 		final ChannelFuture future = context.writeAndFlush( buf );
 		if ( keepAlive )
 		{
