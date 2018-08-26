@@ -345,7 +345,10 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			if ( CoreConfig.debug )
 			{
 				body = new ViewException( e ).generate( request );
-				bytes = body.getContent().getBytes();
+				if ( body != null )
+				{
+					bytes = body.getContent().getBytes();
+				}
 			} else
 			{
 				body = null;
