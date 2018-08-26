@@ -30,6 +30,7 @@ import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.request.AbstractRequest.QueryParameters;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -44,7 +45,7 @@ class KvantumObjectFactoryTest
 		//
 		final KvantumObjectFactory<MockObject> factory = KvantumObjectFactory.from( MockObject.class );
 		MockRequest mockRequest = new MockRequest(
-				new AbstractRequest.Query( HttpMethod.POST, ProtocolType.HTTP, "/?koala=animal" ) );
+				AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( HttpMethod.POST, ProtocolType.HTTP, "/?koala=animal" ) ) );
 		KvantumObjectParserResult<MockObject> result = factory.build( ParameterScope.GET ).parseRequest( mockRequest );
 		Assertions.assertNotNull( result );
 		Assertions.assertTrue( result.isSuccess() );
@@ -57,7 +58,7 @@ class KvantumObjectFactoryTest
 		//
 		// Test if the validation fails (minimum size of string1 is 2, but provided string size is 1)
 		//
-		mockRequest = new MockRequest( new AbstractRequest.Query( HttpMethod.POST, ProtocolType.HTTP, "/?koala=a" ) );
+		mockRequest = new MockRequest( AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( HttpMethod.POST, ProtocolType.HTTP, "/?koala=a" ) ) );
 		result = factory.build( ParameterScope.GET ).parseRequest( mockRequest );
 		Assertions.assertNotNull( result );
 		Assertions.assertFalse( result.isSuccess() );

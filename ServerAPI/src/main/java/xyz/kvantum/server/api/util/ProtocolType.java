@@ -23,15 +23,21 @@ package xyz.kvantum.server.api.util;
 
 import java.util.Locale;
 import java.util.Optional;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Protocol implementation enum
  */
+@RequiredArgsConstructor
 public enum ProtocolType
 {
 
-	HTTP, HTTPS;
+	HTTP("http"), HTTPS("https");
+
+	@Getter
+	private final String string;
 
 	/**
 	 * Match a string to a {@link ProtocolType}, if possible

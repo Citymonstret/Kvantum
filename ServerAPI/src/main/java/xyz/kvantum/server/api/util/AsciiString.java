@@ -187,7 +187,7 @@ import lombok.NonNull;
 		{
 			return false;
 		}
-		for ( int i = 0; 0 < this.value.length; i++ )
+		for ( int i = 0; i < this.value.length; i++ )
 		{
 			if ( this.value[i] != other[i] )
 			{

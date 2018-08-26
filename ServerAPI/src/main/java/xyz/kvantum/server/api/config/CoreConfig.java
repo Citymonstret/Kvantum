@@ -166,6 +166,7 @@ import java.util.List;
 		public static int cachedFilesExpiry = 60 * 60 * 24;
 		public static int cachedFilesMaxItems = 1000;
 		public static int cachedSessionsMaxItems = 1000;
+		public static int cachedQueryMinimumAccesses = 10;
 	}
 
 	@ConfigSection(name = "mongodb") public static class MongoDB

@@ -26,24 +26,36 @@ import com.google.common.collect.ListMultimap;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.ToString;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.config.CoreConfig.Cache;
 import xyz.kvantum.server.api.config.Message;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.memguard.LeakageProne;
+import xyz.kvantum.server.api.memguard.MemoryGuard;
 import xyz.kvantum.server.api.request.post.PostRequest;
 import xyz.kvantum.server.api.response.ResponseCookie;
 import xyz.kvantum.server.api.session.ISession;
@@ -216,10 +228,8 @@ import xyz.kvantum.server.api.util.VariableProvider;
 		meta.put( name, var );
 	}
 
-	public void internalRedirect(final String url)
+	public void internalRedirect(@NonNull final String url)
 	{
-		Assert.notNull( url );
-
 		this.addMeta( INTERNAL_REDIRECT, newRequest( url ) );
 		Message.INTERNAL_REDIRECT.log( url );
 	}
@@ -278,28 +288,84 @@ import xyz.kvantum.server.api.util.VariableProvider;
 
 	public abstract void dumpRequest();
 
+	public final static class QueryCache implements LeakageProne
+	{
+
+		@Getter
+		private static final QueryCache instance = new QueryCache();
+
+		private final Map<QueryParameters, Query> cachedQueries = new ConcurrentHashMap<>();
+
+		private QueryCache()
+		{
+			MemoryGuard.getInstance().register( this );
+		}
+
+		@Override public void cleanUp()
+		{
+			final Collection<QueryParameters> toRemove = new ArrayList<>();
+			for ( Entry<QueryParameters, Query> entry : cachedQueries.entrySet() )
+			{
+				if ( entry.getValue().accesses.get() < Cache.cachedQueryMinimumAccesses )
+				{
+					toRemove.add( entry.getKey() );
+				}
+			}
+			toRemove.forEach( cachedQueries::remove );
+		}
+
+		public Query getQuery(@NonNull final QueryParameters parameters)
+		{
+			final Query query;
+			if ( this.cachedQueries.containsKey( parameters ) )
+			{
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Query fetched from cache: " + parameters );
+				}
+				query = this.cachedQueries.get( parameters );
+			} else
+			{
+				query = new Query( parameters );
+				this.cachedQueries.put( parameters, query );
+			}
+			return query;
+		}
+
+	}
+
+	@EqualsAndHashCode
+	@RequiredArgsConstructor
+	@Getter
+	@ToString
+	public static final class QueryParameters
+	{
+
+		@NonNull final HttpMethod method;
+		@NonNull final ProtocolType protocolType;
+		@NonNull final String resource;
+
+	}
+
 	/**
 	 * The query, for example: "http://localhost/query?example=this"
 	 */
-	final public static class Query
+	public final static class Query
 	{
 
+		@Getter private final AtomicInteger accesses = new AtomicInteger( 0 );
 		@Getter private final HttpMethod method;
 		@Getter private final String resource;
 		@Getter private final Map<String, String> parameters = new HashMap<>();
 
 		/**
 		 * The query constructor
-		 *
-		 * @param method Request Method
-		 * @param resource The requested resource
 		 */
-		public Query(@NonNull final HttpMethod method, @NonNull final ProtocolType protocolType,
-				@NonNull final String resource)
+		private Query(@NonNull final QueryParameters parameters)
 		{
-			String resourceName = resource;
+			String resourceName = parameters.resource;
 
-			final String illegalBeginning = protocolType == ProtocolType.HTTP ? "http" : "https";
+			final String illegalBeginning = parameters.protocolType == ProtocolType.HTTP ? "http" : "https";
 
 			if ( resourceName.startsWith( illegalBeginning ) )
 			{
@@ -313,16 +379,16 @@ import xyz.kvantum.server.api.util.VariableProvider;
 				resourceName = StringUtils.split( resourceName.substring( ignoredChars ), "/", 2 )[ 1 ];
 			}
 
-			this.method = method;
+			this.method = parameters.method;
 			if ( resourceName.contains( "?" ) )
 			{
-				final String[] parts = resource.split( "\\?" );
+				final String[] parts = parameters.resource.split( "\\?" );
 				if ( parts.length > 1 )
 				{
-					String parameters = parts[ 1 ];
+					String params = parts[ 1 ];
 					try
 					{
-						parameters = URLDecoder.decode( parameters, StandardCharsets.UTF_8.toString() );
+						params = URLDecoder.decode( params, StandardCharsets.UTF_8.toString() );
 					} catch ( final UnsupportedEncodingException ignore )
 					{
 						if ( CoreConfig.debug )
@@ -330,7 +396,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 							ignore.printStackTrace();
 						}
 					}
-					final String[] subParts = parameters.split( "&" );
+					final String[] subParts = params.split( "&" );
 					resourceName = parts[ 0 ];
 					for ( final String part : subParts )
 					{
@@ -366,7 +432,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 	/**
 	 * Used to handle HTTP authentication
 	 */
-	@SuppressWarnings("unused") final public static class Authorization
+	@SuppressWarnings("unused") public final static class Authorization
 	{
 
 		@Getter private final AsciiString mechanism;

@@ -32,6 +32,7 @@ import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.RequestException;
+import xyz.kvantum.server.api.request.AbstractRequest.QueryParameters;
 import xyz.kvantum.server.api.util.AsciiString;
 
 @SuppressWarnings({ "unused", "WeakerAccess" }) @UtilityClass public final class RequestCompiler
@@ -42,6 +43,11 @@ import xyz.kvantum.server.api.util.AsciiString;
 					+ "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?" );
 	private static final Pattern PATTERN_HEADER = Pattern.compile( "(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)" );
 
+	private static final String KEY = "key";
+	private static final String VALUE = "value";
+	private static final String METHOD = "method";
+	private static final String RESOURCE = "resource";
+
 	public static Optional<HeaderPair> compileHeader(@NonNull final String line)
 	{
 		final Matcher matcher = PATTERN_HEADER.matcher( line );
@@ -49,8 +55,8 @@ import xyz.kvantum.server.api.util.AsciiString;
 		{
 			return Optional.empty();
 		}
-		final AsciiString key = AsciiString.of( matcher.group( "key" ).toLowerCase( Locale.ENGLISH ) );
-		final AsciiString value = AsciiString.of( matcher.group( "value" ), false );
+		final AsciiString key = AsciiString.of( matcher.group( KEY ).toLowerCase( Locale.ENGLISH ) );
+		final AsciiString value = AsciiString.of( matcher.group( VALUE ), false );
 		return Optional.of( new HeaderPair( key, value ) );
 	}
 
@@ -66,13 +72,15 @@ import xyz.kvantum.server.api.util.AsciiString;
 		{
 			ServerImplementation.getImplementation().log( "Query: " + matcher.group() );
 		}
-		final Optional<HttpMethod> methodOptional = HttpMethod.getByName( matcher.group( "method" ) );
+		final Optional<HttpMethod> methodOptional = HttpMethod.getByName( matcher.group( METHOD ) );
 		if ( !methodOptional.isPresent() )
 		{
-			throw new RequestException( "Unknown request method: " + matcher.group( "method" ), request );
+			throw new RequestException( "Unknown request method: " + matcher.group( METHOD ), request );
 		}
-		request.setQuery( new AbstractRequest.Query( methodOptional.get(), request.getProtocolType(),
-				matcher.group( "resource" ) ) );
+		// request.setQuery( new AbstractRequest.Query( methodOptional.get(), request.getProtocolType(),
+		// 		matcher.group( RESOURCE ) ) );
+		request.setQuery( AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( methodOptional.get(),
+				request.getProtocolType(), matcher.group( RESOURCE ) ) ) );
 	}
 
 	@Getter @RequiredArgsConstructor public static final class HeaderPair
