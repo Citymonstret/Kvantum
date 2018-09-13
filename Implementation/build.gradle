@@ -49,7 +49,7 @@ dependencies {
     compile 'org.mongodb:mongo-java-driver:3.6.1'
     compile 'org.mongodb.morphia:morphia:1.3.2'
     // Cache manager
-    compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
+    compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
     // Makes code pretty
     compileOnly 'org.projectlombok:lombok:1.16.18'
     // HikariCP, SQL connection pooling
