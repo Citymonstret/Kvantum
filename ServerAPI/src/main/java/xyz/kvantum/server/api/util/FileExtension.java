@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Optional;
 import xyz.kvantum.server.api.response.Header;
 
+/**
+ * Basic file and MIME info associated with file extensions / types
+ */
+@SuppressWarnings( "unused" )
 public enum FileExtension
 {
 	CSS( new String[] { "css", }, Header.CONTENT_TYPE_CSS, "/* {cmt} */" ), HTML(

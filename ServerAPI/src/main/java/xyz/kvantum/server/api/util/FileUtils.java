@@ -43,7 +43,7 @@ import xyz.kvantum.server.api.logging.Logger;
 /**
  * Utility class for common File operations (both NIO and IO types)
  */
-@UtilityClass public class FileUtils
+@UtilityClass public final class FileUtils
 {
 
 	/**
@@ -106,6 +106,12 @@ import xyz.kvantum.server.api.logging.Logger;
 		}
 	}
 
+	/**
+	 * Attempt to create a folder. Logs a debug message if the folder couldn't be created
+	 *
+	 * @param folder Folder to create
+	 * @return Input (regardless if created or not)
+	 */
 	public static File attemptFolderCreation(@NonNull final File folder)
 	{
 		if ( !folder.exists() && !folder.mkdirs() )
@@ -116,7 +122,7 @@ import xyz.kvantum.server.api.logging.Logger;
 	}
 
 	/**
-	 * Copy a file from one location to another
+	 * Copy a file from one location to another. Prints all exceptions.
 	 *
 	 * @param in Ingoing File
 	 * @param out Outgoing File
@@ -124,8 +130,7 @@ import xyz.kvantum.server.api.logging.Logger;
 	 */
 	public static void copyFile(@NonNull final InputStream in, @NonNull final OutputStream out, final int size)
 	{
-		Assert.notNull( in );
-		Assert.notNull( out );
+		Assert.isPositive( size ); // Make sure that the buffer size is always a positive number
 		try
 		{
 			final byte[] buffer = new byte[ size ];

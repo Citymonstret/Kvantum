@@ -42,42 +42,56 @@ import xyz.kvantum.server.api.request.Cookie;
 
 	private static final Pattern PATTERN_COOKIE = Pattern.compile( "(?<key>[A-Za-z0-9_\\-]*)=" + "(?<value>.*)?" );
 	private static final ListMultimap<AsciiString, Cookie> EMPTY_COOKIES = ArrayListMultimap.create( 0, 0 );
+	private static final String CONST_COOKIE = "Cookie";
+	private static final String CONST_SLASH_S = "\\s";
+	private static final String CONST_EMPTY = "";
+	private static final String CONST_SEMI_COLON = ";";
+	private static final String CONST_KEY = "key";
+	private static final String CONST_VALUE = "value";
+
+	private static ListMultimap<AsciiString, Cookie> createNewMap()
+	{
+		return MultimapBuilder.hashKeys().arrayListValues().build();
+	}
 
 	/**
 	 * Get all cookies from a HTTP Request
 	 *
-	 * @param r HTTP Request
+	 * @param request HTTP Request
 	 * @return an array containing the cookies
 	 */
-	public static ListMultimap<AsciiString, Cookie> getCookies(@NonNull final AbstractRequest r)
+	public static ListMultimap<AsciiString, Cookie> getCookies(@NonNull final AbstractRequest request)
 	{
-		Assert.isValid( r );
-
-		final String raw = r.getHeader( "Cookie" ).toString().replaceAll( "\\s", "" );
-
+		// Assert that the request is still valid
+		Assert.isValid( request );
+		// Extract the cookie header
+		final String raw = request.getHeader( CONST_COOKIE ).toString().replaceAll( CONST_SLASH_S, CONST_EMPTY );
+		// Avoid unnecessary logic
 		if ( raw.isEmpty() )
 		{
 			return EMPTY_COOKIES;
 		}
-
-		final ListMultimap<AsciiString, Cookie> cookies = MultimapBuilder.hashKeys().arrayListValues().build();
-
-		final StringTokenizer cookieTokenizer = new StringTokenizer( raw, ";" );
+		// Create a new multimap
+		final ListMultimap<AsciiString, Cookie> cookies = createNewMap();
+		// Create a new tokenizer to extract the individual cookies
+		final StringTokenizer cookieTokenizer = new StringTokenizer( raw, CONST_SEMI_COLON );
+		// Loop through all the tokens
 		while ( cookieTokenizer.hasMoreTokens() )
 		{
 			final String cookieString = cookieTokenizer.nextToken();
-
+			// Match the cookie to a regex (to extract the parts)
 			final Matcher matcher = PATTERN_COOKIE.matcher( cookieString );
 			if ( matcher.matches() )
 			{
-				final AsciiString key = AsciiString.of( matcher.group( "key" ) );
+				final AsciiString key = AsciiString.of( matcher.group( CONST_KEY ) );
+				// Cookies don't necessarily have values
 				final AsciiString value = matcher.groupCount() < 2
 						? AsciiString.empty
-						: AsciiString.of( matcher.group( "value" ), false );
+						: AsciiString.of( matcher.group( CONST_VALUE ), false );
+				// Store the cookie in the map
 				cookies.put( key, new Cookie( key, value ) );
 			}
 		}
-
 		return cookies;
 	}
 
