@@ -55,7 +55,7 @@ dependencies {
     // HikariCP, SQL connection pooling
     compile 'com.zaxxer:HikariCP:2.7.8'
     // SQLite Driver
-    runtime group: 'org.xerial', name: 'sqlite-jdbc', version: '3.21.0.1'
+    runtime group: 'org.xerial', name: 'sqlite-jdbc', version: '3.25.2'
     // MySQL Driver
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
     // Program argument parser
