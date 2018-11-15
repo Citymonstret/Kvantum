@@ -16,6 +16,7 @@ framework written in Java. For support, submit a new
 You can see the current progress [here](https://github.com/IntellectualSites/Kvantum/blob/master/PROGRESS.md) along with *W.I.P* and *TODO*'s. 
 
 [![Project Stats](https://www.openhub.net/p/Kvantum/widgets/project_thin_badge.gif)](https://www.openhub.net/p/Kvantum)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSauilitired%2FKvantum.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSauilitired%2FKvantum?ref=badge_shield)
 
 Travis CI:
 [![Build Status](https://travis-ci.org/IntellectualSites/Kvantum.svg?branch=master)](https://travis-ci.org/IntellectualSites/Kvantum)
@@ -110,3 +111,7 @@ $ git clone git://github.com/IntellectualSites/Kvantum.git
 $ cd Kvantum
 $ ./gradlew.bat :build
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSauilitired%2FKvantum.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSauilitired%2FKvantum?ref=badge_large)
