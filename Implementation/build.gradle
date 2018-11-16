@@ -49,7 +49,7 @@ dependencies {
     compile 'org.mongodb:mongo-java-driver:3.6.1'
     compile 'org.mongodb.morphia:morphia:1.3.2'
     // Cache manager
-    compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
+    compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
     // Makes code pretty
     compileOnly 'org.projectlombok:lombok:1.16.18'
     // HikariCP, SQL connection pooling
@@ -63,7 +63,7 @@ dependencies {
     // Netty
     compile group: 'io.netty', name: 'netty-all', version: '4.1.19.Final'
     // Netty native transports
-    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.19.Final',
+    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.29.Final',
             classifier: 'linux-x86_64'
     //
     // Modules
