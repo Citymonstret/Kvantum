@@ -102,6 +102,7 @@ import xyz.kvantum.server.api.util.TimeUtil;
 	public static final HeaderOption X_CONTENT_TYPE_OPTIONS = HeaderOption.create( "X-Content-Type-Options" );
 	public static final HeaderOption X_FRAME_OPTIONS = HeaderOption.create( "X-Frame-Options" );
 	public static final HeaderOption CONTENT_SECURITY_POLICY = HeaderOption.create( "Content-Security-Policy" );
+	public static final HeaderOption X_FORWARDED_FOR = HeaderOption.create( "X-Forwarded-For" );
 
 	/**
 	 * Specifying which web sites can participate in cross-origin resource sharing

@@ -365,7 +365,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 		{
 			String resourceName = parameters.resource;
 
-			final String illegalBeginning = parameters.protocolType == ProtocolType.HTTP ? "http" : "https";
+			final String illegalBeginning = parameters.protocolType.getString();
 
 			if ( resourceName.startsWith( illegalBeginning ) )
 			{
@@ -434,8 +434,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 	 */
 	@SuppressWarnings("unused") public final static class Authorization
 	{
-
-		@Getter private final AsciiString mechanism;
+ 		@Getter private final AsciiString mechanism;
 		@Getter private final AsciiString username;
 		@Getter private final AsciiString password;
 
