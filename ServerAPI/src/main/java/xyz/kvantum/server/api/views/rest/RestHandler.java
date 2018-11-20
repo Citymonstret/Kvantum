@@ -110,7 +110,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax
 		response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
 		response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
 		response.getHeader().set( Header.CONTENT_SECURITY_POLICY, "default-src 'none'" );
-		response.setContent( jsonObject.toString() );
+		response.setResponse( jsonObject.toString() );
 		return response;
 	}
 

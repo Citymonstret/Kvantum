@@ -54,7 +54,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	private ResponseBody body;
 	private boolean gzip;
 	private SocketContext socketContext;
-	private byte[] bytes;
 
 	/**
 	 * TODO: I am fairly confident this would be better somewhere else

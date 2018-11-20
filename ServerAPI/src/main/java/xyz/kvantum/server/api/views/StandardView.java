@@ -79,7 +79,7 @@ public class StandardView extends StaticFileView implements CacheApplicable
 			response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION,
 					String.format( "attachment; filename=\"%s.%s\"", fileName, extension.getOption() ) );
 			response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
-			response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
+			// response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
 		}
 		break;
 		default:

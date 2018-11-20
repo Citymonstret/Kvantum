@@ -62,7 +62,7 @@ public final class HTTPSRedirectHandler extends SimpleRequestHandler
 		final String responseBodyBuilder =
 				"<h1>Redirecting...</h1>\n<p>If the request isn't redirecting," + " click: " + "<a href=\"" + urlBuilder
 						.toString() + "\" title=\"HTTPS Redirect\">" + urlBuilder.toString() + "</a>";
-		response.setContent( responseBodyBuilder );
+		response.setResponse( responseBodyBuilder );
 	};
 
 	@Getter private static final HTTPSRedirectHandler instance = new HTTPSRedirectHandler();

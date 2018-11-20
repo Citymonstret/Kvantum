@@ -96,7 +96,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 					final JsonObject requestStatus = new JsonObject();
 					requestStatus.add( "status", new JsonPrimitive( "error" ) );
 					requestStatus.add( "message", new JsonPrimitive( "Not permitted" ) );
-					response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+					response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 					return;
 				}
 			}
@@ -109,7 +109,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 				{
 					final JsonObject requestStatus = new JsonObject();
 					requestStatus.add( "message", new JsonPrimitive( "No value for key " + queryKey + "was found" ) );
-					response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+					response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 					return;
 				} else
 				{
@@ -121,7 +121,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 				{
 					final JsonObject requestStatus = new JsonObject();
 					requestStatus.add( "message", new JsonPrimitive( "No value for key " + queryKey + "was found" ) );
-					response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+					response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 					return;
 				} else
 				{
@@ -136,7 +136,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 				requestStatus.add( "status", new JsonPrimitive( "error" ) );
 				requestStatus.add( "message", new JsonPrimitive( "No such object" ) );
 				requestStatus.add( "query", new JsonPrimitive( query ) );
-				response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+				response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 			} else
 			{
 				final JsonObject requestStatus = new JsonObject();
@@ -148,7 +148,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 					resultArray.add( ServerImplementation.getImplementation().getGson().toJsonTree( t ) );
 				}
 				requestStatus.add( "result", resultArray );
-				response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+				response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 			}
 		} ) );
 	}

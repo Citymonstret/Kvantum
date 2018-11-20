@@ -21,12 +21,18 @@
  */
 package xyz.kvantum.server.api.views;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.config.CoreConfig.Buffer;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.FilePattern;
@@ -34,6 +40,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.response.ResponseStream;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.TimeUtil;
 
@@ -93,19 +100,69 @@ import xyz.kvantum.server.api.util.TimeUtil;
 		final Path path = ( Path ) r.getMeta( "file" );
 		final FileExtension extension = ( FileExtension ) r.getMeta( "extension" );
 		response.getHeader().set( Header.HEADER_CONTENT_TYPE, extension.getContentType() );
-		if ( extension.getReadType() == FileExtension.ReadType.BYTES || !ServerImplementation.getImplementation()
-				.getProcedure().hasHandlers() )
+		final java.nio.file.Path javaPath = path.getJavaPath();
+
+		final long fileLength = path.length();
+
+		if ( fileLength > CoreConfig.Buffer.files ) // Large files won't be read into memory
 		{
 			if ( CoreConfig.debug )
 			{
-				Logger.debug( "Serving {} using byte[]", this );
+				Logger.debug( "Reading chunks of '{0}' (too big to store into primary memory: {1} > {2})", path, fileLength, CoreConfig.Buffer.files );
 			}
-			response.setBytes( path.readBytes() );
+			final InputStream inputStream;
+			final ResponseStream responseStream = new ResponseStream();
+			try
+			{
+				inputStream = new FileInputStream( javaPath.toFile() );
+			} catch ( final FileNotFoundException e )
+			{
+				e.printStackTrace();
+				return;
+			}
+			response.setResponse( responseStream );
+			final Consumer<Integer> writer = accepted -> {
+				byte[] bytes = new byte[ accepted ];
+				try
+				{
+					inputStream.read( bytes, responseStream.getRead(), accepted );
+				} catch ( final IOException e )
+				{
+					e.printStackTrace();
+				}
+				responseStream.push( bytes );
+			};
+
+			final Consumer<Integer> finalizedAction = totalRead -> {
+				final int leftToRead = ( int ) ( fileLength - totalRead );
+				if ( leftToRead > 0 )
+				{
+					responseStream.offer( ( int ) ( fileLength - totalRead ), writer, null /* Will re-use this one */ );
+				} else
+				{
+					responseStream.finish();
+				}
+			};
+			responseStream.offer( ( int ) fileLength, writer, finalizedAction );
 		} else
 		{
-			response.setContent(
-					extension.getComment( "Served to you by Kvantum" ) + System.lineSeparator() + path.readFile() );
+			if ( CoreConfig.debug )
+			{
+				Logger.debug( "Reading entire file '{0}' into memory ({1} < {2})", path, fileLength, Buffer.files );
+			}
+			if ( extension.getReadType() == FileExtension.ReadType.BYTES || !ServerImplementation.getImplementation().getProcedure().hasHandlers() )
+			{
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Serving {} using byte[]", this );
+				}
+				response.setResponse( path.readBytes() );
+			} else
+			{
+				response.setResponse( extension.getComment( "Served to you by Kvantum" ) + System.lineSeparator() + path.readFile() );
+			}
 		}
+
 		response.getHeader()
 				.set( Header.HEADER_LAST_MODIFIED, TimeUtil.getHTTPTimeStamp( new Date( path.getLastModified() ) ) );
 	}

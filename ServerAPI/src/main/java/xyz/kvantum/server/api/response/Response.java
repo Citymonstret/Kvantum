@@ -21,7 +21,9 @@
  */
 package xyz.kvantum.server.api.response;
 
+import java.nio.charset.StandardCharsets;
 import lombok.Getter;
+import lombok.NonNull;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -35,10 +37,9 @@ import xyz.kvantum.server.api.views.RequestHandler;
 {
 
 	@Getter private Header header;
-	@Getter private String content;
 	private RequestHandler parent;
-	@Getter private boolean text;
-	@Getter private byte[] bytes;
+	@Getter private ResponseStream responseStream;
+	@Getter private boolean text = false;
 
 	/**
 	 * Constructor
@@ -51,8 +52,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 		this.header = new Header( Header.STATUS_OK ).set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML )
 				.set( Header.HEADER_SERVER, Header.POWERED_BY ).set( Header.HEADER_DATE, TimeUtil.getHTTPTimeStamp() )
 				.set( Header.HEADER_STATUS, Header.STATUS_OK );
-		this.content = "";
-		this.bytes = new byte[ 0 ];
 	}
 
 	public Response()
@@ -63,10 +62,9 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	public void copyFrom(final Response handle)
 	{
 		this.header = handle.header;
-		this.content = handle.content;
 		this.parent = handle.parent;
+		this.responseStream = handle.responseStream;
 		this.text = handle.text;
-		this.bytes = handle.bytes;
 	}
 
 	/**
@@ -74,10 +72,15 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	 *
 	 * @param bytes Bytes to send to the client
 	 */
-	public void setBytes(final byte[] bytes)
+	public Response setResponse(final byte[] bytes)
 	{
-		this.bytes = Assert.notNull( bytes );
-		this.text = false;
+		return this.setResponse( new SimpleResponseStream( bytes ) );
+	}
+
+	public Response setResponse(@NonNull final ResponseStream stream)
+	{
+		this.responseStream = stream;
+		return this;
 	}
 
 	/**
@@ -95,13 +98,12 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	 * Set the text content
 	 *
 	 * @param content The string content
-	 * @see #setBytes(byte[]) to send raw bytes
+	 * @see #setResponse(byte[]) to send raw bytes
 	 */
-	public Response setContent(final String content)
+	public Response setResponse(final String content)
 	{
-		this.content = Assert.notNull( content );
 		this.text = true;
-		return this;
+		return this.setResponse( content.getBytes( StandardCharsets.UTF_8 ) );
 	}
 
 	public Response setParent(final RequestHandler parent)
@@ -114,5 +116,4 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	{
 		return this.parent != null;
 	}
-
 }

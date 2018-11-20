@@ -39,7 +39,7 @@ final class HtmlConverter extends OutputConverter
 	@Override protected Response generateResponse(final Object input)
 	{
 		final Response response = new Response();
-		response.setContent( input.toString() );
+		response.setResponse( input.toString() );
 		response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
 		return response;
 	}

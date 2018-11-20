@@ -55,13 +55,13 @@ import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters
 
 	@ViewMatcher(filter = "hello1") public void helloWorld1(final AbstractRequest request, final Response response)
 	{
-		response.setContent( "<h1>Hello World!</h1>" );
+		response.setResponse( "<h1>Hello World!</h1>" );
 	}
 
 	@ViewMatcher(filter = "hello2") public Response helloWorld2(final AbstractRequest request)
 	{
 		final Response response = new Response();
-		response.setContent( "<b>Hello World!</b>" );
+		response.setResponse( "<b>Hello World!</b>" );
 		return response;
 	}
 
@@ -82,13 +82,13 @@ import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters
 		final KvantumPojo<HelloDO> hello = factory.of( new HelloDO() );
 		hello.set( "hello", "world" );
 		request.addModel( "pojo", hello );
-		response.setContent( "Hello {{pojo.hello}}!" );
+		response.setResponse( "Hello {{pojo.hello}}!" );
 	}
 
 	private void helloWorld6()
 	{
 		ServerImplementation.getImplementation().createSimpleRequestHandler( "hello6",
-				( (request, response) -> response.setContent( "Hello World :)" ) ) );
+				( (request, response) -> response.setResponse( "Hello World :)" ) ) );
 	}
 
 	public static final class HelloHandler extends View
@@ -101,7 +101,7 @@ import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters
 
 		@Override protected void handle(AbstractRequest request, Response response)
 		{
-			response.setContent( "Hello World!!!!" );
+			response.setResponse( "Hello World!!!!" );
 		}
 	}
 

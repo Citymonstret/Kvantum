@@ -490,7 +490,7 @@ import xyz.kvantum.server.api.util.Assert;
 	 */
 	protected void handle(@Nullable final AbstractRequest request, @NonNull final Response response)
 	{
-		response.setContent( DEFAULT_RESPONSE );
+		response.setResponse( DEFAULT_RESPONSE );
 	}
 
 	/**

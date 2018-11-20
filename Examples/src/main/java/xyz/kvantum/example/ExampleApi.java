@@ -83,13 +83,13 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 			{
 				Logger.error( "Invalid file update request (Could not Authenticate)" );
 				response.getHeader().setStatus( Header.STATUS_ACCESS_DENIED );
-				response.setContent( "Invalid access token..." );
+				response.setResponse( "Invalid access token..." );
 			} else
 			{
 				Logger.info( "File update: " + attempt.getName() );
 				Logger.info( "File update type: " + attempt.getType() );
 				response.getHeader().setStatus( Header.STATUS_OK );
-				response.setContent( "File change accepted" );
+				response.setResponse( "File change accepted" );
 			}
 		} else
 		{
@@ -98,7 +98,7 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 			//
 			Logger.error( "Invalid file update request (Cannot Parse)" );
 			response.getHeader().setStatus( Header.STATUS_BAD_REQUEST );
-			response.setContent( "Not a valid request..." );
+			response.setResponse( "Not a valid request..." );
 		}
 	}
 

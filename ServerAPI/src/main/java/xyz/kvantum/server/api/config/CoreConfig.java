@@ -143,6 +143,7 @@ import java.util.List;
 
 		public static int in = 100_000;
 		public static int out = 100_000;
+		public static int files = 100_000;
 	}
 
 	@ConfigSection(name = "limits") public static class Limits

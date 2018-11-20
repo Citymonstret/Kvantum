@@ -98,7 +98,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 					final JsonObject requestStatus = new JsonObject();
 					requestStatus.add( "status", new JsonPrimitive( "error" ) );
 					requestStatus.add( "message", new JsonPrimitive( "Not permitted" ) );
-					response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+					response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 					return;
 				}
 			}
@@ -110,7 +110,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 			{
 				final JsonObject requestStatus = new JsonObject();
 				requestStatus.add( "message", new JsonPrimitive( result.getError().getCause() ) );
-				response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+				response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 				return;
 			}
 			final QueryType query = result.getParsedObject();
@@ -122,7 +122,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 				requestStatus.add( "status", new JsonPrimitive( "error" ) );
 				requestStatus.add( "message", new JsonPrimitive( "No such object" ) );
 				requestStatus.add( "query", ServerImplementation.getImplementation().getGson().toJsonTree( query ) );
-				response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+				response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 			} else
 			{
 				final JsonObject requestStatus = new JsonObject();
@@ -134,7 +134,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 					resultArray.add( ServerImplementation.getImplementation().getGson().toJsonTree( t ) );
 				}
 				requestStatus.add( "result", resultArray );
-				response.setContent( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
+				response.setResponse( ServerImplementation.getImplementation().getGson().toJson( requestStatus ) );
 			}
 		} ) );
 	}

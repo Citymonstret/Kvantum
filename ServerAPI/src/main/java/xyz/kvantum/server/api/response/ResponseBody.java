@@ -24,11 +24,9 @@ package xyz.kvantum.server.api.response;
 public interface ResponseBody extends HeaderProvider
 {
 
-	byte[] getBytes();
-
 	Header getHeader();
 
-	String getContent();
+	ResponseStream getResponseStream();
 
 	boolean isText();
 

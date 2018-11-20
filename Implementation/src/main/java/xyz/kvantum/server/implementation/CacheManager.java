@@ -29,11 +29,8 @@ import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
-import xyz.kvantum.server.api.cache.CachedResponse;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.response.ResponseBody;
-import xyz.kvantum.server.api.views.RequestHandler;
 
 /**
  * The utility file that handles all runtime caching
@@ -43,7 +40,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 
 	private final Cache<String, String> cachedIncludes;
 	private final Cache<String, CachedFile> cachedFiles;
-	private final Cache<String, CachedResponse> cachedBodies;
 	private final Cache<Integer, IAccount> cachedAccounts;
 	private final Cache<String, Integer> cachedAccountIds;
 
@@ -54,8 +50,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 				.maximumSize( CoreConfig.Cache.cachedIncludesMaxItems ).build();
 		cachedFiles = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS )
 				.maximumSize( CoreConfig.Cache.cachedFilesMaxItems ).build();
-		cachedBodies = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedBodiesMaxItems ).build();
 		cachedAccounts = Caffeine.newBuilder()
 				.expireAfterWrite( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS )
 				.maximumSize( CoreConfig.Cache.cachedAccountsMaxItems ).build();
@@ -104,21 +98,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	@Override public void setCachedInclude(@NonNull final String group, @NonNull final String document)
 	{
 		this.cachedIncludes.put( group, document );
-	}
-
-	@Override public boolean hasCache(@NonNull final RequestHandler view)
-	{
-		return this.cachedBodies.getIfPresent( view.toString() ) != null;
-	}
-
-	@Override public void setCache(@NonNull final RequestHandler view, @NonNull final ResponseBody responseBody)
-	{
-		this.cachedBodies.put( view.toString(), new CachedResponse( responseBody ) );
-	}
-
-	@Override public CachedResponse getCache(@NonNull final RequestHandler view)
-	{
-		return this.cachedBodies.getIfPresent( view.toString() );
 	}
 
 	@Override public void removeFileCache(@NonNull final Path path)

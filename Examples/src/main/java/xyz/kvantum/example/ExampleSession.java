@@ -66,7 +66,7 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 		//
 		// Render the object
 		//
-		response.setContent( "<h1><b>Session: {{pojo.id}}</b></h1><br/>Message: {{pojo.message}}" );
+		response.setResponse( "<h1><b>Session: {{pojo.id}}</b></h1><br/>Message: {{pojo.message}}" );
 	}
 
 	private static final class Counter

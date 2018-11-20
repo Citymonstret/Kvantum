@@ -65,7 +65,7 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 				.getAccountManager();
 		if ( accountManager.getAccount( request.getSession() ).isPresent() )
 		{
-			response.setContent( "You are already logged in..." );
+			response.setResponse( "You are already logged in..." );
 			return;
 		}
 
@@ -81,7 +81,7 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
 		if ( !result.isSuccess() )
 		{
-			response.setContent( "Error: " + result.getError().getCause() );
+			response.setResponse( "Error: " + result.getError().getCause() );
 			return;
 		}
 
@@ -91,7 +91,7 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 		final Optional<IAccount> accountOptional = accountManager.getAccount( result.getParsedObject().getUsername() );
 		if ( !accountOptional.isPresent() )
 		{
-			response.setContent( "No such account..." );
+			response.setResponse( "No such account..." );
 			return;
 		}
 
@@ -99,10 +99,10 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 		if ( account.passwordMatches( result.getParsedObject().getPassword() ) )
 		{
 			accountManager.bindAccount( account, request.getSession() );
-			response.setContent( "Success!" );
+			response.setResponse( "Success!" );
 		} else
 		{
-			response.setContent( "Password is wrong!" );
+			response.setResponse( "Password is wrong!" );
 		}
 	}
 

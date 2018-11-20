@@ -141,6 +141,7 @@ import xyz.kvantum.server.api.util.TimeUtil;
 	 * The type of encoding used on the data
 	 */
 	public static final HeaderOption HEADER_CONTENT_ENCODING = HeaderOption.create( "Content-Encoding" );
+	public static final HeaderOption HEADER_TRANSFER_ENCODING = HeaderOption.create( "Transfer-Encoding" );
 	/**
 	 * The natural language, or languages of the intended audience for the enclosed content
 	 */

@@ -77,7 +77,7 @@ public class ScriptView extends View
 		if ( !this.viewScriptEngine.evaluate( this.script, bindings ) )
 		{
 			response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
-			response.setContent( "Failed to handle script..." );
+			response.setResponse( "Failed to handle script..." );
 		}
 	}
 

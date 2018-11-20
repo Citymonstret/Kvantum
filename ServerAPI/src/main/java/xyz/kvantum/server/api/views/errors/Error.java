@@ -88,7 +88,7 @@ public class Error extends View
 
 	@Override public Response generate(final AbstractRequest request)
 	{
-		final Response response = new Response().setContent(
+		final Response response = new Response().setResponse(
 				template.replace( "{{code}}", code + "" ).replace( "{{message}}", desc )
 						.replace( "{{path}}", request.getQuery().getFullRequest() ) );
 		response.getHeader().setStatus( code );

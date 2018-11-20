@@ -42,7 +42,7 @@ public class XmlConverter extends OutputConverter
 		response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_XML );
 		response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
 		response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
-		response.setContent( input.toString() );
+		response.setResponse( input.toString() );
 		return response;
 	}
 }
