@@ -34,4 +34,4 @@ folder.getSubPaths().forEach(function (path) {
 
 content += "</ul><br/>Session: " + request.getSession().get("id");
 
-response.setContent(content);
+response.setResponse(content);
