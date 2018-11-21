@@ -141,6 +141,13 @@ import xyz.kvantum.server.api.util.TimeUtil;
 				} else
 				{
 					responseStream.finish();
+					try
+					{
+						inputStream.close();
+					} catch ( final Exception e )
+					{
+						Logger.error( "Failed to close the input stream in StaticFileView: {}", e.getMessage() );
+					}
 				}
 			};
 			responseStream.offer( ( int ) fileLength, writer, finalizedAction );
