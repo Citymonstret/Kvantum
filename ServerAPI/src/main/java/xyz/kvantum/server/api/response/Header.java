@@ -35,74 +35,189 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.TimeUtil;
 
-@SuppressWarnings({ "unused", "WeakerAccess" }) final public class Header
+@SuppressWarnings({ "unused", "WeakerAccess" }) public final class Header
 {
 
+	/**
+	 * text/css; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_CSS = AsciiString.of( "text/css; charset=utf-8" );
+	/**
+	 * application/octet-stream; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_OCTET_STREAM = AsciiString
 			.of( "application/octet-stream; charset=utf-8" );
+	/**
+	 * text/html; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_HTML = AsciiString.of( "text/html; charset=utf-8" );
+	/**
+	 * text/javascript; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_JAVASCRIPT = AsciiString.of( "text/javascript; charset=utf-8" );
+	/**
+	 * text/example; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_TEXT_EXAMPLE = AsciiString.of( "text/example; charset=utf-8" );
+	/**
+	 * text/json; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_JSON = AsciiString.of( "application/json; charset=utf-8" );
+	/**
+	 * text/xml; charset=utf-8
+	 */
 	public static final AsciiString CONTENT_TYPE_XML = AsciiString.of( "text/xml; charset=utf-8" );
-
+	/**
+	 * no-cache
+	 */
 	public static final AsciiString CACHE_NO_CACHE = AsciiString.of( "no-cache" );
-
+	/**
+	 * Kvantum
+	 */
 	public static final AsciiString POWERED_BY = AsciiString.of( "Kvantum" );
 
 	//
 	// 1xx Informational
 	//
+
+	/**
+	 * 100
+	 */
 	public static final AsciiString STATUS_CONTINUE = AsciiString.of( "100 Continue" );
+	/**
+	 * 101
+	 */
 	public static final AsciiString STATUS_SWITCHING_PROTOCOLS = AsciiString.of( "101 Switching Protocols" );
+	/**
+	 * 102
+	 */
 	public static final AsciiString STATUS_PROCESSING = AsciiString.of( "102 Processing" );
 
 	//
 	// 2xx Success
 	//
+
+	/**
+	 * 200
+	 */
 	public static final AsciiString STATUS_OK = AsciiString.of( "200 OK" );
-	public static final AsciiString STATUS_CREATED = AsciiString.of( "2001 Created" );
+	/**
+	 * 201
+	 */
+	public static final AsciiString STATUS_CREATED = AsciiString.of( "201 Created" );
+	/**
+	 *203
+	 */
 	public static final AsciiString STATUS_NON_AUTHORITATIVE_INFORMATION = AsciiString
-			.of( "203 Non-Authoriative Information" );
+			.of( "203 Non-Authoritative Information" );
+	/**
+	 * 202
+	 */
 	public static final AsciiString STATUS_ACCEPTED = AsciiString.of( "202 Accepted" );
+	/**
+	 * 204
+	 */
 	public static final AsciiString STATUS_NO_CONTENT = AsciiString.of( "204 No Content" );
+	/**
+	 * 205
+	 */
 	public static final AsciiString STATUS_RESET_CONTENT = AsciiString.of( "205 Reset Content" );
+	/**
+	 * 206
+	 */
 	public static final AsciiString STATUS_PARTIAL_CONTENT = AsciiString.of( "206 Partial Content" );
 
 	//
 	// 3xx Redirection
 	//
+
+	/**
+	 * 301
+	 */
 	public static final AsciiString STATUS_MOVED_PERMANENTLY = AsciiString.of( "301 Moved Permanently" );
+	/**
+	 * 307
+	 */
 	public static final AsciiString STATUS_TEMPORARY_REDIRECT = AsciiString.of( "307 Temporary Redirect" );
 
 	//
 	// 4xx Client errors
 	//
+
+	/**
+	 * 400
+	 */
 	public static final AsciiString STATUS_BAD_REQUEST = AsciiString.of( "400 Bad Request" );
+	/**
+	 * 401
+	 */
 	public static final AsciiString STATUS_ACCESS_DENIED = AsciiString.of( "401 Access Denied" );
+	/**
+	 * 401
+	 */
 	public static final AsciiString STATUS_UNAUTHORIZED = AsciiString.of( "401 Unauthorized status" );
+	/**
+	 * 404
+	 */
 	public static final AsciiString STATUS_NOT_FOUND = AsciiString.of( "404 Not Found" );
+	/**
+	 * 405
+	 */
 	public static final AsciiString STATUS_NOT_ALLOWED = AsciiString.of( "405 Method not allowed" );
+	/**
+	 * 406
+	 */
 	public static final AsciiString STATUS_NOT_ACCEPTABLE = AsciiString.of( "406 Not Acceptable" );
-	public static final AsciiString STATUS_PAYLOAD_TOO_LARGE = AsciiString.of( "413 Payload Too Large" );
-	public static final AsciiString STATUS_ENTITY_TOO_LARGE = AsciiString.of( "413 Entity Too Large" );
+	/**
+	 * 408
+	 */
 	public static final AsciiString STATUS_REQUEST_TIMEOUT = AsciiString.of( "408 Request Timeout" );
+	/**
+	 * 413
+	 */
+	public static final AsciiString STATUS_PAYLOAD_TOO_LARGE = AsciiString.of( "413 Payload Too Large" );
+	/**
+	 * 413
+	 */
+	public static final AsciiString STATUS_ENTITY_TOO_LARGE = AsciiString.of( "413 Entity Too Large" );
+	/**
+	 * 429
+	 */
 	public static final AsciiString STATUS_TOO_MANY_REQUESTS = AsciiString.of( "429 Too Many Requests" );
 
 	//
 	// 5xx Server errors
 	//
+
+	/**
+	 * 500
+	 */
+	public static final AsciiString STATUS_INTERNAL_ERROR = AsciiString.of( "500 Internal Server Error" );
+	/**
+	 * 505
+	 */
 	public static final AsciiString STATUS_HTTP_VERSION_NOT_SUPPORTED = AsciiString
 			.of( "505 HTTP Version Not Supported" );
-	public static final AsciiString STATUS_INTERNAL_ERROR = AsciiString.of( "500 Internal Server Error" );
 
 	public static final AsciiString ALLOW_ALL = AsciiString.of( "*" );
 
+	/**
+	 * X-Content-Type-Options
+	 */
 	public static final HeaderOption X_CONTENT_TYPE_OPTIONS = HeaderOption.create( "X-Content-Type-Options" );
+	/**
+	 * X-Frame-Options
+	 */
 	public static final HeaderOption X_FRAME_OPTIONS = HeaderOption.create( "X-Frame-Options" );
-	public static final HeaderOption CONTENT_SECURITY_POLICY = HeaderOption.create( "Content-Security-Policy" );
+	/**
+	 * X-Forwarded-For
+	 */
 	public static final HeaderOption X_FORWARDED_FOR = HeaderOption.create( "X-Forwarded-For" );
+
+	/**
+	 * Content-Security-Policy
+	 */
+	public static final HeaderOption CONTENT_SECURITY_POLICY = HeaderOption.create( "Content-Security-Policy" );
 
 	/**
 	 * Specifying which web sites can participate in cross-origin resource sharing
