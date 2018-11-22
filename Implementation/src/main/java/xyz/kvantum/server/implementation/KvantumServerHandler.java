@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -209,6 +210,8 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		RequestHandler requestHandler = workerContext.getRequestHandler();
 		AbstractRequest request = workerContext.getRequest();
 		ResponseBody body;
+		ResponseStream responseStream = null;
+		boolean cache = false, shouldCache = false;
 
 		try
 		{
@@ -221,7 +224,35 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 				requestHandler.getValidationManager().validate( request );
 			}
 
-			body = requestHandler.handle( request );
+			if ( requestHandler instanceof CacheApplicable &&
+					( ( CacheApplicable ) requestHandler ).isApplicable( request ) )
+			{
+				cache = true;
+				if ( !ServerImplementation.getImplementation().getCacheManager().hasCache( requestHandler ) )
+				{
+					shouldCache = true;
+				}
+			}
+
+			//
+			// Make sure that cache is handled as it should
+			//
+			if ( !cache || shouldCache )
+			{ // Either it's a non-cached view, or there is no cache stored
+				body = requestHandler.handle( request );
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Did not find cache for request handler: {}", requestHandler.getName() );
+				}
+			} else
+			{
+				// Just read from memory
+				body = ServerImplementation.getImplementation().getCacheManager().getCache( requestHandler );
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Found request handler in cache: {}", requestHandler.getName() );
+				}
+			}
 
 			//
 			// If the body is null, it is either marked for an internal redirect
@@ -249,6 +280,16 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 				return;
 			}
 
+			responseStream = body.getResponseStream();
+
+			//
+			// Store cache
+			//
+			if ( shouldCache && body.getResponseStream() instanceof KnownLengthStream )
+			{
+				ServerImplementation.getImplementation().getCacheManager().setCache( requestHandler, body );
+			}
+
 			//
 			// Post-generation procedures
 			//
@@ -271,11 +312,11 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			// content length is known (can't act on stream)
 			//
 			if ( 	request.getQuery().getMethod().hasBody() &&
-					body.isText() && body.getResponseStream() instanceof KnownLengthStream &&
+					body.isText() && responseStream instanceof KnownLengthStream &&
 					workerContext.getWorkerProcedureInstance().containsHandlers() )
 			{
 				// If it's a string we have to read the entire string into memory, act on it, and return it
-				final KnownLengthStream knownLengthStream = (KnownLengthStream) body.getResponseStream();
+				final KnownLengthStream knownLengthStream = (KnownLengthStream) responseStream;
 
 				String text = new String( knownLengthStream.getAll(), StandardCharsets.UTF_8 );
 				for ( final WorkerProcedure.Handler<String> handler : workerContext.getWorkerProcedureInstance()
@@ -304,12 +345,13 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			}
 		}
 
-		if ( body == null )
+		if ( body == null || responseStream == null )
 		{
 			throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext );
 		}
 
 		workerContext.setBody( body );
+		workerContext.setResponseStream( responseStream );
 	}
 
 	private void determineRequestHandler() throws Throwable
@@ -392,7 +434,7 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		//
 		// Get the respone stream
 		//
-		final ResponseStream responseStream = body.getResponseStream();
+		final ResponseStream responseStream = workerContext.getResponseStream(); // body.getResponseStream();
 		final boolean hasKnownLength = responseStream instanceof KnownLengthStream;
 
 		//

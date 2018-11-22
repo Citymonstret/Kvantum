@@ -32,6 +32,7 @@ import xyz.kvantum.server.api.core.WorkerProcedure;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.ResponseBody;
+import xyz.kvantum.server.api.response.ResponseStream;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -52,6 +53,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	private RequestHandler requestHandler;
 	private AbstractRequest request;
 	private ResponseBody body;
+	private ResponseStream responseStream;
 	private boolean gzip;
 	private SocketContext socketContext;
 

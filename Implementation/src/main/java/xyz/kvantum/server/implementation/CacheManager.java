@@ -29,8 +29,11 @@ import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
+import xyz.kvantum.server.api.cache.CachedResponse;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.response.ResponseBody;
+import xyz.kvantum.server.api.views.RequestHandler;
 
 /**
  * The utility file that handles all runtime caching
@@ -42,6 +45,7 @@ import xyz.kvantum.server.api.config.CoreConfig;
 	private final Cache<String, CachedFile> cachedFiles;
 	private final Cache<Integer, IAccount> cachedAccounts;
 	private final Cache<String, Integer> cachedAccountIds;
+	private final Cache<String, CachedResponse> cachedBodies;
 
 	public CacheManager()
 	{
@@ -53,6 +57,8 @@ import xyz.kvantum.server.api.config.CoreConfig;
 		cachedAccounts = Caffeine.newBuilder()
 				.expireAfterWrite( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS )
 				.maximumSize( CoreConfig.Cache.cachedAccountsMaxItems ).build();
+		cachedBodies = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS )
+				.maximumSize( CoreConfig.Cache.cachedBodiesMaxItems ).build();
 		cachedAccountIds = Caffeine.newBuilder()
 				.expireAfterWrite( CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS )
 				.maximumSize( CoreConfig.Cache.cachedAccountIdsMaxItems ).build();
@@ -104,4 +110,18 @@ import xyz.kvantum.server.api.config.CoreConfig;
 	{
 		this.cachedFiles.invalidate( path.toString() );
 	}
+
+	@Override public boolean hasCache(@NonNull final RequestHandler view)
+	{
+		return this.cachedBodies.getIfPresent( view.toString() ) != null;
+	}
+	@Override public void setCache(@NonNull final RequestHandler view, @NonNull final ResponseBody responseBody)
+	{
+		this.cachedBodies.put( view.toString(), new CachedResponse( responseBody ) );
+	}
+	@Override public CachedResponse getCache(@NonNull final RequestHandler view)
+	{
+		return this.cachedBodies.getIfPresent( view.toString() );
+	}
+
 }

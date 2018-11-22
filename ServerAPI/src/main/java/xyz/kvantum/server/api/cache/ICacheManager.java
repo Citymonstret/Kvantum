@@ -25,6 +25,8 @@ import java.util.Optional;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.account.IAccount;
+import xyz.kvantum.server.api.response.ResponseBody;
+import xyz.kvantum.server.api.views.RequestHandler;
 
 /**
  * Interface that manages all Kvantum caching.
@@ -101,4 +103,29 @@ public interface ICacheManager
 	 * @param path File to remove
 	 */
 	void removeFileCache(Path path);
+
+	/**
+	 * Check if there is a ResponseBody cached for the view
+	 *
+	 * @param view RequestHandler
+	 * @return true if there is a ResponseBody cached, else false
+	 */
+	boolean hasCache(RequestHandler view);
+	/**
+	 * Add a cached ResponseBody
+	 *
+	 * @param view RequestHandler for which the caching will apply
+	 * @param body ResponseBody (will generate a CachedResponseBody)
+	 * @see CachedResponse
+	 */
+	void setCache(RequestHandler view, ResponseBody body);
+	/**
+	 * Get the cached response for a view
+	 *
+	 * @param view RequestHandler
+	 * @return the cached ResponseBody
+	 * @see #hasCache(RequestHandler) To check if the view has a cache
+	 */
+	CachedResponse getCache(RequestHandler view);
+
 }
