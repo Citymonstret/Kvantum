@@ -37,8 +37,7 @@ import lombok.RequiredArgsConstructor;
 
 	@Getter private boolean finished = false;
 
-	@Getter
-	private int read = 0;
+	@Getter private int read = 0;
 	private int offer = -1;
 	private Consumer<Integer> offerAction, finalizedAction;
 
@@ -56,6 +55,8 @@ import lombok.RequiredArgsConstructor;
 
 	/**
 	 * Mark the stream as finished, which means it cannot be written to anymore
+	 *
+	 * @throws IllegalStateException If the stream has already been finished.
 	 */
 	public void finish()
 	{
@@ -72,8 +73,11 @@ import lombok.RequiredArgsConstructor;
 	 * @param amount Length of available data. Must be bigger than 0.
 	 * @param acceptedAction Action to run when the client has accepted the offer
 	 * @param finalizedAction Action to run when the client has read the offered data
+	 * @throws IllegalArgumentException If the specified amount is less than or equal to 0.
+	 * @throws IllegalStateException If the method is called after the stream has been marked as finished.
 	 */
-	public void offer(final int amount, @NonNull final Consumer<Integer> acceptedAction, final Consumer<Integer> finalizedAction)
+	public void offer(final int amount, @NonNull final Consumer<Integer> acceptedAction,
+			final Consumer<Integer> finalizedAction)
 	{
 		if ( amount <= 0 )
 		{
@@ -92,6 +96,7 @@ import lombok.RequiredArgsConstructor;
 	 * Push data to the stream
 	 *
 	 * @param bytes Data. Length should not be larger than the offer.
+	 * @throws IllegalArgumentException If the length of the pushed data exceeds the last offer.
 	 */
 	public void push(final byte[] bytes)
 	{
@@ -106,8 +111,10 @@ import lombok.RequiredArgsConstructor;
 	 * Read data from the stream, with a specified maximal length. Check return array size for actual length of read
 	 * data.
 	 *
-	 * @param amount Amount of data that can be read.
+	 * @param amount Amount of data that can be read. Must be bigger than 0.
 	 * @return Read data.
+	 * @throws IllegalArgumentException If amount is less than or equal to 0.
+	 * @throws IllegalStateException If content isn't written to the stream within 500ms of the method call.
 	 */
 	public byte[] read(int amount)
 	{

@@ -29,6 +29,9 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AsciiStringable;
 import xyz.kvantum.server.api.util.TimeUtil;
 
+/**
+ * Outgoing cookie (see {@link xyz.kvantum.server.api.request.Cookie} for incoming cookies).
+ */
 @EqualsAndHashCode @Getter @Builder public final class ResponseCookie implements AsciiStringable
 {
 
