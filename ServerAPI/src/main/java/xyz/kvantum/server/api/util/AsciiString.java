@@ -102,6 +102,11 @@ import lombok.NonNull;
 		return of( string, true );
 	}
 
+	public static AsciiString of(@NonNull final Number number)
+	{
+		return of ( number.toString(), false );
+	}
+
 	public static AsciiString of(@NonNull final String string, final boolean cache)
 	{
 		if ( map.containsKey( string ) )

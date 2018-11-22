@@ -46,10 +46,10 @@ import xyz.kvantum.server.api.request.Request;
 import xyz.kvantum.server.api.response.FinalizedResponse;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.HeaderOption;
+import xyz.kvantum.server.api.response.KnownLengthStream;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.response.ResponseStream;
-import xyz.kvantum.server.api.response.SimpleResponseStream;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
@@ -68,7 +68,6 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 @RequiredArgsConstructor final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 {
 
-	private static final byte[] EMPTY = AsciiString.of( "NULL" ).getValue();
 	private static final String CONTENT_TYPE = "content_type";
 	private static final byte[] NEW_LINE = AsciiString.of( "\n" ).getValue();
 	private static final byte[] COLON_SPACE = AsciiString.of( ": " ).getValue();
@@ -268,27 +267,24 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			}
 
 			//
-			// Allow text handlers to act upon the content
+			// Allow text handlers to act upon the content, if the content is text and the
+			// content length is known (can't act on stream)
 			//
-			if ( request.getQuery().getMethod().hasBody() )
+			if ( 	request.getQuery().getMethod().hasBody() &&
+					body.isText() && body.getResponseStream() instanceof KnownLengthStream &&
+					workerContext.getWorkerProcedureInstance().containsHandlers() )
 			{
-				if ( body.isText() )
+				// If it's a string we have to read the entire string into memory, act on it, and return it
+				final KnownLengthStream knownLengthStream = (KnownLengthStream) body.getResponseStream();
+
+				String text = new String( knownLengthStream.getAll(), StandardCharsets.UTF_8 );
+				for ( final WorkerProcedure.Handler<String> handler : workerContext.getWorkerProcedureInstance()
+						.getStringHandlers() )
 				{
-					if ( workerContext.getWorkerProcedureInstance().containsHandlers() )
-					{
-						// If it's a string we have to read the entire string into memory, act on it, and return it
-						final SimpleResponseStream simpleResponseStream = (SimpleResponseStream) body.getResponseStream();
-
-						String text = new String( simpleResponseStream.getBytes(), StandardCharsets.UTF_8 );
-						for ( final WorkerProcedure.Handler<String> handler : workerContext.getWorkerProcedureInstance()
-								.getStringHandlers() )
-						{
-							text = handler.act( requestHandler, request, text );
-						}
-
-						simpleResponseStream.replaceBytes( text.getBytes( StandardCharsets.UTF_8 ) );
-					}
+					text = handler.act( requestHandler, request, text );
 				}
+
+				knownLengthStream.replaceBytes( text.getBytes( StandardCharsets.UTF_8 ) );
 			}
 		} catch ( final Exception e )
 		{
@@ -350,10 +346,14 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 	@SuppressWarnings("ALL") private void sendResponse(final ChannelHandlerContext context)
 	{
+		//
 		// Determine whether or not the responce should be compressed
+		//
 		workerContext.determineGzipStatus();
 
+		//
 		// Get the generated body
+		//
 		ResponseBody body = workerContext.getBody();
 
 		// Make sure that the generated response is valid (not null)
@@ -362,23 +362,26 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		Assert.notNull( body.getHeader() );
 
 		// Retrieve an Md5Handler from the handler pool
-		final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
+		// final Md5Handler md5Handler = SimpleServer.md5HandlerPool.getNullable();
 		// Generate the md5 checksum
 		// TODO: Re-enable this final String checksum = md5Handler.generateChecksum( bytes );
 		// Update the headers to include the md5 checksum
 		// body.getHeader().set( Header.HEADER_CONTENT_MD5, checksum );
 		// body.getHeader().set( Header.HEADER_ETAG, checksum );
-
 		// Return the md5 handler to the pool
-		SimpleServer.md5HandlerPool.add( md5Handler );
+		// SimpleServer.md5HandlerPool.add( md5Handler );
 
+		//
 		// Add a Last-Modified if it isn't already present in the response
+		//
 		if ( !body.getHeader().get( Header.HEADER_LAST_MODIFIED ).isPresent() )
 		{
 			body.getHeader().set( Header.HEADER_LAST_MODIFIED, TimeUtil.getHTTPTimeStamp() );
 		}
 
+		//
 		// Output debug messages
+		//
 		if ( CoreConfig.debug )
 		{
 			DebugTree.builder().name( "Response Information" )
@@ -386,9 +389,53 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 					.entry( "Headers", body.getHeader().getHeaders() ).build().collect().forEach( Logger::debug );
 		}
 
-		body.getHeader().set( Header.HEADER_TRANSFER_ENCODING, "chunked" );
+		//
+		// Get the respone stream
+		//
+		final ResponseStream responseStream = body.getResponseStream();
+		final boolean hasKnownLength = responseStream instanceof KnownLengthStream;
 
+		//
+		// Fetch the GZIP handler, if applicable
+		//
+		final GzipHandler gzipHandler;
+		if ( workerContext.isGzip() )
+		{
+			gzipHandler = SimpleServer.gzipHandlerPool.getNullable();
+		} else
+		{
+			gzipHandler = null;
+		}
+
+		//
+		// Send either the transfer encoding or content length, important for keep-alive
+		//
+		if ( hasKnownLength )
+		{
+			//
+			// If the length is known, we compress before writing
+			//
+			if ( workerContext.isGzip() )
+			{
+				byte[] bytes = ( ( KnownLengthStream ) responseStream ).getAll();
+				try
+				{
+					bytes = gzipHandler.compress( bytes );
+				} catch ( final IOException e )
+				{
+					new KvantumException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
+				}
+				( ( KnownLengthStream) responseStream ).replaceBytes( bytes );
+			}
+			body.getHeader().set( Header.HEADER_CONTENT_LENGTH, AsciiString.of( ( ( KnownLengthStream) responseStream ).getLength() ) );
+		} else
+		{
+			body.getHeader().set( Header.HEADER_TRANSFER_ENCODING, "chunked" );
+		}
+
+		//
 		// Determine whether to keep the connection alive
+		//
 		final boolean keepAlive;
 		if ( workerContext.getRequest().getHeaders().getOrDefault( CONNECTION, CLOSE ).equalsIgnoreCase( KEEP_ALIVE ) )
 		{
@@ -408,10 +455,14 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			body.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
 		}
 
+		//
 		// Alocate a byte buffer
+		//
 		final ByteBuf buf = context.alloc().buffer( CoreConfig.Buffer.out );
 
+		//
 		// Write the header
+		//
 		buf.writeBytes( body.getHeader().getFormat().getValue() );
 		buf.writeBytes( SPACE );
 		buf.writeBytes( body.getHeader().getStatus().getValue() );
@@ -427,67 +478,91 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		// would otherwise be classed as headers, which really isn't optimal <3
 		buf.writeBytes( NEW_LINE );
 
-		final ResponseStream responseStream = body.getResponseStream();
-		long actualLength = 0L;
-
-		final GzipHandler gzipHandler;
-		if ( workerContext.isGzip() )
+		if ( CoreConfig.debug )
 		{
-			gzipHandler = SimpleServer.gzipHandlerPool.getNullable();
-		} else
-		{
-			gzipHandler = null;
+			Logger.debug( "Using direct write from memory: {}", hasKnownLength );
 		}
 
+		//
+		// Write the response
+		//
 		while ( !responseStream.isFinished() )
 		{
+			//
+			// Read as much data as possible from the respone stream
+			//
 			byte[] bytes = responseStream.read( CoreConfig.Buffer.out );
 			if ( bytes != null && bytes.length > 0 )
 			{
-				if ( workerContext.isGzip() )
+				//
+				// If the length is known, write data directly
+				//
+				if ( hasKnownLength )
 				{
-					try
+					buf.writeBytes( bytes );
+				} else
+				{
+					//
+					// If the length isn't known, we first compress (if applicable) and then write using
+					// the chunked transfer encoding format
+					//
+					if ( workerContext.isGzip() )
 					{
-						bytes = gzipHandler.compress( bytes );
-					} catch ( final IOException e )
-					{
-						new KvantumException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
-						continue;
+						try
+						{
+							bytes = gzipHandler.compress( bytes );
+						} catch ( final IOException e )
+						{
+							new KvantumException( "( GZIP ) Failed to compress the bytes" ).printStackTrace();
+							continue;
+						}
 					}
+					// <size>
+					buf.writeBytes( AsciiString.of( Integer.toHexString( bytes.length ) ).getValue() );
+					// <crlf>
+					buf.writeBytes( CRLF );
+					// <chunk data>
+					buf.writeBytes( bytes );
+					// <crlf>
+					buf.writeBytes( CRLF );
 				}
-
-				// <size>
-				buf.writeBytes( AsciiString.of( Integer.toHexString( bytes.length ) ).getValue() );
-				// <crlf>
-				buf.writeBytes( CRLF );
-				// <chunk data>
-				buf.writeBytes( bytes );
-				// <crlf>
-				buf.writeBytes( CRLF );
-
-				actualLength += bytes.length;
 			}
 		}
 
-		// 0 \r\n
-		// \r\n
-		buf.writeBytes( END_CHUNK );
-		buf.writeBytes( CRLF );
+		//
+		// If we're using the chunked encoding format
+		// write the end chunk
+		//
+		if ( !hasKnownLength )
+		{
+			// 0 \r\n
+			// \r\n
+			buf.writeBytes( END_CHUNK );
+			buf.writeBytes( CRLF );
+		}
 
+		//
+		// Return the GZIP handler to the pool
+		//
 		if ( gzipHandler != null )
 		{
 			SimpleServer.gzipHandlerPool.add( gzipHandler );
 		}
 
-
+		//
 		// Invalidate request to make sure that it isn't handled anywhere else, again (wouldn't work)
+		//
 		workerContext.getRequest().setValid( false );
 
+		//
 		// Intialize a finalized response builder (used for logging)
+		//
 		final FinalizedResponse.FinalizedResponseBuilder finalizedResponse = FinalizedResponse.builder();
 
+		//
 		// Safety measure taken to make sure that IPs are not logged
 		// in production mode. This is is to ensure GDPR compliance
+		//
 		if ( CoreConfig.debug )
 		{
 			finalizedResponse.address( this.workerContext.getSocketContext().getIP() );
@@ -496,11 +571,14 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			finalizedResponse.address( "external" );
 		}
 		finalizedResponse.authorization( this.workerContext.getRequest().getAuthorization().orElse( null ) )
-				.length( (int) actualLength ).status( body.getHeader().getStatus().toString() )
+				/* .length( (int) actualLength ) */.status( body.getHeader().getStatus().toString() )
 				.query( this.workerContext.getRequest().getQuery() ).timeFinished( System.currentTimeMillis() ).build();
 		ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse );
 
-		// Make sure everything is written
+		//
+		// Make sure everything is written and either close the connection
+		// or the channel (depending on whether keep-alive is used or not)
+		//
 		final ChannelFuture future = context.writeAndFlush( buf );
 		if ( keepAlive )
 		{

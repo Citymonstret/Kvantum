@@ -1,11 +1,12 @@
 package xyz.kvantum.server.api.response;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Response stream with a single input write
  */
-public final class SimpleResponseStream extends ResponseStream
+public final class SimpleResponseStream extends ResponseStream implements KnownLengthStream
 {
 
 	@Getter
@@ -15,12 +16,6 @@ public final class SimpleResponseStream extends ResponseStream
 	public SimpleResponseStream(final byte[] bytes)
 	{
 		this.bytes = bytes;
-	}
-
-	public void replaceBytes(final byte[] newBytes)
-	{
-		this.bytes = newBytes;
-		this.read = 0;
 	}
 
 	@Override public byte[] read(int amount)
@@ -40,4 +35,21 @@ public final class SimpleResponseStream extends ResponseStream
 	{
 		return this.bytes.length - read;
 	}
+
+	@Override public int getLength()
+	{
+		return this.getBytes().length;
+	}
+
+	@Override public byte[] getAll()
+	{
+		return this.getBytes();
+	}
+
+	@Override public void replaceBytes(@NonNull final byte[] bytes)
+	{
+		this.bytes = bytes;
+		this.read = 0;
+	}
+
 }
