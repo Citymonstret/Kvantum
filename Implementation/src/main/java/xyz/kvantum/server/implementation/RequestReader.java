@@ -59,6 +59,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 	private boolean hasQuery = false;
 	private ByteBuf overloadBuffer;
 	private int contentLength = -1;
+	@Getter private boolean cleared = true;
 
 	RequestReader(final AbstractRequest abstractRequest)
 	{
@@ -94,6 +95,8 @@ import xyz.kvantum.server.api.util.AsciiString;
 	 */
 	boolean readByte(final byte b) throws Throwable
 	{
+		this.cleared = false;
+
 		if ( done )
 		{
 			return false;
@@ -297,6 +300,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 			this.overloadBuffer = null;
 		}
 		this.contentLength = -1;
+		this.cleared = true;
 	}
 
 }

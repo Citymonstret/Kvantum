@@ -52,6 +52,7 @@ public final class InputThread extends Thread
 		ServerImplementation.getImplementation().getCommandManager().createCommand( new Stop() );
 		ServerImplementation.getImplementation().getCommandManager().createCommand( new Dump() );
 		ServerImplementation.getImplementation().getCommandManager().createCommand( new Show() );
+		ServerImplementation.getImplementation().getCommandManager().createCommand( ServerImplementation.getImplementation().getMetrics() );
 		ServerImplementation.getImplementation().getCommandManager().createCommand( new Generate() );
 		ServerImplementation.getImplementation().getCommandManager()
 				.addCommand( new Help( ServerImplementation.getImplementation().getCommandManager() ) );

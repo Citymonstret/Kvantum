@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.implementation;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -69,6 +71,9 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 @RequiredArgsConstructor final class KvantumServerHandler extends ChannelInboundHandlerAdapter
 {
 
+	//
+	// Cached content
+	//
 	private static final String CONTENT_TYPE = "content_type";
 	private static final byte[] NEW_LINE = AsciiString.of( "\n" ).getValue();
 	private static final byte[] COLON_SPACE = AsciiString.of( ": " ).getValue();
@@ -79,8 +84,24 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 	private static final AsciiString CLOSE = AsciiString.of( "close" );
 	private static final AsciiString CONNECTION = AsciiString.of( "connection" );
 
+	//
+	// Metrics
+	//
+	private static final Timer TIMER_WRITE_RESPONSE = ServerImplementation.getImplementation().getMetrics().getRegistry()
+			.timer( MetricRegistry.name( KvantumServerHandler.class, "writeResponse" ) );
+	private static final Timer TIMER_SEND_RESPONSE = ServerImplementation.getImplementation().getMetrics().getRegistry()
+			.timer( MetricRegistry.name( KvantumServerHandler.class, "sendResponse" ) );
+	private static final Timer TIMER_READ_REQUEST = ServerImplementation.getImplementation().getMetrics().getRegistry()
+			.timer( MetricRegistry.name( KvantumServerHandler.class, "readRequest" ) );
+	private static final Timer TIMER_TOTAL_SEND = ServerImplementation.getImplementation().getMetrics().getRegistry()
+			.timer( MetricRegistry.name( KvantumServerHandler.class, "totalSend" ) );
+
+	//
+	// Instance variables
+	//
 	private final ProtocolType protocolType;
 
+	private Timer.Context totalTimer;
 	private WorkerContext workerContext;
 	private RequestReader requestReader;
 	private boolean reused = false;
@@ -144,6 +165,11 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		//
 		final ByteBuf message = ( ByteBuf ) messageObject;
 
+		if ( this.requestReader.isCleared() )
+		{
+			totalTimer = TIMER_READ_REQUEST.time();
+		}
+
 		try
 		{
 			this.requestReader.readBytes( message );
@@ -168,6 +194,8 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			{
 				this.workerContext.getRequest().dumpRequest();
 			}
+
+			this.totalTimer.stop();
 
 			try
 			{
@@ -204,6 +232,7 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 	private void writeResponse() throws Throwable
 	{
+		final Timer.Context timer = TIMER_WRITE_RESPONSE.time();
 		//
 		// Scope variables
 		//
@@ -347,11 +376,13 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 		if ( body == null || responseStream == null )
 		{
+			timer.stop();
 			throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext );
 		}
 
 		workerContext.setBody( body );
 		workerContext.setResponseStream( responseStream );
+		timer.stop();
 	}
 
 	private void determineRequestHandler() throws Throwable
@@ -381,13 +412,16 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 	private void handleResponse(final ChannelHandlerContext context) throws Throwable
 	{
+		final Timer.Context timer = TIMER_TOTAL_SEND.time();
 		this.determineRequestHandler();
 		this.writeResponse();
 		this.sendResponse( context );
+		timer.close();
 	}
 
 	@SuppressWarnings("ALL") private void sendResponse(final ChannelHandlerContext context)
 	{
+		final Timer.Context timer = TIMER_SEND_RESPONSE.time();
 		//
 		// Determine whether or not the responce should be compressed
 		//
@@ -631,6 +665,8 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		{
 			future.addListener( ChannelFutureListener.CLOSE );
 		}
+
+		timer.stop();
 	}
 
 	@Override public void exceptionCaught(final ChannelHandlerContext context, final Throwable cause)

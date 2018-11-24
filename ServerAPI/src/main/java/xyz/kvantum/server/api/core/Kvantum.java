@@ -48,6 +48,7 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CollectionUtil;
 import xyz.kvantum.server.api.util.Generator;
 import xyz.kvantum.server.api.util.ITempFileManagerFactory;
+import xyz.kvantum.server.api.util.Metrics;
 import xyz.kvantum.server.api.views.RequestHandler;
 
 /**
@@ -160,6 +161,14 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	 * @param args Replacements
 	 */
 	void log(String message, int mode, Object... args);
+
+	/**
+	 * Get the metric manager
+	 *
+	 *
+	 * @return Metric manager
+	 */
+	Metrics getMetrics();
 
 	/**
 	 * Get the cache manager instance

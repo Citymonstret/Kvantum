@@ -85,6 +85,7 @@ import xyz.kvantum.server.api.util.ErrorOutputStream;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.util.ITempFileManagerFactory;
 import xyz.kvantum.server.api.util.MetaProvider;
+import xyz.kvantum.server.api.util.Metrics;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
@@ -117,6 +118,7 @@ public class SimpleServer implements Kvantum
 	@Getter private final WorkerProcedure procedure = new WorkerProcedure();
 	@Getter private final ITempFileManagerFactory tempFileManagerFactory = new TempFileManagerFactory();
 	@Getter private final KvantumFileUpload globalFileUpload = new KvantumFileUpload();
+	@Getter private final Metrics metrics = new Metrics();
 	@Getter private final Gson gson = new GsonBuilder().registerTypeAdapter( Account.class, new AccountSerializer() )
 			.create();
 	private final ServerContext serverContext;

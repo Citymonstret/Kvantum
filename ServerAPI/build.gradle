@@ -1,4 +1,6 @@
 dependencies {
+    // Performance monitoring
+    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
     // Logback (used for configuration purposes only)
     compile 'ch.qos.logback:logback-classic:1.1.5'
     // Used to simplify code creation
