@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
         classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.1")
-        classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
+        classpath 'com.netflix.nebula:gradle-lint-plugin:10.3.1'
     }
 }
 
