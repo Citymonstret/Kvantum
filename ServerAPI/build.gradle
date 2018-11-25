@@ -18,7 +18,7 @@ dependencies {
     // Command management system
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     // Password encryption
-    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
+    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4-atlassian-1'
     // Auto-generated configuration files
     compile 'com.github.Sauilitired:Configurable:1.0.0'
     // Great IO utilities (TODO: Look into this dependency)
