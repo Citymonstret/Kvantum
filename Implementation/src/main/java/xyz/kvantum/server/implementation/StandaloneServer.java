@@ -242,20 +242,25 @@ public final class StandaloneServer extends SimpleServer
 					Logger.debug( "Trying to load addons from {}", url );
 				}
 				final java.nio.file.Path addonFolderPath;
-				if ( url.getFile().contains( "!" ) )
+				if ( url != null && url.getFile() != null )
 				{
-					// inside of jar
-					// MyClass.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
-					final java.nio.file.Path jarPath = Paths
-							.get( StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation()
-									.getPath() );
-					final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem( jarPath, null );
-					addonFolderPath = fileSystem.getPath( "/addons" );
+					if ( url.getFile().contains( "!" ) )
+					{
+						// inside of jar
+						// MyClass.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+						final java.nio.file.Path jarPath = Paths
+								.get( StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath() );
+						final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem( jarPath, null );
+						addonFolderPath = fileSystem.getPath( "/addons" );
+					} else
+					{
+						// loading from IDE
+						@NonNull final File file = new File( url.getFile() );
+						addonFolderPath = file.toPath();
+					}
 				} else
 				{
-					// loading from IDE
-					@NonNull final File file = new File( url.getFile() );
-					addonFolderPath = file.toPath();
+					addonFolderPath = null;
 				}
 
 				Logger.info( "Loading internal addons..." );
@@ -282,17 +287,19 @@ public final class StandaloneServer extends SimpleServer
 					Logger.info( "- {}", disabled );
 				}
 
-				Files.list( addonFolderPath ).filter( file -> !skipping.contains( file.getFileName().toString() ) )
-						.forEach( file -> {
-							try
-							{
-								Files.copy( file, new File( new File( getCoreFolder(), "plugins" ),
-										file.getFileName().toString() ).toPath(), StandardCopyOption.REPLACE_EXISTING );
-							} catch ( IOException e )
-							{
-								e.printStackTrace();
-							}
-						} );
+				if ( addonFolderPath != null )
+				{
+					Files.list( addonFolderPath ).filter( file -> !skipping.contains( file.getFileName().toString() ) ).forEach( file -> {
+						try
+						{
+							Files.copy( file, new File( new File( getCoreFolder(), "plugins" ), file.getFileName().toString() ).toPath(),
+									StandardCopyOption.REPLACE_EXISTING );
+						} catch ( IOException e )
+						{
+							e.printStackTrace();
+						}
+					} );
+				}
 			} catch ( final Exception e )
 			{
 				e.printStackTrace();
@@ -311,22 +318,27 @@ public final class StandaloneServer extends SimpleServer
 			{
 				@NonNull final URL url = StandaloneServer.class.getResource( "/META-INF/resources/webjars" );
 				final java.nio.file.Path webjarsFolderPath;
-				if ( url.getFile().contains( "!" ) )
+				if ( url != null && url.getFile() != null )
 				{
-					// inside of jar
-					// MyClass.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
-					final java.nio.file.Path jarPath = Paths
-							.get( StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation()
-									.getPath() );
-					final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem( jarPath, null );
-					webjarsFolderPath = fileSystem.getPath( "/META-INF/resources/webjars" );
+					if ( url.getFile().contains( "!" ) )
+					{
+						// inside of jar
+						// MyClass.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+						final java.nio.file.Path jarPath = Paths
+								.get( StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath() );
+						final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem( jarPath, null );
+						webjarsFolderPath = fileSystem.getPath( "/META-INF/resources/webjars" );
+					} else
+					{
+						// loading from IDE
+						@NonNull final File file = new File( url.getFile() );
+						webjarsFolderPath = file.toPath();
+					}
 				} else
 				{
-					// loading from IDE
-					@NonNull final File file = new File( url.getFile() );
-					webjarsFolderPath = file.toPath();
+					webjarsFolderPath = null;
 				}
-				if ( !Files.exists( webjarsFolderPath ) )
+				if ( webjarsFolderPath == null || !Files.exists( webjarsFolderPath ) )
 				{
 					Logger.warn( "`loadWebJars`= true, but no webjars resources present..." );
 					break loadWebJars;

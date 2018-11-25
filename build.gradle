@@ -13,11 +13,21 @@ buildscript {
     }
 }
 
+plugins {
+    id 'net.ltgt.apt' version '0.10'
+    id 'java'
+}
+
+repositories {
+    jcenter() // or Maven central, required for Lombok dependency
+}
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3.1'
+    gradleVersion = '4.10.2'
 }
 
 allprojects {
+    apply plugin: 'net.ltgt.apt'
     apply plugin: 'com.github.hierynomus.license'
     apply plugin: 'maven'
     apply plugin: 'idea'
@@ -38,6 +48,9 @@ allprojects {
     }
 
     dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.4'
+        apt 'org.projectlombok:lombok:1.18.4'
+        
         testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
         testCompile(
                 'org.junit.jupiter:junit-jupiter-engine:5.3.1',
@@ -101,10 +114,8 @@ group 'xyz.kvantum'
 version = '1.2-SNAPSHOT'
 
 subprojects {
-    apply plugin: 'java'
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.10
+    targetCompatibility = 1.10
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'

@@ -4,8 +4,8 @@ dependencies {
     // Logback (used for configuration purposes only)
     compile 'ch.qos.logback:logback-classic:1.2.3'
     // Used to simplify code creation
-    compileOnly 'org.projectlombok:lombok:1.16.18'
-    testCompileOnly 'org.projectlombok:lombok:1.16.18'
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+    testCompileOnly 'org.projectlombok:lombok:1.18.4'
     // Mostly used for its awesome map implementations
     compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // rest query engine
@@ -18,7 +18,7 @@ dependencies {
     // Command management system
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     // Password encryption
-    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4-atlassian-1'
+    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
     // Auto-generated configuration files
     compile 'com.github.Sauilitired:Configurable:1.0.0'
     // Great IO utilities (TODO: Look into this dependency)
