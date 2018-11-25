@@ -22,6 +22,7 @@
 package xyz.kvantum.server.implementation;
 
 import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
 import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
@@ -445,6 +446,22 @@ final class ResponseTask implements Runnable
 			Logger.debug( "Using direct write from memory: {}", hasKnownLength );
 		}
 
+		int toRead;
+		if ( hasKnownLength )
+		{
+			toRead = CoreConfig.Buffer.out;
+		} else
+		{
+			toRead = CoreConfig.Buffer.out - KvantumServerHandler.MAX_LENGTH;
+		}
+
+		if ( toRead <= 0 )
+		{
+			Logger.warn( "buffer.out is less than {}, configured value will be ignored",
+					KvantumServerHandler.MAX_LENGTH );
+			toRead = MAX_LENGTH + 1;
+		}
+
 		//
 		// Write the response
 		//
@@ -453,15 +470,6 @@ final class ResponseTask implements Runnable
 			//
 			// Read as much data as possible from the respone stream
 			//
-			final int toRead;
-			if ( hasKnownLength )
-			{
-				toRead = CoreConfig.Buffer.out;
-			} else
-			{
-				toRead = CoreConfig.Buffer.out - KvantumServerHandler.MAX_LENGTH;
-			}
-
 			byte[] bytes = responseStream.read( toRead );
 			if ( bytes != null && bytes.length > 0 )
 			{
