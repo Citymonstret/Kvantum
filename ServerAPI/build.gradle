@@ -1,6 +1,4 @@
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.4'
-    testCompileOnly 'org.projectlombok:lombok:1.18.4'
     // Performance monitoring
     compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
     // Logback (used for configuration purposes only)
