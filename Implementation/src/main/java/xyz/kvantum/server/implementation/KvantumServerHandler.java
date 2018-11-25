@@ -95,6 +95,8 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			.timer( MetricRegistry.name( KvantumServerHandler.class, "readRequest" ) );
 	private static final Timer TIMER_TOTAL_SEND = ServerImplementation.getImplementation().getMetrics().getRegistry()
 			.timer( MetricRegistry.name( KvantumServerHandler.class, "totalSend" ) );
+	private static final Timer TIMER_ROUTING = ServerImplementation.getImplementation().getMetrics().getRegistry()
+			.timer( MetricRegistry.name( KvantumServerHandler.class, "routing" ) );
 
 	//
 	// Instance variables
@@ -404,10 +406,12 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 	private void determineRequestHandler() throws Throwable
 	{
+		Timer.Context timer = TIMER_ROUTING.time();
 		workerContext.setRequestHandler(
 				ServerImplementation.getImplementation().getRouter().match( workerContext.getRequest() ) );
 		if ( workerContext.getRequestHandler() == null )
 		{
+			timer.close();
 			throw new ReturnStatus( Header.STATUS_NOT_FOUND, workerContext );
 		}
 		if ( workerContext.getRequest().getProtocolType() != ProtocolType.HTTPS && workerContext.getRequestHandler()
@@ -420,11 +424,13 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 			}
 			if ( !CoreConfig.SSL.enable )
 			{
+				timer.close();
 				Logger.error( "RequestHandler ({}) forces HTTPS but SSL runner not enabled!" );
 				throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext );
 			}
 			workerContext.setRequestHandler( HTTPSRedirectHandler.getInstance() );
 		}
+		timer.close();
 	}
 
 	@SuppressWarnings( "unused" )

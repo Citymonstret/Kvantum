@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.matching;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import xyz.kvantum.server.api.config.CoreConfig;
 
 class ViewPatternTest
 {
@@ -40,6 +41,8 @@ class ViewPatternTest
 
 	@Test void matches()
 	{
+		CoreConfig.debug = false; // Prevent logging
+
 		final String username = getRandomString( 10 ) + "_";
 
 		final ViewPattern pattern1 = new ViewPattern( "user/<username>" );
@@ -79,6 +82,12 @@ class ViewPatternTest
 
 		Assert.assertNull( pattern3.matches( "user/" ) );
 		Assert.assertNull( pattern3.matches( "user/Username/posts/foo/bar" ) );
+
+		final ViewPattern pattern4 = new ViewPattern( "/test/file.extension.[extension]/" );
+		map = pattern4.matches( "/test/file.extension.com" );
+		Assert.assertNotNull( map );
+		Assert.assertTrue( map.containsKey( "extension" ) );
+		Assert.assertEquals( "com", map.get( "extension" ) );
 	}
 
 }

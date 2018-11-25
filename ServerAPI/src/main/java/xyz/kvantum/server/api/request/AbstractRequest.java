@@ -401,7 +401,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 					for ( final String part : subParts )
 					{
 						final String[] subSubParts = StringUtils.split( part, "=", 2 );
-						this.parameters.put( subSubParts[ 0 ], subSubParts[ 1 ] );
+						this.parameters.put( subSubParts[ 0 ], subSubParts.length > 1 ? subSubParts[ 1 ] : "" );
 					}
 				} else
 				{

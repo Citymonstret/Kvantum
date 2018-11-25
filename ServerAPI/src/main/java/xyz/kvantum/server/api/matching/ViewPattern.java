@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.matching;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +33,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 
 /**
@@ -51,9 +53,12 @@ import xyz.kvantum.server.api.util.Assert;
 	private static final Pattern PATTERN_VARIABLE_REQUIRED = Pattern.compile( "<([a-zA-Z0-9]*)>" );
 	private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)(=([a-zA-Z0-9]*))?]" );
 	private static final Pattern PATTERN_VARIABLE_STATIC = Pattern.compile( "([a-zA-Z0-9]*)" );
+	private static final String  PATTERN_PATTERN = "[\\/]*%s[\\/]*";
 
 	private final List<Part> parts = new ArrayList<>();
 	private final String raw;
+	private final Pattern pattern;
+	private final Map<String, Variable> variableMap = new HashMap<>();
 
 	/**
 	 * Generate a list of parts from the provided string
@@ -66,12 +71,18 @@ import xyz.kvantum.server.api.util.Assert;
 
 		this.raw = in;
 
-		final SmartString string = new SmartString( raw.toLowerCase( Locale.ENGLISH ) );
-		string.replaceLastIf( '/', SmartString.nil );
-		string.replaceFirstIf( '/', SmartString.nil );
+		String string = raw.toLowerCase( Locale.ENGLISH );
+		if ( string.charAt( 0 ) == '/' )
+		{
+			string = string.substring( 1 );
+		}
+		if ( string.charAt( string.length() - 1 ) == '/' )
+		{
+			string = string.substring( 0, string.length() - 1 );
+		}
 
 		final List<Integer> delimiterTypes = new ArrayList<>();
-		for ( final Character c : string )
+		for ( final Character c : string.toCharArray() )
 		{
 			if ( c.equals( '.' ) )
 			{
@@ -83,7 +94,7 @@ import xyz.kvantum.server.api.util.Assert;
 		}
 		final Iterator<Integer> delimiterIterator = delimiterTypes.iterator();
 
-		final StringTokenizer stringTokenizer = new StringTokenizer( string.toString(), "\\/." );
+		final StringTokenizer stringTokenizer = new StringTokenizer( string, "\\/." );
 		while ( stringTokenizer.hasMoreTokens() )
 		{
 			final String token = stringTokenizer.nextToken();
@@ -120,6 +131,35 @@ import xyz.kvantum.server.api.util.Assert;
 				}
 			}
 		}
+
+		final StringBuilder pattern = new StringBuilder();
+		for ( int index = 0; index < parts.size(); index++ )
+		{
+			final Part part = parts.get( index );
+			final Part nextPart;
+			if ( index + 1 == parts.size() )
+			{
+				nextPart = null;
+			} else
+			{
+				nextPart = parts.get( index + 1 );
+			}
+			final boolean optional = nextPart != null && nextPart instanceof Variable &&
+					( ( Variable ) nextPart ).getType() == Variable.TYPE_OPTIONAL;
+			pattern.append( part.toRegexBlock( optional ) );
+			if ( part instanceof Variable )
+			{
+				final Variable variable = (Variable) part;
+				variableMap.put( variable.name, variable );
+			}
+		}
+		this.pattern = Pattern.compile( String.format( PATTERN_PATTERN, pattern.toString() ) );
+
+		if ( CoreConfig.debug )
+		{
+			Logger.debug( "Transformed pattern into regex: {0} -> {1}", raw, this.pattern.pattern() );
+		}
+
 	}
 
 	/**
@@ -132,26 +172,29 @@ import xyz.kvantum.server.api.util.Assert;
 	{
 		Assert.notNull( in );
 
-		final SmartString url;
-		if ( in.contains( "?" ) )
+		String url;
+		int index;
+		if ( ( index = in.indexOf( '?' )) != -1 )
 		{
-			url = new SmartString( in.split( "\\?" )[ 0 ] );
+			url = in.substring( 0, index );
 		} else
 		{
-			url = new SmartString( in );
+			url = in;
 		}
 
-		url.replaceFirstIf( '/', SmartString.nil );
-		url.replaceLastIf( '/', SmartString.nil );
+		// Replace all but last occurrence of . with §
+		final int count = StringUtils.countMatches( url, "." );
 
-		if ( url.count( '.' ) >= 2 )
+		if ( count >= 2 )
 		{
-			url.replaceAllButLast( '.', '§' );
+			final int lastIndex = url.lastIndexOf( "." );
+			final String sub = url.substring( 0, lastIndex );
+			url = sub.replaceAll( "\\.", "§" ) + url.substring( lastIndex );
 		}
 
 		if ( parts.isEmpty() )
 		{
-			if ( url.toString().isEmpty() )
+			if ( url.isEmpty() )
 			{
 				return new HashMap<>();
 			} else
@@ -160,116 +203,37 @@ import xyz.kvantum.server.api.util.Assert;
 			}
 		}
 
-		final List<Integer> delimiterTypes = new ArrayList<>();
-		for ( final Character c : url )
-		{
-			if ( c.equals( '.' ) )
-			{
-				delimiterTypes.add( 0 );
-			} else if ( c.equals( '/' ) )
-			{
-				delimiterTypes.add( 1 );
-			}
-		}
-
-		final Iterator<Integer> delimiterIterator = delimiterTypes.iterator();
-		int currentDelimiter = -1;
-
-		final Map<String, String> variables = new HashMap<>();
-		final StringTokenizer stringTokenizer = new StringTokenizer( url.toString(), "\\/." );
-		Part lastPart = null;
-
-		int iterator = -1;
-
-		for ( final Part part : parts )
-		{
-			iterator++;
-
-			if ( part instanceof Split || part instanceof Dot )
-			{
-				if ( delimiterIterator.hasNext() )
-				{
-					currentDelimiter = delimiterIterator.next();
-				} else
-				{
-					currentDelimiter = -1;
-				}
-				lastPart = part;
-
-				if ( ( iterator + 1 ) < parts.size() && ( ( parts.get( iterator + 1 ) instanceof Variable
-						&& ( ( ( Variable ) parts.get( iterator + 1 ) ).getType() ) == Variable.TYPE_REQUIRED ) || parts
-						.get( iterator + 1 ) instanceof Static ) )
-				{
-					if ( part instanceof Split && currentDelimiter != 1 )
-					{
-						return null; // Nullable
-					} else if ( part instanceof Dot && currentDelimiter != 0 )
-					{
-						return null; // Nullable
-					}
-				}
-				continue;
-			}
-
-			boolean has = stringTokenizer.hasMoreTokens();
-			String next = has ? stringTokenizer.nextToken() : "";
-
-			if ( part instanceof Variable )
-			{
-				Variable v = ( Variable ) part;
-
-				if ( v.getType() == Variable.TYPE_REQUIRED )
-				{
-					if ( !has )
-					{
-						return null; // Nullable
-					}
-				} else if ( has )
-				{
-					if ( lastPart instanceof Split && currentDelimiter != 1 )
-					{
-						return null; // Nullable
-					} else if ( lastPart instanceof Dot && currentDelimiter != 0 )
-					{
-						return null; // Nullable
-					}
-				}
-			} else if ( part instanceof Static )
-			{
-				if ( !has )
-				{
-					return null; // Nullable
-				} else
-				{
-					if ( !next.equalsIgnoreCase( part.toString() ) )
-					{
-						return null; // Nullable
-					}
-				}
-			}
-
-			if ( part instanceof Variable )
-			{
-				final Variable variable = ( Variable ) part;
-				if ( next.isEmpty() )
-				{
-					if ( variable.hasDefaultValue() )
-					{
-						variables.put( variable.getName(), variable.getDefaultValue() );
-					}
-				} else
-				{
-					variables.put( variable.getName(), next );
-				}
-			}
-
-			lastPart = part;
-		}
-
-		if ( stringTokenizer.hasMoreTokens() )
+		final Matcher matcher = pattern.matcher( url );
+		if ( !matcher.matches() )
 		{
 			return null; // Nullable
 		}
+
+		final Map<String, String> variables = new HashMap<>();
+		for ( final Map.Entry<String, Variable> entry : this.variableMap.entrySet() )
+		{
+			String value = matcher.group( entry.getKey() );
+			if ( value == null )
+			{
+				value = "";
+			}
+			if ( value.isEmpty() ) // The value is missing
+			{
+				if ( entry.getValue().getType() == Variable.TYPE_REQUIRED ) // Value is missing
+				{
+					return null; // Nullable
+				}
+				if ( entry.getValue().hasDefaultValue() )
+				{
+					value = entry.getValue().getDefaultValue();
+				} else
+				{
+					continue;
+				}
+			}
+			variables.put( entry.getKey(), value );
+		}
+
 		return variables;
 	}
 
@@ -282,6 +246,8 @@ import xyz.kvantum.server.api.util.Assert;
 	{
 
 		@Override public abstract String toString();
+
+		public abstract String toRegexBlock(boolean nextOptional);
 
 	}
 
@@ -299,184 +265,10 @@ import xyz.kvantum.server.api.util.Assert;
 		{
 			return string;
 		}
-	}
 
-	@SuppressWarnings("unused") private static class SmartString implements Iterable<Character>
-	{
-
-		private static final char nil = '#';
-
-		private char[] chars;
-		private int length;
-
-		private boolean changed = false;
-
-		private SmartString(final String in)
+		@Override public String toRegexBlock(final boolean nextOptional)
 		{
-			Assert.notNull( in );
-
-			this.chars = in.toCharArray();
-			this.length = in.length();
-		}
-
-		char lastCharacter()
-		{
-			return chars[ length - 1 ];
-		}
-
-		void replaceLast(char c)
-		{
-			set( length - 1, c );
-		}
-
-		void replaceAll(char c, char w)
-		{
-			int[] indices = findAll( c );
-			for ( int i : indices )
-			{
-				set( i, w );
-			}
-		}
-
-		@SuppressWarnings("ALL") void replaceLastIf(char c, char k)
-		{
-			replaceIf( length - 1, c, k );
-		}
-
-		int count(char search)
-		{
-			int i = 0;
-			for ( char c : this.chars )
-			{
-				if ( c == search )
-				{
-					i += 1;
-				}
-			}
-			return i;
-		}
-
-		int[] search(char search)
-		{
-			final int count = this.count( search );
-			int[] indices = new int[ count ];
-			char c;
-			int indexPointer = 0;
-			for ( int index = 0; index < this.chars.length; index++ )
-			{
-				c = this.chars[ index ];
-				if ( c == search )
-				{
-					indices[ indexPointer++ ] = index;
-				}
-			}
-			return indices;
-		}
-
-		void replaceIf(int n, char c, char k)
-		{
-			if ( length == 0 )
-			{
-				return;
-			}
-			if ( chars[ n ] == c )
-			{
-				set( n, k );
-			}
-		}
-
-		int[] findAll(char c)
-		{
-			int[] indices = new int[ length ];
-			int written = 0;
-			for ( int i = 0; i < length; i++ )
-			{
-				if ( chars[ i ] == c )
-				{
-					indices[ written++ ] = i;
-				}
-			}
-			int[] n = new int[ written ];
-			System.arraycopy( indices, 0, n, 0, n.length );
-			return n;
-		}
-
-		void set(final int i, final char c)
-		{
-			if ( length == 0 )
-			{
-				return;
-			}
-			chars[ i ] = c;
-			changed = true;
-		}
-
-		void remove(final int i)
-		{
-			set( i, nil );
-		}
-
-		void regenerate()
-		{
-			char[] temp = new char[ length ];
-			int index = 0;
-			for ( char c : chars )
-			{
-				if ( c != nil )
-				{
-					temp[ index++ ] = c;
-				}
-			}
-			chars = new char[ index ];
-			System.arraycopy( temp, 0, chars, 0, index );
-			length = chars.length;
-			changed = false;
-		}
-
-		@Override public String toString()
-		{
-			if ( changed )
-			{
-				regenerate();
-			}
-			return new String( chars );
-		}
-
-		@Override @NonNull public Iterator<Character> iterator()
-		{
-			return new Iterator<Character>()
-			{
-
-				int index = 0;
-
-				{
-					SmartString.this.regenerate();
-				}
-
-				@Override public boolean hasNext()
-				{
-					return index < length;
-				}
-
-				@Override public Character next()
-				{
-					return chars[ index++ ];
-				}
-			};
-		}
-
-		@SuppressWarnings("ALL") void replaceFirstIf(char c1, char c2)
-		{
-			replaceIf( 0, c1, c2 );
-		}
-
-		@SuppressWarnings("ALL") void replaceAllButLast(char search, char replacement)
-		{
-			final int[] indices = search( search );
-			for ( int index = 0; index < indices.length - 1; index++ )
-			{
-				this.chars[ indices[ index ] ] = replacement;
-			}
+			return String.format( "(%s)", this.string );
 		}
 	}
 
@@ -487,6 +279,17 @@ import xyz.kvantum.server.api.util.Assert;
 		{
 			return ".";
 		}
+
+		@Override public String toRegexBlock(final boolean nextOptional)
+		{
+			if ( nextOptional )
+			{
+				return "[.§]*";
+			} else
+			{
+				return "[§.]{1}";
+			}
+		}
 	}
 
 	private static final class Split extends Part
@@ -495,6 +298,17 @@ import xyz.kvantum.server.api.util.Assert;
 		@Override public String toString()
 		{
 			return "/";
+		}
+
+		@Override public String toRegexBlock(final boolean nextOptional)
+		{
+			if ( nextOptional )
+			{
+				return "[\\/]*";
+			} else
+			{
+				return "[\\/]{1}";
+			}
 		}
 	}
 
@@ -518,7 +332,12 @@ import xyz.kvantum.server.api.util.Assert;
 
 		@Override public String toString()
 		{
-			return this.name + ( type == TYPE_REQUIRED ? "" : "?" );
+			return this.name + ( type == TYPE_REQUIRED ? "" :  "?" );
+		}
+
+		@Override public String toRegexBlock(final boolean nextOptional)
+		{
+			return String.format( "(?<%s>[A-Za-z0-9_-]%s)", this.name, type == TYPE_REQUIRED ? "+" : "*" );
 		}
 	}
 
