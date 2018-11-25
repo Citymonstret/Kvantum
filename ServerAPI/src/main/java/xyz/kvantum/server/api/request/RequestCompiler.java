@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.request;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -38,6 +40,11 @@ import xyz.kvantum.server.api.util.AsciiString;
 @SuppressWarnings({ "unused", "WeakerAccess" }) @UtilityClass public final class RequestCompiler
 {
 
+	private static final Timer TIMER_COMPILE_HEADER = ServerImplementation.getImplementation().getMetrics()
+			.getRegistry().timer( MetricRegistry.name( RequestCompiler.class, "compileHeader" ) );
+	private static final Timer TIMER_COMPILE_QUERY = ServerImplementation.getImplementation().getMetrics()
+			.getRegistry().timer( MetricRegistry.name( RequestCompiler.class, "compileQuery" ) );
+
 	private static final Pattern PATTERN_QUERY = Pattern.compile(
 			"(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!%]*) "
 					+ "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?" );
@@ -50,22 +57,27 @@ import xyz.kvantum.server.api.util.AsciiString;
 
 	public static Optional<HeaderPair> compileHeader(@NonNull final String line)
 	{
+		Timer.Context timer = TIMER_COMPILE_HEADER.time();
 		final Matcher matcher = PATTERN_HEADER.matcher( line );
 		if ( !matcher.matches() )
 		{
+			timer.close();
 			return Optional.empty();
 		}
 		final AsciiString key = AsciiString.of( matcher.group( KEY ).toLowerCase( Locale.ENGLISH ) );
 		final AsciiString value = AsciiString.of( matcher.group( VALUE ), false );
+		timer.close();
 		return Optional.of( new HeaderPair( key, value ) );
 	}
 
 	public static void compileQuery(@NonNull final AbstractRequest request, @NonNull final String line)
 			throws IllegalArgumentException, RequestException
 	{
+		final Timer.Context timer = TIMER_COMPILE_QUERY.time();
 		final Matcher matcher = PATTERN_QUERY.matcher( line );
 		if ( !matcher.matches() )
 		{
+			timer.close();
 			throw new IllegalArgumentException( "Not a query line" );
 		}
 		if ( CoreConfig.verbose )
@@ -75,12 +87,14 @@ import xyz.kvantum.server.api.util.AsciiString;
 		final Optional<HttpMethod> methodOptional = HttpMethod.getByName( matcher.group( METHOD ) );
 		if ( !methodOptional.isPresent() )
 		{
+			timer.close();
 			throw new RequestException( "Unknown request method: " + matcher.group( METHOD ), request );
 		}
 		// request.setQuery( new AbstractRequest.Query( methodOptional.get(), request.getProtocolType(),
 		// 		matcher.group( RESOURCE ) ) );
 		request.setQuery( AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( methodOptional.get(),
 				request.getProtocolType(), matcher.group( RESOURCE ) ) ) );
+		timer.close();
 	}
 
 	@Getter @RequiredArgsConstructor public static final class HeaderPair

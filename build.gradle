@@ -14,7 +14,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3.1'
+    gradleVersion = '4.8'
 }
 
 allprojects {
@@ -102,8 +102,8 @@ group 'xyz.kvantum'
 version = '1.2-SNAPSHOT'
 
 subprojects {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.10
+    targetCompatibility = 1.10
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'

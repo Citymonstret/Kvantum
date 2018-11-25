@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
@@ -33,6 +34,9 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +52,6 @@ import pw.stamina.causam.registry.SubscriptionRegistry;
 import pw.stamina.causam.scan.method.model.Subscriber;
 import pw.stamina.causam.select.CachingSubscriptionSelectorServiceDecorator;
 import pw.stamina.causam.select.SubscriptionSelectorService;
-import sun.misc.Signal;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.server.api.account.IAccountManager;
@@ -124,7 +127,9 @@ public class SimpleServer implements Kvantum
 	private final ServerContext serverContext;
 	@Getter protected ICacheManager cacheManager;
 	PrintStream logStream;
+	@Getter private InputThread inputThread;
 	@Getter private boolean silent = false;
+	@Getter private ExecutorService executorService;
 	@Getter private SessionManager sessionManager;
 	@Getter private boolean paused = false;
 	@Getter private boolean stopping;
@@ -158,6 +163,14 @@ public class SimpleServer implements Kvantum
 		{
 			throw new KvantumInitializationException( "Failed to create the core folder: " + getCoreFolder() );
 		}
+
+		//
+		// Initialize the executor service
+		//
+		this.executorService = Executors.newCachedThreadPool(
+				new ThreadFactoryBuilder().setDaemon( false )
+				.setNameFormat( "kvantum-handler-pool-%d" ).build()
+		);
 
 		//
 		// Watches for file updates and invalidates cache
@@ -246,8 +259,14 @@ public class SimpleServer implements Kvantum
 		if ( serverContext.isStandalone() )
 		{
 			// Makes the application closable in the terminal
-			Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
-
+			// Removed post Java 8: Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
+			final Thread exitThread = new Thread( () ->
+			{
+				ServerImplementation.getImplementation().stopServer();
+			} );
+			exitThread.setName( "Shutdown Handler" );
+			exitThread.setDaemon( true );
+			Runtime.getRuntime().addShutdownHook( exitThread );
 			this.commandManager = new CommandManager( '/' );
 			this.commandManager.getManagerOptions().getFindCloseMatches( false );
 			this.commandManager.getManagerOptions().setRequirePrefix( false );
@@ -457,7 +476,8 @@ public class SimpleServer implements Kvantum
 
 		if ( isStandalone() && CoreConfig.enableInputThread )
 		{
-			new InputThread().start();
+			this.inputThread = new InputThread();
+			this.inputThread.start();
 		}
 
 		this.started = true;
@@ -653,7 +673,30 @@ public class SimpleServer implements Kvantum
 
 		if ( isStandalone() && CoreConfig.exitOnStop )
 		{
-			System.exit( 0 );
+			Logger.info( "Shutting down the JVM." );
+
+			//
+			// Find all threads that are currently running
+			//
+			boolean destroyThreadExists = false;
+
+			final Set<Thread> threads = Thread.getAllStackTraces().keySet();
+			for ( final Thread thread : threads )
+			{
+				Logger.info( "Running thread found: \"{0}\" daemon: {1}", thread.getName(), thread.isDaemon() );
+				if ( thread.getName().equalsIgnoreCase( "DestroyJavaVM" ) )
+				{
+					destroyThreadExists = true;
+				}
+			}
+
+			 if ( !destroyThreadExists )
+			 {
+			 	System.exit( 0 );
+			 }
+		} else
+		{
+			Logger.info( "Not set to shutdown on exit. Waiting for parent application to close." );
 		}
 	}
 

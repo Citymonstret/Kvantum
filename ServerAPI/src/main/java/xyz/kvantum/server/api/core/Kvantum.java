@@ -28,6 +28,7 @@ import com.intellectualsites.commands.callers.CommandCaller;
 import com.intellectualsites.commands.parser.Parserable;
 import java.io.File;
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import pw.stamina.causam.EventBus;
 import xyz.kvantum.files.FileSystem;
@@ -126,6 +127,8 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	RequestHandler createSimpleRequestHandler(String filter, BiConsumer<AbstractRequest, Response> generator);
 
 	CommandManager getCommandManager();
+
+	ExecutorService getExecutorService();
 
 	/**
 	 * Start the server instance

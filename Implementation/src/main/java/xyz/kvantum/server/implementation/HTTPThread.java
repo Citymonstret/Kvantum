@@ -27,6 +27,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
@@ -74,7 +75,7 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 					@Override protected void initChannel(final SocketChannel ch) throws Exception
 					{
 						ch.pipeline().addLast( new KvantumReadTimeoutHandler() )
-								.addLast( new KvantumServerHandler( ProtocolType.HTTP ) );
+								.addLast( new ByteArrayEncoder() ).addLast( new KvantumServerHandler( ProtocolType.HTTP ) );
 					}
 				} );
 	}

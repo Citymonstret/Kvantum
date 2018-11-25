@@ -26,6 +26,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.ssl.SslHandler;
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,6 +92,7 @@ final class HTTPSThread extends Thread
 							sslEngine.setNeedClientAuth( false );
 							ch.pipeline().addLast( new SslHandler( sslEngine ) );
 							ch.pipeline().addLast( new KvantumReadTimeoutHandler() );
+							ch.pipeline().addLast( new ByteArrayEncoder() );
 							ch.pipeline().addLast( new KvantumServerHandler( ProtocolType.HTTPS ) );
 						}
 					} );

@@ -47,6 +47,7 @@ import java.util.function.BiConsumer;
 	public FileWatcher()
 	{
 		this.contexts = new CopyOnWriteArrayList<>();
+		this.setName( "KvantumFileWatcher" );
 		this.setDaemon( true );
 		this.start();
 	}

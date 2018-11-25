@@ -22,7 +22,7 @@
 package xyz.kvantum.server.implementation;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -170,7 +170,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 				{
 					throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null );
 				}
-				this.overloadBuffer = ByteBufAllocator.DEFAULT.buffer( this.contentLength );
+				this.overloadBuffer = PooledByteBufAllocator.DEFAULT.buffer( this.contentLength ); // ByteBufAllocator.DEFAULT.buffer( this.contentLength );
 				if ( this.contentLength >= CoreConfig.Limits.limitPostBasicSize )
 				{
 					if ( CoreConfig.debug )

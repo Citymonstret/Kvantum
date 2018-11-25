@@ -21,10 +21,11 @@
  */
 package xyz.kvantum.server.api.request;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import xyz.kvantum.server.api.util.Assert;
-import xyz.kvantum.server.api.util.LambdaUtil;
 
 @SuppressWarnings("ALL") public enum HttpMethod
 {
@@ -61,24 +62,35 @@ import xyz.kvantum.server.api.util.LambdaUtil;
 	 */
 	ALL;
 
-	private final boolean hasBody;
+	private static Map<String, HttpMethod> METHOD_CACHE;
 
-	HttpMethod(final boolean hasBody)
-	{
-		this.hasBody = hasBody;
-	}
+	private final boolean hasBody;
 
 	HttpMethod()
 	{
 		this( true );
 	}
 
+	HttpMethod(final boolean hasBody)
+	{
+		this.hasBody = hasBody;
+	}
+
 	public static Optional<HttpMethod> getByName(final String name)
 	{
 		Assert.notEmpty( name );
 
+		if ( METHOD_CACHE == null )
+		{
+			METHOD_CACHE = new HashMap<>();
+			for ( final HttpMethod method : values() )
+			{
+				METHOD_CACHE.put( method.name(), method );
+			}
+		}
+
 		final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
-		return LambdaUtil.getFirst( values(), method -> method.name().equals( fixed ) );
+		return Optional.ofNullable( METHOD_CACHE.get( fixed ) );
 	}
 
 	public boolean hasBody()

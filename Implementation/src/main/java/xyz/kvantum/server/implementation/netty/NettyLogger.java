@@ -42,59 +42,89 @@ public final class NettyLogger extends AbstractInternalLogger
 
 	@Override public void trace(final String msg)
 	{
-		Logger.info( msg );
+		if ( this.isTraceEnabled() )
+		{
+			Logger.info( msg );
+		}
 	}
 
 	@Override public void trace(final String format, final Object arg)
 	{
-		Logger.info( format, arg );
+		if ( this.isTraceEnabled() )
+		{
+			Logger.info( format, arg );
+		}
 	}
 
 	@Override public void trace(final String format, final Object argA, final Object argB)
 	{
-		Logger.info( format, argA, argB );
+		if ( this.isTraceEnabled() )
+		{
+			Logger.info( format, argA, argB );
+		}
 	}
 
 	@Override public void trace(final String format, final Object... arguments)
 	{
-		Logger.info( format, arguments );
+		if ( this.isTraceEnabled() )
+		{
+			Logger.info( format, arguments );
+		}
 	}
 
 	@Override public void trace(final String msg, final Throwable t)
 	{
-		Logger.info( msg );
-		t.printStackTrace();
+		if ( this.isTraceEnabled() )
+		{
+			Logger.info( msg );
+			t.printStackTrace();
+		}
 	}
 
 	@Override public boolean isDebugEnabled()
 	{
-		return CoreConfig.debug;
+		return CoreConfig.debug && CoreConfig.verbose;
 	}
 
 	@Override public void debug(final String msg)
 	{
-		Logger.debug( msg );
+		if ( this.isDebugEnabled() )
+		{
+			Logger.debug( msg );
+		}
 	}
 
 	@Override public void debug(final String format, final Object arg)
 	{
-		Logger.debug( format, arg );
+		if ( this.isDebugEnabled() )
+		{
+			Logger.debug( format, arg );
+		}
 	}
 
 	@Override public void debug(final String format, final Object argA, final Object argB)
 	{
-		Logger.debug( format, argA, argB );
+		if ( this.isDebugEnabled() )
+		{
+			Logger.debug( format, argA, argB );
+		}
 	}
 
 	@Override public void debug(final String format, final Object... arguments)
 	{
-		Logger.debug( format, arguments );
+		if ( this.isDebugEnabled() )
+		{
+			Logger.debug( format, arguments );
+		}
 	}
 
 	@Override public void debug(final String msg, final Throwable t)
 	{
-		Logger.debug( msg );
-		t.printStackTrace();
+		if ( this.isDebugEnabled() )
+		{
+			Logger.debug( msg );
+			t.printStackTrace();
+		}
 	}
 
 	@Override public boolean isInfoEnabled()
@@ -130,27 +160,39 @@ public final class NettyLogger extends AbstractInternalLogger
 
 	@Override public boolean isWarnEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	@Override public void warn(final String msg)
 	{
-		Logger.warn( msg );
+		if ( this.isWarnEnabled() )
+		{
+			Logger.warn( msg );
+		}
 	}
 
 	@Override public void warn(final String format, final Object arg)
 	{
-		Logger.warn( format, arg );
+		if ( this.isWarnEnabled() )
+		{
+			Logger.warn( format, arg );
+		}
 	}
 
 	@Override public void warn(final String format, final Object... arguments)
 	{
-		Logger.warn( format, arguments );
+		if ( this.isWarnEnabled() )
+		{
+			Logger.warn( format, arguments );
+		}
 	}
 
 	@Override public void warn(final String format, final Object argA, final Object argB)
 	{
-		Logger.warn( format, argA, argB );
+		if ( this.isWarnEnabled() )
+		{
+			Logger.warn( format, argA, argB );
+		}
 	}
 
 	@Override public void warn(final String msg, final Throwable t)

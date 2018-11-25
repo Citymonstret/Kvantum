@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.request;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.io.UnsupportedEncodingException;
@@ -53,6 +55,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.CoreConfig.Cache;
 import xyz.kvantum.server.api.config.Message;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.memguard.LeakageProne;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
@@ -291,6 +294,9 @@ import xyz.kvantum.server.api.util.VariableProvider;
 	public final static class QueryCache implements LeakageProne
 	{
 
+		private static final Timer TIMER_QUERY_CREATE = ServerImplementation.getImplementation().getMetrics()
+				.getRegistry().timer( MetricRegistry.name( QueryCache.class, "createQuery" ) );
+
 		@Getter
 		private static final QueryCache instance = new QueryCache();
 
@@ -316,6 +322,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 
 		public Query getQuery(@NonNull final QueryParameters parameters)
 		{
+			final Timer.Context timer = TIMER_QUERY_CREATE.time();
 			final Query query;
 			if ( this.cachedQueries.containsKey( parameters ) )
 			{
@@ -329,6 +336,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 				query = new Query( parameters );
 				this.cachedQueries.put( parameters, query );
 			}
+			timer.close();
 			return query;
 		}
 

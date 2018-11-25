@@ -21,7 +21,9 @@
  */
 package xyz.kvantum.server.api.util;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,6 +38,8 @@ public enum ProtocolType
 
 	HTTP("http"), HTTPS("https");
 
+	private static Map<String, ProtocolType> CACHE;
+
 	@Getter
 	private final String string;
 
@@ -49,8 +53,17 @@ public enum ProtocolType
 	{
 		Assert.notEmpty( string );
 
+		if ( CACHE == null )
+		{
+			CACHE = new HashMap<>();
+			for ( final ProtocolType type : values() )
+			{
+				CACHE.put( type.name(), type );
+			}
+		}
+
 		final String fixed = string.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
-		return LambdaUtil.getFirst( values(), type -> type.name().equals( fixed ) );
+		return Optional.of( CACHE.get( fixed ) );
 	}
 
 }

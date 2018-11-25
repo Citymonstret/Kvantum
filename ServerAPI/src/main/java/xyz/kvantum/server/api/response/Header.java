@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -423,7 +424,7 @@ import xyz.kvantum.server.api.util.TimeUtil;
 	 * @param allowDuplicates If this is set to false, then previous entries will be overwritten
 	 * @return Instance
 	 */
-	public Header set(@NonNull final HeaderOption key, @NonNull final String value, final boolean allowDuplicates)
+	public Header set(@NonNull final HeaderOption key, @Nullable final String value, final boolean allowDuplicates)
 	{
 		return this.set( key, AsciiString.of( value, false ), allowDuplicates );
 	}
@@ -436,13 +437,16 @@ import xyz.kvantum.server.api.util.TimeUtil;
 	 * @param allowDuplicates If this is set to false, then previous entries will be overwritten
 	 * @return Instance
 	 */
-	public Header set(@NonNull final HeaderOption key, @NonNull final AsciiString value, final boolean allowDuplicates)
+	public Header set(@NonNull final HeaderOption key, @Nullable final AsciiString value, final boolean allowDuplicates)
 	{
-		if ( !allowDuplicates )
+		if ( value == null || !allowDuplicates )
 		{
 			this.headers.removeAll( key );
 		}
-		this.headers.put( key, value );
+		if ( value != null )
+		{
+			this.headers.put( key, value );
+		}
 		return this;
 	}
 

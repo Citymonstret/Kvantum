@@ -51,7 +51,8 @@ dependencies {
     // Cache manager
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
     // Makes code pretty
-    compileOnly 'org.projectlombok:lombok:1.16.18'
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+    testCompileOnly 'org.projectlombok:lombok:1.18.4'
     // HikariCP, SQL connection pooling
     compile 'com.zaxxer:HikariCP:3.2.0'
     // SQLite Driver
@@ -61,9 +62,9 @@ dependencies {
     // Program argument parser
     compile group: 'com.beust', name: 'jcommander', version: '1.72'
     // Netty
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.19.Final'
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.31.Final'
     // Netty native transports
-    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.29.Final',
+    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.31.Final',
             classifier: 'linux-x86_64'
     //
     // Modules

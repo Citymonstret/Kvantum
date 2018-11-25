@@ -44,6 +44,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	private static final byte[] EMPTY = "NULL".getBytes( StandardCharsets.UTF_8 );
 	private static final AsciiString ACCEPT_ENCODING = AsciiString.of( "Accept-Encoding" );
 	private static final AsciiString GZIP = AsciiString.of( "gzip" );
+	private static final AsciiString NULL = null;
 
 	private final Kvantum server;
 	private final WorkerProcedure.WorkerProcedureInstance workerProcedureInstance;
@@ -54,7 +55,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	private AbstractRequest request;
 	private ResponseBody body;
 	private ResponseStream responseStream;
-	private boolean gzip;
+	private boolean gzip = false;
 	private SocketContext socketContext;
 
 	/**
@@ -75,10 +76,8 @@ import xyz.kvantum.server.api.views.RequestHandler;
 			} else if ( CoreConfig.debug )
 			{
 				Message.CLIENT_NOT_ACCEPTING_GZIP.log( request.getHeaders() );
+				body.getHeader().set( Header.HEADER_CONTENT_ENCODING, NULL );
 			}
-		} else
-		{
-			this.gzip = false;
 		}
 	}
 
