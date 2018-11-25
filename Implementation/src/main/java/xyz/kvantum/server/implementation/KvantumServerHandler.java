@@ -141,6 +141,9 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		final ConnectionEstablishedEvent connectionEstablishedEvent = new ConnectionEstablishedEvent(
 				this.workerContext.getSocketContext().getIP() );
 		ServerImplementation.getImplementation().getEventBus().emit( connectionEstablishedEvent );
+		//
+		// Events may cancel the event, in which case we close the context
+		//
 		if ( connectionEstablishedEvent.isCancelled() )
 		{
 			ctx.close();
@@ -150,6 +153,9 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 
 	@Override public void channelRead(final ChannelHandlerContext context, final Object messageObject)
 	{
+		//
+		// Debug message to indicate that the handler is reused
+		//
 		if ( reused && CoreConfig.debug )
 		{
 			Logger.debug( "Reused socket: {}", this.workerContext.getSocketContext().getIP() );
@@ -165,11 +171,17 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		//
 		final ByteBuf message = ( ByteBuf ) messageObject;
 
+		//
+		// Create a new timer context for each request
+		//
 		if ( this.requestReader.isCleared() )
 		{
 			totalTimer = TIMER_READ_REQUEST.time();
 		}
 
+		//
+		// Read all available data and try to compile it
+		//
 		try
 		{
 			this.requestReader.readBytes( message );
@@ -186,7 +198,9 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		//
 		if ( this.requestReader.isDone() )
 		{
+			//
 			// Release content
+			//
 			this.requestReader.clear();
 			this.workerContext.getRequest().onCompileFinish();
 
@@ -195,6 +209,9 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 				this.workerContext.getRequest().dumpRequest();
 			}
 
+			//
+			// Close the read timer
+			//
 			this.totalTimer.stop();
 
 			try
@@ -410,20 +427,33 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		}
 	}
 
+	@SuppressWarnings( "unused" )
 	private void handleResponse(final ChannelHandlerContext context) throws Throwable
 	{
-		final Timer.Context timer = TIMER_TOTAL_SEND.time();
-		this.determineRequestHandler();
-		this.writeResponse();
-		this.sendResponse( context );
-		timer.close();
+		try ( Timer.Context timer = TIMER_TOTAL_SEND.time() )
+		{
+			//
+			// Attempt to find a handler for the request, or create
+			// the appropriate error handler
+			//
+			this.determineRequestHandler();
+			//
+			// Generate the response
+			//
+			this.writeResponse();
+			//
+			// Send the response to the client
+			//
+			this.sendResponse( context );
+		}
 	}
 
 	@SuppressWarnings("ALL") private void sendResponse(final ChannelHandlerContext context)
 	{
 		final Timer.Context timer = TIMER_SEND_RESPONSE.time();
+
 		//
-		// Determine whether or not the responce should be compressed
+		// Determine whether or not the response should be compressed
 		//
 		workerContext.determineGzipStatus();
 
@@ -433,7 +463,6 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 		ResponseBody body = workerContext.getBody();
 
 		// Make sure that the generated response is valid (not null)
-		// TODO: Add more checks
 		Assert.notNull( body );
 		Assert.notNull( body.getHeader() );
 

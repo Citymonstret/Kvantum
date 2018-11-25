@@ -39,7 +39,7 @@ import xyz.kvantum.server.api.util.ProtocolType;
 /**
  * Socket context used to make sure that sockets are handled the same way, across implementations
  */
-@EqualsAndHashCode(of = "socketId") @RequiredArgsConstructor final public class SocketContext
+@EqualsAndHashCode(of = "socketId") @RequiredArgsConstructor public final class SocketContext
 {
 
 	private static final AtomicLong socketIdPoll = new AtomicLong( Long.MIN_VALUE );
