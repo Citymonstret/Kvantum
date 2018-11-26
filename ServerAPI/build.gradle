@@ -30,7 +30,7 @@ dependencies {
     // Apache Commons Fileupload
     compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.3.3'
     // Needed to get the fileupload system to compile
-    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.0'
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
     // Field verification (used in KvantumObject)
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
