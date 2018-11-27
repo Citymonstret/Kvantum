@@ -170,7 +170,6 @@ import xyz.kvantum.server.api.util.AsciiString;
 				{
 					throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null, e );
 				}
-				this.overloadBuffer = PooledByteBufAllocator.DEFAULT.buffer( this.contentLength ); // ByteBufAllocator.DEFAULT.buffer( this.contentLength );
 				if ( this.contentLength >= CoreConfig.Limits.limitPostBasicSize )
 				{
 					if ( CoreConfig.debug )
@@ -180,6 +179,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 					}
 					throw new ReturnStatus( Header.STATUS_ENTITY_TOO_LARGE, null );
 				}
+				this.overloadBuffer = PooledByteBufAllocator.DEFAULT.buffer( this.contentLength ); // ByteBufAllocator.DEFAULT.buffer( this.contentLength );
 			} else
 			{
 				begunLastLine = false;
