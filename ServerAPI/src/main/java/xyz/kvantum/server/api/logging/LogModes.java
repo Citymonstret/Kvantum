@@ -31,7 +31,8 @@ final public class LogModes
 	public static final int MODE_INFO = 1;
 	public static final int MODE_WARNING = 2;
 	public static final int MODE_ERROR = 3;
+	public static final int MODE_ACCESS = 4;
 
 	public static int lowestLevel = MODE_DEBUG;
-	public static int highestLevel = MODE_ERROR;
+	public static int highestLevel = MODE_ACCESS;
 }

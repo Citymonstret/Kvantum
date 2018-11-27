@@ -27,7 +27,7 @@ import lombok.NonNull;
 /**
  * Response stream with a single input write
  */
-public final class SimpleResponseStream extends ResponseStream implements KnownLengthStream
+public class SimpleResponseStream extends ResponseStream implements KnownLengthStream
 {
 
 	@Getter

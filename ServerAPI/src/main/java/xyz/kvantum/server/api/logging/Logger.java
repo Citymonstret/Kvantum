@@ -74,6 +74,21 @@ import xyz.kvantum.server.api.core.ServerImplementation;
 	}
 
 	/**
+	 * Log an access message to the server implementation logger
+	 *
+	 * Replaces string arguments using the pattern {num} from an array of objects, starting from index 0, as such: 0
+	 * &le; num &lt; args.length. If num &ge; args.length, then the pattern will be replaced by an empty string. An
+	 * argument can also be passed as "{}" or "{}", in which case the number will be implied.
+	 *
+	 * @param message message to be logged
+	 * @param args Replacements
+	 */
+	public static void access(final String message, final Object... args)
+	{
+		ServerImplementation.getImplementation().log( message, LogModes.MODE_ACCESS, args );
+	}
+
+	/**
 	 * Log a debug message to the server implementation logger
 	 *
 	 * Replaces string arguments using the pattern {num} from an array of objects, starting from index 0, as such: 0

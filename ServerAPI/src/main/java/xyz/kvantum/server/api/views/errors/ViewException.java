@@ -42,9 +42,9 @@ public class ViewException extends View
 		initTemplate();
 	}
 
-	private final java.lang.Exception in;
+	private final Throwable in;
 
-	public ViewException(final java.lang.Exception in)
+	public ViewException(final Throwable in)
 	{
 		super( "", "exception" );
 		this.in = in;

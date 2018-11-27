@@ -19,36 +19,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.implementation;
+package xyz.kvantum.server.api.response;
 
-import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import xyz.kvantum.server.api.util.AsciiString;
-
-final class ReturnStatus extends Throwable
+public final class ImmutableResponseStream extends SimpleResponseStream
 {
 
-	private static final String MESSAGE_FORMAT = "Status: %s";
-
-	@Getter private AsciiString status;
-
-	@Setter @Getter private WorkerContext applicableContext;
-
-	ReturnStatus(@NonNull final AsciiString status, @Nullable final WorkerContext applicableContext)
+	public ImmutableResponseStream(final byte[] bytes)
 	{
-		super( String.format( MESSAGE_FORMAT, status ) );
-		this.status = status;
-		this.applicableContext = applicableContext;
+		super( bytes );
 	}
 
-	ReturnStatus(@NonNull final AsciiString status, @Nullable final WorkerContext applicableContext,
-			@NonNull final Throwable cause)
+	@Override public void push(byte[] bytes)
 	{
-		super( String.format( MESSAGE_FORMAT, status ), cause );
-		this.status = status;
-		this.applicableContext = applicableContext;
+		throw new UnsupportedOperationException( "Cannot write to immutable stream" );
 	}
 
 }

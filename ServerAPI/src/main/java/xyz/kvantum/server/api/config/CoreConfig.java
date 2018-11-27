@@ -47,6 +47,7 @@ import java.util.List;
 	public static boolean enableSecurityManager = true;
 	public static boolean enableInputThread = true;
 	public static boolean exitOnStop = true;
+	public static boolean hideIps = false;
 
 	public static long timeout = 15;
 	public static String timeoutUnit = "SECONDS";

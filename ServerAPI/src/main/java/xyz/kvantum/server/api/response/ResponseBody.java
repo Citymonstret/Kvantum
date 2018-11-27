@@ -30,4 +30,6 @@ public interface ResponseBody extends HeaderProvider
 
 	boolean isText();
 
+	boolean supportsGzip();
+
 }

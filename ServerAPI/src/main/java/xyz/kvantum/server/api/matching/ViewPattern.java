@@ -76,12 +76,14 @@ import xyz.kvantum.server.api.util.Assert;
 
 		this.raw = in;
 
+		final boolean empty = in.isEmpty();
+
 		String string = raw.toLowerCase( Locale.ENGLISH );
-		if ( string.charAt( 0 ) == '/' )
+		if ( !empty && string.charAt( 0 ) == '/' )
 		{
 			string = string.substring( 1 );
 		}
-		if ( string.charAt( string.length() - 1 ) == '/' )
+		if ( !empty && string.charAt( string.length() - 1 ) == '/' )
 		{
 			string = string.substring( 0, string.length() - 1 );
 		}

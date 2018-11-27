@@ -29,6 +29,7 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.ResponseBody;
@@ -69,7 +70,12 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	{
 		if ( CoreConfig.gzip )
 		{
-			if ( request.getHeader( ACCEPT_ENCODING ).contains( "gzip" ) )
+			if ( !body.supportsGzip() ) {
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Response does not support GZIP encoding" );
+				}
+			} else if ( request.getHeader( ACCEPT_ENCODING ).contains( "gzip" ) )
 			{
 				this.gzip = true;
 				body.getHeader().set( Header.HEADER_CONTENT_ENCODING, GZIP );

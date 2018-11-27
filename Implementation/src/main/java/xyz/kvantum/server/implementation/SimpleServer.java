@@ -169,7 +169,7 @@ public class SimpleServer implements Kvantum
 		//
 		this.executorService = Executors.newCachedThreadPool(
 				new ThreadFactoryBuilder().setDaemon( false )
-				.setNameFormat( "kvantum-handler-pool-%d" ).build()
+				.setNameFormat( "kvantum-%d" ).build()
 		);
 
 		//
@@ -398,6 +398,7 @@ public class SimpleServer implements Kvantum
 		//
 		// Initialize access.log logger
 		//
+		Logger.info( "Creating access.log handler..." );
 		this.eventBus.register( new AccessLogStream( logFolder ) );
 
 		//
@@ -549,6 +550,9 @@ public class SimpleServer implements Kvantum
 			break;
 		case LogModes.MODE_WARNING:
 			prefix = "Warning";
+			break;
+		case LogModes.MODE_ACCESS:
+			prefix = "Access";
 			break;
 		default:
 			prefix = "Info";

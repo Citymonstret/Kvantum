@@ -168,7 +168,7 @@ import xyz.kvantum.server.api.util.AsciiString;
 					this.contentLength = contentLength.toInteger();
 				} catch ( final Exception e )
 				{
-					throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null );
+					throw new ReturnStatus( Header.STATUS_BAD_REQUEST, null, e );
 				}
 				this.overloadBuffer = PooledByteBufAllocator.DEFAULT.buffer( this.contentLength ); // ByteBufAllocator.DEFAULT.buffer( this.contentLength );
 				if ( this.contentLength >= CoreConfig.Limits.limitPostBasicSize )

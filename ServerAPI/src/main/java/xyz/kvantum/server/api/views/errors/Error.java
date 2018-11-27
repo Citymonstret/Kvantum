@@ -45,7 +45,7 @@ public class Error extends View
 	private final String desc;
 	Error(final AsciiString code, final String desc)
 	{
-		super( "/", "error" );
+		super( "", "error" );
 		this.code = code;
 		this.desc = desc;
 	}

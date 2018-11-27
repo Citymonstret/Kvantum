@@ -22,6 +22,7 @@
 package xyz.kvantum.server.implementation;
 
 import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
 import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
 import com.codahale.metrics.Timer;
@@ -130,12 +131,33 @@ final class ResponseTask implements Runnable
 				returnStatus.setApplicableContext( this.workerContext );
 			}
 
-			final Response response = new Response();
-			response.getHeader().clear();
+			// Here we need to decide whether ot not to do verbose logging or not
+			final Response response;
+			if ( CoreConfig.debug )
+			{
+
+				Message.WORKER_FAILED_HANDLING.log( throwable.getMessage() );
+
+				if ( CoreConfig.verbose )
+				{
+					throwable.printStackTrace();
+				}
+
+				response = new ViewException( throwable ).generate( workerContext.getRequest() );
+			} else
+			{
+				response = new Response();
+				response.getHeader().clear();
+				response.getHeader().set( Header.HEADER_CONTENT_LENGTH, AsciiString.of( 0 ) );
+			}
+
+			assert response != null && response.getResponseStream() != null;
+
 			response.getHeader().setStatus( returnStatus.getStatus() );
 			response.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
-			this.workerContext.setBody( response );
 
+			this.workerContext.setBody( response );
+			this.workerContext.setResponseStream( response.getResponseStream() );
 			this.sendResponse( context );
 		} else
 		{
@@ -271,8 +293,8 @@ final class ResponseTask implements Runnable
 			}
 		} catch ( final Exception e )
 		{
+			/*
 			Message.WORKER_FAILED_HANDLING.log( e.getMessage() );
-
 			if ( CoreConfig.verbose )
 			{
 				e.printStackTrace();
@@ -281,13 +303,17 @@ final class ResponseTask implements Runnable
 			if ( CoreConfig.debug )
 			{
 				body = new ViewException( e ).generate( request );
+				responseStream = body.getResponseStream();
 			} else
 			{
 				body = null;
 			}
+			*/
+			timer.stop();
+			throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext, e );
 		}
 
-		if ( body == null || responseStream == null )
+		if ( responseStream == null )
 		{
 			timer.stop();
 			throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext );
@@ -393,7 +419,7 @@ final class ResponseTask implements Runnable
 		//
 		final boolean keepAlive;
 		if ( workerContext.getRequest().getHeaders().getOrDefault( KvantumServerHandler.CONNECTION, CLOSE )
-				.equalsIgnoreCase( KvantumServerHandler.KEEP_ALIVE ) )
+				.equalsIgnoreCase( KEEP_ALIVE ) && !body.getHeader().get( Header.HEADER_CONNECTION ).orElse( KEEP_ALIVE ).equals( CLOSE ) )
 		{
 			if ( CoreConfig.debug )
 			{
@@ -404,7 +430,7 @@ final class ResponseTask implements Runnable
 			// Apply "connection: keep-alive" and "content-length: n" headers to
 			// make sure that the client keeps the connection open
 			//
-			body.getHeader().set( Header.HEADER_CONNECTION, KvantumServerHandler.KEEP_ALIVE );
+			body.getHeader().set( Header.HEADER_CONNECTION, KEEP_ALIVE );
 		} else
 		{
 			keepAlive = false;
@@ -462,6 +488,8 @@ final class ResponseTask implements Runnable
 			toRead = MAX_LENGTH + 1;
 		}
 
+		long actualLength = 0L;
+
 		//
 		// Write the response
 		//
@@ -479,6 +507,7 @@ final class ResponseTask implements Runnable
 				if ( hasKnownLength )
 				{
 					context.write( bytes );
+					actualLength = bytes.length;
 				} else
 				{
 					//
@@ -496,6 +525,8 @@ final class ResponseTask implements Runnable
 							continue;
 						}
 					}
+
+					actualLength += bytes.length;
 
 					context.write( AsciiString.of( Integer.toHexString( bytes.length ) ).getValue() );
 					context.write( KvantumServerHandler.CRLF );
@@ -543,17 +574,19 @@ final class ResponseTask implements Runnable
 		// Safety measure taken to make sure that IPs are not logged
 		// in production mode. This is is to ensure GDPR compliance
 		//
-		if ( CoreConfig.debug )
+		if ( CoreConfig.hideIps )
 		{
-			finalizedResponse.address( this.workerContext.getSocketContext().getIP() );
+			finalizedResponse.address( "127.0.0.1" );
 		} else
 		{
-			finalizedResponse.address( "external" );
+			finalizedResponse.address( this.workerContext.getSocketContext().getIP() );
 		}
+
 		finalizedResponse.authorization( this.workerContext.getRequest().getAuthorization().orElse( null ) )
-				/* .length( (int) actualLength ) */.status( body.getHeader().getStatus().toString() )
+				 .length( (int) actualLength ).status( body.getHeader().getStatus().toString() )
 				.query( this.workerContext.getRequest().getQuery() ).timeFinished( System.currentTimeMillis() ).build();
-		ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse );
+
+		ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse.build() );
 
 		//
 		// Make sure everything is written and either close the connection

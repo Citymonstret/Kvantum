@@ -41,11 +41,13 @@ public final class CachedResponse implements ResponseBody
 	public final Header header;
 	private final SimpleResponseStream responseStream;
 	private final boolean isText;
+	private boolean supportsGzip;
 
 	public CachedResponse(@NonNull final ResponseBody parent)
 	{
 		this.header = parent.getHeader();
 		this.isText = parent.isText();
+		this.supportsGzip = parent.supportsGzip();
 		final ResponseStream responseStream = parent.getResponseStream();
 		if ( !( responseStream instanceof KnownLengthStream) )
 		{
@@ -68,6 +70,11 @@ public final class CachedResponse implements ResponseBody
 		}
 		// Always return a copy of the response stream
 		return new SimpleResponseStream( responseStream.getBytes() );
+	}
+
+	@Override public boolean supportsGzip()
+	{
+		return this.supportsGzip;
 	}
 
 	@Override public boolean isText()

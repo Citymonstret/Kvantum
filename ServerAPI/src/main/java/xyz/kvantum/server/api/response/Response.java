@@ -36,9 +36,11 @@ import xyz.kvantum.server.api.views.RequestHandler;
 @SuppressWarnings("unused") public class Response implements ResponseBody
 {
 
+	private static final ResponseStream DEFAULT_RESPONSE_STREAM = new ImmutableResponseStream( new byte[0] );
+
 	@Getter private Header header;
 	private RequestHandler parent;
-	@Getter private ResponseStream responseStream;
+	@Getter private ResponseStream responseStream = DEFAULT_RESPONSE_STREAM;
 	@Getter private boolean text = false;
 
 	/**
@@ -110,6 +112,16 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	{
 		this.parent = Assert.notNull( parent );
 		return this;
+	}
+
+	public boolean supportsGzip()
+	{
+		if ( this.responseStream instanceof KnownLengthStream )
+		{
+			final KnownLengthStream knownLengthStream = ( KnownLengthStream ) this.responseStream;
+			return knownLengthStream.getLength() != 0;
+		}
+		return true;
 	}
 
 	public boolean hasParent()

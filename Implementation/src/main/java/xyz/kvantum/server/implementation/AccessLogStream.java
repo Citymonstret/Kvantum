@@ -28,7 +28,9 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import lombok.NonNull;
 import pw.stamina.causam.scan.method.model.Subscriber;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.response.FinalizedResponse;
+import xyz.kvantum.server.api.util.Assert;
 
 /**
  * Streams to log/access.log
@@ -43,7 +45,10 @@ final class AccessLogStream extends PrintStream
 
 	@Subscriber @SuppressWarnings("unused") private void onRequestFinish(@NonNull final FinalizedResponse response)
 	{
-		this.println( response.toLogString() );
+		final String logString = response.toLogString();
+		Assert.notNull( logString );
+		Logger.access( logString );
+		this.println( logString );
 		this.flush();
 	}
 
