@@ -40,10 +40,19 @@ import xyz.kvantum.server.api.util.AsciiString;
 @SuppressWarnings({ "unused", "WeakerAccess" }) @UtilityClass public final class RequestCompiler
 {
 
-	private static final Timer TIMER_COMPILE_HEADER = ServerImplementation.getImplementation().getMetrics()
-			.getRegistry().timer( MetricRegistry.name( RequestCompiler.class, "compileHeader" ) );
-	private static final Timer TIMER_COMPILE_QUERY = ServerImplementation.getImplementation().getMetrics()
-			.getRegistry().timer( MetricRegistry.name( RequestCompiler.class, "compileQuery" ) );
+	private static final Timer TIMER_COMPILE_QUERY;
+
+	static
+	{
+		if ( ServerImplementation.getImplementation() != null )
+		{
+			TIMER_COMPILE_QUERY = ServerImplementation.getImplementation().getMetrics()
+					.getRegistry().timer( MetricRegistry.name( RequestCompiler.class, "compileQuery" ) );
+		} else
+		{
+			TIMER_COMPILE_QUERY = null;
+		}
+	}
 
 	private static final Pattern PATTERN_QUERY = Pattern.compile(
 			"(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!%]*) "
@@ -57,16 +66,13 @@ import xyz.kvantum.server.api.util.AsciiString;
 
 	public static Optional<HeaderPair> compileHeader(@NonNull final String line)
 	{
-		Timer.Context timer = TIMER_COMPILE_HEADER.time();
 		final Matcher matcher = PATTERN_HEADER.matcher( line );
 		if ( !matcher.matches() )
 		{
-			timer.close();
 			return Optional.empty();
 		}
 		final AsciiString key = AsciiString.of( matcher.group( KEY ).toLowerCase( Locale.ENGLISH ) );
 		final AsciiString value = AsciiString.of( matcher.group( VALUE ), false );
-		timer.close();
 		return Optional.of( new HeaderPair( key, value ) );
 	}
 

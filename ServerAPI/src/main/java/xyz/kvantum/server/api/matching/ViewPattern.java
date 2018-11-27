@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.server.api.matching;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,7 +35,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
-import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 
@@ -52,8 +49,6 @@ import xyz.kvantum.server.api.util.Assert;
  */
 @SuppressWarnings("unused") public class ViewPattern
 {
-	private static final Timer TIMER_MATCH = ServerImplementation.getImplementation().getMetrics().getRegistry()
-			.timer( MetricRegistry.name( ViewPattern.class, "match" ) );
 
 	private static final Pattern PATTERN_VARIABLE_REQUIRED = Pattern.compile( "<([a-zA-Z0-9]*)>" );
 	private static final Pattern PATTERN_VARIABLE_OPTIONAL = Pattern.compile( "\\[([a-zA-Z0-9]*)(=([a-zA-Z0-9]*))?]" );
@@ -179,8 +174,6 @@ import xyz.kvantum.server.api.util.Assert;
 	{
 		Assert.notNull( in );
 
-		Timer.Context timer = TIMER_MATCH.time();
-
 		String url;
 		int index;
 		if ( ( index = in.indexOf( '?' )) != -1 )
@@ -205,11 +198,9 @@ import xyz.kvantum.server.api.util.Assert;
 		{
 			if ( url.isEmpty() )
 			{
-				timer.close();
 				return new HashMap<>();
 			} else
 			{
-				timer.close();
 				return null; // Nullable
 			}
 		}
@@ -217,7 +208,6 @@ import xyz.kvantum.server.api.util.Assert;
 		final Matcher matcher = pattern.matcher( url );
 		if ( !matcher.matches() )
 		{
-			timer.close();
 			return null; // Nullable
 		}
 
@@ -233,7 +223,6 @@ import xyz.kvantum.server.api.util.Assert;
 			{
 				if ( entry.getValue().getType() == Variable.TYPE_REQUIRED ) // Value is missing
 				{
-					timer.close();
 					return null; // Nullable
 				}
 				if ( entry.getValue().hasDefaultValue() )
@@ -246,8 +235,7 @@ import xyz.kvantum.server.api.util.Assert;
 			}
 			variables.put( entry.getKey(), value );
 		}
-
-		timer.close();
+		
 		return variables;
 	}
 

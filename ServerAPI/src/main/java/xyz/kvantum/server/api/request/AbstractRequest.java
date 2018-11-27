@@ -318,6 +318,7 @@ import xyz.kvantum.server.api.util.VariableProvider;
 				}
 			}
 			toRemove.forEach( cachedQueries::remove );
+			Logger.info( "Cleaned up {} stored queries!", toRemove.size() );
 		}
 
 		public Query getQuery(@NonNull final QueryParameters parameters)
