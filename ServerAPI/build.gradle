@@ -14,7 +14,7 @@ dependencies {
         // exclude group: 'org.springframework', module: '*'
     }
     // Makes input handling better and more fluent
-    compile group: 'org.jline', name: 'jline', version: '3.5.1'
+    compile group: 'org.jline', name: 'jline', version: '3.9.0'
     // Command management system
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
     // Password encryption
