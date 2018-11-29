@@ -69,6 +69,9 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 	private final String uniqueId = UUID.randomUUID().toString();
 	private final Collection<Decorator> decorators = new ArrayList<>();
 
+	@Getter
+	private long matchCount = 0L;
+
 	/**
 	 * Register an alternate outcome, which can be triggered using Middleware, by using {@link
 	 * AbstractRequest#useAlternateOutcome(String)}, where the parameter is the identifier given to this method.
@@ -132,6 +135,14 @@ import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 			return Optional.of( alternateOutcomes.get( identifier ) );
 		}
 		return Optional.empty();
+	}
+
+	/**
+	 * Increment the match counter by 1
+	 */
+	public void incrementMatchCount()
+	{
+		this.matchCount += 1;
 	}
 
 	/**

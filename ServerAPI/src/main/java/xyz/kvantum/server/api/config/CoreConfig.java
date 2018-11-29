@@ -48,6 +48,7 @@ import java.util.List;
 	public static boolean enableInputThread = true;
 	public static boolean exitOnStop = true;
 	public static boolean hideIps = false;
+	public static int requestHandlerSortRate = 60; // Once every minute
 
 	public static long timeout = 15;
 	public static String timeoutUnit = "SECONDS";

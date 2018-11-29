@@ -24,17 +24,23 @@ package xyz.kvantum.server.api.util;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.events.RequestHandlerAddedEvent;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -43,15 +49,44 @@ import xyz.kvantum.server.api.views.errors.View404;
 /**
  * A simple {@link Router} implementation,
  */
-@SuppressWarnings("unused") @Builder public final class RequestManager extends Router
+@SuppressWarnings("unused") public final class RequestManager extends Router
 {
 
 	private static final Generator<AbstractRequest, RequestHandler> DEFAULT_404_GENERATOR = (request) -> View404
 			.construct( request.getQuery().getFullRequest() );
+	private static final Comparator<RequestHandler> REQUEST_HANDLER_COMPARATOR = Collections.reverseOrder( Comparator.comparing( RequestHandler::getMatchCount ) );
 
-	@Builder.Default private List<RequestHandler> views = new ArrayList<>();
-
+	@Builder.Default private List<RequestHandler> views = Collections.synchronizedList( new ArrayList<>() );
 	@Setter @Getter @NonNull @Builder.Default private Generator<AbstractRequest, RequestHandler> error404Generator = DEFAULT_404_GENERATOR;
+	private RequestHandler currentHead;
+	private boolean changed = true;
+
+	private final Timer timer;
+
+	@Builder
+	RequestManager()
+	{
+		this.timer = new Timer( true );
+		System.out.println( "Delaying request manager timer initialization for 30 seconds." );
+		this.timer.schedule( new TimerTask()
+		{
+			@Override public void run()
+			{
+				Logger.info( "Checking request handler sort rate..." );
+				if ( CoreConfig.requestHandlerSortRate > 0 )
+				{
+					Logger.info( "Will sort request handlers every {}ms", CoreConfig.requestHandlerSortRate * 1000 );
+					timer.schedule( new TimerTask()
+					{
+						@Override public void run()
+						{
+							sortViews();
+						}
+					}, 0L, CoreConfig.requestHandlerSortRate * 1000 );
+				}
+			}
+		}, 30000L );
+	}
 
 	/**
 	 * Register a view to the request manager
@@ -88,6 +123,34 @@ import xyz.kvantum.server.api.views.errors.View404;
 		return view;
 	}
 
+	public void sortViews()
+	{
+		if ( !changed )
+		{
+			return;
+		}
+
+		Logger.info( "Sorting request handlers." );
+
+		final long nanoTime1 = System.nanoTime();
+		this.views.sort( REQUEST_HANDLER_COMPARATOR );
+		this.currentHead = this.views.get( 0 );
+		final long nanoTime2 = System.nanoTime();
+		changed = false;
+
+		Logger.info( "Sorted request handlers. Took {}ns", nanoTime2 - nanoTime1 );
+
+		if ( CoreConfig.debug )
+		{
+			Logger.debug( "Request handler order:" );
+			for ( int i = 0; i < this.views.size(); i++ )
+			{
+				final RequestHandler handler = this.views.get( i );
+				Logger.debug( "- {0}: {1} - {2} matches", i + 1, handler, handler.getMatchCount() );
+			}
+		}
+	}
+
 	/**
 	 * Try to find the request handler that matches the request
 	 *
@@ -103,6 +166,11 @@ import xyz.kvantum.server.api.views.errors.View404;
 			{
 				if ( handler.matches( request ) )
 				{
+					handler.incrementMatchCount();
+					if ( currentHead == null || currentHead != handler )
+					{
+						changed = true;
+					}
 					return handler;
 				}
 			}
