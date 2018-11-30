@@ -25,12 +25,15 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
+import xyz.kvantum.server.api.account.AccountDecorator;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -45,6 +48,7 @@ import xyz.kvantum.server.implementation.MongoApplicationStructure;
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType") private static final Optional<IAccount> EMPTY_OPTIONAL = Optional
 			.empty();
 	@Getter private final MongoApplicationStructure applicationStructure;
+	private final Collection<AccountDecorator> decorators = new ArrayList<>();
 
 	private DBCollection counters;
 
@@ -74,6 +78,11 @@ import xyz.kvantum.server.implementation.MongoApplicationStructure;
 	{
 		return ( int ) counters.findAndModify( new BasicDBObject( "_id", "userId" ),
 				new BasicDBObject( "$inc", new BasicDBObject( "seq", 1 ) ) ).get( "seq" );
+	}
+
+	@Override public void addAccountDecorator(@NonNull final AccountDecorator decorator)
+	{
+		this.decorators.add( decorator );
 	}
 
 	@Override public Optional<IAccount> createAccount(final IAccount temporary)
@@ -123,6 +132,7 @@ import xyz.kvantum.server.implementation.MongoApplicationStructure;
 		ret.ifPresent(
 				account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
 		ret.ifPresent( account -> account.setManager( this ) );
+		ret.ifPresent( account -> decorators.forEach( decorator -> decorator.decorateAccount( account )) );
 		return ret;
 	}
 
@@ -141,6 +151,7 @@ import xyz.kvantum.server.implementation.MongoApplicationStructure;
 		ret.ifPresent(
 				account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
 		ret.ifPresent( account -> account.setManager( this ) );
+		ret.ifPresent( account -> decorators.forEach( decorator -> decorator.decorateAccount( account )) );
 		return ret;
 	}
 

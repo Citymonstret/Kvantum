@@ -25,11 +25,14 @@ import com.google.common.collect.ImmutableList;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
+import xyz.kvantum.server.api.account.AccountDecorator;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -44,6 +47,7 @@ import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
 			.empty();
 
 	@Getter private final SQLiteApplicationStructure applicationStructure;
+	private final Collection<AccountDecorator> decorators = new ArrayList<>();
 
 	private static String getNewSalt()
 	{
@@ -64,6 +68,11 @@ import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
 				+ "INTEGER PRIMARY KEY, account_id INTEGER, `key` VARCHAR(255), `value` VARCHAR(255), UNIQUE"
 				+ "(account_id, `key`) )" );
 		this.checkAdmin();
+	}
+
+	@Override public void addAccountDecorator(@NonNull final AccountDecorator decorator)
+	{
+		this.decorators.add( decorator );
 	}
 
 	@Override public Optional<IAccount> createAccount(@NonNull final IAccount temporary)
@@ -133,6 +142,7 @@ import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
 		ret.ifPresent(
 				account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
 		ret.ifPresent( account -> account.setManager( this ) );
+		ret.ifPresent( account -> decorators.forEach( decorator -> decorator.decorateAccount( account )) );
 		return ret;
 	}
 
@@ -162,6 +172,7 @@ import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
 		ret.ifPresent(
 				account -> ServerImplementation.getImplementation().getCacheManager().setCachedAccount( account ) );
 		ret.ifPresent( account -> account.setManager( this ) );
+		ret.ifPresent( account -> decorators.forEach( decorator -> decorator.decorateAccount( account )) );
 		return ret;
 	}
 

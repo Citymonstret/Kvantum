@@ -61,6 +61,13 @@ import xyz.kvantum.server.api.util.ApplicationStructure;
 	}
 
 	/**
+	 * Add an account decorator to the manager
+	 *
+	 * @param decorator Decorator to add
+	 */
+	void addAccountDecorator(AccountDecorator decorator);
+
+	/**
 	 * Get the container {@link ApplicationStructure}
 	 *
 	 * @return {@link ApplicationStructure} implementation
@@ -132,8 +139,7 @@ import xyz.kvantum.server.api.util.ApplicationStructure;
 	}
 
 	/**
-	 * Unbind any account from a {@link ISession}. Saves the
-	 * account state beforehand.
+	 * Unbind any account from a {@link ISession}. Saves the account state beforehand.
 	 *
 	 * @param session Session to be unbound
 	 */
