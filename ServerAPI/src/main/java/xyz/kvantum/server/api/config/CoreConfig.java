@@ -170,8 +170,7 @@ import java.util.List;
 		public static int cachedFilesMaxItems = 1000;
 		public static int cachedSessionsMaxItems = 1000;
 		public static int cachedQueryMinimumAccesses = 10;
-		public static int cachedRoutesExpiry = 60 * 60;
-		public static int cachedRoutesMaxItems = 1000;
+		public static int cachedFilesMaxSize = 1024 * 1024; // Default max size is 1MB
 	}
 
 	@ConfigSection(name = "mongodb") public static class MongoDB

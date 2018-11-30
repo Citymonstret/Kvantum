@@ -49,6 +49,11 @@ public final class CachedFile
 		this.bytes = bytes;
 	}
 
+	public int getLength()
+	{
+		return this.bytes.length;
+	}
+
 	@Override public String toString()
 	{
 		return this.getAsString();
