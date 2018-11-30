@@ -37,6 +37,7 @@ import net.sf.oval.constraint.NotEmpty;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Transient;
+import xyz.kvantum.server.api.account.AccountExtension;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.account.roles.AccountRole;
@@ -76,6 +77,8 @@ import xyz.kvantum.server.api.util.StringList;
 	@KvantumField @NonNull private String password;
 	@NonNull private Map<String, String> data;
 	@Setter @Transient private transient IAccountManager manager;
+	private final Map<Class<? extends AccountExtension>, AccountExtension> extensions =
+			new ConcurrentHashMap<>();
 
 	private StringList rawRoleList;
 	private Collection<AccountRole> roleList;
@@ -199,9 +202,46 @@ import xyz.kvantum.server.api.util.StringList;
 		}
 	}
 
+	@Override public <T extends AccountExtension> T attachExtension(@NonNull final Class<T> extension)
+	{
+		if ( this.getExtension( extension ).isPresent() )
+		{
+			throw new IllegalArgumentException( "Cannot attach an extension twice" );
+		}
+		try
+		{
+			final T instance = AccountExtension.createInstance( extension );
+			instance.attach( this );
+			this.extensions.put( extension, instance );
+			return instance;
+		} catch ( final Exception e )
+		{
+			return null;
+		}
+	}
+
+	@SuppressWarnings( "ALL" )
+	@Override public <T extends AccountExtension> Optional<T> getExtension(@NonNull final Class<T> extension)
+	{
+		final Object extensionInstance = this.extensions.get( extension );
+		if ( extensionInstance == null )
+		{
+			return Optional.empty();
+		}
+		return Optional.of( (T) extensionInstance );
+	}
+
 	@Override public String getSuppliedPassword()
 	{
 		return this.password;
+	}
+
+	@Override public void saveState()
+	{
+		for ( final AccountExtension extension : this.extensions.values() )
+		{
+			extension.saveState();
+		}
 	}
 
 	@Override public boolean isPermitted(@NonNull final String permissionKey)

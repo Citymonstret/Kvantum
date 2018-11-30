@@ -23,8 +23,12 @@ package xyz.kvantum.server.implementation;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
@@ -56,7 +60,15 @@ import xyz.kvantum.server.api.views.RequestHandler;
 				.maximumSize( CoreConfig.Cache.cachedFilesMaxItems ).build();
 		cachedAccounts = Caffeine.newBuilder()
 				.expireAfterWrite( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedAccountsMaxItems ).build();
+				.maximumSize( CoreConfig.Cache.cachedAccountsMaxItems )
+				.removalListener( new RemovalListener<Integer, IAccount>()
+				{
+					@Override public void onRemoval(@Nullable Integer key, @Nullable IAccount value,
+							@Nonnull RemovalCause cause)
+					{
+						value.saveState();
+					}
+				} ).<Integer, IAccount> build();
 		cachedBodies = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS )
 				.maximumSize( CoreConfig.Cache.cachedBodiesMaxItems ).build();
 		cachedAccountIds = Caffeine.newBuilder()

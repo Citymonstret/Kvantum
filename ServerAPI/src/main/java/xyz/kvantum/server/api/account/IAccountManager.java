@@ -132,12 +132,18 @@ import xyz.kvantum.server.api.util.ApplicationStructure;
 	}
 
 	/**
-	 * Unbind any account from a {@link ISession}
+	 * Unbind any account from a {@link ISession}. Saves the
+	 * account state beforehand.
 	 *
 	 * @param session Session to be unbound
 	 */
 	default void unbindAccount(final ISession session)
 	{
+		final Object object = session.get( SESSION_ACCOUNT_CONSTANT );
+		if ( object instanceof IAccount )
+		{
+			( ( IAccount ) object ).saveState();
+		}
 		session.set( SESSION_ACCOUNT_CONSTANT, null );
 	}
 

@@ -161,4 +161,24 @@ import xyz.kvantum.server.api.pojo.KvantumPojo;
 		return new AccountDO( this );
 	}
 
+	/**
+	 * Attach an extension to the account
+	 *
+	 * @param extension Extension to attach
+	 * @return Initialized extension, nor null if it failed to attach
+	 */
+	<T extends AccountExtension> T attachExtension(Class<T> extension);
+
+	/**
+	 * Get the instance of a given extension, if attached to the account
+	 *
+	 * @param extension Extension type
+	 */
+	<T extends AccountExtension> Optional<T> getExtension(Class<T> extension);
+
+	/**
+	 * Save the state of the account
+	 */
+	void saveState();
+
 }
