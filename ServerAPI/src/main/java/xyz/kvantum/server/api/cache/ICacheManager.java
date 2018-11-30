@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.cache;
 
+import java.util.Collection;
 import java.util.Optional;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
@@ -103,6 +104,13 @@ public interface ICacheManager
 	 * @param path File to remove
 	 */
 	void removeFileCache(Path path);
+
+	/**
+	 * Get all stored accounts
+	 *
+	 * @return all stored accounts as an immutable collection
+	 */
+	Collection<IAccount> getAllStoredAccounts();
 
 	/**
 	 * Check if there is a ResponseBody cached for the view

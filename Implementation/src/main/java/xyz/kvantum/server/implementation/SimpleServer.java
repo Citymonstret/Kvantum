@@ -54,6 +54,7 @@ import pw.stamina.causam.select.CachingSubscriptionSelectorServiceDecorator;
 import pw.stamina.causam.select.SubscriptionSelectorService;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
+import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.ConfigVariableProvider;
@@ -638,6 +639,11 @@ public class SimpleServer implements Kvantum
 		{
 			getEventBus().emit( new ServerShutdownEvent( this ) );
 		}
+
+		//
+		// Save all stored account states on shutdown
+		//
+		this.cacheManager.getAllStoredAccounts().forEach( IAccount::saveState );
 
 		//
 		// Gracefully shutdown the file watcher

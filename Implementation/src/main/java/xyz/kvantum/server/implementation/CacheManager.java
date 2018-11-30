@@ -25,6 +25,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
@@ -95,6 +97,11 @@ import xyz.kvantum.server.api.views.RequestHandler;
 	{
 		this.cachedAccounts.put( account.getId(), account );
 		this.cachedAccountIds.put( account.getUsername(), account.getId() );
+	}
+
+	@Override public Collection<IAccount> getAllStoredAccounts()
+	{
+		return Collections.unmodifiableCollection( this.cachedAccounts.asMap().values() );
 	}
 
 	@Override public void deleteAccount(@NonNull final IAccount account)
