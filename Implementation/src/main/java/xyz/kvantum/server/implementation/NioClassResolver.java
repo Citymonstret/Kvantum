@@ -34,16 +34,28 @@ final class NioClassResolver
 
 	NioClassResolver()
 	{
+		ClassProvider temporary = null;
 		final String osName = System.getProperty( "os.name" );
+
 		if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
 		{
 			Logger.info( "Using EpollClassResolver" );
-			this.classProvider = new EpollClassResolver();
-		} else
+			try
+			{
+				temporary = new EpollClassResolver();
+			} catch ( final Throwable throwable )
+			{
+				Logger.error( "Failed to initialize epoll class resolver: {}", throwable.getMessage() );
+			}
+		}
+
+		if ( temporary == null )
 		{
 			Logger.info( "Using DefaultClassResolver" );
-			this.classProvider = new DefaultClassResolver();
+			temporary = new DefaultClassResolver();
 		}
+
+		this.classProvider = temporary;
 	}
 
 	interface ClassProvider

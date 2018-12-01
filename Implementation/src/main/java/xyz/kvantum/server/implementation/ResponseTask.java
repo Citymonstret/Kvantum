@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import javax.net.ssl.SSLException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.cache.CacheApplicable;
@@ -66,6 +67,8 @@ import xyz.kvantum.server.implementation.error.KvantumException;
 final class ResponseTask implements Runnable
 {
 
+	private static final String HIDDEN_IP = "127.0.0.1";
+
 	@NonNull final ChannelHandlerContext context;
 	@NonNull final WorkerContext workerContext;
 
@@ -94,71 +97,77 @@ final class ResponseTask implements Runnable
 
 	private void determineRequestHandler() throws Throwable
 	{
-		Timer.Context timer = KvantumServerHandler.TIMER_ROUTING.time();
-		workerContext.setRequestHandler(
-				ServerImplementation.getImplementation().getRouter().match( workerContext.getRequest() ) );
-		if ( workerContext.getRequestHandler() == null )
+		try ( Timer.Context timer = KvantumServerHandler.TIMER_ROUTING.time() )
 		{
-			timer.close();
-			throw new ReturnStatus( Header.STATUS_NOT_FOUND, workerContext );
-		}
-		if ( workerContext.getRequest().getProtocolType() != ProtocolType.HTTPS && workerContext.getRequestHandler()
-				.forceHTTPS() )
-		{
-			if ( CoreConfig.debug )
-			{
-				Logger.debug( "Redirecting request [{}] to HTTPS version of [{}]", workerContext.getRequest(),
-						workerContext.getRequestHandler() );
-			}
-			if ( !CoreConfig.SSL.enable )
+			workerContext.setRequestHandler( ServerImplementation.getImplementation().getRouter().match( workerContext.getRequest() ) );
+			if ( workerContext.getRequestHandler() == null )
 			{
 				timer.close();
-				Logger.error( "RequestHandler ({}) forces HTTPS but SSL runner not enabled!" );
-				throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext );
+				throw new ReturnStatus( Header.STATUS_NOT_FOUND, workerContext );
 			}
-			workerContext.setRequestHandler( HTTPSRedirectHandler.getInstance() );
+			if ( workerContext.getRequest().getProtocolType() != ProtocolType.HTTPS && workerContext.getRequestHandler()
+					.forceHTTPS() )
+			{
+				if ( CoreConfig.debug )
+				{
+					Logger.debug( "Redirecting request [{}] to HTTPS version of [{}]", workerContext.getRequest(),
+							workerContext.getRequestHandler() );
+				}
+				if ( !CoreConfig.SSL.enable )
+				{
+					timer.close();
+					throw new ReturnStatus( Header.STATUS_INTERNAL_ERROR, workerContext, new SSLException(
+							String.format( "Request handler %s forced HTTPS but SSL runner not enabled", workerContext.getRequestHandler() ) ) );
+				}
+				workerContext.setRequestHandler( HTTPSRedirectHandler.getInstance() );
+			}
 		}
-		timer.close();
 	}
 
-	void handleThrowable(final Throwable throwable, final ChannelHandlerContext context)
+	void handleThrowable(@NonNull final Throwable throwable, @NonNull final ChannelHandlerContext context)
 	{
 		if ( throwable instanceof ReturnStatus )
 		{
-			final ReturnStatus returnStatus = ( ReturnStatus ) throwable;
-			if ( returnStatus.getApplicableContext() == null )
+			try
 			{
-				returnStatus.setApplicableContext( this.workerContext );
-			}
-
-			// Here we need to decide whether ot not to do verbose logging or not
-			final Response response;
-			if ( CoreConfig.debug )
-			{
-
-				Message.WORKER_FAILED_HANDLING.log( throwable.getMessage() );
-
-				if ( CoreConfig.verbose )
+				final ReturnStatus returnStatus = ( ReturnStatus ) throwable;
+				if ( returnStatus.getApplicableContext() == null )
 				{
-					throwable.printStackTrace();
+					returnStatus.setApplicableContext( this.workerContext );
 				}
 
-				response = new ViewException( throwable ).generate( workerContext.getRequest() );
-			} else
+				// Here we need to decide whether ot not to do verbose logging or not
+				final Response response;
+				if ( CoreConfig.debug )
+				{
+
+					Message.WORKER_FAILED_HANDLING.log( throwable.getMessage() );
+
+					if ( CoreConfig.verbose )
+					{
+						throwable.printStackTrace();
+					}
+
+					response = new ViewException( throwable ).generate( workerContext.getRequest() );
+				} else
+				{
+					response = new Response();
+					response.getHeader().clear();
+					response.getHeader().set( Header.HEADER_CONTENT_LENGTH, AsciiString.of( 0 ) );
+				}
+
+				assert response != null && response.getResponseStream() != null;
+
+				response.getHeader().setStatus( returnStatus.getStatus() );
+				response.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
+
+				this.workerContext.setBody( response );
+				this.workerContext.setResponseStream( response.getResponseStream() );
+				this.sendResponse( context );
+			} catch ( final Throwable innerThrowable )
 			{
-				response = new Response();
-				response.getHeader().clear();
-				response.getHeader().set( Header.HEADER_CONTENT_LENGTH, AsciiString.of( 0 ) );
+				new KvantumException( "Failed to handle return status", innerThrowable ).printStackTrace();
 			}
-
-			assert response != null && response.getResponseStream() != null;
-
-			response.getHeader().setStatus( returnStatus.getStatus() );
-			response.getHeader().set( Header.HEADER_CONNECTION, CLOSE );
-
-			this.workerContext.setBody( response );
-			this.workerContext.setResponseStream( response.getResponseStream() );
-			this.sendResponse( context );
 		} else
 		{
 			new KvantumException( "Failed to handle incoming socket", throwable ).printStackTrace();
@@ -174,7 +183,7 @@ final class ResponseTask implements Runnable
 		RequestHandler requestHandler = workerContext.getRequestHandler();
 		AbstractRequest request = workerContext.getRequest();
 		ResponseBody body;
-		ResponseStream responseStream = null;
+		ResponseStream responseStream;
 		boolean cache = false, shouldCache = false;
 
 		try
@@ -576,7 +585,7 @@ final class ResponseTask implements Runnable
 		//
 		if ( CoreConfig.hideIps )
 		{
-			finalizedResponse.address( "127.0.0.1" );
+			finalizedResponse.address( HIDDEN_IP );
 		} else
 		{
 			finalizedResponse.address( this.workerContext.getSocketContext().getIP() );

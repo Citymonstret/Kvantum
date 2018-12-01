@@ -79,7 +79,7 @@ public final class StandaloneServer extends SimpleServer
 	/**
 	 * @param serverContext ServerContext that will be used to initialize the server
 	 */
-	@SneakyThrows @SuppressWarnings("WeakerAccess") public StandaloneServer(final ServerContext serverContext)
+	@SneakyThrows public StandaloneServer(final ServerContext serverContext)
 	{
 		super( serverContext );
 

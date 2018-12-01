@@ -30,6 +30,7 @@ import java.util.Random;
 import java.util.UUID;
 import lombok.Data;
 import lombok.Getter;
+import xyz.kvantum.server.api.account.AccountExtension;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.account.roles.AccountRole;
@@ -49,6 +50,7 @@ import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 	private String username = UUID.randomUUID().toString();
 	private IAccountManager manager;
 	private Collection<AccountRole> accountRoles = new HashSet<>();
+	private Map<Class<? extends AccountExtension>, AccountExtension> extensions = new HashMap<>();
 
 	@Override public void internalMetaUpdate(final String key, final String value)
 	{
@@ -63,6 +65,27 @@ import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 	@Override public Optional<String> getData(final String key)
 	{
 		return Optional.ofNullable( rawData.getOrDefault( key, null ) );
+	}
+
+	@Override public <T extends AccountExtension> T attachExtension(Class<T> extension)
+	{
+		final T instance = AccountExtension.createInstance( extension );
+		this.extensions.put( extension, instance );
+		return instance;
+	}
+
+	@Override @SuppressWarnings( "ALL" ) public <T extends AccountExtension> Optional<T> getExtension(Class<T> extension)
+	{
+		final Object extensionInstance = this.extensions.get( extension );
+		if ( extensionInstance == null )
+		{
+			return Optional.empty();
+		}
+		return Optional.of( (T) extensionInstance );
+	}
+
+	@Override public void saveState()
+	{
 	}
 
 	@Override public void setData(final String key, final String value)
