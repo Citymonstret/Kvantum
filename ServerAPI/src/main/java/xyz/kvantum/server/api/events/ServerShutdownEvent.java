@@ -24,6 +24,9 @@ package xyz.kvantum.server.api.events;
 import lombok.NonNull;
 import xyz.kvantum.server.api.core.Kvantum;
 
+/**
+ * {@inheritDoc}
+ */
 public final class ServerShutdownEvent extends ServerEvent {
 
     public ServerShutdownEvent(@NonNull final Kvantum instance) {

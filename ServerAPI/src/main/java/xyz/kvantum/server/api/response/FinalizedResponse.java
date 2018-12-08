@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.TimeUtil;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Getter @RequiredArgsConstructor @Builder public final class FinalizedResponse {
@@ -41,7 +42,7 @@ import javax.annotation.Nullable;
     @NonNull private final String status;
     private final int length;
 
-    public String toLogString() {
+    @Nonnull public String toLogString() {
         return LOG_FORMAT.replace("%h", this.address).replace("%l", "-")
             .replace("%u", authorization != null ? authorization.getUsername() : "-")
             .replace("%t", TimeUtil.getAccessLogTimeStamp(this.timeFinished))

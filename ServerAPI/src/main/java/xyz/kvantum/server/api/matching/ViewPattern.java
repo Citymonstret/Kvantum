@@ -24,10 +24,12 @@ package xyz.kvantum.server.api.matching;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -123,7 +125,7 @@ import java.util.regex.Pattern;
             } else {
                 nextPart = parts.get(index + 1);
             }
-            final boolean optional = nextPart != null && nextPart instanceof Variable
+            final boolean optional = nextPart instanceof Variable
                 && ((Variable) nextPart).getType() == Variable.TYPE_OPTIONAL;
             pattern.append(part.toRegexBlock(optional));
             if (part instanceof Variable) {
@@ -235,11 +237,11 @@ import java.util.regex.Pattern;
 
     private static final class Dot extends Part {
 
-        @Override public String toString() {
+        @Nonnull @Contract(pure = true) @Override public String toString() {
             return ".";
         }
 
-        @Override public String toRegexBlock(final boolean nextOptional) {
+        @Nonnull @Contract(pure = true) @Override public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[.§]*";
             } else {
@@ -251,11 +253,11 @@ import java.util.regex.Pattern;
 
     private static final class Split extends Part {
 
-        @Override public String toString() {
+        @Nonnull @Contract(pure = true) @Override public String toString() {
             return "/";
         }
 
-        @Override public String toRegexBlock(final boolean nextOptional) {
+        @Nonnull @Contract(pure = true) @Override public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[\\/]*";
             } else {

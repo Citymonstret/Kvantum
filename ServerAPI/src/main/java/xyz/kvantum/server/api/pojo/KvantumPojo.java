@@ -26,16 +26,19 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.util.VariableProvider;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
 
 /**
  * Representation of a POJO instance constructed by a {@link KvantumPojoFactory} instance <p> Delegates {@link
  * #toString()}, {@link #equals(Object)} and {@link #hashCode()} to the POJO instance
+ * {@inheritDoc}
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) @SuppressWarnings({"unused", "WeakerAccess"})
 public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
@@ -45,7 +48,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
     @NonNull private final Map<String, PojoGetter<Pojo>> fieldValues;
     @NonNull private final Map<String, PojoSetter<Pojo>> fieldSetters;
 
-    @Override public boolean contains(final String variable) {
+    @Contract(pure = true) @Override public boolean contains(final String variable) {
         return this.containsGetter(variable);
     }
 
@@ -68,7 +71,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return Collection of field names
      */
-    public Collection<String> getSetterNames() {
+    @Nonnull @Contract(pure = true) public Collection<String> getSetterNames() {
         return this.fieldSetters.keySet();
     }
 
@@ -77,7 +80,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return Collection of field names
      */
-    public Collection<String> getGetterNames() {
+    @Nonnull @Contract(pure = true) public Collection<String> getGetterNames() {
         return this.fieldValues.keySet();
     }
 
@@ -87,7 +90,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @param key Key to check for
      * @return True if the key exists
      */
-    public boolean containsGetter(@NonNull final String key) {
+    @Contract(pure = true) public boolean containsGetter(@NonNull final String key) {
         return fieldValues.containsKey(key);
     }
 
@@ -97,7 +100,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @param key Key to check for
      * @return True if the key exists
      */
-    public boolean containsSetter(@NonNull final String key) {
+    @Contract(pure = true) public boolean containsSetter(@NonNull final String key) {
         return fieldSetters.containsKey(key);
     }
 
@@ -119,7 +122,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return JSON object
      */
-    public JSONObject toJson() {
+    @Nonnull public JSONObject toJson() {
         return this.factory.getJsonFactory().toJson(this);
     }
 
@@ -149,7 +152,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return POJO instance
      */
-    public Pojo getPojo() {
+    @Contract(pure = true) public Pojo getPojo() {
         return this.instance;
     }
 
@@ -161,7 +164,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
         return this.instance.hashCode();
     }
 
-    @Override public boolean equals(final Object object) {
+    @Contract(value = "null -> false", pure = true) @Override public boolean equals(final Object object) {
         if (object == null) {
             return false;
         } else if (object instanceof KvantumPojo) {

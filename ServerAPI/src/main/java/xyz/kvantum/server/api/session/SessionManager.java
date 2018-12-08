@@ -39,11 +39,13 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ProviderFactory;
 
+import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Manager for {@link ISession sessions}
+ * {@inheritDoc}
  */
 @SuppressWarnings({"WeakerAccess", "unused"}) @AllArgsConstructor public final class SessionManager
     implements ProviderFactory<ISession> {
@@ -71,13 +73,13 @@ import java.util.concurrent.TimeUnit;
     }
 
     private void saveSession(
-        @NonNull final RemovalNotification<AsciiString, ISession> notification) {
+        @Nonnull @NonNull final RemovalNotification<AsciiString, ISession> notification) {
         if (!notification.getValue().isDeleted()) {
             this.sessionDatabase.updateSession(notification.getKey());
         }
     }
 
-    private void saveCookies(@NonNull final AbstractRequest r, @NonNull final ISession session,
+    private void saveCookies(@Nonnull @NonNull final AbstractRequest r, @Nonnull @NonNull final ISession session,
         @NonNull final AsciiString sessionID) {
         r.postponedCookies.add(
             ResponseCookie.builder().cookie(SESSION_KEY).value(sessionID).httpOnly(true).build());
@@ -98,7 +100,7 @@ import java.util.concurrent.TimeUnit;
         return session;
     }
 
-    public void deleteSession(@NonNull final AbstractRequest r, @NonNull final HeaderProvider re) {
+    public void deleteSession(@NonNull final AbstractRequest r, @Nonnull @NonNull final HeaderProvider re) {
         re.getHeader().removeCookie(SESSION_KEY);
     }
 

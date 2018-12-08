@@ -25,9 +25,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.fileupload.UploadContext;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 
+import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +54,7 @@ final public class KvantumFileUploadContext implements UploadContext {
      * @param request Incoming request
      * @return Parsing result
      */
-    public static KvantumFileUploadContextParsingResult from(final AbstractRequest request) {
+    @Nonnull @Contract("_ -> new") public static KvantumFileUploadContextParsingResult from(final AbstractRequest request) {
         if (request.getQuery().getMethod() == HttpMethod.POST && request.getHeader("Content-Type")
             .startsWith("multipart")) {
             final KvantumFileUploadContext context = new KvantumFileUploadContext(request,
@@ -64,11 +66,11 @@ final public class KvantumFileUploadContext implements UploadContext {
             KvantumFileUploadContextParsingStatus.BAD_CONTENT_TYPE, null);
     }
 
-    @Override public String getCharacterEncoding() {
+    @Nonnull @Contract(pure = true) @Override public String getCharacterEncoding() {
         return "UTF-8";
     }
 
-    @Override public String getContentType() {
+    @Nonnull @Override public String getContentType() {
         return request.getHeader("Content-Type").toString();
     }
 
@@ -80,7 +82,7 @@ final public class KvantumFileUploadContext implements UploadContext {
         return this.request.getHeader("content-length").toLong();
     }
 
-    @Override public InputStream getInputStream() throws IOException {
+    @Contract(pure = true) @Override public InputStream getInputStream() throws IOException {
         return this.inputStream;
     }
 

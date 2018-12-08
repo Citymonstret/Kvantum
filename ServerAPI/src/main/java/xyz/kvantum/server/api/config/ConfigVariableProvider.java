@@ -33,6 +33,7 @@ import java.util.Optional;
 
 /**
  * This allows you to access configuration variables through the variable syntax
+ * {@inheritDoc}
  */
 public class ConfigVariableProvider
     implements ProviderFactory<ConfigVariableProvider>, VariableProvider {

@@ -23,6 +23,9 @@ package xyz.kvantum.server.api.events;
 
 import xyz.kvantum.server.api.core.Kvantum;
 
+/**
+ * {@inheritDoc}
+ */
 public final class ServerStartedEvent extends ServerEvent {
 
     public ServerStartedEvent(Kvantum instance) {

@@ -22,19 +22,19 @@
 package xyz.kvantum.server.api.request;
 
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.post.PostRequest;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.MapUtil;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * Created 2015-04-25 for Kvantum
- *
- * @author Citymonstret
+ * {@inheritDoc}
  */
 @NoArgsConstructor public final class PostProviderFactory
     implements ProviderFactory<PostProviderFactory>, VariableProvider {
@@ -54,7 +54,7 @@ import java.util.Optional;
         return Optional.of(new PostProviderFactory(r.getPostRequest()));
     }
 
-    @Override public String providerName() {
+    @Nonnull @Contract(pure = true) @Override public String providerName() {
         return "post";
     }
 

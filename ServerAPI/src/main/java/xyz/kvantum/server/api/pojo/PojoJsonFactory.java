@@ -23,18 +23,21 @@ package xyz.kvantum.server.api.pojo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONObject;
+
+import javax.annotation.Nonnull;
 
 @SuppressWarnings("WeakerAccess") @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PojoJsonFactory<Pojo> {
 
     private final KvantumPojoFactory<Pojo> kvantumPojoFactory;
 
-    JSONObject toJson(final KvantumPojo<Pojo> kvantumPojo) {
+    @Nonnull @Contract("_ -> new") JSONObject toJson(@Nonnull final KvantumPojo<Pojo> kvantumPojo) {
         return new JSONObject(kvantumPojo.getAll());
     }
 
-    @SuppressWarnings("unused") JSONObject toJson(final Pojo pojo) {
+    @Nonnull @SuppressWarnings("unused") JSONObject toJson(final Pojo pojo) {
         return this.toJson(kvantumPojoFactory.of(pojo));
     }
 

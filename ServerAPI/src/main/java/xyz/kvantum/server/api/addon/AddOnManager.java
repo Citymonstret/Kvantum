@@ -26,6 +26,7 @@ import lombok.NonNull;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.api.util.CollectionUtil;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
      *
      * @throws AddOnManagerException If the loading of the addons fails for any reason
      */
-    @SuppressWarnings("WeakerAccess") public void load() throws AddOnManagerException {
+    public void load() throws AddOnManagerException {
         if (!addOnFolder.exists()) {
             if (!addOnFolder.mkdir()) {
                 throw new AddOnManagerException("Couldn't create AddOn folder");
@@ -126,10 +127,9 @@ import java.util.stream.Collectors;
      *
      * @return All loaded libraries
      */
-    @SuppressWarnings("WeakerAccess") public Collection<String> getLibraries() {
-        return Collections.unmodifiableList(
-            this.classLoaders.values().stream().filter(loader -> loader.getAddOn() == null)
-                .map(AddOnClassLoader::getName).collect(Collectors.toList()));
+    @Nonnull public Collection<String> getLibraries() {
+        return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() == null)
+            .map(AddOnClassLoader::getName).collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -137,10 +137,9 @@ import java.util.stream.Collectors;
      *
      * @return All loaded addons
      */
-    @SuppressWarnings("WeakerAccess") public Collection<AddOn> getAddOns() {
-        return Collections.unmodifiableList(
-            this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null)
-                .map(AddOnClassLoader::getAddOn).collect(Collectors.toList()));
+    @Nonnull public Collection<AddOn> getAddOns() {
+        return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null)
+            .map(AddOnClassLoader::getAddOn).collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -149,14 +148,13 @@ import java.util.stream.Collectors;
      * @param clazz Addon class
      * @return Instance, if it can be found
      */
-    @SuppressWarnings("WeakerAccess") public <T extends AddOn> Optional<T> getAddOnInstance(
-        @NonNull final Class<T> clazz) {
+    @Nonnull @SuppressWarnings("WeakerAccess") public <T extends AddOn> Optional<T> getAddOnInstance(
+        @Nonnull @NonNull final Class<T> clazz) {
         return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null).
             map(AddOnClassLoader::getAddOn).filter(addOn -> addOn.getClass().equals(clazz))
             .map(clazz::cast).findAny();
     }
 
-    @SuppressWarnings("WeakerAccess")
     public Optional<AddOn> getAddOnInstance(@NonNull final String addOnName) {
         if (this.classLoaders.containsKey(addOnName)) {
             return Optional.of(this.classLoaders.get(addOnName).getAddOn());
@@ -169,7 +167,7 @@ import java.util.stream.Collectors;
      *
      * @param clazz Addon class
      */
-    @SuppressWarnings("WeakerAccess") public <T extends AddOn> void unloadAddon(
+    public <T extends AddOn> void unloadAddon(
         @NonNull final Class<T> clazz) {
         getAddOnInstance(clazz).ifPresent(this::unloadAddon);
     }
@@ -181,7 +179,7 @@ import java.util.stream.Collectors;
      * @throws AddOnManagerException If anything happens during the unloading of the addon
      */
     @SuppressWarnings("WeakerAccess") public <T extends AddOn> void unloadAddon(
-        @NonNull final T addOn) throws AddOnManagerException {
+        @Nonnull @NonNull final T addOn) throws AddOnManagerException {
         if (addOn.isEnabled()) {
             addOn.disable();
         }
@@ -203,8 +201,8 @@ import java.util.stream.Collectors;
      * @return New AddOn instance
      * @throws AddOnManagerException If anything goes wrong
      */
-    @SuppressWarnings("WeakerAccess") public <T extends AddOn> AddOn reloadAddon(
-        @NonNull final T addOn) throws AddOnManagerException {
+    public <T extends AddOn> AddOn reloadAddon(
+        @Nonnull @NonNull final T addOn) throws AddOnManagerException {
         if (addOn.isEnabled()) {
             addOn.disable();
         }
@@ -299,7 +297,7 @@ import java.util.stream.Collectors;
     /**
      * Enable all addons. Does NOT load any addons.
      */
-    @SuppressWarnings("WeakerAccess") public void enableAddOns() {
+    public void enableAddOns() {
         this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null)
             .map(AddOnClassLoader::getAddOn).filter(addOn -> !addOn.isEnabled())
             .forEach(AddOn::enable);
@@ -313,7 +311,7 @@ import java.util.stream.Collectors;
             .map(AddOnClassLoader::getAddOn).filter(AddOn::isEnabled).forEach(AddOn::disable);
     }
 
-    void removeAll(final Map<String, Class<?>> clear) {
+    void removeAll(@Nonnull final Map<String, Class<?>> clear) {
         clear.keySet().forEach(key -> this.globalClassMap.remove(key));
         for (final Class<?> clazz : clear.values()) {
             if (this.globalClassMap.containsValue(clazz)) {

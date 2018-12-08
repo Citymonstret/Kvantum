@@ -26,8 +26,6 @@ import xyz.kvantum.server.api.util.Assert;
 
 /**
  * This is the configuration file that allows us to access configuration file variables
- *
- * @author Citymonstret
  */
 @EqualsAndHashCode(of = "name") @SuppressWarnings("WeakerAccess")
 public abstract class ConfigProvider implements ConfigurationFile {

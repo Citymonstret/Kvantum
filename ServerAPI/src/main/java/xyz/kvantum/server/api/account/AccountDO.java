@@ -31,6 +31,7 @@ import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,7 @@ import java.util.List;
 
     @NonNull @NotNull private final Collection<AccountRole> accountRoles;
 
-    public AccountDO(@NotNull final IAccount account) {
+    public AccountDO(@Nonnull @NotNull final IAccount account) {
         this.id = account.getId();
         this.username = account.getUsername();
         this.accountRoles = new ArrayList<>(account.getAccountRoles());

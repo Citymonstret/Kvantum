@@ -25,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -72,7 +73,7 @@ import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
      *
      * @return true if the socket is connected over SSL (is a {@link SSLSocket})
      */
-    public boolean isSSL() {
+    @Contract(pure = true) public boolean isSSL() {
         return this.protocolType == HTTPS;
     }
 
@@ -81,7 +82,7 @@ import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
      *
      * @return socket address
      */
-    public InetSocketAddress getAddress() {
+    @Contract(pure = true) public InetSocketAddress getAddress() {
         return (InetSocketAddress) this.socketAddress;
     }
 

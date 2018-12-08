@@ -36,6 +36,9 @@ import xyz.kvantum.server.api.util.ProtocolType;
 
 import java.util.Optional;
 
+/**
+ * {@inheritDoc}
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE) public final class Request
     extends AbstractRequest {
 

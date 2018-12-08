@@ -22,7 +22,9 @@
 package xyz.kvantum.server.api.account;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,11 +42,12 @@ public class AccountDecorator {
         this.consumers = Collections.unmodifiableCollection(consumers);
     }
 
-    @SafeVarargs public static AccountDecorator with(final Consumer<IAccount>... consumers) {
+    @Nonnull @Contract("_ -> new") @SafeVarargs public static AccountDecorator with(final Consumer<IAccount>... consumers) {
         return new AccountDecorator(Arrays.asList(consumers));
     }
 
-    @SuppressWarnings("ALL") public static AccountDecorator with(final Object... objects) {
+    @Nonnull @Contract("_ -> new") @SuppressWarnings("ALL") public static AccountDecorator with(
+        @Nonnull final Object... objects) {
         final Collection<Consumer<IAccount>> consumers = new ArrayList<>();
         for (final Object object : objects) {
             if (object instanceof Consumer) {

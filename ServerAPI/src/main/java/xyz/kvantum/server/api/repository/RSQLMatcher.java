@@ -25,13 +25,16 @@ import com.github.rutledgepaulv.qbuilders.visitors.PredicateVisitor;
 import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 /**
  * Matcher that matches RSQL queries to objects. Build using {@link RSQLMatcherFactory}
+ * {@inheritDoc}
  */
-@SuppressWarnings("WeakerAccess") public final class RSQLMatcher<V> extends Matcher<String, V> {
+public final class RSQLMatcher<V> extends Matcher<String, V> {
 
     private static final QueryConversionPipeline pipeline =
         QueryConversionPipeline.defaultPipeline();
@@ -51,7 +54,8 @@ import java.util.function.Predicate;
         return this.predicate.test(value);
     }
 
-    @SuppressWarnings("ALL") private Class<V> getClass(@NonNull final V instance) {
+    @Contract(pure = true) @SuppressWarnings("ALL") private Class<V> getClass(
+        @Nonnull @NonNull final V instance) {
         return (Class<V>) instance.getClass();
     }
 

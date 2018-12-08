@@ -29,6 +29,9 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+/**
+ * {@inheritDoc}
+ */
 @RequiredArgsConstructor public abstract class TemplateSyntaxHandler
     extends WorkerProcedure.StringHandler {
 

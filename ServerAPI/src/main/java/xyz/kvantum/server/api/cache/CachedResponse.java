@@ -29,6 +29,9 @@ import xyz.kvantum.server.api.response.*;
 
 import java.util.UUID;
 
+/**
+ * {@inheritDoc}
+ */
 @ToString(of = "uuid") public final class CachedResponse implements ResponseBody {
 
     public final Header header;

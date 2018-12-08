@@ -27,7 +27,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -39,7 +41,7 @@ import java.util.stream.Collectors;
  *
  * @param <Object> POJO class
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE) @SuppressWarnings({"WeakerAccess", "unused"})
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE) @SuppressWarnings("unused")
 public final class KvantumPojoFactory<Object> {
 
     private final Map<String, PojoGetter<Object>> getters;
@@ -55,7 +57,7 @@ public final class KvantumPojoFactory<Object> {
      * @param <Object>  Class Type
      * @return Constructed Factory
      */
-    public static <Object> KvantumPojoFactory<Object> forClass(
+    @Nonnull @Contract("_ -> new") public static <Object> KvantumPojoFactory<Object> forClass(
         @NonNull final Class<Object> pojoClass) {
         final ImmutableMap.Builder<String, PojoGetter<Object>> getterBuilder =
             ImmutableMap.builder();
@@ -129,7 +131,7 @@ public final class KvantumPojoFactory<Object> {
      * @param instance POJO Instance
      * @return Instance
      */
-    public KvantumPojo<Object> of(@NonNull final Object instance) {
+    @Nonnull @Contract("_ -> new") public KvantumPojo<Object> of(@NonNull final Object instance) {
         return new KvantumPojo<>(this, instance, getters, setters);
     }
 
@@ -139,7 +141,7 @@ public final class KvantumPojoFactory<Object> {
      * @param collection Collection
      * @return Stream of {@link KvantumPojo} objects
      */
-    public Collection<KvantumPojo> getPojoCollection(@NonNull final Collection<Object> collection) {
+    public Collection<KvantumPojo> getPojoCollection(@Nonnull @NonNull final Collection<Object> collection) {
         if (collection.isEmpty()) {
             return Collections.emptyList();
         }

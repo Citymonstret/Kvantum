@@ -22,11 +22,13 @@
 package xyz.kvantum.server.api.response;
 
 import lombok.*;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AsciiStringable;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +55,7 @@ import java.util.Map;
         return headerOption;
     }
 
-    public static HeaderOption getOrCreate(@NonNull final AsciiString text) {
+    public static HeaderOption getOrCreate(@Nonnull @NonNull final AsciiString text) {
         if (headerOptionMap.containsKey(text.toLowerCase())) {
             return headerOptionMap.get(text.toLowerCase());
         }
@@ -63,16 +65,16 @@ import java.util.Map;
         return create(text);
     }
 
-    private HeaderOption cacheApplicable(final boolean b) {
+    @Contract("_ -> this") private HeaderOption cacheApplicable(final boolean b) {
         this.cacheApplicable = b;
         return this;
     }
 
-    @Override public final String toString() {
+    @Nonnull @Contract(pure = true) @Override public final String toString() {
         return this.text.toString();
     }
 
-    @Override public final AsciiString toAsciiString() {
+    @Contract(pure = true) @Override public final AsciiString toAsciiString() {
         return this.text;
     }
 

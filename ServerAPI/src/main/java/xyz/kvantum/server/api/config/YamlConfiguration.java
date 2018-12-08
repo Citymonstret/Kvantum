@@ -21,11 +21,13 @@
  */
 package xyz.kvantum.server.api.config;
 
+import org.jetbrains.annotations.Contract;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.Assert;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.util.HashMap;
@@ -33,8 +35,7 @@ import java.util.Map;
 
 /**
  * YAML implementation of the configuration file
- *
- * @author Citymonstret
+ * {@inheritDoc}
  */
 public class YamlConfiguration extends ConfigProvider implements ConfigurationFile {
 
@@ -165,7 +166,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         return null; // Nullable
     }
 
-    @Override public final Map<String, Object> getAll() {
+    @Nonnull @Contract(" -> new") @Override public final Map<String, Object> getAll() {
         return new HashMap<>(this.map);
     }
 

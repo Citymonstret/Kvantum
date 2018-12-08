@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  * actions
  */
 @EqualsAndHashCode(of = "roleIdentifier") @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-@SuppressWarnings({"unused", "WeakerAccess"}) public abstract class AccountRole {
+@SuppressWarnings("unused") public abstract class AccountRole {
 
     @Getter private final String roleIdentifier;
 

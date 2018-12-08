@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -44,7 +45,7 @@ final class AddOnClassLoader extends URLClassLoader {
 
     @Getter @Setter(AccessLevel.PROTECTED) private boolean disabling;
 
-    AddOnClassLoader(@NonNull final AddOnManager addOnManager, @NonNull final File file,
+    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager, @Nonnull @NonNull final File file,
         @NonNull final String name) throws AddOnLoaderException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, addOnManager.getClass().getClassLoader());
 
@@ -58,7 +59,7 @@ final class AddOnClassLoader extends URLClassLoader {
         }
     }
 
-    AddOnClassLoader(@NonNull final AddOnManager addOnManager, @NonNull final File file,
+    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager, @Nonnull @NonNull final File file,
         @NonNull final String mainFile, @NonNull final String name)
         throws AddOnLoaderException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, addOnManager.getClass().getClassLoader());
@@ -80,7 +81,7 @@ final class AddOnClassLoader extends URLClassLoader {
             throw new AddOnLoaderException(mainFile + " does not implement AddOn");
         }
         try {
-            this.addOn = addOnMain.newInstance();
+            this.addOn = addOnMain.getConstructor().newInstance(); // addOnMain.newInstance();
             this.addOn.setClassLoader(this);
             this.addOn.setName(name);
             this.name = name;

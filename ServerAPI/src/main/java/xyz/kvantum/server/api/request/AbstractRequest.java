@@ -27,6 +27,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.CoreConfig.Cache;
 import xyz.kvantum.server.api.config.Message;
@@ -40,6 +41,7 @@ import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -119,16 +121,15 @@ public abstract class AbstractRequest
     }
 
     public void addModel(@NonNull final String name, @NonNull final VariableProvider provider) {
-        final ProviderFactory<VariableProvider> providerFactory =
-            new ProviderFactory<VariableProvider>() {
-                @Override public Optional<VariableProvider> get(AbstractRequest r) {
-                    return Optional.of(provider);
-                }
+        final ProviderFactory<VariableProvider> providerFactory = new ProviderFactory<>() {
+            @Nonnull @Contract(pure = true) @Override public Optional<VariableProvider> get(AbstractRequest r) {
+                return Optional.of(provider);
+            }
 
-                @Override public String providerName() {
-                    return name;
-                }
-            };
+            @Contract(pure = true) @Override public String providerName() {
+                return name;
+            }
+        };
         this.models.put(name, providerFactory);
     }
 
@@ -307,7 +308,7 @@ public abstract class AbstractRequest
         /**
          * The query constructor
          */
-        private Query(@NonNull final QueryParameters parameters) {
+        private Query(@Nonnull @NonNull final QueryParameters parameters) {
             String resourceName = parameters.resource;
 
             final String illegalBeginning = parameters.protocolType.getString();
@@ -354,7 +355,7 @@ public abstract class AbstractRequest
          *
          * @return compiled string
          */
-        String buildLog() {
+        @Nonnull String buildLog() {
             return "Query: [Method: " + method.toString() + " | Resource: " + resource + "]";
         }
 
@@ -374,7 +375,7 @@ public abstract class AbstractRequest
         @Getter private final AsciiString username;
         @Getter private final AsciiString password;
 
-        Authorization(@NonNull final AsciiString input) {
+        Authorization(@Nonnull @NonNull final AsciiString input) {
             final List<AsciiString> parts = input.split("\\s");
             this.mechanism = parts.get(1);
             final val auth =
@@ -388,7 +389,7 @@ public abstract class AbstractRequest
             }
         }
 
-        public boolean isValid() {
+        @Contract(pure = true) public boolean isValid() {
             return this.mechanism != null && this.username != null && this.password != null;
         }
 

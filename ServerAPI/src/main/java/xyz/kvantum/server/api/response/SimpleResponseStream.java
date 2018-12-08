@@ -24,15 +24,18 @@ package xyz.kvantum.server.api.response;
 import lombok.Getter;
 import lombok.NonNull;
 
+import javax.annotation.Nonnull;
+
 /**
  * Response stream with a single input write
+ * {@inheritDoc}
  */
 public class SimpleResponseStream extends ResponseStream implements KnownLengthStream {
 
     @Getter private byte[] bytes;
     private int read = 0;
 
-    public SimpleResponseStream(final byte[] bytes) {
+    public SimpleResponseStream(@Nonnull final byte[] bytes) {
         this.bytes = new byte[bytes.length];
         System.arraycopy(bytes, 0, this.bytes, 0, bytes.length);
     }

@@ -26,10 +26,14 @@ import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.util.FileUtils;
 
+import javax.annotation.Nonnull;
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+/**
+ * {@inheritDoc}
+ */
 final class ViewScriptEngine extends KvantumScriptEngine {
 
     @Getter private final Path path;
@@ -53,7 +57,7 @@ final class ViewScriptEngine extends KvantumScriptEngine {
         return this.getEngine().createBindings();
     }
 
-    boolean evaluate(@NonNull final Path script, @NonNull final Bindings bindings) {
+    boolean evaluate(@Nonnull @NonNull final Path script, @NonNull final Bindings bindings) {
         final String content = script.readFile();
         try {
             this.getEngine().eval(content, bindings);

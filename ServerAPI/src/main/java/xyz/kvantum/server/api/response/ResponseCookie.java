@@ -32,6 +32,7 @@ import java.util.Date;
 
 /**
  * Outgoing cookie (see {@link xyz.kvantum.server.api.request.Cookie} for incoming cookies).
+ * {@inheritDoc}
  */
 @EqualsAndHashCode @Getter @Builder public final class ResponseCookie implements AsciiStringable {
 

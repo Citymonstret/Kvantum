@@ -27,6 +27,7 @@ import java.util.Set;
 
 /**
  * HashSet implementation of {@link AccountRole}
+ * {@inheritDoc}
  */
 public class SimpleAccountRole extends AccountRole {
 

@@ -25,7 +25,9 @@ import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 
 @Getter @SuppressWarnings({"WeakerAccess"}) public final class ListenerMethod {
@@ -41,7 +43,7 @@ import java.lang.reflect.Method;
         this.lambda = LambdaFactory.create(method);
     }
 
-    public void invoke(@NonNull final Object instance) {
+    public void invoke(@Nonnull @NonNull final Object instance) {
         if (!instance.getClass().equals(eventType)) {
             throw new IllegalArgumentException(String.
                 format("Mis-matched event types. Requires '%s', but was given '%s'",
@@ -50,7 +52,7 @@ import java.lang.reflect.Method;
         this.lambda.invoke_for_void(this.instance, instance);
     }
 
-    @Override public boolean equals(@NonNull final Object obj) {
+    @Contract(value = "null -> false", pure = true) @Override public boolean equals(final Object obj) {
         return (obj != null && obj.getClass().equals(this.getClass()) && obj.toString()
             .equals(this.toString()));
     }

@@ -26,6 +26,7 @@ import com.intellectualsites.commands.parser.ParserResult;
 import lombok.*;
 import net.sf.oval.ConstraintViolation;
 import net.sf.oval.Validator;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumInsert;
@@ -35,6 +36,7 @@ import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.util.Parsers;
 import xyz.kvantum.server.api.views.rest.RequestRequirements;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -101,7 +103,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @return Generated factory
      * @throws IllegalArgumentException If the class does not fit the specifications of a Kvantum object
      */
-    @SuppressWarnings("ALL") public static <T> KvantumObjectFactory<T> from(final Class<T> clazz)
+    @SuppressWarnings("ALL") public static <T> KvantumObjectFactory<T> from(@Nonnull final Class<T> clazz)
         throws IllegalArgumentException {
         final KvantumObject kvantumObject;
         if ((kvantumObject = clazz.getAnnotation(KvantumObject.class)) == null) {
@@ -231,7 +233,7 @@ import java.util.concurrent.ConcurrentHashMap;
         return factory;
     }
 
-    public BuilderInstance build(final ParameterScope scope) {
+    @Nonnull @Contract("_ -> new") public BuilderInstance build(final ParameterScope scope) {
         if (scope == ParameterScope.GET) {
             return new GetBuilderInstance();
         } else {
@@ -272,7 +274,7 @@ import java.util.concurrent.ConcurrentHashMap;
     @NoArgsConstructor(access = AccessLevel.PRIVATE) public final class GetBuilderInstance
         extends BuilderInstance {
 
-        @Override protected Map<String, String> getParameters(final AbstractRequest request) {
+        @Override protected Map<String, String> getParameters(@Nonnull final AbstractRequest request) {
             return request.getQuery().getParameters();
         }
     }
@@ -281,7 +283,7 @@ import java.util.concurrent.ConcurrentHashMap;
     @NoArgsConstructor(access = AccessLevel.PRIVATE) public final class PostBuilderInstance
         extends BuilderInstance {
 
-        @Override protected Map<String, String> getParameters(final AbstractRequest request) {
+        @Nonnull @Override protected Map<String, String> getParameters(@Nonnull final AbstractRequest request) {
             return request.getPostRequest().get();
         }
     }

@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 /**
  * Custom stream implementation used to write HTTP response bodies
  */
-@RequiredArgsConstructor @SuppressWarnings({"WeakerAccess", "unused"}) public class ResponseStream {
+@RequiredArgsConstructor public class ResponseStream {
 
     private static final byte[] EMPTY_RESPONSE = new byte[0];
     private static final long MAX_WAIT = 500L; // Wait time of 500ms

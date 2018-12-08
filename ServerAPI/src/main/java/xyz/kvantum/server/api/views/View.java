@@ -25,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -42,6 +43,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.HashMap;
@@ -221,7 +223,7 @@ public class View extends RequestHandler {
      *
      * @return options as string
      */
-    public final String getOptionString() {
+    @Nonnull public final String getOptionString() {
         final StringBuilder b = new StringBuilder();
         for (final Map.Entry<String, Object> e : options.entrySet()) {
             b.append(';').append(e.getKey()).append('=').append(e.getValue().toString());
@@ -235,11 +237,11 @@ public class View extends RequestHandler {
      * @param s Key
      * @return True if the option is stored, False if it isn't
      */
-    final public boolean containsOption(@NonNull final String s) {
+    @Contract(pure = true) final public boolean containsOption(@NonNull final String s) {
         return options.containsKey(s);
     }
 
-    @Override public final String getName() {
+    @Contract(pure = true) @Override public final String getName() {
         return this.internalName;
     }
 

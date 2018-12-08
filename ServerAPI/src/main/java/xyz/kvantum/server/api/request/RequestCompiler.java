@@ -38,7 +38,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings({"unused", "WeakerAccess"}) @UtilityClass public final class RequestCompiler {
+@UtilityClass public final class RequestCompiler {
 
     private static final Timer TIMER_COMPILE_QUERY;
     private static final Pattern PATTERN_QUERY = Pattern.compile(

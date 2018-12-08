@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.matching;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.exceptions.NotImplementedException;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -63,7 +64,7 @@ import java.util.Collections;
      *
      * @param handlers RequestHandlers that are to be registered
      */
-    public final Collection<? extends RequestHandler> addAll(
+    @Contract("_ -> param1") public final Collection<? extends RequestHandler> addAll(
         @NonNull final Collection<? extends RequestHandler> handlers) {
         handlers.forEach(this::add);
         return handlers;

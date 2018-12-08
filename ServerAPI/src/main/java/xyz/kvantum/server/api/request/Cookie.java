@@ -24,7 +24,10 @@ package xyz.kvantum.server.api.request;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.util.AsciiString;
+
+import javax.annotation.Nonnull;
 
 /**
  * A very simple representation of a cookie
@@ -39,7 +42,7 @@ import xyz.kvantum.server.api.util.AsciiString;
      *
      * @return name=value
      */
-    public String toString() {
+    @Nonnull @Contract(pure = true) public String toString() {
         return name + "=" + value;
     }
 }

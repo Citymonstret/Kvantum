@@ -174,7 +174,6 @@ public class CoreConfig {
 
     @ConfigSection(name = "mongodb") public static class MongoDB {
 
-        public static boolean enabled = false;
         public static String uri = "mongodb://localhost:27017";
 
         public static String dbSessions = "isites";

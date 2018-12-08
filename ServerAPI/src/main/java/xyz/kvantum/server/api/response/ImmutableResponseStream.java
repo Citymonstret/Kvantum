@@ -21,13 +21,19 @@
  */
 package xyz.kvantum.server.api.response;
 
+import org.jetbrains.annotations.Contract;
+
+/**
+ * {@inheritDoc}
+ */
 public final class ImmutableResponseStream extends SimpleResponseStream {
 
+    @SuppressWarnings("WeakerAccess")
     public ImmutableResponseStream(final byte[] bytes) {
         super(bytes);
     }
 
-    @Override public void push(byte[] bytes) {
+    @Contract("_ -> fail") @Override public void push(byte[] bytes) {
         throw new UnsupportedOperationException("Cannot write to immutable stream");
     }
 

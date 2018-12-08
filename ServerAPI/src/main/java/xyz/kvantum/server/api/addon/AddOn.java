@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.addon;
 
 import lombok.*;
 import net.sf.oval.constraint.NotNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogProvider;
 
@@ -31,7 +32,7 @@ import java.util.UUID;
 /**
  * Abstract class used to declare an addon. All addons should have a main class that extends this class.
  */
-@SuppressWarnings("WeakerAccess") @EqualsAndHashCode @ToString public abstract class AddOn
+@EqualsAndHashCode @ToString public abstract class AddOn
     implements LogProvider {
 
     @Getter private final UUID uuid = UUID.randomUUID();
@@ -71,7 +72,7 @@ import java.util.UUID;
      */
     protected abstract void onDisable();
 
-    @Override public final String getLogIdentifier() {
+    @Contract(pure = true) @Override public final String getLogIdentifier() {
         return this.name;
     }
 

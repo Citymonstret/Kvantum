@@ -31,8 +31,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * The HTTP response, this includes all headers and the actual bytecode.
- *
- * @author Citymonstret
+ * {@inheritDoc}
  */
 @SuppressWarnings("unused") public class Response implements ResponseBody {
 

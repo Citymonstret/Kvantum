@@ -22,8 +22,11 @@
 package xyz.kvantum.server.api.account;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.repository.FieldComparator;
 import xyz.kvantum.server.api.repository.MatcherFactory;
+
+import javax.annotation.Nonnull;
 
 /**
  * Factory class for {@link FieldComparator}
@@ -31,7 +34,7 @@ import xyz.kvantum.server.api.repository.MatcherFactory;
 public final class AccountMatcherFactory<A extends IAccount, B extends IAccount>
     implements MatcherFactory<A, B> {
 
-    @Override
+    @Nonnull @Contract("_ -> new") @Override
     public FieldComparator<? extends A, ? super B> createMatcher(@NonNull final A queryObject) {
         return new FieldComparator<>(queryObject, true, true);
     }

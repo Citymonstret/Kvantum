@@ -25,6 +25,9 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.kvantum.server.api.event.Cancellable;
 
+/**
+ * {@inheritDoc}
+ */
 public final class ConnectionEstablishedEvent extends Event implements Cancellable {
 
     @Getter private final String ip;

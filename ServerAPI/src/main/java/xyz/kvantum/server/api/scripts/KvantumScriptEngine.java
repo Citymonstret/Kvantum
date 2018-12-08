@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.scripts;
 import lombok.Getter;
 import lombok.NonNull;
 
+import javax.annotation.Nonnull;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -33,7 +34,7 @@ abstract class KvantumScriptEngine {
 
     @Getter(PROTECTED) private final ScriptEngine engine;
 
-    KvantumScriptEngine(@NonNull final ScriptEngineManager scriptEngineManager) {
+    KvantumScriptEngine(@Nonnull @NonNull final ScriptEngineManager scriptEngineManager) {
         this.engine = scriptEngineManager.getEngineByName("nashorn");
     }
 

@@ -25,9 +25,11 @@ import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.VariableHolder;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +42,7 @@ import java.util.regex.Pattern;
     private final String pattern;
     private final Map<String, String> variableMap;
 
-    public static FilePattern compile(@NonNull final String in) {
+    @Nonnull @Contract("_ -> new") public static FilePattern compile(@NonNull final String in) {
         final Matcher matcher = PATTERN_VARIABLE.matcher(in);
         final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
         while (matcher.find()) {
@@ -49,7 +51,7 @@ import java.util.regex.Pattern;
         return new FilePattern(in, mapBuilder.build());
     }
 
-    public FileMatcher matcher(final VariableHolder holder) {
+    @Nonnull @Contract("_ -> new") public FileMatcher matcher(final VariableHolder holder) {
         return new FileMatcher(holder);
     }
 
@@ -62,12 +64,12 @@ import java.util.regex.Pattern;
     }
 
 
-    @SuppressWarnings("WeakerAccess") public class FileMatcher {
+    public class FileMatcher {
 
         private final Map<String, String> variableMapping;
         private String compiledName = null;
 
-        private FileMatcher(@NonNull final VariableHolder variableHolder) {
+        private FileMatcher(@Nonnull @NonNull final VariableHolder variableHolder) {
             final ImmutableMap.Builder<String, String> variableMappingBuilder =
                 ImmutableMap.builder();
             final Map<String, String> requestVariables = variableHolder.getVariables();

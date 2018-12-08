@@ -22,10 +22,16 @@
 package xyz.kvantum.server.api.repository;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
+
+/**
+ * {@inheritDoc}
+ */
 public final class RSQLMatcherFactory<V> implements MatcherFactory<String, V> {
 
-    @Override public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
+    @Nonnull @Contract("_ -> new") @Override public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
         return new RSQLMatcher<>(queryObject);
     }
 

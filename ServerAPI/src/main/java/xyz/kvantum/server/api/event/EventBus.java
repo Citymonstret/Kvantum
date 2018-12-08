@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.event;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.util.ReflectionUtils.AnnotatedMethod;
@@ -54,7 +55,7 @@ import java.util.concurrent.Future;
      * @return True if the event bus supports asynchronous event distribution,
      * False if not
      */
-    public final boolean supportsAsync() {
+    @Contract(pure = true) public final boolean supportsAsync() {
         return this.supportsAsync;
     }
 
@@ -137,7 +138,7 @@ import java.util.concurrent.Future;
         return this.toString().hashCode();
     }
 
-    @Override public final boolean equals(final Object obj) {
+    @Contract(value = "null -> false", pure = true) @Override public final boolean equals(final Object obj) {
         return obj != null && obj.getClass().equals(getClass()) && ((EventBus) obj).name
             .equalsIgnoreCase(this.name);
     }

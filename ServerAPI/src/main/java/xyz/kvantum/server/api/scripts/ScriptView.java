@@ -33,6 +33,9 @@ import xyz.kvantum.server.api.views.View;
 import javax.script.Bindings;
 import java.util.Map;
 
+/**
+ * {@inheritDoc}
+ */
 public class ScriptView extends View {
 
     private static ScriptManager scriptManager;

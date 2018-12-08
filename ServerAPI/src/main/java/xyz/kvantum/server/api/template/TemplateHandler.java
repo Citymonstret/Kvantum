@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 
-@SuppressWarnings({"WeakerAccess", "unused"}) @RequiredArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode(of = {"engineName"}) public abstract class TemplateHandler {
 
     @Getter private final CoreConfig.TemplatingEngine engineEnum;

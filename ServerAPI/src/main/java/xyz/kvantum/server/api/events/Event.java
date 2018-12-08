@@ -28,7 +28,7 @@ import xyz.kvantum.server.api.core.Kvantum;
 
 /**
  * An event represents something that may occur in the server, and that can be broadcasted to {@link
- * pw.stamina.causam.scan.method.model.Subscriber subscribers} <p> One can subscribe to these events using {@link
+ * xyz.kvantum.server.api.event.Listener listeners} <p> One can subscribe to these events using {@link
  * Kvantum#getEventBus()}
  */
 @RequiredArgsConstructor abstract class Event {

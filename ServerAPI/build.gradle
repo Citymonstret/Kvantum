@@ -1,6 +1,7 @@
 dependencies {
+    compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
     // CSV
-    compile 'org.apache.commons:commons-csv:1.6'
+    // compile 'org.apache.commons:commons-csv:1.6'
     // Performance monitoring
     compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
     // Logback (used for configuration purposes only)

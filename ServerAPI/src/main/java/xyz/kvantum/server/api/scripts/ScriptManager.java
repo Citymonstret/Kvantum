@@ -27,6 +27,7 @@ import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.logging.Logger;
 
+import javax.annotation.Nonnull;
 import javax.script.ScriptEngineManager;
 import java.util.Arrays;
 
@@ -36,7 +37,7 @@ final class ScriptManager {
 
     @Getter private final ViewScriptEngine viewScriptEngine;
 
-    ScriptManager(@NonNull final Kvantum server) {
+    ScriptManager(@Nonnull @NonNull final Kvantum server) {
         this.corePath = server.getFileSystem().getPath("scripts");
         if (!corePath.exists() && !corePath.create()) {
             Logger.error("Failed to create kvantum/scripts - Please do it manually!");

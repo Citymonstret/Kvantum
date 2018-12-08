@@ -27,6 +27,9 @@ import lombok.Setter;
 import xyz.kvantum.server.api.event.Cancellable;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+/**
+ * {@inheritDoc}
+ */
 public final class RequestHandlerAddedEvent extends Event implements Cancellable {
 
     @Getter private final RequestHandler context;

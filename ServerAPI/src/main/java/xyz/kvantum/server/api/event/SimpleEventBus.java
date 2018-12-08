@@ -25,8 +25,10 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.logging.Logger;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +38,7 @@ import java.util.concurrent.Future;
 /**
  * Simple {@link EventBus} implementation using a cached thread pool to handle
  * asynchronous events
+ * {@inheritDoc}
  */
 public final class SimpleEventBus extends EventBus {
 
@@ -52,7 +55,7 @@ public final class SimpleEventBus extends EventBus {
     }
 
     @Override protected void registerListenersInternally(
-        @NonNull Collection<ListenerMethod> listenerMethods) {
+        @Nonnull @NonNull Collection<ListenerMethod> listenerMethods) {
         synchronized (this.lock) {
             for (final ListenerMethod listenerMethod : listenerMethods) {
                 if (listenerMethodMultimap
@@ -68,6 +71,7 @@ public final class SimpleEventBus extends EventBus {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public final Collection<ListenerMethod> getMethods(@NonNull final String eventType) {
         final Collection<ListenerMethod> methods;
         synchronized (this.lock) {
@@ -76,7 +80,7 @@ public final class SimpleEventBus extends EventBus {
         return methods;
     }
 
-    private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
+    @Nonnull @Contract(pure = true) private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
         @NonNull final T event) {
         return () -> {
             for (final ListenerMethod method : methods) {
@@ -86,11 +90,11 @@ public final class SimpleEventBus extends EventBus {
         };
     }
 
-    private String getClassName(@NonNull final Class clazz) {
+    private String getClassName(@Nonnull @NonNull final Class clazz) {
         return clazz.getName();
     }
 
-    @Override protected <T> Future<T> throwAsync(@NonNull T event) {
+    @Nonnull @Override protected <T> Future<T> throwAsync(@Nonnull @NonNull T event) {
         final Collection<ListenerMethod> methods = getMethods(getClassName(event.getClass()));
         return this.executorService.submit(createRunnable(methods, event));
     }

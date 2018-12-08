@@ -26,8 +26,10 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONObject;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
 
@@ -59,7 +61,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return Collection of field names
      */
-    public Collection<String> getGetterNames() {
+    @Nonnull @Contract(pure = true) public Collection<String> getGetterNames() {
         return this.fieldValues.keySet();
     }
 
@@ -69,7 +71,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      * @param key Key to check for
      * @return True if the key exists
      */
-    public boolean containsGetter(@NonNull final String key) {
+    @Contract(pure = true) public boolean containsGetter(@NonNull final String key) {
         return fieldValues.containsKey(key);
     }
 
@@ -91,7 +93,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return JSON object
      */
-    public JSONObject toJson() {
+    @Nonnull @Contract(" -> new") public JSONObject toJson() {
         return new JSONObject(this.getAll());
     }
 
@@ -100,7 +102,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return POJO instance
      */
-    public Pojo getPojo() {
+    @Contract(pure = true) public Pojo getPojo() {
         return this.instance;
     }
 
@@ -112,7 +114,7 @@ public final class ImmutableKvantumPojo<Pojo> {
         return this.instance.hashCode();
     }
 
-    @Override public boolean equals(final Object object) {
+    @Contract(value = "null -> false", pure = true) @Override public boolean equals(final Object object) {
         if (object == null) {
             return false;
         } else if (object instanceof KvantumPojo) {

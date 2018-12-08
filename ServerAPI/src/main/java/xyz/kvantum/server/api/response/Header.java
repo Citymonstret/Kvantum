@@ -26,6 +26,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
@@ -303,7 +304,7 @@ import java.util.Optional;
      */
     public static final HeaderOption HEADER_CONTENT_TYPE = HeaderOption.create("Content-Type");
     /**
-     * CGI Heeader field specifying the status of the HTTP response. Normal HTTP response use a Status-Line instead
+     * CGI Header field specifying the status of the HTTP response. Normal HTTP response use a Status-Line instead
      */
     public static final HeaderOption HEADER_STATUS = HeaderOption.create("Status");
     /**
@@ -402,7 +403,7 @@ import java.util.Optional;
      * @param status Response status
      * @return Instance
      */
-    public Header setStatus(@NonNull final AsciiString status) {
+    @Contract("_ -> this") public Header setStatus(@NonNull final AsciiString status) {
         this.status = status;
         this.set(HEADER_STATUS, status);
         return this;
@@ -415,7 +416,7 @@ import java.util.Optional;
      * @param value Header value
      * @return Instance
      */
-    public Header set(final HeaderOption key, final String value) {
+    @Contract("_, _ -> this") public Header set(final HeaderOption key, final String value) {
         return set(key, AsciiString.of(value, false));
     }
 
@@ -426,7 +427,7 @@ import java.util.Optional;
      * @param value Header value
      * @return Instance
      */
-    public Header set(final HeaderOption key, final AsciiString value) {
+    @Contract("_, _ -> this") public Header set(final HeaderOption key, final AsciiString value) {
         return set(key, value, false);
     }
 
@@ -438,7 +439,7 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    public Header set(@NonNull final HeaderOption key, @Nullable final String value,
+    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key, @Nullable final String value,
         final boolean allowDuplicates) {
         return this.set(key, AsciiString.of(value, false), allowDuplicates);
     }
@@ -451,7 +452,7 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    public Header set(@NonNull final HeaderOption key, @Nullable final AsciiString value,
+    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key, @Nullable final AsciiString value,
         final boolean allowDuplicates) {
         if (value == null || !allowDuplicates) {
             this.headers.removeAll(key);
@@ -516,7 +517,7 @@ import java.util.Optional;
      * @param cookie Cookie
      * @return Instance
      */
-    public Header setCookie(@NonNull final ResponseCookie cookie) {
+    @Contract("_ -> this") public Header setCookie(@NonNull final ResponseCookie cookie) {
         if (CoreConfig.debug) {
             Logger.debug("Cookie set! Key: {}, Value: {}, Full: {}", cookie.getCookie(),
                 cookie.getValue(), cookie.toString());

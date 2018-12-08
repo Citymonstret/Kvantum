@@ -22,11 +22,16 @@
 package xyz.kvantum.server.api.repository;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
+/**
+ * {@inheritDoc}
+ */
 @SuppressWarnings("unused") public final class FieldComparator<Q, V> extends Matcher<Q, V> {
 
     private final KvantumPojo<Q> queryPojo;
@@ -55,7 +60,8 @@ import java.util.Map;
         this.queryPojo = queryFactory.of(queryObject);
     }
 
-    @SuppressWarnings("all") private static <T> Class<T> getClass(final T instance) {
+    @Contract(pure = true) @SuppressWarnings("all") private static <T> Class<T> getClass(
+        @Nonnull final T instance) {
         return (Class<T>) instance.getClass();
     }
 

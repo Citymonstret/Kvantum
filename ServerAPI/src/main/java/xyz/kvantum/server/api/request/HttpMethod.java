@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.request;
 
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.util.Assert;
 
 import java.util.HashMap;
@@ -88,7 +89,7 @@ import java.util.Optional;
         return Optional.ofNullable(METHOD_CACHE.get(fixed));
     }
 
-    public boolean hasBody() {
+    @Contract(pure = true) public boolean hasBody() {
         return this.hasBody;
     }
 }
