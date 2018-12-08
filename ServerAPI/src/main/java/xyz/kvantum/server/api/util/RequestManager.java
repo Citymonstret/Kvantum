@@ -22,6 +22,8 @@
 package xyz.kvantum.server.api.util;
 
 import com.google.common.collect.ImmutableList;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,11 +37,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.event.Listener;
 import xyz.kvantum.server.api.events.RequestHandlerAddedEvent;
+import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -75,6 +81,8 @@ import xyz.kvantum.server.api.views.errors.View404;
 				Logger.info( "Checking request handler sort rate..." );
 				if ( CoreConfig.requestHandlerSortRate > 0 )
 				{
+					Logger.info( "Loading view sorting" );
+
 					Logger.info( "Will sort request handlers every {}ms", CoreConfig.requestHandlerSortRate * 1000 );
 					timer.schedule( new TimerTask()
 					{
@@ -84,8 +92,47 @@ import xyz.kvantum.server.api.views.errors.View404;
 						}
 					}, 0L, CoreConfig.requestHandlerSortRate * 1000 );
 				}
+				ServerImplementation.getImplementation().getEventBus().registerListeners( RequestManager.this );
 			}
 		}, 30000L );
+	}
+
+	@Listener
+	public void onShutdown(@NonNull final ServerShutdownEvent event)
+	{
+		final File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "config" ), "requestHandlerOrder.csv" );
+		if ( !file.exists() )
+		{
+			try
+			{
+				file.createNewFile();
+			} catch ( final Exception e )
+			{
+				Logger.error( "Failed to create requestHandlerOrder.csv: {}", e.getMessage() );
+				return;
+			}
+		}
+		try  (final CSVPrinter printer = CSVFormat.DEFAULT.withHeader( OrderedHandler.class ).print( file, StandardCharsets.UTF_8 ) )
+		{
+			printer.printComment( "Request handler ordered by sorter" );
+			for ( int index = 0; index < this.views.size(); index++ )
+			{
+				printer.print( index );
+				printer.print( views.get( index ).getName() );
+				printer.println();
+			}
+		} catch ( final Exception e )
+		{
+			Logger.error( "Failed to write to requestHandlerOrder.csv: {}", e.getMessage() );
+		}
+	}
+
+	private enum OrderedHandler
+	{
+
+		ORDER,
+		HANDLER_NAME
+
 	}
 
 	/**
@@ -110,7 +157,7 @@ import xyz.kvantum.server.api.views.errors.View404;
 		// Call event
 		//
 		final RequestHandlerAddedEvent requestHandlerAddedEvent = new RequestHandlerAddedEvent( view );
-		ServerImplementation.getImplementation().getEventBus().emit( requestHandlerAddedEvent );
+		ServerImplementation.getImplementation().getEventBus().throwEvent( requestHandlerAddedEvent, false );
 		if ( requestHandlerAddedEvent.isCancelled() )
 		{
 			return null; // Nullable

@@ -225,7 +225,7 @@ public final class StandaloneServer extends SimpleServer
 		{
 			throw new KvantumInitializationException( "Couldn't load in views", e );
 		}
-		this.getEventBus().emit( new ServerInitializedEvent( this ) );
+		this.getEventBus().throwEvent( new ServerInitializedEvent( this ), true );
 	}
 
 	@Override protected void onStart()
@@ -389,11 +389,6 @@ public final class StandaloneServer extends SimpleServer
 		{
 			Message.VIEWS_DISABLED.log();
 		}
-	}
-
-	@SneakyThrows @SuppressWarnings("unused") private <T> void emit(@NonNull final T event)
-	{
-		this.getEventBus().emit( event );
 	}
 
 	private void loadPlugins()

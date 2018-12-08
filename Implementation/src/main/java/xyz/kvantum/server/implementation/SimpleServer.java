@@ -44,14 +44,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
-import pw.stamina.causam.EventBus;
-import pw.stamina.causam.event.EventEmitter;
-import pw.stamina.causam.publish.Publisher;
-import pw.stamina.causam.registry.SetBasedSubscriptionRegistry;
-import pw.stamina.causam.registry.SubscriptionRegistry;
-import pw.stamina.causam.scan.method.model.Subscriber;
-import pw.stamina.causam.select.CachingSubscriptionSelectorServiceDecorator;
-import pw.stamina.causam.select.SubscriptionSelectorService;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.server.api.account.IAccount;
@@ -64,6 +56,9 @@ import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.event.EventBus;
+import xyz.kvantum.server.api.event.Listener;
+import xyz.kvantum.server.api.event.SimpleEventBus;
 import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.events.ServerStartedEvent;
@@ -389,25 +384,20 @@ public class SimpleServer implements Kvantum
 		//
 		// Setup causam (EventBus)
 		//
-		final SubscriptionSelectorService selectorService = CachingSubscriptionSelectorServiceDecorator
-				.concurrent( SubscriptionSelectorService.simple() );
-		final SubscriptionRegistry registry = SetBasedSubscriptionRegistry.hash( selectorService );
-		final Publisher publisher = Publisher.immediate();
-		final EventEmitter emitter = EventEmitter.standard( registry, publisher );
-		this.eventBus = EventBus.standard( registry, emitter );
+		this.eventBus = new SimpleEventBus();
 
 		//
 		// Initialize access.log logger
 		//
 		Logger.info( "Creating access.log handler..." );
-		this.eventBus.register( new AccessLogStream( logFolder ) );
+		this.eventBus.registerListeners( new AccessLogStream( logFolder ) );
 
 		//
 		// Register connection denier
 		//
 		if ( CoreConfig.debug )
 		{
-			this.getEventBus().register( this );
+			this.getEventBus().registerListeners( this );
 		}
 
 		//
@@ -518,7 +508,7 @@ public class SimpleServer implements Kvantum
 			return false;
 		}
 		this.httpThread.start();
-		this.getEventBus().emit( new ServerStartedEvent( this ) );
+		this.getEventBus().throwEvent( new ServerStartedEvent( this ), false );
 		return true;
 	}
 
@@ -637,7 +627,7 @@ public class SimpleServer implements Kvantum
 		//
 		if ( getEventBus() != null )
 		{
-			getEventBus().emit( new ServerShutdownEvent( this ) );
+			getEventBus().throwEvent( new ServerShutdownEvent( this ), false );
 		}
 
 		//
@@ -717,7 +707,7 @@ public class SimpleServer implements Kvantum
 				.addToRouter( getRouter() );
 	}
 
-	@Subscriber @SuppressWarnings("unused") private void listenForConnections(
+	@Listener @SuppressWarnings("unused") private void listenForConnections(
 			@NonNull final ConnectionEstablishedEvent establishedEvent)
 	{
 		Logger.debug( "Checking for external connection {}", establishedEvent.getIp() );

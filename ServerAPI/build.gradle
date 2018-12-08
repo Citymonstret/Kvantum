@@ -1,4 +1,6 @@
 dependencies {
+    // CSV
+    compile 'org.apache.commons:commons-csv:1.6'
     // Performance monitoring
     compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
     // Logback (used for configuration purposes only)
@@ -35,8 +37,6 @@ dependencies {
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
     compile 'com.github.Hervian:lambda-factory:91bc62f8c2'
-    // Event handling
-    compile 'com.github.staminapw:causam:efb517dfaa'
     //
     // Modules
     //

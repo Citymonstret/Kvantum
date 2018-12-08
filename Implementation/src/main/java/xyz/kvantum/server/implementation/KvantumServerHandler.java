@@ -124,7 +124,7 @@ import xyz.kvantum.server.api.util.ProtocolType;
 		//
 		final ConnectionEstablishedEvent connectionEstablishedEvent = new ConnectionEstablishedEvent(
 				this.workerContext.getSocketContext().getIP() );
-		ServerImplementation.getImplementation().getEventBus().emit( connectionEstablishedEvent );
+		ServerImplementation.getImplementation().getEventBus().throwEvent( connectionEstablishedEvent, false );
 		//
 		// Events may cancel the event, in which case we close the context
 		//

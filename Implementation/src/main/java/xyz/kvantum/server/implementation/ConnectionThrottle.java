@@ -30,9 +30,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.NonNull;
-import pw.stamina.causam.scan.method.model.Subscriber;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.event.Listener;
 import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.memguard.LeakageProne;
@@ -63,7 +63,7 @@ final class ConnectionThrottle implements LeakageProne
 		//
 		// Register event listener
 		//
-		ServerImplementation.getImplementation().getEventBus().register( this );
+		ServerImplementation.getImplementation().getEventBus().registerListeners( this );
 	}
 
 	static void initialize()
@@ -117,7 +117,7 @@ final class ConnectionThrottle implements LeakageProne
 		return totalAttempts > CoreConfig.Throttle.limit;
 	}
 
-	@Subscriber @SuppressWarnings("unused") private void listenForConnections(
+	@Listener @SuppressWarnings("unused") private void listenForConnections(
 			final ConnectionEstablishedEvent establishedEvent)
 	{
 		if ( CoreConfig.debug )

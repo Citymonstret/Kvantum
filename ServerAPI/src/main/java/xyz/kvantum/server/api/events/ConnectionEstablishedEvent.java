@@ -23,7 +23,7 @@ package xyz.kvantum.server.api.events;
 
 import lombok.Getter;
 import lombok.Setter;
-import pw.stamina.causam.event.Cancellable;
+import xyz.kvantum.server.api.event.Cancellable;
 
 public final class ConnectionEstablishedEvent extends Event implements Cancellable
 {

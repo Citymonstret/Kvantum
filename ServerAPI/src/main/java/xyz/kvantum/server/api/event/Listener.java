@@ -19,28 +19,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.events;
+package xyz.kvantum.server.api.event;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import xyz.kvantum.server.api.event.Cancellable;
-import xyz.kvantum.server.api.views.RequestHandler;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public final class RequestHandlerAddedEvent extends Event implements Cancellable
+@Retention( RetentionPolicy.RUNTIME )
+@Target( ElementType.METHOD )
+public @interface Listener
 {
-
-	@Getter private final RequestHandler context;
-	@Getter @Setter private boolean cancelled = false;
-
-	public RequestHandlerAddedEvent(@NonNull final RequestHandler context)
-	{
-		super( "requestHandlerAddedEvent" );
-		this.context = context;
-	}
-
-	@Override public void cancel()
-	{
-		this.setCancelled( true );
-	}
 }

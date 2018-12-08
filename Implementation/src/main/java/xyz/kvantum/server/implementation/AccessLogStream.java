@@ -27,7 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import lombok.NonNull;
-import pw.stamina.causam.scan.method.model.Subscriber;
+import xyz.kvantum.server.api.event.Listener;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.response.FinalizedResponse;
 import xyz.kvantum.server.api.util.Assert;
@@ -43,7 +43,7 @@ final class AccessLogStream extends PrintStream
 		super( new AsyncBufferedOutputStream( new FileOutputStream( new File( logFolder, "access.log" ), true ) ) );
 	}
 
-	@Subscriber @SuppressWarnings("unused") private void onRequestFinish(@NonNull final FinalizedResponse response)
+	@Listener @SuppressWarnings("unused") private void onRequestFinish(@NonNull final FinalizedResponse response)
 	{
 		final String logString = response.toLogString();
 		Assert.notNull( logString );

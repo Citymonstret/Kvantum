@@ -595,7 +595,7 @@ final class ResponseTask implements Runnable
 				 .length( (int) actualLength ).status( body.getHeader().getStatus().toString() )
 				.query( this.workerContext.getRequest().getQuery() ).timeFinished( System.currentTimeMillis() ).build();
 
-		ServerImplementation.getImplementation().getEventBus().emit( finalizedResponse.build() );
+		ServerImplementation.getImplementation().getEventBus().throwEvent( finalizedResponse.build(), true );
 
 		//
 		// Make sure everything is written and either close the connection
