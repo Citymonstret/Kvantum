@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
+@SuppressWarnings( { "WeakerAccess" } )
 public final class ListenerMethod
 {
 

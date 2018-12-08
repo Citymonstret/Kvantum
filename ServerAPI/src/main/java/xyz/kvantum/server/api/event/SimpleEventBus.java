@@ -32,6 +32,10 @@ import java.util.concurrent.Future;
 import lombok.NonNull;
 import xyz.kvantum.server.api.logging.Logger;
 
+/**
+ * Simple {@link EventBus} implementation using a cached thread pool to handle
+ * asynchronous events
+ */
 public final class SimpleEventBus extends EventBus
 {
 

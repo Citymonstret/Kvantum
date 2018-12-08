@@ -21,11 +21,23 @@
  */
 package xyz.kvantum.server.api.event;
 
+/**
+ * Indicates an event that can be cancelled by {@link Listener listeners}
+ */
 public interface Cancellable
 {
 
+	/**
+	 * Check whether or not the event has been cancelled by
+	 * a {@link Listener}
+	 *
+	 * @return True if the event has been cancelled, false if it hasn't
+ 	 */
 	boolean isCancelled();
 
+	/**
+	 * Indicate that the event has been cancelled
+	 */
 	void cancel();
 
 }

@@ -32,6 +32,10 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.util.ReflectionUtils.AnnotatedMethod;
 
+/**
+ * Event bus responsible for distributing submitted events, and
+ * handling {@link Listener} registrations
+ */
 @SuppressWarnings( { "unused", "WeakerAccess" } )
 public abstract class EventBus
 {
@@ -45,11 +49,24 @@ public abstract class EventBus
 		this.supportsAsync = supportsAsync;
 	}
 
+	/**
+	 * Check whether or not the event bus implementation supports
+	 * asynchronous event distribution
+	 *
+	 * @return True if the event bus supports asynchronous event distribution,
+	 * 		   False if not
+	 */
 	public final boolean supportsAsync()
 	{
 		return this.supportsAsync;
 	}
 
+	/**
+	 * Scan a class for methods annotated with {@link Listener} annotations,
+	 * and register them in the event bus
+	 *
+	 * @param listenerInstance Instance to scan
+	 */
 	public void registerListeners(@NonNull final Object listenerInstance)
 	{
 		final Class<?> clazz = listenerInstance.getClass();
@@ -94,6 +111,14 @@ public abstract class EventBus
 
 	protected abstract <T> T throwSync(@NonNull final T event);
 
+	/**
+	 * Submit an event for distribution
+	 *
+	 * @param event The event to submit
+	 * @param async Whether or not the event can be handled asynchronously
+	 * @return Future containing the distributed event, or an exception if the event
+	 * 		   could not be handled properly
+	 */
 	public final <T> Future<T> throwEvent(@NonNull final T event, final boolean async)
 	{
 		if ( async && !this.supportsAsync() )

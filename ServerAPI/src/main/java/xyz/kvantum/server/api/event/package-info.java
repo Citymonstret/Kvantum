@@ -19,22 +19,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.event;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * Annotation that indicates that a method can
- * accept an event (see {@link EventBus}).
- *
- * An annotated method must take precisely one
- * parameter, which indicates the event type
+ * Simple event bus system, that allows you to submit any object and
+ * let other objects listen to it.
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.METHOD )
-public @interface Listener
-{
-}
+package xyz.kvantum.server.api.event;
