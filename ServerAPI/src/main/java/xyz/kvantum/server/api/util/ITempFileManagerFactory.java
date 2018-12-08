@@ -24,14 +24,13 @@ package xyz.kvantum.server.api.util;
 /**
  * Factory that creates new temporary file managers
  */
-@FunctionalInterface public interface ITempFileManagerFactory
-{
+@FunctionalInterface public interface ITempFileManagerFactory {
 
-	/**
-	 * Create a new temporary file manager
-	 *
-	 * @return new temporary file manager
-	 */
-	ITempFileManager newTempFileManager();
+    /**
+     * Create a new temporary file manager
+     *
+     * @return new temporary file manager
+     */
+    ITempFileManager newTempFileManager();
 
 }

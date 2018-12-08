@@ -29,12 +29,9 @@ import java.lang.annotation.Target;
 /**
  * Annotation that indicates that a method can
  * accept an event (see {@link EventBus}).
- *
+ * <p>
  * An annotated method must take precisely one
  * parameter, which indicates the event type
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.METHOD )
-public @interface Listener
-{
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.METHOD) public @interface Listener {
 }

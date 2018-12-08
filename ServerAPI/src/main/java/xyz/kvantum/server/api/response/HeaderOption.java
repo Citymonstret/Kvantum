@@ -21,75 +21,62 @@
  */
 package xyz.kvantum.server.api.response;
 
-import java.util.HashMap;
-import java.util.Map;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AsciiStringable;
 
-@SuppressWarnings("unused") @EqualsAndHashCode(of = "text") @RequiredArgsConstructor(access = AccessLevel.PRIVATE) public final class HeaderOption
-		implements AsciiStringable
-{
+import java.util.HashMap;
+import java.util.Map;
 
-	private static Map<AsciiString, HeaderOption> headerOptionMap = new HashMap<>();
+@SuppressWarnings("unused") @EqualsAndHashCode(of = "text")
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE) public final class HeaderOption
+    implements AsciiStringable {
 
-	@NonNull @Getter private final AsciiString text;
-	@Getter private boolean cacheApplicable = true;
+    private static Map<AsciiString, HeaderOption> headerOptionMap = new HashMap<>();
 
-	public static HeaderOption create(final String string)
-	{
-		return create( AsciiString.of( string ) );
-	}
+    @NonNull @Getter private final AsciiString text;
+    @Getter private boolean cacheApplicable = true;
 
-	public static HeaderOption create(final AsciiString text)
-	{
-		return create( text, true );
-	}
+    public static HeaderOption create(final String string) {
+        return create(AsciiString.of(string));
+    }
 
-	public static HeaderOption create(@NonNull final AsciiString text, boolean cacheApplicable)
-	{
-		final HeaderOption headerOption = new HeaderOption( text ).cacheApplicable( cacheApplicable );
-		headerOptionMap.put( text.toLowerCase(), headerOption );
-		return headerOption;
-	}
+    public static HeaderOption create(final AsciiString text) {
+        return create(text, true);
+    }
 
-	public static HeaderOption getOrCreate(@NonNull final AsciiString text)
-	{
-		if ( headerOptionMap.containsKey( text.toLowerCase() ) )
-		{
-			return headerOptionMap.get( text.toLowerCase() );
-		}
-		if ( CoreConfig.debug )
-		{
-			Logger.debug( "View requested unknown header [{}] - Creating...", text );
-		}
-		return create( text );
-	}
+    public static HeaderOption create(@NonNull final AsciiString text, boolean cacheApplicable) {
+        final HeaderOption headerOption = new HeaderOption(text).cacheApplicable(cacheApplicable);
+        headerOptionMap.put(text.toLowerCase(), headerOption);
+        return headerOption;
+    }
 
-	private HeaderOption cacheApplicable(final boolean b)
-	{
-		this.cacheApplicable = b;
-		return this;
-	}
+    public static HeaderOption getOrCreate(@NonNull final AsciiString text) {
+        if (headerOptionMap.containsKey(text.toLowerCase())) {
+            return headerOptionMap.get(text.toLowerCase());
+        }
+        if (CoreConfig.debug) {
+            Logger.debug("View requested unknown header [{}] - Creating...", text);
+        }
+        return create(text);
+    }
 
-	@Override public final String toString()
-	{
-		return this.text.toString();
-	}
+    private HeaderOption cacheApplicable(final boolean b) {
+        this.cacheApplicable = b;
+        return this;
+    }
 
-	@Override public final AsciiString toAsciiString()
-	{
-		return this.text;
-	}
+    @Override public final String toString() {
+        return this.text.toString();
+    }
 
-	public final byte[] getBytes()
-	{
-		return this.toAsciiString().getValue();
-	}
+    @Override public final AsciiString toAsciiString() {
+        return this.text;
+    }
+
+    public final byte[] getBytes() {
+        return this.toAsciiString().getValue();
+    }
 }

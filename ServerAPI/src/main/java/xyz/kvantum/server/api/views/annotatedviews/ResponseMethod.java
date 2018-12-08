@@ -24,58 +24,53 @@ package xyz.kvantum.server.api.views.annotatedviews;
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.lang.reflect.Method;
-import java.util.function.BiConsumer;
 import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.ViewReturn;
 
-final public class ResponseMethod<T, C> implements BiConsumer<AbstractRequest, Response>, ViewReturn
-{
+import java.lang.reflect.Method;
+import java.util.function.BiConsumer;
 
-	private final Lambda lambda;
-	private final C instance;
-	private final boolean passResponse;
-	private final OutputConverter outputConverter;
+final public class ResponseMethod<T, C>
+    implements BiConsumer<AbstractRequest, Response>, ViewReturn {
 
-	ResponseMethod(@NonNull final Method method, @NonNull final C instance,
-			@Nullable final OutputConverter outputConverter) throws Throwable
-	{
-		Assert.notNull( method, instance );
+    private final Lambda lambda;
+    private final C instance;
+    private final boolean passResponse;
+    private final OutputConverter outputConverter;
 
-		this.lambda = LambdaFactory.create( method );
-		this.instance = instance;
-		this.passResponse = method.getReturnType() == Void.TYPE;
-		this.outputConverter = outputConverter;
-	}
+    ResponseMethod(@NonNull final Method method, @NonNull final C instance,
+        @Nullable final OutputConverter outputConverter) throws Throwable {
+        Assert.notNull(method, instance);
 
-	public Response handle(final AbstractRequest r)
-	{
-		Assert.notNull( r );
+        this.lambda = LambdaFactory.create(method);
+        this.instance = instance;
+        this.passResponse = method.getReturnType() == Void.TYPE;
+        this.outputConverter = outputConverter;
+    }
 
-		if ( passResponse )
-		{
-			final Response response = new Response();
-			this.lambda.invoke_for_void( instance, r, response );
-			return response;
-		}
-		final Object output = this.lambda.invoke_for_Object( instance, r );
-		if ( outputConverter != null )
-		{
-			return outputConverter.generateResponse( output );
-		}
-		return ( Response ) output;
-	}
+    public Response handle(final AbstractRequest r) {
+        Assert.notNull(r);
 
-	@Override public void accept(final AbstractRequest request, final Response response)
-	{
-		response.copyFrom( handle( request ) );
-	}
+        if (passResponse) {
+            final Response response = new Response();
+            this.lambda.invoke_for_void(instance, r, response);
+            return response;
+        }
+        final Object output = this.lambda.invoke_for_Object(instance, r);
+        if (outputConverter != null) {
+            return outputConverter.generateResponse(output);
+        }
+        return (Response) output;
+    }
 
-	@Override public final Response get(final AbstractRequest r)
-	{
-		return this.handle( r );
-	}
+    @Override public void accept(final AbstractRequest request, final Response response) {
+        response.copyFrom(handle(request));
+    }
+
+    @Override public final Response get(final AbstractRequest r) {
+        return this.handle(r);
+    }
 }

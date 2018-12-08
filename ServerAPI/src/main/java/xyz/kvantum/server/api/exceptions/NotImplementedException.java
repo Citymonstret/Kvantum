@@ -21,12 +21,10 @@
  */
 package xyz.kvantum.server.api.exceptions;
 
-public final class NotImplementedException extends IllegalAccessException
-{
+public final class NotImplementedException extends IllegalAccessException {
 
-	public NotImplementedException(final String message)
-	{
-		super( message );
-	}
+    public NotImplementedException(final String message) {
+        super(message);
+    }
 
 }

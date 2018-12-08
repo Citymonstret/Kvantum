@@ -21,80 +21,74 @@
  */
 package xyz.kvantum.server.api.request;
 
+import xyz.kvantum.server.api.util.Assert;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import xyz.kvantum.server.api.util.Assert;
 
-@SuppressWarnings("ALL") public enum HttpMethod
-{
+@SuppressWarnings("ALL") public enum HttpMethod {
 
-	/**
-	 * Post requests are used to handle data
-	 */
-	POST,
+    /**
+     * Post requests are used to handle data
+     */
+    POST,
 
-	/**
-	 * Get requests are handled for getting resources
-	 */
-	GET,
+    /**
+     * Get requests are handled for getting resources
+     */
+    GET,
 
-	/**
-	 *
-	 */
-	PUT,
+    /**
+     *
+     */
+    PUT,
 
-	PATCH,
+    PATCH,
 
-	/**
-	 * Retrieve the headers for a request Uses {@link #GET} but ignores any content
-	 */
-	HEAD( false ),
+    /**
+     * Retrieve the headers for a request Uses {@link #GET} but ignores any content
+     */
+    HEAD(false),
 
-	/**
-	 *
-	 */
-	DELETE,
+    /**
+     *
+     */
+    DELETE,
 
-	/**
-	 * Used to indicate that ALL methods are applicable
-	 */
-	ALL;
+    /**
+     * Used to indicate that ALL methods are applicable
+     */
+    ALL;
 
-	private static Map<String, HttpMethod> METHOD_CACHE;
+    private static Map<String, HttpMethod> METHOD_CACHE;
 
-	private final boolean hasBody;
+    private final boolean hasBody;
 
-	HttpMethod()
-	{
-		this( true );
-	}
+    HttpMethod() {
+        this(true);
+    }
 
-	HttpMethod(final boolean hasBody)
-	{
-		this.hasBody = hasBody;
-	}
+    HttpMethod(final boolean hasBody) {
+        this.hasBody = hasBody;
+    }
 
-	public static Optional<HttpMethod> getByName(final String name)
-	{
-		Assert.notEmpty( name );
+    public static Optional<HttpMethod> getByName(final String name) {
+        Assert.notEmpty(name);
 
-		if ( METHOD_CACHE == null )
-		{
-			METHOD_CACHE = new HashMap<>();
-			for ( final HttpMethod method : values() )
-			{
-				METHOD_CACHE.put( method.name(), method );
-			}
-		}
+        if (METHOD_CACHE == null) {
+            METHOD_CACHE = new HashMap<>();
+            for (final HttpMethod method : values()) {
+                METHOD_CACHE.put(method.name(), method);
+            }
+        }
 
-		final String fixed = name.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
-		return Optional.ofNullable( METHOD_CACHE.get( fixed ) );
-	}
+        final String fixed = name.replaceAll("\\s", "").toUpperCase(Locale.ENGLISH);
+        return Optional.ofNullable(METHOD_CACHE.get(fixed));
+    }
 
-	public boolean hasBody()
-	{
-		return this.hasBody;
-	}
+    public boolean hasBody() {
+        return this.hasBody;
+    }
 }

@@ -28,9 +28,8 @@ import xyz.kvantum.server.api.response.Response;
  * (example of this is {@link xyz.kvantum.server.api.views.decorators.CacheDecorator}) and other changes to the
  * generated response
  */
-@FunctionalInterface public interface Decorator
-{
+@FunctionalInterface public interface Decorator {
 
-	void decorate(Response response);
+    void decorate(Response response);
 
 }

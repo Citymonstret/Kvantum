@@ -21,55 +21,50 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.io.IOException;
 import lombok.NonNull;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 
+import java.io.IOException;
+
 /**
  * Handler for Gzip compression
  */
-final class GzipHandler extends AutoCloseable
-{
+final class GzipHandler extends AutoCloseable {
 
-	private final ReusableGzipOutputStream reusableGzipOutputStream;
+    private final ReusableGzipOutputStream reusableGzipOutputStream;
 
-	GzipHandler()
-	{
-		this.reusableGzipOutputStream = new ReusableGzipOutputStream();
-	}
+    GzipHandler() {
+        this.reusableGzipOutputStream = new ReusableGzipOutputStream();
+    }
 
-	@Override protected void handleClose()
-	{
-		try
-		{
-			this.reusableGzipOutputStream.close();
-		} catch ( final Exception e )
-		{
-			e.printStackTrace();
-		}
-	}
+    @Override protected void handleClose() {
+        try {
+            this.reusableGzipOutputStream.close();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Compress bytes using gzip
-	 *
-	 * @param data Bytes to compress
-	 * @return GZIP compressed data
-	 * @throws IOException If compression fails
-	 */
-	byte[] compress(@NonNull final byte[] data) throws IOException
-	{
-		Assert.notNull( data );
+    /**
+     * Compress bytes using gzip
+     *
+     * @param data Bytes to compress
+     * @return GZIP compressed data
+     * @throws IOException If compression fails
+     */
+    byte[] compress(@NonNull final byte[] data) throws IOException {
+        Assert.notNull(data);
 
-		reusableGzipOutputStream.reset();
-		reusableGzipOutputStream.write( data );
-		reusableGzipOutputStream.finish();
-		reusableGzipOutputStream.flush();
+        reusableGzipOutputStream.reset();
+        reusableGzipOutputStream.write(data);
+        reusableGzipOutputStream.finish();
+        reusableGzipOutputStream.flush();
 
-		final byte[] compressed = reusableGzipOutputStream.getData();
+        final byte[] compressed = reusableGzipOutputStream.getData();
 
-		Assert.equals( compressed != null && compressed.length > 0, true, "Failed to compress data" );
+        Assert.equals(compressed != null && compressed.length > 0, true, "Failed to compress data");
 
-		return compressed;
-	}
+        return compressed;
+    }
 }

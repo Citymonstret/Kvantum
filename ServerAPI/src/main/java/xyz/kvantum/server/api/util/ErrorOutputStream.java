@@ -21,34 +21,31 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.logging.LogWrapper;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Extremely hacky solution that enables file logging for exceptions
  *
  * @author Citymonstret
  */
-@RequiredArgsConstructor public final class ErrorOutputStream extends ByteArrayOutputStream
-{
+@RequiredArgsConstructor public final class ErrorOutputStream extends ByteArrayOutputStream {
 
-	@NonNull private final LogWrapper logWrapper;
+    @NonNull private final LogWrapper logWrapper;
 
-	@Override public void flush() throws IOException
-	{
-		String message = new String( toByteArray(), StandardCharsets.UTF_8 );
-		if ( message.endsWith( System.lineSeparator() ) )
-		{
-			message = message.substring( 0, message.length() - System.lineSeparator().length() );
-		}
-		if ( !message.isEmpty() )
-		{
-			logWrapper.log( new String( toByteArray(), StandardCharsets.UTF_8 ) );
-		}
-		super.reset();
-	}
+    @Override public void flush() throws IOException {
+        String message = new String(toByteArray(), StandardCharsets.UTF_8);
+        if (message.endsWith(System.lineSeparator())) {
+            message = message.substring(0, message.length() - System.lineSeparator().length());
+        }
+        if (!message.isEmpty()) {
+            logWrapper.log(new String(toByteArray(), StandardCharsets.UTF_8));
+        }
+        super.reset();
+    }
 }

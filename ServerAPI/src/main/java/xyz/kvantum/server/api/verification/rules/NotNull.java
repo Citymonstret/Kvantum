@@ -23,17 +23,14 @@ package xyz.kvantum.server.api.verification.rules;
 
 import xyz.kvantum.server.api.verification.Rule;
 
-public final class NotNull<T> implements Rule<T>
-{
+public final class NotNull<T> implements Rule<T> {
 
-	@Override public String getRuleDescription()
-	{
-		return "Supplied object cannot be null";
-	}
+    @Override public String getRuleDescription() {
+        return "Supplied object cannot be null";
+    }
 
-	@Override public boolean test(final Object o)
-	{
-		return o != null;
-	}
+    @Override public boolean test(final Object o) {
+        return o != null;
+    }
 
 }

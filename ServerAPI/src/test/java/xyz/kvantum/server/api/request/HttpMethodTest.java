@@ -21,24 +21,23 @@
  */
 package xyz.kvantum.server.api.request;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class HttpMethodTest
-{
+import java.util.Optional;
 
-	@Test void getByName()
-	{
-		final Optional<HttpMethod> upperscorePostTest = HttpMethod.getByName( "POST" );
-		final Optional<HttpMethod> underscorePostTest = HttpMethod.getByName( "post" );
-		final Optional<HttpMethod> whitespacePostTest = HttpMethod.getByName( " PO ST" );
-		// False positive test
-		final Optional<HttpMethod> unknownMethodTest = HttpMethod.getByName( "foo" );
-		// Assertions
-		Assertions.assertTrue( upperscorePostTest.isPresent() );
-		Assertions.assertTrue( underscorePostTest.isPresent() );
-		Assertions.assertTrue( whitespacePostTest.isPresent() );
-		Assertions.assertFalse( unknownMethodTest.isPresent() );
-	}
+class HttpMethodTest {
+
+    @Test void getByName() {
+        final Optional<HttpMethod> upperscorePostTest = HttpMethod.getByName("POST");
+        final Optional<HttpMethod> underscorePostTest = HttpMethod.getByName("post");
+        final Optional<HttpMethod> whitespacePostTest = HttpMethod.getByName(" PO ST");
+        // False positive test
+        final Optional<HttpMethod> unknownMethodTest = HttpMethod.getByName("foo");
+        // Assertions
+        Assertions.assertTrue(upperscorePostTest.isPresent());
+        Assertions.assertTrue(underscorePostTest.isPresent());
+        Assertions.assertTrue(whitespacePostTest.isPresent());
+        Assertions.assertFalse(unknownMethodTest.isPresent());
+    }
 }

@@ -21,69 +21,59 @@
  */
 package xyz.kvantum.crush.syntax;
 
+import xyz.kvantum.server.api.request.AbstractRequest;
+import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.VariableProvider;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.util.ProviderFactory;
-import xyz.kvantum.server.api.util.VariableProvider;
 
-final public class IfStatement extends Syntax
-{
+final public class IfStatement extends Syntax {
 
-	public IfStatement()
-	{
-		super( Pattern.compile( "\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}" ) );
-	}
+    public IfStatement() {
+        super(Pattern
+            .compile("\\{(#if)( !| )([A-Za-z0-9]*).([A-Za-z0-9_\\-@]*)\\}([\\S\\s]*?)\\{(/if)\\}"));
+    }
 
-	@Override public String process(final String in, final Matcher matcher, final AbstractRequest r,
-			final Map<String, ProviderFactory<? extends VariableProvider>> factories)
-	{
-		String workingString = in;
-		while ( matcher.find() )
-		{
-			String neg = matcher.group( 2 );
-			String namespace = matcher.group( 3 );
-			String variable = matcher.group( 4 );
-			if ( factories.containsKey( namespace.toLowerCase( Locale.ENGLISH ) ) )
-			{
-				final Optional<? extends VariableProvider> pOptional = factories
-						.get( namespace.toLowerCase( Locale.ENGLISH ) ).get( r );
-				if ( pOptional.isPresent() )
-				{
-					final VariableProvider p = pOptional.get();
-					if ( p.contains( variable ) )
-					{
-						Object o = p.get( variable );
-						boolean b;
-						if ( o instanceof Boolean )
-						{
-							b = ( Boolean ) o;
-						} else if ( o instanceof String )
-						{
-							b = o.toString().equalsIgnoreCase( "true" );
-						} else
-						{
-							b = o instanceof Number && ( ( Number ) o ).intValue() == 1;
-						}
-						if ( neg.contains( "!" ) )
-						{
-							b = !b;
-						}
+    @Override public String process(final String in, final Matcher matcher, final AbstractRequest r,
+        final Map<String, ProviderFactory<? extends VariableProvider>> factories) {
+        String workingString = in;
+        while (matcher.find()) {
+            String neg = matcher.group(2);
+            String namespace = matcher.group(3);
+            String variable = matcher.group(4);
+            if (factories.containsKey(namespace.toLowerCase(Locale.ENGLISH))) {
+                final Optional<? extends VariableProvider> pOptional =
+                    factories.get(namespace.toLowerCase(Locale.ENGLISH)).get(r);
+                if (pOptional.isPresent()) {
+                    final VariableProvider p = pOptional.get();
+                    if (p.contains(variable)) {
+                        Object o = p.get(variable);
+                        boolean b;
+                        if (o instanceof Boolean) {
+                            b = (Boolean) o;
+                        } else if (o instanceof String) {
+                            b = o.toString().equalsIgnoreCase("true");
+                        } else {
+                            b = o instanceof Number && ((Number) o).intValue() == 1;
+                        }
+                        if (neg.contains("!")) {
+                            b = !b;
+                        }
 
-						if ( b )
-						{
-							workingString = workingString.replace( matcher.group(), matcher.group( 5 ) );
-						} else
-						{
-							workingString = workingString.replace( matcher.group(), "" );
-						}
-					}
-				}
-			}
-		}
-		return workingString;
-	}
+                        if (b) {
+                            workingString =
+                                workingString.replace(matcher.group(), matcher.group(5));
+                        } else {
+                            workingString = workingString.replace(matcher.group(), "");
+                        }
+                    }
+                }
+            }
+        }
+        return workingString;
+    }
 }

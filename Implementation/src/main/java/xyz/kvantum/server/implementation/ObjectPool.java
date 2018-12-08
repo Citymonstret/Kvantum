@@ -21,69 +21,63 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.util.concurrent.LinkedBlockingDeque;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import xyz.kvantum.server.api.util.LambdaUtil;
 import xyz.kvantum.server.api.util.Provider;
+
+import javax.annotation.Nullable;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * An abstract pool of objects using a {@link LinkedBlockingDeque} backend
  *
  * @param <T> Pooled object type
  */
-final class ObjectPool<T>
-{
+final class ObjectPool<T> {
 
-	private final LinkedBlockingDeque<T> availableObjects;
+    private final LinkedBlockingDeque<T> availableObjects;
 
-	/**
-	 * Setup the handler with a specified number of instances
-	 *
-	 * @param objects Number of  instances (must be positive)
-	 * @param supplier Supplier of objects
-	 */
-	ObjectPool(final int objects, @NonNull final Provider<T> supplier)
-	{
-		this.availableObjects = new LinkedBlockingDeque<>( objects );
-		LambdaUtil.collectionAssign( () -> availableObjects, supplier, objects );
-	}
+    /**
+     * Setup the handler with a specified number of instances
+     *
+     * @param objects  Number of  instances (must be positive)
+     * @param supplier Supplier of objects
+     */
+    ObjectPool(final int objects, @NonNull final Provider<T> supplier) {
+        this.availableObjects = new LinkedBlockingDeque<>(objects);
+        LambdaUtil.collectionAssign(() -> availableObjects, supplier, objects);
+    }
 
-	/**
-	 * Poll the worker queue until an object is available. Warning: The thread will be locked until a new object is
-	 * available
-	 *
-	 * @return The next available object
-	 * @throws InterruptedException If the polling of the queue is interrupted
-	 */
-	private T getAvailable() throws InterruptedException
-	{
-		return this.availableObjects.takeFirst();
-	}
+    /**
+     * Poll the worker queue until an object is available. Warning: The thread will be locked until a new object is
+     * available
+     *
+     * @return The next available object
+     * @throws InterruptedException If the polling of the queue is interrupted
+     */
+    private T getAvailable() throws InterruptedException {
+        return this.availableObjects.takeFirst();
+    }
 
-	/**
-	 * Get next available, but return null if the pooling is interrupted
-	 *
-	 * @return next object | null
-	 */
-	@Nullable final T getNullable()
-	{
-		try
-		{
-			return getAvailable();
-		} catch ( final InterruptedException e )
-		{
-			return null; // Nullable
-		}
-	}
+    /**
+     * Get next available, but return null if the pooling is interrupted
+     *
+     * @return next object | null
+     */
+    @Nullable final T getNullable() {
+        try {
+            return getAvailable();
+        } catch (final InterruptedException e) {
+            return null; // Nullable
+        }
+    }
 
-	/**
-	 * Add an object back into the pool (after it has finished everything)
-	 *
-	 * @param t object
-	 */
-	final void add(@NonNull final T t)
-	{
-		this.availableObjects.add( t );
-	}
+    /**
+     * Add an object back into the pool (after it has finished everything)
+     *
+     * @param t object
+     */
+    final void add(@NonNull final T t) {
+        this.availableObjects.add(t);
+    }
 }

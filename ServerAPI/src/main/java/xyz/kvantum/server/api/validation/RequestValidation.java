@@ -24,63 +24,54 @@ package xyz.kvantum.server.api.validation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestChild;
 
-@SuppressWarnings({ "WeakerAccess", "unused" }) public abstract class RequestValidation<T>
-{
+@SuppressWarnings({"WeakerAccess", "unused"}) public abstract class RequestValidation<T> {
 
-	private final ValidationStage stage;
+    private final ValidationStage stage;
 
-	public RequestValidation(final ValidationStage stage)
-	{
-		this.stage = stage;
-	}
+    public RequestValidation(final ValidationStage stage) {
+        this.stage = stage;
+    }
 
-	public abstract ValidationResult validate(final T t);
+    public abstract ValidationResult validate(final T t);
 
-	public ValidationStage getStage()
-	{
-		return stage;
-	}
+    public ValidationStage getStage() {
+        return stage;
+    }
 
-	public enum ValidationStage
-	{
-		ADDRESS, POST_PARAMETERS, GET_PARAMETERS
-	}
+    public enum ValidationStage {
+        ADDRESS, POST_PARAMETERS, GET_PARAMETERS
+    }
 
-	public class ValidationResult
-	{
 
-		private final AbstractRequest request;
-		private final boolean success;
-		private final String message;
+    public class ValidationResult {
 
-		public ValidationResult(final RequestChild request)
-		{
-			this.request = request.getParent();
-			this.success = true;
-			this.message = null;
-		}
+        private final AbstractRequest request;
+        private final boolean success;
+        private final String message;
 
-		public ValidationResult(final RequestChild request, final String message)
-		{
-			this.request = request.getParent();
-			this.success = false;
-			this.message = message;
-		}
+        public ValidationResult(final RequestChild request) {
+            this.request = request.getParent();
+            this.success = true;
+            this.message = null;
+        }
 
-		public AbstractRequest getRequest()
-		{
-			return request;
-		}
+        public ValidationResult(final RequestChild request, final String message) {
+            this.request = request.getParent();
+            this.success = false;
+            this.message = message;
+        }
 
-		public boolean isSuccess()
-		{
-			return success;
-		}
+        public AbstractRequest getRequest() {
+            return request;
+        }
 
-		public String getMessage()
-		{
-			return message;
-		}
-	}
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
 
 }

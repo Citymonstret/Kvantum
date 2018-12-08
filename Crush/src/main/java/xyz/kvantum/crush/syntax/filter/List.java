@@ -21,36 +21,30 @@
  */
 package xyz.kvantum.crush.syntax.filter;
 
-import java.util.Collection;
 import xyz.kvantum.crush.syntax.Filter;
 
-final public class List extends Filter
-{
+import java.util.Collection;
 
-	public List()
-	{
-		super( "list" );
-	}
+final public class List extends Filter {
 
-	public Object handle(String objectName, Object o)
-	{
-		StringBuilder s = new StringBuilder();
-		s.append( "<ul id='list-" ).append( objectName ).append( "'>" );
-		if ( o instanceof Object[] )
-		{
-			for ( Object oo : ( Object[] ) o )
-			{
-				s.append( "<li>" ).append( oo ).append( "</li>" );
-			}
-		} else if ( o instanceof Collection )
-		{
-			for ( Object oo : ( Collection ) o )
-			{
-				s.append( "<li>" ).append( oo ).append( "</li>" );
-			}
-		}
-		s.append( "</ul>" );
-		return s.toString();
-	}
+    public List() {
+        super("list");
+    }
+
+    public Object handle(String objectName, Object o) {
+        StringBuilder s = new StringBuilder();
+        s.append("<ul id='list-").append(objectName).append("'>");
+        if (o instanceof Object[]) {
+            for (Object oo : (Object[]) o) {
+                s.append("<li>").append(oo).append("</li>");
+            }
+        } else if (o instanceof Collection) {
+            for (Object oo : (Collection) o) {
+                s.append("<li>").append(oo).append("</li>");
+            }
+        }
+        s.append("</ul>");
+        return s.toString();
+    }
 
 }

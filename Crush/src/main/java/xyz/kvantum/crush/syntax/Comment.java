@@ -21,28 +21,25 @@
  */
 package xyz.kvantum.crush.syntax;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-final public class Comment extends Syntax
-{
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-	public Comment()
-	{
-		super( Pattern.compile( "(/\\*[\\S\\s]*?\\*/)" ) );
-	}
+final public class Comment extends Syntax {
 
-	@Override public String process(String in, Matcher matcher, AbstractRequest r,
-			Map<String, ProviderFactory<? extends VariableProvider>> factories)
-	{
-		while ( matcher.find() )
-		{
-			in = in.replace( matcher.group( 1 ), "" );
-		}
-		return in;
-	}
+    public Comment() {
+        super(Pattern.compile("(/\\*[\\S\\s]*?\\*/)"));
+    }
+
+    @Override public String process(String in, Matcher matcher, AbstractRequest r,
+        Map<String, ProviderFactory<? extends VariableProvider>> factories) {
+        while (matcher.find()) {
+            in = in.replace(matcher.group(1), "");
+        }
+        return in;
+    }
 }

@@ -23,11 +23,9 @@ package xyz.kvantum.server.api.exceptions;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-final public class QueryException extends RequestException
-{
+final public class QueryException extends RequestException {
 
-	public QueryException(String message, AbstractRequest request)
-	{
-		super( "Failed to interpret query: " + message, request );
-	}
+    public QueryException(String message, AbstractRequest request) {
+        super("Failed to interpret query: " + message, request);
+    }
 }

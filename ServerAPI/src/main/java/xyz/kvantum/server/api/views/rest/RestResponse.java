@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.server.api.views.rest;
 
-import java.util.List;
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.json.simple.JSONObject;
@@ -31,72 +29,63 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.util.AsciiString;
 
-@SuppressWarnings({ "unused", "WeakerAccess " }) public abstract class RestResponse
-{
+import java.util.List;
+import java.util.Map;
 
-	@Getter private final HttpMethod httpMethod;
-	private final ViewPattern viewPattern;
-	@Getter private final String contentType;
-	@Getter(AccessLevel.PROTECTED) private final RequestRequirements requestRequirements;
+@SuppressWarnings({"unused", "WeakerAccess "}) public abstract class RestResponse {
 
-	public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern)
-	{
-		this( httpMethod, viewPattern, "application/json" );
-	}
+    @Getter private final HttpMethod httpMethod;
+    private final ViewPattern viewPattern;
+    @Getter private final String contentType;
+    @Getter(AccessLevel.PROTECTED) private final RequestRequirements requestRequirements;
 
-	public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType)
-	{
-		this( httpMethod, viewPattern, contentType, new RequestRequirements() );
-	}
+    public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern) {
+        this(httpMethod, viewPattern, "application/json");
+    }
 
-	public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType,
-			RequestRequirements requestRequirements)
-	{
-		this.httpMethod = httpMethod;
-		this.viewPattern = viewPattern;
-		this.contentType = contentType;
-		this.requestRequirements = requestRequirements;
-	}
+    public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType) {
+        this(httpMethod, viewPattern, contentType, new RequestRequirements());
+    }
 
-	public boolean methodMatches(final AbstractRequest request)
-	{
-		return request.getQuery().getMethod().equals( this.httpMethod );
-	}
+    public RestResponse(HttpMethod httpMethod, ViewPattern viewPattern, String contentType,
+        RequestRequirements requestRequirements) {
+        this.httpMethod = httpMethod;
+        this.viewPattern = viewPattern;
+        this.contentType = contentType;
+        this.requestRequirements = requestRequirements;
+    }
 
-	public boolean contentTypeMatches(final AbstractRequest request)
-	{
-		if ( this.contentType.isEmpty() )
-		{
-			// We simply don't care.
-			return true;
-		}
-		final AsciiString supplied = request.getHeader( "Accept" );
-		if ( supplied.isEmpty() )
-		{
-			// Assume that they will accept everything
-			return true;
-		}
-		final List<AsciiString> parts = supplied.split( "\\s+" );
-		for ( AsciiString part : parts )
-		{
-			if ( part.equals( "*/*" ) || part.equals( this.contentType ) )
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean methodMatches(final AbstractRequest request) {
+        return request.getQuery().getMethod().equals(this.httpMethod);
+    }
 
-	protected final boolean matches(AbstractRequest request)
-	{
-		final Map<String, String> map = viewPattern.matches( request.getQuery().getFullRequest() );
-		if ( map != null )
-		{
-			request.addMeta( "variables", map );
-		}
-		return map != null;
-	}
+    public boolean contentTypeMatches(final AbstractRequest request) {
+        if (this.contentType.isEmpty()) {
+            // We simply don't care.
+            return true;
+        }
+        final AsciiString supplied = request.getHeader("Accept");
+        if (supplied.isEmpty()) {
+            // Assume that they will accept everything
+            return true;
+        }
+        final List<AsciiString> parts = supplied.split("\\s+");
+        for (AsciiString part : parts) {
+            if (part.equals("*/*") || part.equals(this.contentType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public abstract JSONObject generate(AbstractRequest request);
+    protected final boolean matches(AbstractRequest request) {
+        final Map<String, String> map = viewPattern.matches(request.getQuery().getFullRequest());
+        if (map != null) {
+            request.addMeta("variables", map);
+        }
+        return map != null;
+    }
+
+    public abstract JSONObject generate(AbstractRequest request);
 
 }

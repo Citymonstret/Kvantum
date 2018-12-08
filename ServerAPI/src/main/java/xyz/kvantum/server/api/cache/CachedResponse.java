@@ -21,64 +21,52 @@
  */
 package xyz.kvantum.server.api.cache;
 
-import java.util.UUID;
 import lombok.NonNull;
 import lombok.ToString;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.response.Header;
-import xyz.kvantum.server.api.response.KnownLengthStream;
-import xyz.kvantum.server.api.response.ResponseBody;
-import xyz.kvantum.server.api.response.ResponseStream;
-import xyz.kvantum.server.api.response.SimpleResponseStream;
+import xyz.kvantum.server.api.response.*;
 
-@ToString( of = "uuid" )
-public final class CachedResponse implements ResponseBody
-{
+import java.util.UUID;
 
-	private final UUID uuid = UUID.randomUUID();
+@ToString(of = "uuid") public final class CachedResponse implements ResponseBody {
 
-	public final Header header;
-	private final SimpleResponseStream responseStream;
-	private final boolean isText;
-	private boolean supportsGzip;
+    public final Header header;
+    private final UUID uuid = UUID.randomUUID();
+    private final SimpleResponseStream responseStream;
+    private final boolean isText;
+    private boolean supportsGzip;
 
-	public CachedResponse(@NonNull final ResponseBody parent)
-	{
-		this.header = parent.getHeader();
-		this.isText = parent.isText();
-		this.supportsGzip = parent.supportsGzip();
-		final ResponseStream responseStream = parent.getResponseStream();
-		if ( !( responseStream instanceof KnownLengthStream) )
-		{
-			throw new IllegalArgumentException( "Supplied parent does not have a known length response stream" );
-		}
-		final KnownLengthStream knownLengthStream = (KnownLengthStream) responseStream;
-		this.responseStream = new SimpleResponseStream( knownLengthStream.getAll() );
-	}
+    public CachedResponse(@NonNull final ResponseBody parent) {
+        this.header = parent.getHeader();
+        this.isText = parent.isText();
+        this.supportsGzip = parent.supportsGzip();
+        final ResponseStream responseStream = parent.getResponseStream();
+        if (!(responseStream instanceof KnownLengthStream)) {
+            throw new IllegalArgumentException(
+                "Supplied parent does not have a known length response stream");
+        }
+        final KnownLengthStream knownLengthStream = (KnownLengthStream) responseStream;
+        this.responseStream = new SimpleResponseStream(knownLengthStream.getAll());
+    }
 
-	@Override public Header getHeader()
-	{
-		return this.header;
-	}
+    @Override public Header getHeader() {
+        return this.header;
+    }
 
-	@Override public ResponseStream getResponseStream()
-	{
-		if ( CoreConfig.debug )
-		{
-			Logger.debug( "Creating a new copy of response stream: {}", this );
-		}
-		// Always return a copy of the response stream
-		return new SimpleResponseStream( responseStream.getBytes() );
-	}
+    @Override public ResponseStream getResponseStream() {
+        if (CoreConfig.debug) {
+            Logger.debug("Creating a new copy of response stream: {}", this);
+        }
+        // Always return a copy of the response stream
+        return new SimpleResponseStream(responseStream.getBytes());
+    }
 
-	@Override public boolean supportsGzip()
-	{
-		return this.supportsGzip;
-	}
+    @Override public boolean supportsGzip() {
+        return this.supportsGzip;
+    }
 
-	@Override public boolean isText()
-	{
-		return this.isText;
-	}
+    @Override public boolean isText() {
+        return this.isText;
+    }
 }

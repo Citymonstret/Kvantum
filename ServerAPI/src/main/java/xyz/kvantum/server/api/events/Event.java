@@ -31,12 +31,11 @@ import xyz.kvantum.server.api.core.Kvantum;
  * pw.stamina.causam.scan.method.model.Subscriber subscribers} <p> One can subscribe to these events using {@link
  * Kvantum#getEventBus()}
  */
-@RequiredArgsConstructor abstract class Event
-{
+@RequiredArgsConstructor abstract class Event {
 
-	/**
-	 * The name of the event
-	 */
-	@NonNull @Getter private final String name;
+    /**
+     * The name of the event
+     */
+    @NonNull @Getter private final String name;
 
 }

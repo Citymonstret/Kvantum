@@ -21,16 +21,13 @@
  */
 package xyz.kvantum.server.implementation.error;
 
-public class KvantumException extends Exception
-{
+public class KvantumException extends Exception {
 
-	public KvantumException(final String s, final Throwable cause)
-	{
-		super( "Kvantum: " + s, cause );
-	}
+    public KvantumException(final String s, final Throwable cause) {
+        super("Kvantum: " + s, cause);
+    }
 
-	public KvantumException(final String s)
-	{
-		super( "Kvantum: " + s );
-	}
+    public KvantumException(final String s) {
+        super("Kvantum: " + s);
+    }
 }

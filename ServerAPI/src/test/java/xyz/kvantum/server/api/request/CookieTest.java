@@ -25,12 +25,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import xyz.kvantum.server.api.util.AsciiString;
 
-class CookieTest
-{
+class CookieTest {
 
-	@Test void testToString()
-	{
-		final Cookie cookie = new Cookie( AsciiString.of( "hello" ), AsciiString.of( "world" ) );
-		Assertions.assertEquals( "hello=world", cookie.toString() );
-	}
+    @Test void testToString() {
+        final Cookie cookie = new Cookie(AsciiString.of("hello"), AsciiString.of("world"));
+        Assertions.assertEquals("hello=world", cookie.toString());
+    }
 }

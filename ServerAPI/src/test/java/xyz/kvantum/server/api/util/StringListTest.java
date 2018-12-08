@@ -21,78 +21,68 @@
  */
 package xyz.kvantum.server.api.util;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-class StringListTest
-{
+import static org.junit.jupiter.api.Assertions.*;
 
-	private static final String TEST_STRING = "foo,bar,oof,rab";
+class StringListTest {
 
-	private static StringList createNewStringList()
-	{
-		return new StringList(TEST_STRING) ;
-	}
+    private static final String TEST_STRING = "foo,bar,oof,rab";
 
-	@Test void remove()
-	{
-		final StringList list = createNewStringList();
-		final boolean result = list.remove( "foo" );
-		assertTrue( result );
-		assertFalse( list.contains( "foo" ) );
-	}
+    private static StringList createNewStringList() {
+        return new StringList(TEST_STRING);
+    }
 
-	@Test void addAll()
-	{
-		final StringList list = createNewStringList();
-		final String toAdd = "cow,horse";
-		assertTrue( list.addAll( toAdd ) );
-		assertEquals( 6, list.size() );
-		assertTrue( list.contains( "cow" ) );
-		assertTrue( list.contains( "horse" ) );
-	}
+    @Test void remove() {
+        final StringList list = createNewStringList();
+        final boolean result = list.remove("foo");
+        assertTrue(result);
+        assertFalse(list.contains("foo"));
+    }
 
-	@Test void add()
-	{
-		final StringList list = createNewStringList();
-		final String toAdd = "cow";
-		assertTrue( list.add( toAdd ) );
-		assertEquals( 5, list.size() );
-		assertTrue( list.contains( "cow" ) );
-	}
+    @Test void addAll() {
+        final StringList list = createNewStringList();
+        final String toAdd = "cow,horse";
+        assertTrue(list.addAll(toAdd));
+        assertEquals(6, list.size());
+        assertTrue(list.contains("cow"));
+        assertTrue(list.contains("horse"));
+    }
 
-	@Test void testToString()
-	{
-		final StringList list = createNewStringList();
-		assertEquals( TEST_STRING, list.toString() );
-	}
+    @Test void add() {
+        final StringList list = createNewStringList();
+        final String toAdd = "cow";
+        assertTrue(list.add(toAdd));
+        assertEquals(5, list.size());
+        assertTrue(list.contains("cow"));
+    }
 
-	@Test void toAsciiString()
-	{
-		final StringList list = createNewStringList();
-		assertNotNull( list.toAsciiString() );
-	}
+    @Test void testToString() {
+        final StringList list = createNewStringList();
+        assertEquals(TEST_STRING, list.toString());
+    }
 
-	@Test void size()
-	{
-		final StringList list = createNewStringList();
-		assertEquals( 4, list.size() );
-	}
+    @Test void toAsciiString() {
+        final StringList list = createNewStringList();
+        assertNotNull(list.toAsciiString());
+    }
 
-	@Test void isEmpty()
-	{
-		final StringList list = createNewStringList();
-		assertFalse( list.isEmpty() );
-		final StringList newList = new StringList( "" );
-		assertTrue( newList.isEmpty() );
-	}
+    @Test void size() {
+        final StringList list = createNewStringList();
+        assertEquals(4, list.size());
+    }
 
-	@Test void contains()
-	{
-		final StringList list = createNewStringList();
-		final boolean result = list.contains( "foo" );
-		assertTrue( result );
-	}
+    @Test void isEmpty() {
+        final StringList list = createNewStringList();
+        assertFalse(list.isEmpty());
+        final StringList newList = new StringList("");
+        assertTrue(newList.isEmpty());
+    }
+
+    @Test void contains() {
+        final StringList list = createNewStringList();
+        final boolean result = list.contains("foo");
+        assertTrue(result);
+    }
 
 }

@@ -24,11 +24,9 @@ package xyz.kvantum.server.implementation.netty;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-public class NettyLoggerFactory extends InternalLoggerFactory
-{
+public class NettyLoggerFactory extends InternalLoggerFactory {
 
-	@Override protected InternalLogger newInstance(final String name)
-	{
-		return NettyLogger.instance;
-	}
+    @Override protected InternalLogger newInstance(final String name) {
+        return NettyLogger.instance;
+    }
 }

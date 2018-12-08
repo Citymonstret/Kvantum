@@ -21,49 +21,42 @@
  */
 package xyz.kvantum.server.api.util;
 
+import xyz.kvantum.server.api.request.AbstractRequest;
+
 import java.util.Map;
 import java.util.Optional;
-import xyz.kvantum.server.api.request.AbstractRequest;
 
 /**
  * A {@link VariableProvider} implementation for meta variables
  */
-public final class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider
-{
+public final class MetaProvider implements ProviderFactory<MetaProvider>, VariableProvider {
 
-	private AbstractRequest r;
+    private AbstractRequest r;
 
-	public MetaProvider()
-	{
-	}
+    public MetaProvider() {
+    }
 
-	private MetaProvider(final AbstractRequest r)
-	{
-		this.r = r;
-	}
+    private MetaProvider(final AbstractRequest r) {
+        this.r = r;
+    }
 
-	@Override public Optional<MetaProvider> get(final AbstractRequest r)
-	{
-		return Optional.of( new MetaProvider( r ) );
-	}
+    @Override public Optional<MetaProvider> get(final AbstractRequest r) {
+        return Optional.of(new MetaProvider(r));
+    }
 
-	@Override public String providerName()
-	{
-		return "meta";
-	}
+    @Override public String providerName() {
+        return "meta";
+    }
 
-	@Override public boolean contains(final String variable)
-	{
-		return r.getMeta( variable ) != null;
-	}
+    @Override public boolean contains(final String variable) {
+        return r.getMeta(variable) != null;
+    }
 
-	@Override public Object get(final String variable)
-	{
-		return r.getMeta( variable );
-	}
+    @Override public Object get(final String variable) {
+        return r.getMeta(variable);
+    }
 
-	@Override public Map<String, Object> getAll()
-	{
-		return r.getAllMeta();
-	}
+    @Override public Map<String, Object> getAll() {
+        return r.getAllMeta();
+    }
 }

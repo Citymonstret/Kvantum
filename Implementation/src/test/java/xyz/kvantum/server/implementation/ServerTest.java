@@ -21,97 +21,81 @@
  */
 package xyz.kvantum.server.implementation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-
-import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-class ServerTest extends GenericServerTest
-{
+import java.time.Duration;
 
-	@Test void stop()
-	{
-		assertTimeout( Duration.ofSeconds( 10 ), () -> serverInstance.stopServer() );
-	}
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
 
-	@Test void createSimpleRequestHandler()
-	{
-		RequestHandler created = serverInstance.createSimpleRequestHandler( "/", (request, response) -> {
-		} );
-		assertNotNull( created );
-	}
+class ServerTest extends GenericServerTest {
 
-	@Test void getInstance()
-	{
-		assertNotNull( ServerImplementation.getImplementation() );
-		assertEquals( serverInstance, ServerImplementation.getImplementation() );
-	}
+    @Test void stop() {
+        assertTimeout(Duration.ofSeconds(10), () -> serverInstance.stopServer());
+    }
 
-	@Test void getLogWrapper()
-	{
-		assertNotNull( serverInstance.getLogWrapper() );
-		assertTrue( serverInstance.getLogWrapper() instanceof DefaultLogWrapper );
-	}
+    @Test void createSimpleRequestHandler() {
+        RequestHandler created =
+            serverInstance.createSimpleRequestHandler("/", (request, response) -> {
+            });
+        assertNotNull(created);
+    }
 
-	@Test void isStandalone()
-	{
-		assertTrue( serverInstance.isStandalone() );
-	}
+    @Test void getInstance() {
+        assertNotNull(ServerImplementation.getImplementation());
+        assertEquals(serverInstance, ServerImplementation.getImplementation());
+    }
 
-	@Test void getCacheManager()
-	{
-		assertNotNull( serverInstance.getCacheManager() );
-	}
+    @Test void getLogWrapper() {
+        assertNotNull(serverInstance.getLogWrapper());
+        assertTrue(serverInstance.getLogWrapper() instanceof DefaultLogWrapper);
+    }
 
-	@Test void isSilent()
-	{
-		assertFalse( serverInstance.isSilent() );
-	}
+    @Test void isStandalone() {
+        assertTrue(serverInstance.isStandalone());
+    }
 
-	@Test void getRouter()
-	{
-		assertNotNull( serverInstance.getRouter() );
-	}
+    @Test void getCacheManager() {
+        assertNotNull(serverInstance.getCacheManager());
+    }
 
-	@Test void getSessionManager()
-	{
-		assertNotNull( serverInstance.getSessionManager() );
-	}
+    @Test void isSilent() {
+        assertFalse(serverInstance.isSilent());
+    }
 
-	@Test void getTranslations()
-	{
-		assertNotNull( serverInstance.getTranslationManager() );
-	}
+    @Test void getRouter() {
+        assertNotNull(serverInstance.getRouter());
+    }
 
-	@Test void isPaused()
-	{
-		assertFalse( serverInstance.isPaused() );
-	}
+    @Test void getSessionManager() {
+        assertNotNull(serverInstance.getSessionManager());
+    }
 
-	@Test void isStopping()
-	{
-		assertFalse( serverInstance.isStopping() );
-	}
+    @Test void getTranslations() {
+        assertNotNull(serverInstance.getTranslationManager());
+    }
 
-	@Test void isStarted()
-	{
-		assertFalse( serverInstance.isStarted() );
-	}
+    @Test void isPaused() {
+        assertFalse(serverInstance.isPaused());
+    }
 
-	@Test void getFileSystem()
-	{
-		assertNotNull( serverInstance.getFileSystem() );
-	}
+    @Test void isStopping() {
+        assertFalse(serverInstance.isStopping());
+    }
 
-	@Test void getCommandManager()
-	{
-		assertNotNull( serverInstance.getCommandManager() );
-	}
+    @Test void isStarted() {
+        assertFalse(serverInstance.isStarted());
+    }
+
+    @Test void getFileSystem() {
+        assertNotNull(serverInstance.getFileSystem());
+    }
+
+    @Test void getCommandManager() {
+        assertNotNull(serverInstance.getCommandManager());
+    }
 
 }

@@ -21,49 +21,44 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Protocol implementation enum
  */
-@RequiredArgsConstructor
-public enum ProtocolType
-{
+@RequiredArgsConstructor public enum ProtocolType {
 
-	HTTP("http"), HTTPS("https");
+    HTTP("http"), HTTPS("https");
 
-	private static Map<String, ProtocolType> CACHE;
+    private static Map<String, ProtocolType> CACHE;
 
-	@Getter
-	private final String string;
+    @Getter private final String string;
 
-	/**
-	 * Match a string to a {@link ProtocolType}, if possible
-	 *
-	 * @param string String to match, may not be null
-	 * @return matched protocol type if found
-	 */
-	public static Optional<ProtocolType> getByName(@NonNull final String string)
-	{
-		Assert.notEmpty( string );
+    /**
+     * Match a string to a {@link ProtocolType}, if possible
+     *
+     * @param string String to match, may not be null
+     * @return matched protocol type if found
+     */
+    public static Optional<ProtocolType> getByName(@NonNull final String string) {
+        Assert.notEmpty(string);
 
-		if ( CACHE == null )
-		{
-			CACHE = new HashMap<>();
-			for ( final ProtocolType type : values() )
-			{
-				CACHE.put( type.name(), type );
-			}
-		}
+        if (CACHE == null) {
+            CACHE = new HashMap<>();
+            for (final ProtocolType type : values()) {
+                CACHE.put(type.name(), type);
+            }
+        }
 
-		final String fixed = string.replaceAll( "\\s", "" ).toUpperCase( Locale.ENGLISH );
-		return Optional.of( CACHE.get( fixed ) );
-	}
+        final String fixed = string.replaceAll("\\s", "").toUpperCase(Locale.ENGLISH);
+        return Optional.of(CACHE.get(fixed));
+    }
 
 }

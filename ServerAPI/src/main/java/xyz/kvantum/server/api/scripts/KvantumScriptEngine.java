@@ -21,21 +21,20 @@
  */
 package xyz.kvantum.server.api.scripts;
 
-import static lombok.AccessLevel.PROTECTED;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import lombok.Getter;
 import lombok.NonNull;
 
-abstract class KvantumScriptEngine
-{
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
-	@Getter(PROTECTED) private final ScriptEngine engine;
+import static lombok.AccessLevel.PROTECTED;
 
-	KvantumScriptEngine(@NonNull final ScriptEngineManager scriptEngineManager)
-	{
-		this.engine = scriptEngineManager.getEngineByName( "nashorn" );
-	}
+abstract class KvantumScriptEngine {
+
+    @Getter(PROTECTED) private final ScriptEngine engine;
+
+    KvantumScriptEngine(@NonNull final ScriptEngineManager scriptEngineManager) {
+        this.engine = scriptEngineManager.getEngineByName("nashorn");
+    }
 
 }

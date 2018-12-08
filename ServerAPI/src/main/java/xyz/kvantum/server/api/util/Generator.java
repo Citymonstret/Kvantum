@@ -29,19 +29,17 @@ import java.util.function.Function;
  * @param <I> Input type
  * @param <O> Output type
  */
-@FunctionalInterface public interface Generator<I, O> extends Function<I, O>
-{
+@FunctionalInterface public interface Generator<I, O> extends Function<I, O> {
 
-	/**
-	 * Generate an object from the input
-	 *
-	 * @param input Input
-	 * @return Generated object
-	 */
-	O generate(I input);
+    /**
+     * Generate an object from the input
+     *
+     * @param input Input
+     * @return Generated object
+     */
+    O generate(I input);
 
-	@Override default O apply(I input)
-	{
-		return generate( input );
-	}
+    @Override default O apply(I input) {
+        return generate(input);
+    }
 }

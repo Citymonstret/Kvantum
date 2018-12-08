@@ -35,53 +35,52 @@ import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.util.ParameterScope;
 import xyz.kvantum.server.api.util.ProtocolType;
 
-class KvantumObjectFactoryTest
-{
+class KvantumObjectFactoryTest {
 
-	@Test void from()
-	{
-		//
-		// Make sure that the request is parsed successfully
-		//
-		final KvantumObjectFactory<MockObject> factory = KvantumObjectFactory.from( MockObject.class );
-		MockRequest mockRequest = new MockRequest(
-				AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( HttpMethod.POST, ProtocolType.HTTP, "/?koala=animal" ) ) );
-		KvantumObjectParserResult<MockObject> result = factory.build( ParameterScope.GET ).parseRequest( mockRequest );
-		Assertions.assertNotNull( result );
-		Assertions.assertTrue( result.isSuccess() );
-		Assertions.assertNull( result.getError() );
-		Assertions.assertNotNull( result.getParsedObject() );
-		final MockObject mockObject = result.getParsedObject();
-		Assertions.assertEquals( "animal", mockObject.string1 );
-		Assertions.assertEquals( "york", mockObject.string2 );
+    @Test void from() {
+        //
+        // Make sure that the request is parsed successfully
+        //
+        final KvantumObjectFactory<MockObject> factory =
+            KvantumObjectFactory.from(MockObject.class);
+        MockRequest mockRequest = new MockRequest(AbstractRequest.QueryCache.getInstance()
+            .getQuery(new QueryParameters(HttpMethod.POST, ProtocolType.HTTP, "/?koala=animal")));
+        KvantumObjectParserResult<MockObject> result =
+            factory.build(ParameterScope.GET).parseRequest(mockRequest);
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.isSuccess());
+        Assertions.assertNull(result.getError());
+        Assertions.assertNotNull(result.getParsedObject());
+        final MockObject mockObject = result.getParsedObject();
+        Assertions.assertEquals("animal", mockObject.string1);
+        Assertions.assertEquals("york", mockObject.string2);
 
-		//
-		// Test if the validation fails (minimum size of string1 is 2, but provided string size is 1)
-		//
-		mockRequest = new MockRequest( AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( HttpMethod.POST, ProtocolType.HTTP, "/?koala=a" ) ) );
-		result = factory.build( ParameterScope.GET ).parseRequest( mockRequest );
-		Assertions.assertNotNull( result );
-		Assertions.assertFalse( result.isSuccess() );
-		Assertions.assertNotNull( result.getError() );
-		Assertions.assertNull( result.getParsedObject() );
-		Assertions.assertTrue(
-				result.getError() instanceof KvantumObjectParserResult.KvantumObjectParserValidationFailed );
-		final KvantumObjectParserResult.KvantumObjectParserValidationFailed validationFailed = ( KvantumObjectParserResult.KvantumObjectParserValidationFailed ) result
-				.getError();
-		Assertions.assertEquals( 1, validationFailed.getViolations().size() );
-	}
+        //
+        // Test if the validation fails (minimum size of string1 is 2, but provided string size is 1)
+        //
+        mockRequest = new MockRequest(AbstractRequest.QueryCache.getInstance()
+            .getQuery(new QueryParameters(HttpMethod.POST, ProtocolType.HTTP, "/?koala=a")));
+        result = factory.build(ParameterScope.GET).parseRequest(mockRequest);
+        Assertions.assertNotNull(result);
+        Assertions.assertFalse(result.isSuccess());
+        Assertions.assertNotNull(result.getError());
+        Assertions.assertNull(result.getParsedObject());
+        Assertions.assertTrue(result
+            .getError() instanceof KvantumObjectParserResult.KvantumObjectParserValidationFailed);
+        final KvantumObjectParserResult.KvantumObjectParserValidationFailed validationFailed =
+            (KvantumObjectParserResult.KvantumObjectParserValidationFailed) result.getError();
+        Assertions.assertEquals(1, validationFailed.getViolations().size());
+    }
 
-	@KvantumObject(checkValidity = true) private static class MockObject
-	{
+    @KvantumObject(checkValidity = true) private static class MockObject {
 
-		@MinLength(2) @NotEmpty @KvantumField(kvantumName = "koala") private String string1;
+        @MinLength(2) @NotEmpty @KvantumField(kvantumName = "koala") private String string1;
 
-		@KvantumField(kvantumName = "new", defaultValue = "york") private String string2;
+        @KvantumField(kvantumName = "new", defaultValue = "york") private String string2;
 
-		@KvantumConstructor private MockObject()
-		{
-		}
+        @KvantumConstructor private MockObject() {
+        }
 
-	}
+    }
 
 }

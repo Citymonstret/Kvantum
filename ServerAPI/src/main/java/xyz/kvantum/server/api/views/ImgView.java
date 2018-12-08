@@ -21,29 +21,27 @@
  */
 package xyz.kvantum.server.api.views;
 
-import java.util.Map;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
+
+import java.util.Map;
 
 /**
  * Created 2015-04-21 for Kvantum
  *
  * @author Citymonstret
  */
-public class ImgView extends StaticFileView implements CacheApplicable, IgnoreSyntax
-{
+public class ImgView extends StaticFileView implements CacheApplicable, IgnoreSyntax {
 
-	public ImgView(String filter, Map<String, Object> options)
-	{
-		super( filter, options, "img", FileExtension.IMAGE );
-		super.relatedFolderPath = "/assets/img";
-	}
+    public ImgView(String filter, Map<String, Object> options) {
+        super(filter, options, "img", FileExtension.IMAGE);
+        super.relatedFolderPath = "/assets/img";
+    }
 
-	@Override public boolean isApplicable(AbstractRequest r)
-	{
-		return false;
-	}
+    @Override public boolean isApplicable(AbstractRequest r) {
+        return false;
+    }
 
 }

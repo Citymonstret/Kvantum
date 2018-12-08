@@ -21,13 +21,6 @@
  */
 package xyz.kvantum.server.api.mocking;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
 import lombok.Data;
 import lombok.Getter;
 import xyz.kvantum.server.api.account.AccountExtension;
@@ -37,89 +30,77 @@ import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
-@Data @SuppressWarnings("unused") public class MockAccount implements IAccount
-{
+import java.util.*;
 
-	@Getter private static final KvantumPojoFactory<IAccount> kvantumPojoFactory = KvantumPojoFactory
-			.forClass( IAccount.class );
+@Data @SuppressWarnings("unused") public class MockAccount implements IAccount {
 
-	private static final Random random = new Random();
+    @Getter private static final KvantumPojoFactory<IAccount> kvantumPojoFactory =
+        KvantumPojoFactory.forClass(IAccount.class);
 
-	private Map<String, String> rawData = new HashMap<>();
-	private int id = random.nextInt( 10000 );
-	private String username = UUID.randomUUID().toString();
-	private IAccountManager manager;
-	private Collection<AccountRole> accountRoles = new HashSet<>();
-	private Map<Class<? extends AccountExtension>, AccountExtension> extensions = new HashMap<>();
+    private static final Random random = new Random();
 
-	@Override public void internalMetaUpdate(final String key, final String value)
-	{
-		this.rawData.put( "meta." + key, value );
-	}
+    private Map<String, String> rawData = new HashMap<>();
+    private int id = random.nextInt(10000);
+    private String username = UUID.randomUUID().toString();
+    private IAccountManager manager;
+    private Collection<AccountRole> accountRoles = new HashSet<>();
+    private Map<Class<? extends AccountExtension>, AccountExtension> extensions = new HashMap<>();
 
-	@Override public boolean passwordMatches(final String password)
-	{
-		return true;
-	}
+    @Override public void internalMetaUpdate(final String key, final String value) {
+        this.rawData.put("meta." + key, value);
+    }
 
-	@Override public Optional<String> getData(final String key)
-	{
-		return Optional.ofNullable( rawData.getOrDefault( key, null ) );
-	}
+    @Override public boolean passwordMatches(final String password) {
+        return true;
+    }
 
-	@Override public <T extends AccountExtension> T attachExtension(Class<T> extension)
-	{
-		final T instance = AccountExtension.createInstance( extension );
-		this.extensions.put( extension, instance );
-		return instance;
-	}
+    @Override public Optional<String> getData(final String key) {
+        return Optional.ofNullable(rawData.getOrDefault(key, null));
+    }
 
-	@Override @SuppressWarnings( "ALL" ) public <T extends AccountExtension> Optional<T> getExtension(Class<T> extension)
-	{
-		final Object extensionInstance = this.extensions.get( extension );
-		if ( extensionInstance == null )
-		{
-			return Optional.empty();
-		}
-		return Optional.of( (T) extensionInstance );
-	}
+    @Override public <T extends AccountExtension> T attachExtension(Class<T> extension) {
+        final T instance = AccountExtension.createInstance(extension);
+        this.extensions.put(extension, instance);
+        return instance;
+    }
 
-	@Override public void saveState()
-	{
-	}
+    @Override @SuppressWarnings("ALL")
+    public <T extends AccountExtension> Optional<T> getExtension(Class<T> extension) {
+        final Object extensionInstance = this.extensions.get(extension);
+        if (extensionInstance == null) {
+            return Optional.empty();
+        }
+        return Optional.of((T) extensionInstance);
+    }
 
-	@Override public void setData(final String key, final String value)
-	{
-		this.rawData.put( key, value );
-	}
+    @Override public void saveState() {
+    }
 
-	@Override public void removeData(final String key)
-	{
-		this.rawData.remove( key );
-	}
+    @Override public void setData(final String key, final String value) {
+        this.rawData.put(key, value);
+    }
 
-	@Override public void addRole(final AccountRole role)
-	{
-		this.accountRoles.add( role );
-	}
+    @Override public void removeData(final String key) {
+        this.rawData.remove(key);
+    }
 
-	@Override public void removeRole(final AccountRole role)
-	{
-		this.accountRoles.remove( role );
-	}
+    @Override public void addRole(final AccountRole role) {
+        this.accountRoles.add(role);
+    }
 
-	@Override public String getSuppliedPassword()
-	{
-		return "";
-	}
+    @Override public void removeRole(final AccountRole role) {
+        this.accountRoles.remove(role);
+    }
 
-	@Override public boolean isPermitted(final String permissionKey)
-	{
-		return true;
-	}
+    @Override public String getSuppliedPassword() {
+        return "";
+    }
 
-	@Override public KvantumPojo<IAccount> toKvantumPojo()
-	{
-		return kvantumPojoFactory.of( this );
-	}
+    @Override public boolean isPermitted(final String permissionKey) {
+        return true;
+    }
+
+    @Override public KvantumPojo<IAccount> toKvantumPojo() {
+        return kvantumPojoFactory.of(this);
+    }
 }

@@ -21,15 +21,6 @@
  */
 package xyz.kvantum.server.api.views;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.CoreConfig.Buffer;
@@ -44,133 +35,130 @@ import xyz.kvantum.server.api.response.ResponseStream;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.TimeUtil;
 
-@SuppressWarnings({ "WeakerAccess", "unused" }) public abstract class StaticFileView extends View
-{
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
-	final Collection<FileExtension> extensionList;
+@SuppressWarnings({"WeakerAccess", "unused"}) public abstract class StaticFileView extends View {
 
-	public StaticFileView(String filter, Map<String, Object> options, String name, Collection<FileExtension> extensions)
-	{
-		super( filter, name, options, HttpMethod.ALL );
-		this.extensionList = extensions;
-	}
+    final Collection<FileExtension> extensionList;
 
-	@Override final public boolean passes(final AbstractRequest request)
-	{
-		final Map<String, String> variables = request.getVariables();
-		FileExtension fileExtension;
+    public StaticFileView(String filter, Map<String, Object> options, String name,
+        Collection<FileExtension> extensions) {
+        super(filter, name, options, HttpMethod.ALL);
+        this.extensionList = extensions;
+    }
 
-		if ( !variables.containsKey( "extension" ) )
-		{
-			final Optional<String> extensionOptional = getOptionSafe( "extension" );
-			extensionOptional.ifPresent( s -> variables.put( "extension", s ) );
-		}
+    @Override final public boolean passes(final AbstractRequest request) {
+        final Map<String, String> variables = request.getVariables();
+        FileExtension fileExtension;
 
-		check:
-		{
-			for ( final FileExtension extension : extensionList )
-			{
-				if ( extension.matches( variables.get( "extension" ) ) )
-				{
-					fileExtension = extension;
-					break check;
-				}
-			}
-			Logger.error( "Unknown file extension: " + variables.get( "extension" ) );
-			return false; // None matched
-		}
+        if (!variables.containsKey("extension")) {
+            final Optional<String> extensionOptional = getOptionSafe("extension");
+            extensionOptional.ifPresent(s -> variables.put("extension", s));
+        }
 
-		final FilePattern.FileMatcher fileMatcher = getFilePattern().matcher( () -> variables );
-		request.addMeta( "fileMatcher", fileMatcher );
-		request.addMeta( "extension", fileExtension );
+        check:
+        {
+            for (final FileExtension extension : extensionList) {
+                if (extension.matches(variables.get("extension"))) {
+                    fileExtension = extension;
+                    break check;
+                }
+            }
+            Logger.error("Unknown file extension: " + variables.get("extension"));
+            return false; // None matched
+        }
 
-		final Path file = getFile( request );
-		request.addMeta( "file", file );
+        final FilePattern.FileMatcher fileMatcher = getFilePattern().matcher(() -> variables);
+        request.addMeta("fileMatcher", fileMatcher);
+        request.addMeta("extension", fileExtension);
 
-		final boolean exists = file.exists();
-		if ( exists )
-		{
-			request.addMeta( "file_length", file.length() );
-		}
-		return exists;
-	}
+        final Path file = getFile(request);
+        request.addMeta("file", file);
 
-	@Override public void handle(final AbstractRequest r, final Response response)
-	{
-		final Path path = ( Path ) r.getMeta( "file" );
-		final FileExtension extension = ( FileExtension ) r.getMeta( "extension" );
-		response.getHeader().set( Header.HEADER_CONTENT_TYPE, extension.getContentType() );
-		final java.nio.file.Path javaPath = path.getJavaPath();
+        final boolean exists = file.exists();
+        if (exists) {
+            request.addMeta("file_length", file.length());
+        }
+        return exists;
+    }
 
-		final long fileLength = path.length();
+    @Override public void handle(final AbstractRequest r, final Response response) {
+        final Path path = (Path) r.getMeta("file");
+        final FileExtension extension = (FileExtension) r.getMeta("extension");
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, extension.getContentType());
+        final java.nio.file.Path javaPath = path.getJavaPath();
 
-		if ( fileLength > CoreConfig.Buffer.files ) // Large files won't be read into memory
-		{
-			if ( CoreConfig.debug )
-			{
-				Logger.debug( "Reading chunks of '{0}' (too big to store into primary memory: {1} > {2})", path, fileLength, CoreConfig.Buffer.files );
-			}
-			final InputStream inputStream;
-			final ResponseStream responseStream = new ResponseStream();
-			try
-			{
-				inputStream = new FileInputStream( javaPath.toFile() );
-			} catch ( final FileNotFoundException e )
-			{
-				e.printStackTrace();
-				return;
-			}
-			response.setResponse( responseStream );
-			final Consumer<Integer> writer = accepted -> {
-				byte[] bytes = new byte[ accepted ];
-				try
-				{
-					inputStream.read( bytes, responseStream.getRead(), accepted );
-				} catch ( final IOException e )
-				{
-					e.printStackTrace();
-				}
-				responseStream.push( bytes );
-			};
+        final long fileLength = path.length();
 
-			final Consumer<Integer> finalizedAction = totalRead -> {
-				final int leftToRead = ( int ) ( fileLength - totalRead );
-				if ( leftToRead > 0 )
-				{
-					responseStream.offer( ( int ) ( fileLength - totalRead ), writer, null /* Will re-use this one */ );
-				} else
-				{
-					responseStream.finish();
-					try
-					{
-						inputStream.close();
-					} catch ( final Exception e )
-					{
-						Logger.error( "Failed to close the input stream in StaticFileView: {}", e.getMessage() );
-					}
-				}
-			};
-			responseStream.offer( ( int ) fileLength, writer, finalizedAction );
-		} else
-		{
-			if ( CoreConfig.debug )
-			{
-				Logger.debug( "Reading entire file '{0}' into memory ({1} < {2})", path, fileLength, Buffer.files );
-			}
-			if ( extension.getReadType() == FileExtension.ReadType.BYTES || !ServerImplementation.getImplementation().getProcedure().hasHandlers() )
-			{
-				if ( CoreConfig.debug )
-				{
-					Logger.debug( "Serving {} using byte[]", this );
-				}
-				response.setResponse( path.readBytes() );
-			} else
-			{
-				response.setResponse( extension.getComment( "Served to you by Kvantum" ) + System.lineSeparator() + path.readFile() );
-			}
-		}
+        if (fileLength > CoreConfig.Buffer.files) // Large files won't be read into memory
+        {
+            if (CoreConfig.debug) {
+                Logger.debug(
+                    "Reading chunks of '{0}' (too big to store into primary memory: {1} > {2})",
+                    path, fileLength, CoreConfig.Buffer.files);
+            }
+            final InputStream inputStream;
+            final ResponseStream responseStream = new ResponseStream();
+            try {
+                inputStream = new FileInputStream(javaPath.toFile());
+            } catch (final FileNotFoundException e) {
+                e.printStackTrace();
+                return;
+            }
+            response.setResponse(responseStream);
+            final Consumer<Integer> writer = accepted -> {
+                byte[] bytes = new byte[accepted];
+                try {
+                    inputStream.read(bytes, responseStream.getRead(), accepted);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+                responseStream.push(bytes);
+            };
 
-		response.getHeader()
-				.set( Header.HEADER_LAST_MODIFIED, TimeUtil.getHTTPTimeStamp( new Date( path.getLastModified() ) ) );
-	}
+            final Consumer<Integer> finalizedAction = totalRead -> {
+                final int leftToRead = (int) (fileLength - totalRead);
+                if (leftToRead > 0) {
+                    responseStream.offer((int) (fileLength - totalRead), writer,
+                        null /* Will re-use this one */);
+                } else {
+                    responseStream.finish();
+                    try {
+                        inputStream.close();
+                    } catch (final Exception e) {
+                        Logger.error("Failed to close the input stream in StaticFileView: {}",
+                            e.getMessage());
+                    }
+                }
+            };
+            responseStream.offer((int) fileLength, writer, finalizedAction);
+        } else {
+            if (CoreConfig.debug) {
+                Logger.debug("Reading entire file '{0}' into memory ({1} < {2})", path, fileLength,
+                    Buffer.files);
+            }
+            if (extension.getReadType() == FileExtension.ReadType.BYTES || !ServerImplementation
+                .getImplementation().getProcedure().hasHandlers()) {
+                if (CoreConfig.debug) {
+                    Logger.debug("Serving {} using byte[]", this);
+                }
+                response.setResponse(path.readBytes());
+            } else {
+                response.setResponse(
+                    extension.getComment("Served to you by Kvantum") + System.lineSeparator() + path
+                        .readFile());
+            }
+        }
+
+        response.getHeader().set(Header.HEADER_LAST_MODIFIED,
+            TimeUtil.getHTTPTimeStamp(new Date(path.getLastModified())));
+    }
 }

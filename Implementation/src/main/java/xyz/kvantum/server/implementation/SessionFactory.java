@@ -24,12 +24,10 @@ package xyz.kvantum.server.implementation;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionCreator;
 
-final class SessionFactory implements ISessionCreator
-{
+final class SessionFactory implements ISessionCreator {
 
-	@Override public ISession createSession()
-	{
-		return new Session();
-	}
+    @Override public ISession createSession() {
+        return new Session();
+    }
 
 }

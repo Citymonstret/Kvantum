@@ -21,78 +21,62 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.sql.*;
+
 /**
  * Utility class for dealing with common SQLite operations
  */
-@SuppressWarnings({ "unused",
-		"WeakerAccess" }) @EqualsAndHashCode(of = "name", callSuper = false) public class SQLiteManager
-		extends AutoCloseable
-{
+@SuppressWarnings({"unused", "WeakerAccess"}) @EqualsAndHashCode(of = "name", callSuper = false)
+public class SQLiteManager extends AutoCloseable {
 
-	private final Connection connection;
-	private final String name;
+    private final Connection connection;
+    private final String name;
 
-	public SQLiteManager(@NonNull final String name) throws IOException, SQLException
-	{
-		this.name = name + ".db";
-		final File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "storage" ),
-				this.name );
-		if ( !file.exists() && ( !( file.getParentFile().exists() || file.getParentFile().mkdir() ) || !file
-				.createNewFile() ) )
-		{
-			throw new KvantumException( "Couldn't create: " + this.name );
-		}
-		this.connection = DriverManager.getConnection( "jdbc:sqlite:" + file.getAbsolutePath() );
-	}
+    public SQLiteManager(@NonNull final String name) throws IOException, SQLException {
+        this.name = name + ".db";
+        final File file =
+            new File(new File(ServerImplementation.getImplementation().getCoreFolder(), "storage"),
+                this.name);
+        if (!file.exists() && (!(file.getParentFile().exists() || file.getParentFile().mkdir())
+            || !file.createNewFile())) {
+            throw new KvantumException("Couldn't create: " + this.name);
+        }
+        this.connection = DriverManager.getConnection("jdbc:sqlite:" + file.getAbsolutePath());
+    }
 
-	public void executeUpdate(@NonNull final String sql) throws SQLException
-	{
-		try ( final Statement statement = this.connection.createStatement() )
-		{
-			statement.executeUpdate( sql );
-			statement.close();
-		}
-	}
+    public void executeUpdate(@NonNull final String sql) throws SQLException {
+        try (final Statement statement = this.connection.createStatement()) {
+            statement.executeUpdate(sql);
+            statement.close();
+        }
+    }
 
-	public PreparedStatement prepareStatement(@NonNull final String statement) throws SQLException
-	{
-		return connection.prepareStatement( statement );
-	}
+    public PreparedStatement prepareStatement(@NonNull final String statement) throws SQLException {
+        return connection.prepareStatement(statement);
+    }
 
-	@Nullable public Blob createBlob()
-	{
-		try
-		{
-			return connection.createBlob();
-		} catch ( SQLException e )
-		{
-			e.printStackTrace();
-		}
-		return null; // Nullable
-	}
+    @Nullable public Blob createBlob() {
+        try {
+            return connection.createBlob();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Nullable
+    }
 
-	@Override public void handleClose()
-	{
-		try
-		{
-			connection.close();
-		} catch ( SQLException e )
-		{
-			e.printStackTrace();
-		}
-	}
+    @Override public void handleClose() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -23,17 +23,14 @@ package xyz.kvantum.crush.syntax.filter;
 
 import xyz.kvantum.crush.syntax.Filter;
 
-final public class Uppercase extends Filter
-{
+final public class Uppercase extends Filter {
 
-	public Uppercase()
-	{
-		super( "uppercase" );
-	}
+    public Uppercase() {
+        super("uppercase");
+    }
 
-	@Override public Object handle(String objectName, Object in)
-	{
-		return in.toString().toUpperCase();
-	}
+    @Override public Object handle(String objectName, Object in) {
+        return in.toString().toUpperCase();
+    }
 
 }

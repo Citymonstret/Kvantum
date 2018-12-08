@@ -21,43 +21,33 @@
  */
 package xyz.kvantum.server.implementation;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import java.lang.reflect.Type;
+import com.google.gson.*;
 import xyz.kvantum.server.api.util.KvantumJsonFactory;
+
+import java.lang.reflect.Type;
 
 /**
  * GSON serializer for accounts. Will only expose ID and username (not data), so this can be used publicly
  */
-public final class AccountSerializer implements JsonSerializer<Account>, JsonDeserializer<Account>
-{
+public final class AccountSerializer implements JsonSerializer<Account>, JsonDeserializer<Account> {
 
-	@Override public JsonElement serialize(final Account src, final Type typeOfSrc,
-			final JsonSerializationContext context)
-	{
-		final JsonObject jsonObject = new JsonObject();
-		jsonObject.add( "id", new JsonPrimitive( src.getId() ) );
-		jsonObject.add( "username", KvantumJsonFactory.stringToPrimitive( src.getUsername() ) );
-		return jsonObject;
-	}
+    @Override public JsonElement serialize(final Account src, final Type typeOfSrc,
+        final JsonSerializationContext context) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.add("id", new JsonPrimitive(src.getId()));
+        jsonObject.add("username", KvantumJsonFactory.stringToPrimitive(src.getUsername()));
+        return jsonObject;
+    }
 
-	@Override public Account deserialize(final JsonElement json, final Type typeOfT,
-			final JsonDeserializationContext context) throws JsonParseException
-	{
-		if ( json instanceof JsonObject )
-		{
-			final JsonObject object = ( JsonObject ) json;
-			return new Account( object.get( "id" ).getAsInt(), object.get( "username" ).getAsString(), "" );
-		} else
-		{
-			throw new JsonParseException( "Provided json not an object" );
-		}
-	}
+    @Override public Account deserialize(final JsonElement json, final Type typeOfT,
+        final JsonDeserializationContext context) throws JsonParseException {
+        if (json instanceof JsonObject) {
+            final JsonObject object = (JsonObject) json;
+            return new Account(object.get("id").getAsInt(), object.get("username").getAsString(),
+                "");
+        } else {
+            throw new JsonParseException("Provided json not an object");
+        }
+    }
 
 }

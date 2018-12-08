@@ -21,20 +21,21 @@
  */
 package xyz.kvantum.server.api.views.rest;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * A simple framework which allows for validation of requests by providing some static conditions that must be met. This
  * is especially useful when using {@link KvantumObjectFactory} parsing.
- *
+ * <p>
  * Example:
  * <pre>{@code
  * final RequestRequirements requestRequirements = new RequestRequirements()
@@ -46,150 +47,126 @@ import xyz.kvantum.server.api.request.AbstractRequest;
  * }
  * }</pre>
  */
-@SuppressWarnings({ "unused", "WeakerAccess" }) @NoArgsConstructor public class RequestRequirements
-{
+@SuppressWarnings({"unused", "WeakerAccess"}) @NoArgsConstructor public class RequestRequirements {
 
-	private final Collection<RequestRequirement> requirements = new ArrayDeque<>();
+    private final Collection<RequestRequirement> requirements = new ArrayDeque<>();
 
-	private static <K, V> Optional<V> mapOptional(Map<K, V> map, K instance)
-	{
-		if ( map.containsKey( instance ) )
-		{
-			return Optional.of( map.get( instance ) );
-		} else
-		{
-			return Optional.empty();
-		}
-	}
+    private static <K, V> Optional<V> mapOptional(Map<K, V> map, K instance) {
+        if (map.containsKey(instance)) {
+            return Optional.of(map.get(instance));
+        } else {
+            return Optional.empty();
+        }
+    }
 
-	public RequestRequirements addRequirement(final RequestRequirement requirement)
-	{
-		this.requirements.add( requirement );
-		return this;
-	}
+    public RequestRequirements addRequirement(final RequestRequirement requirement) {
+        this.requirements.add(requirement);
+        return this;
+    }
 
-	public RequirementStatus testRequirements(final AbstractRequest request)
-	{
-		RequirementStatus status;
-		for ( final RequestRequirement requirement : this.requirements )
-		{
-			if ( !( status = requirement.test( request ) ).passed )
-			{
-				return status;
-			}
-		}
-		return RequirementStatus.builder().passed( true ).get();
-	}
+    public RequirementStatus testRequirements(final AbstractRequest request) {
+        RequirementStatus status;
+        for (final RequestRequirement requirement : this.requirements) {
+            if (!(status = requirement.test(request)).passed) {
+                return status;
+            }
+        }
+        return RequirementStatus.builder().passed(true).get();
+    }
 
-	public final static class GetVariableRequirement extends VariableRequirement
-	{
+    public final static class GetVariableRequirement extends VariableRequirement {
 
-		public GetVariableRequirement(String key)
-		{
-			super( key );
-		}
+        public GetVariableRequirement(String key) {
+            super(key);
+        }
 
-		@Override protected Optional<String> getVariable(AbstractRequest request, String key)
-		{
-			return mapOptional( request.getQuery().getParameters(), key );
-		}
-	}
+        @Override protected Optional<String> getVariable(AbstractRequest request, String key) {
+            return mapOptional(request.getQuery().getParameters(), key);
+        }
+    }
 
-	public final static class PostVariableRequirement extends VariableRequirement
-	{
 
-		public PostVariableRequirement(String key)
-		{
-			super( key );
-		}
+    public final static class PostVariableRequirement extends VariableRequirement {
 
-		@Override protected Optional<String> getVariable(AbstractRequest request, String key)
-		{
-			return mapOptional( request.getPostRequest().get(), key );
-		}
-	}
+        public PostVariableRequirement(String key) {
+            super(key);
+        }
 
-	public abstract static class VariableRequirement extends RequestRequirement
-	{
+        @Override protected Optional<String> getVariable(AbstractRequest request, String key) {
+            return mapOptional(request.getPostRequest().get(), key);
+        }
+    }
 
-		private final String key;
 
-		public VariableRequirement(final String key)
-		{
-			this.key = key;
-		}
+    public abstract static class VariableRequirement extends RequestRequirement {
 
-		protected abstract Optional<String> getVariable(AbstractRequest request, String key);
+        private final String key;
 
-		@Override final RequirementStatus test(AbstractRequest request)
-		{
-			Optional<String> optional = getVariable( request, key );
-			RequirementStatus.Builder builder = RequirementStatus.builder();
-			if ( optional.isPresent() )
-			{
-				builder.passed( true );
-			} else
-			{
-				builder.passed( false ).message( "Missing variable: " + key ).internalMessage( key );
-			}
-			return builder.get();
-		}
-	}
+        public VariableRequirement(final String key) {
+            this.key = key;
+        }
 
-	public abstract static class RequestRequirement
-	{
+        protected abstract Optional<String> getVariable(AbstractRequest request, String key);
 
-		abstract RequirementStatus test(AbstractRequest request);
+        @Override final RequirementStatus test(AbstractRequest request) {
+            Optional<String> optional = getVariable(request, key);
+            RequirementStatus.Builder builder = RequirementStatus.builder();
+            if (optional.isPresent()) {
+                builder.passed(true);
+            } else {
+                builder.passed(false).message("Missing variable: " + key).internalMessage(key);
+            }
+            return builder.get();
+        }
+    }
 
-	}
 
-	@NoArgsConstructor(access = AccessLevel.PRIVATE) public static final class RequirementStatus
-	{
+    public abstract static class RequestRequirement {
 
-		@Getter private String message = "";
-		@Getter private String internalMessage;
-		private boolean passed = true;
+        abstract RequirementStatus test(AbstractRequest request);
 
-		public static Builder builder()
-		{
-			return new Builder();
-		}
+    }
 
-		public boolean passed()
-		{
-			return this.passed;
-		}
 
-		@NoArgsConstructor(access = AccessLevel.PRIVATE) public static final class Builder
-		{
+    @NoArgsConstructor(access = AccessLevel.PRIVATE) public static final class RequirementStatus {
 
-			private final RequirementStatus requirementStatus = new RequirementStatus();
+        @Getter private String message = "";
+        @Getter private String internalMessage;
+        private boolean passed = true;
 
-			public Builder message(final String message)
-			{
-				requirementStatus.message = message;
-				return this;
-			}
+        public static Builder builder() {
+            return new Builder();
+        }
 
-			public Builder internalMessage(final String internalMessage)
-			{
-				requirementStatus.internalMessage = internalMessage;
-				return this;
-			}
+        public boolean passed() {
+            return this.passed;
+        }
 
-			public Builder passed(final boolean passed)
-			{
-				requirementStatus.passed = passed;
-				return this;
-			}
+        @NoArgsConstructor(access = AccessLevel.PRIVATE) public static final class Builder {
 
-			public RequirementStatus get()
-			{
-				return requirementStatus;
-			}
+            private final RequirementStatus requirementStatus = new RequirementStatus();
 
-		}
+            public Builder message(final String message) {
+                requirementStatus.message = message;
+                return this;
+            }
 
-	}
+            public Builder internalMessage(final String internalMessage) {
+                requirementStatus.internalMessage = internalMessage;
+                return this;
+            }
+
+            public Builder passed(final boolean passed) {
+                requirementStatus.passed = passed;
+                return this;
+            }
+
+            public RequirementStatus get() {
+                return requirementStatus;
+            }
+
+        }
+
+    }
 
 }

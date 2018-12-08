@@ -21,73 +21,71 @@
  */
 package xyz.kvantum.server.api.matching;
 
-import java.util.Map;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import xyz.kvantum.server.api.config.CoreConfig;
 
-class ViewPatternTest
-{
+import java.util.Map;
 
-	private String getRandomString(final int size)
-	{
-		final char[] characters = new char[ size ];
-		for ( int i = 0; i < size; i++ )
-		{
-			characters[ i ] = ( char ) ( 'a' + ( Math.random() * 26 ) );
-		}
-		return new String( characters );
-	}
+class ViewPatternTest {
 
-	@Test void matches()
-	{
-		CoreConfig.debug = false; // Prevent logging
+    private String getRandomString(final int size) {
+        final char[] characters = new char[size];
+        for (int i = 0; i < size; i++) {
+            characters[i] = (char) ('a' + (Math.random() * 26));
+        }
+        return new String(characters);
+    }
 
-		final String username = getRandomString( 10 ) + "_";
+    @Test void matches() {
+        CoreConfig.debug = false; // Prevent logging
 
-		final ViewPattern pattern1 = new ViewPattern( "user/<username>" );
-		Map<String, String> map = pattern1.matches( "user/" + username );
-		Assert.assertNotNull( map );
-		Assert.assertTrue( map.containsKey( "username" ) );
-		Assert.assertEquals( map.get( "username" ), username );
+        final String username = getRandomString(10) + "_";
 
-		Assert.assertNull( pattern1.matches( "user/Username/other" ) );
+        final ViewPattern pattern1 = new ViewPattern("user/<username>");
+        Map<String, String> map = pattern1.matches("user/" + username);
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("username"));
+        Assert.assertEquals(map.get("username"), username);
 
-		final ViewPattern pattern2 = new ViewPattern( "news/[page=0]" );
-		map = pattern2.matches( "news" );
-		Assert.assertNotNull( map );
-		Assert.assertTrue( map.containsKey( "page" ) );
-		Assert.assertEquals( "0", map.get( "page" ) );
+        Assert.assertNull(pattern1.matches("user/Username/other"));
 
-		map = pattern2.matches( "news/foo" );
-		Assert.assertNotNull( map );
-		Assert.assertTrue( map.containsKey( "page" ) );
-		Assert.assertEquals( map.get( "page" ), "foo" );
+        final ViewPattern pattern2 = new ViewPattern("news/[page=0]");
+        map = pattern2.matches("news");
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("page"));
+        Assert.assertEquals("0", map.get("page"));
 
-		Assert.assertNull( pattern2.matches( "news/foo/bar" ) );
+        map = pattern2.matches("news/foo");
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("page"));
+        Assert.assertEquals(map.get("page"), "foo");
 
-		final ViewPattern pattern3 = new ViewPattern( "user/<username>/posts/[page]" );
-		map = pattern3.matches( "user/" + username + "/posts" );
-		Assert.assertNotNull( map );
-		Assert.assertTrue( map.containsKey( "username" ) );
-		Assert.assertEquals( username, map.get( "username" ) );
-		Assert.assertFalse( "\"" + map.get( "page" ) + "\" is not supposed to exist", map.containsKey( "page" ) );
+        Assert.assertNull(pattern2.matches("news/foo/bar"));
 
-		map = pattern3.matches( "user/" + username + "/posts/10" );
-		Assert.assertNotNull( map );
-		Assert.assertTrue( map.containsKey( "username" ) );
-		Assert.assertEquals( username, map.get( "username" ) );
-		Assert.assertTrue( map.containsKey( "page" ) );
-		Assert.assertEquals( "10", map.get( "page" ) );
+        final ViewPattern pattern3 = new ViewPattern("user/<username>/posts/[page]");
+        map = pattern3.matches("user/" + username + "/posts");
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("username"));
+        Assert.assertEquals(username, map.get("username"));
+        Assert.assertFalse("\"" + map.get("page") + "\" is not supposed to exist",
+            map.containsKey("page"));
 
-		Assert.assertNull( pattern3.matches( "user/" ) );
-		Assert.assertNull( pattern3.matches( "user/Username/posts/foo/bar" ) );
+        map = pattern3.matches("user/" + username + "/posts/10");
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("username"));
+        Assert.assertEquals(username, map.get("username"));
+        Assert.assertTrue(map.containsKey("page"));
+        Assert.assertEquals("10", map.get("page"));
 
-		final ViewPattern pattern4 = new ViewPattern( "/test/file.extension.[extension]/" );
-		map = pattern4.matches( "/test/file.extension.com" );
-		Assert.assertNotNull( map );
-		Assert.assertTrue( map.containsKey( "extension" ) );
-		Assert.assertEquals( "com", map.get( "extension" ) );
-	}
+        Assert.assertNull(pattern3.matches("user/"));
+        Assert.assertNull(pattern3.matches("user/Username/posts/foo/bar"));
+
+        final ViewPattern pattern4 = new ViewPattern("/test/file.extension.[extension]/");
+        map = pattern4.matches("/test/file.extension.com");
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("extension"));
+        Assert.assertEquals("com", map.get("extension"));
+    }
 
 }

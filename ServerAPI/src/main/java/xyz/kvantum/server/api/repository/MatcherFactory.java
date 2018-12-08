@@ -27,15 +27,14 @@ package xyz.kvantum.server.api.repository;
  * @param <Q> Query Type
  * @param <V> Value type
  */
-@FunctionalInterface public interface MatcherFactory<Q, V>
-{
+@FunctionalInterface public interface MatcherFactory<Q, V> {
 
-	/**
-	 * Create a new {@link Matcher} instance
-	 *
-	 * @param queryObject Query object
-	 * @return Matcher instance
-	 */
-	Matcher<? extends Q, ? super V> createMatcher(final Q queryObject);
+    /**
+     * Create a new {@link Matcher} instance
+     *
+     * @param queryObject Query object
+     * @return Matcher instance
+     */
+    Matcher<? extends Q, ? super V> createMatcher(final Q queryObject);
 
 }

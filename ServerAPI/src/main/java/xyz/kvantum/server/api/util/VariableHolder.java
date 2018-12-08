@@ -26,14 +26,13 @@ import java.util.Map;
 /**
  * A variable holder is any class that is able to hold variables where both the keys and values are strings
  */
-@FunctionalInterface public interface VariableHolder
-{
+@FunctionalInterface public interface VariableHolder {
 
-	/**
-	 * Get all variables contained in the holder
-	 *
-	 * @return map containing all stored variables
-	 */
-	Map<String, String> getVariables();
+    /**
+     * Get all variables contained in the holder
+     *
+     * @return map containing all stored variables
+     */
+    Map<String, String> getVariables();
 
 }

@@ -22,34 +22,34 @@
 package xyz.kvantum.server.implementation;
 
 import de.jungblut.datastructure.AsyncBufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import lombok.NonNull;
 import xyz.kvantum.server.api.event.Listener;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.response.FinalizedResponse;
 import xyz.kvantum.server.api.util.Assert;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 /**
  * Streams to log/access.log
  */
-final class AccessLogStream extends PrintStream
-{
+final class AccessLogStream extends PrintStream {
 
-	AccessLogStream(@NonNull final File logFolder) throws FileNotFoundException
-	{
-		super( new AsyncBufferedOutputStream( new FileOutputStream( new File( logFolder, "access.log" ), true ) ) );
-	}
+    AccessLogStream(@NonNull final File logFolder) throws FileNotFoundException {
+        super(new AsyncBufferedOutputStream(
+            new FileOutputStream(new File(logFolder, "access.log"), true)));
+    }
 
-	@Listener @SuppressWarnings("unused") private void onRequestFinish(@NonNull final FinalizedResponse response)
-	{
-		final String logString = response.toLogString();
-		Assert.notNull( logString );
-		Logger.access( logString );
-		this.println( logString );
-		this.flush();
-	}
+    @Listener @SuppressWarnings("unused")
+    private void onRequestFinish(@NonNull final FinalizedResponse response) {
+        final String logString = response.toLogString();
+        Assert.notNull(logString);
+        Logger.access(logString);
+        this.println(logString);
+        this.flush();
+    }
 
 }

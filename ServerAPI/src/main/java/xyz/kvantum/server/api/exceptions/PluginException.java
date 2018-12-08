@@ -21,17 +21,14 @@
  */
 package xyz.kvantum.server.api.exceptions;
 
-public class PluginException extends KvantumException
-{
+public class PluginException extends KvantumException {
 
-	public PluginException(final String message)
-	{
-		super( message );
-	}
+    public PluginException(final String message) {
+        super(message);
+    }
 
-	public PluginException(final String message, final Throwable cause)
-	{
-		super( message, cause );
-	}
+    public PluginException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

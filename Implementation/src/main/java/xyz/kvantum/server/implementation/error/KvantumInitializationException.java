@@ -21,17 +21,14 @@
  */
 package xyz.kvantum.server.implementation.error;
 
-final public class KvantumInitializationException extends KvantumException
-{
+final public class KvantumInitializationException extends KvantumException {
 
-	public KvantumInitializationException(final String s, final Throwable cause)
-	{
-		super( "Couldn't load Kvantum: " + s, cause );
-	}
+    public KvantumInitializationException(final String s, final Throwable cause) {
+        super("Couldn't load Kvantum: " + s, cause);
+    }
 
-	public KvantumInitializationException(final String s)
-	{
-		super( "Couldn't load Kvantum: " + s );
-	}
+    public KvantumInitializationException(final String s) {
+        super("Couldn't load Kvantum: " + s);
+    }
 
 }

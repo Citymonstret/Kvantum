@@ -31,68 +31,58 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.views.View;
 
-public class Error extends View
-{
+public class Error extends View {
 
-	private static String template = "not loaded";
+    private static String template = "not loaded";
 
-	static
-	{
-		initTemplate();
-	}
+    static {
+        initTemplate();
+    }
 
-	private final AsciiString code;
-	private final String desc;
-	Error(final AsciiString code, final String desc)
-	{
-		super( "", "error" );
-		this.code = code;
-		this.desc = desc;
-	}
+    private final AsciiString code;
+    private final String desc;
 
-	private static void initTemplate()
-	{
-		final String resourcePath = "template/error.html";
-		final Path folder = ServerImplementation.getImplementation().getFileSystem().getPath( "templates" );
-		if ( !folder.exists() )
-		{
-			if ( !folder.create() )
-			{
-				Message.COULD_NOT_CREATE_FOLDER.log( folder );
-				return;
-			}
-		}
-		final Path path = folder.getPath( "error.html" );
-		if ( !path.exists() )
-		{
-			if ( !path.create() )
-			{
-				Logger.error( "could not create file: '{}'", path );
-				return;
-			}
-			try
-			{
-				FileUtils.copyResource( resourcePath, path.getJavaPath() );
-			} catch ( Exception e )
-			{
-				e.printStackTrace();
-			}
-		}
-		template = path.readFile();
-	}
+    Error(final AsciiString code, final String desc) {
+        super("", "error");
+        this.code = code;
+        this.desc = desc;
+    }
 
-	@Override public boolean passes(final AbstractRequest request)
-	{
-		return true;
-	}
+    private static void initTemplate() {
+        final String resourcePath = "template/error.html";
+        final Path folder =
+            ServerImplementation.getImplementation().getFileSystem().getPath("templates");
+        if (!folder.exists()) {
+            if (!folder.create()) {
+                Message.COULD_NOT_CREATE_FOLDER.log(folder);
+                return;
+            }
+        }
+        final Path path = folder.getPath("error.html");
+        if (!path.exists()) {
+            if (!path.create()) {
+                Logger.error("could not create file: '{}'", path);
+                return;
+            }
+            try {
+                FileUtils.copyResource(resourcePath, path.getJavaPath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        template = path.readFile();
+    }
 
-	@Override public Response generate(final AbstractRequest request)
-	{
-		final Response response = new Response().setResponse(
-				template.replace( "{{code}}", code + "" ).replace( "{{message}}", desc )
-						.replace( "{{path}}", request.getQuery().getFullRequest() ) );
-		response.getHeader().setStatus( code );
-		return response;
-	}
+    @Override public boolean passes(final AbstractRequest request) {
+        return true;
+    }
+
+    @Override public Response generate(final AbstractRequest request) {
+        final Response response = new Response().setResponse(
+            template.replace("{{code}}", code + "").replace("{{message}}", desc)
+                .replace("{{path}}", request.getQuery().getFullRequest()));
+        response.getHeader().setStatus(code);
+        return response;
+    }
 
 }

@@ -22,43 +22,40 @@
 package xyz.kvantum.server.api.templates;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE) final public class TemplateManager
-{
+import java.util.ArrayList;
+import java.util.Collection;
 
-	private static TemplateManager instance;
-	private final Collection<ProviderFactory<? extends VariableProvider>> providers = new ArrayList<>();
+@NoArgsConstructor(access = AccessLevel.PRIVATE) final public class TemplateManager {
 
-	public static TemplateManager get()
-	{
-		if ( instance == null )
-		{
-			instance = new TemplateManager();
-		}
-		return instance;
-	}
+    private static TemplateManager instance;
+    private final Collection<ProviderFactory<? extends VariableProvider>> providers =
+        new ArrayList<>();
 
-	public void addProviderFactory(@NonNull final ProviderFactory<? extends VariableProvider> factory)
-	{
-		for ( final ProviderFactory<?> registeredFactory : this.providers )
-		{
-			if ( registeredFactory.providerName().equals( factory.providerName() ) )
-			{
-				throw new IllegalArgumentException( "Cannot register a provider factory twice" );
-			}
-		}
-		this.providers.add( factory );
-	}
+    public static TemplateManager get() {
+        if (instance == null) {
+            instance = new TemplateManager();
+        }
+        return instance;
+    }
 
-	public Collection<ProviderFactory<? extends VariableProvider>> getProviders()
-	{
-		return ImmutableList.<ProviderFactory<? extends VariableProvider>>builder().addAll( this.providers ).build();
-	}
+    public void addProviderFactory(
+        @NonNull final ProviderFactory<? extends VariableProvider> factory) {
+        for (final ProviderFactory<?> registeredFactory : this.providers) {
+            if (registeredFactory.providerName().equals(factory.providerName())) {
+                throw new IllegalArgumentException("Cannot register a provider factory twice");
+            }
+        }
+        this.providers.add(factory);
+    }
+
+    public Collection<ProviderFactory<? extends VariableProvider>> getProviders() {
+        return ImmutableList.<ProviderFactory<? extends VariableProvider>>builder()
+            .addAll(this.providers).build();
+    }
 }

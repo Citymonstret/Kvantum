@@ -21,13 +21,6 @@
  */
 package xyz.kvantum.server.api.socket;
 
-import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
-import javax.net.ssl.SSLSocket;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,66 +29,69 @@ import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
 import xyz.kvantum.server.api.util.ProtocolType;
 
+import javax.net.ssl.SSLSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
+
+import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
+
 /**
  * Socket context used to make sure that sockets are handled the same way, across implementations
  */
-@EqualsAndHashCode(of = "socketId") @RequiredArgsConstructor public final class SocketContext
-{
+@EqualsAndHashCode(of = "socketId") @RequiredArgsConstructor public final class SocketContext {
 
-	private static final AtomicLong socketIdPoll = new AtomicLong( Long.MIN_VALUE );
+    private static final AtomicLong socketIdPoll = new AtomicLong(Long.MIN_VALUE);
 
-	@Getter final long socketId = socketIdPoll.getAndIncrement();
+    @Getter final long socketId = socketIdPoll.getAndIncrement();
 
-	@NonNull final ProtocolType protocolType;
-	@NonNull final SocketAddress socketAddress;
-	@NonNull final Supplier<Boolean> activeCheck;
+    @NonNull final ProtocolType protocolType;
+    @NonNull final SocketAddress socketAddress;
+    @NonNull final Supplier<Boolean> activeCheck;
 
-	private ITempFileManager tempFileManager;
+    private ITempFileManager tempFileManager;
 
-	/**
-	 * Get a {@link ITempFileManager} for this socket instance. This loaded lazily, so it will be created on the first
-	 * call to this method.
-	 *
-	 * @return ITempFileManager instance
-	 */
-	public ITempFileManager getTempFileManager()
-	{
-		if ( tempFileManager == null )
-		{
-			this.tempFileManager = ServerImplementation.getImplementation().getTempFileManagerFactory()
-					.newTempFileManager();
-		}
-		return tempFileManager;
-	}
+    /**
+     * Get a {@link ITempFileManager} for this socket instance. This loaded lazily, so it will be created on the first
+     * call to this method.
+     *
+     * @return ITempFileManager instance
+     */
+    public ITempFileManager getTempFileManager() {
+        if (tempFileManager == null) {
+            this.tempFileManager =
+                ServerImplementation.getImplementation().getTempFileManagerFactory()
+                    .newTempFileManager();
+        }
+        return tempFileManager;
+    }
 
-	/**
-	 * Check if the socket is connected over SSL
-	 *
-	 * @return true if the socket is connected over SSL (is a {@link SSLSocket})
-	 */
-	public boolean isSSL()
-	{
-		return this.protocolType == HTTPS;
-	}
+    /**
+     * Check if the socket is connected over SSL
+     *
+     * @return true if the socket is connected over SSL (is a {@link SSLSocket})
+     */
+    public boolean isSSL() {
+        return this.protocolType == HTTPS;
+    }
 
-	/**
-	 * Get the socket address
-	 *
-	 * @return socket address
-	 */
-	public InetSocketAddress getAddress()
-	{
-		return ( InetSocketAddress ) this.socketAddress;
-	}
+    /**
+     * Get the socket address
+     *
+     * @return socket address
+     */
+    public InetSocketAddress getAddress() {
+        return (InetSocketAddress) this.socketAddress;
+    }
 
-	/**
-	 * Get the remote IP
-	 *
-	 * @return remote IP
-	 */
-	public String getIP()
-	{
-		return getAddress().getAddress().getHostAddress();
-	}
+    /**
+     * Get the remote IP
+     *
+     * @return remote IP
+     */
+    public String getIP() {
+        return getAddress().getAddress().getHostAddress();
+    }
 
 }

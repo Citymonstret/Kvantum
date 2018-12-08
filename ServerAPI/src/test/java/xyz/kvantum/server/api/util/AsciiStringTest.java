@@ -21,130 +21,112 @@
  */
 package xyz.kvantum.server.api.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static xyz.kvantum.server.api.util.AsciiString.of;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.jupiter.api.Test;
 
-class AsciiStringTest
-{
+import static org.junit.jupiter.api.Assertions.*;
+import static xyz.kvantum.server.api.util.AsciiString.of;
 
-	@Test void isEmpty()
-	{
-		final AsciiString asciiString1 = of( "", false );
-		assertTrue( asciiString1.isEmpty() );
-		final AsciiString asciiString2 = of( "content", false );
-		assertFalse( asciiString2.isEmpty() );
-	}
+class AsciiStringTest {
 
-	@Test void getValue()
-	{
-		final AsciiString asciiString1 = of( "Hello World", false );
-		final String string = "Hello World";
-		assertTrue( Arrays.equals( asciiString1.getValue(), string.getBytes( StandardCharsets.US_ASCII ) ) );
-	}
+    @Test void isEmpty() {
+        final AsciiString asciiString1 = of("", false);
+        assertTrue(asciiString1.isEmpty());
+        final AsciiString asciiString2 = of("content", false);
+        assertFalse(asciiString2.isEmpty());
+    }
 
-	@Test void length()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertEquals( 11, asciiString.length() );
-	}
+    @Test void getValue() {
+        final AsciiString asciiString1 = of("Hello World", false);
+        final String string = "Hello World";
+        assertTrue(
+            Arrays.equals(asciiString1.getValue(), string.getBytes(StandardCharsets.US_ASCII)));
+    }
 
-	@Test void charAt()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertEquals( 'l', asciiString.charAt( 3 ) );
-	}
+    @Test void length() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertEquals(11, asciiString.length());
+    }
 
-	@Test void subSequence()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		final CharSequence subsequence = asciiString.subSequence( 0, 5 );
-		assertEquals( "Hello", subsequence );
-	}
+    @Test void charAt() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertEquals('l', asciiString.charAt(3));
+    }
 
-	@Test void testToString()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertEquals( "Hello World", asciiString.toString() );
-	}
+    @Test void subSequence() {
+        final AsciiString asciiString = of("Hello World", false);
+        final CharSequence subsequence = asciiString.subSequence(0, 5);
+        assertEquals("Hello", subsequence);
+    }
 
-	@Test void testHashCode()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertEquals( "Hello World".hashCode(), asciiString.hashCode() );
-	}
+    @Test void testToString() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertEquals("Hello World", asciiString.toString());
+    }
 
-	@Test void equals()
-	{
-		final AsciiString asciiString1 = of( "Hello World", false );
-		final AsciiString asciiString2 = of( "Hello World", false );
-		assertTrue( asciiString1.equals( asciiString2 ) );
-		final String string = "Hello World";
-		assertTrue( asciiString1.equals( string ) );
-	}
+    @Test void testHashCode() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertEquals("Hello World".hashCode(), asciiString.hashCode());
+    }
 
-	@Test void contains()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.contains( "Hello" ) );
-		assertFalse( asciiString.contains( "Obama" ) );
-	}
+    @Test void equals() {
+        final AsciiString asciiString1 = of("Hello World", false);
+        final AsciiString asciiString2 = of("Hello World", false);
+        assertTrue(asciiString1.equals(asciiString2));
+        final String string = "Hello World";
+        assertTrue(asciiString1.equals(string));
+    }
 
-	@Test void containsIgnoreCase()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.containsIgnoreCase( "HELLO" ) );
-		assertTrue( asciiString.containsIgnoreCase( "hello" ) );
-		assertTrue( asciiString.containsIgnoreCase( "hElLo" ) );
-	}
+    @Test void contains() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.contains("Hello"));
+        assertFalse(asciiString.contains("Obama"));
+    }
 
-	@Test void equalsIgnoreCase()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.equalsIgnoreCase( "hElLO woRlD" ) );
-	}
+    @Test void containsIgnoreCase() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.containsIgnoreCase("HELLO"));
+        assertTrue(asciiString.containsIgnoreCase("hello"));
+        assertTrue(asciiString.containsIgnoreCase("hElLo"));
+    }
 
-	@Test void endsWith()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.endsWith( "World" ) );
-	}
+    @Test void equalsIgnoreCase() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.equalsIgnoreCase("hElLO woRlD"));
+    }
 
-	@Test void toLowerCase()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.toLowerCase().equals( "hello world" ) );
-	}
+    @Test void endsWith() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.endsWith("World"));
+    }
 
-	@Test void toUpperCase()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.toUpperCase().equals( "HELLO WORLD" ) );
-	}
+    @Test void toLowerCase() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.toLowerCase().equals("hello world"));
+    }
 
-	@Test void compareTo()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertEquals( "Hello World".compareTo( "Hello" ), asciiString.compareTo( "Hello" ) );
-	}
+    @Test void toUpperCase() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.toUpperCase().equals("HELLO WORLD"));
+    }
 
-	@Test void split()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		final Collection<AsciiString> collection = asciiString.split( " " );
-		assertEquals( 2, collection.size() );
-	}
+    @Test void compareTo() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertEquals("Hello World".compareTo("Hello"), asciiString.compareTo("Hello"));
+    }
 
-	@Test void startsWith()
-	{
-		final AsciiString asciiString = of( "Hello World", false );
-		assertTrue( asciiString.startsWith( "Hello" ) );
-	}
+    @Test void split() {
+        final AsciiString asciiString = of("Hello World", false);
+        final Collection<AsciiString> collection = asciiString.split(" ");
+        assertEquals(2, collection.size());
+    }
+
+    @Test void startsWith() {
+        final AsciiString asciiString = of("Hello World", false);
+        assertTrue(asciiString.startsWith("Hello"));
+    }
 
 }

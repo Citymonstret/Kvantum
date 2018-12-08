@@ -21,12 +21,6 @@
  */
 package xyz.kvantum.server.api.request.post;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Getter;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -36,66 +30,62 @@ import xyz.kvantum.server.api.fileupload.KvantumFileUploadContext;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-public class MultipartPostRequest extends PostRequest
-{
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
-	@Getter private KvantumFileUploadContext.KvantumFileUploadContextParsingResult parsingResult;
+public class MultipartPostRequest extends PostRequest {
 
-	public MultipartPostRequest(final AbstractRequest parent, final String rawRequest)
-	{
-		super( parent, rawRequest, true );
-	}
+    @Getter private KvantumFileUploadContext.KvantumFileUploadContextParsingResult parsingResult;
 
-	@Override protected void parseRequest(final String rawRequest)
-	{
-		this.parsingResult = KvantumFileUploadContext.from( this.getParent() );
-		if ( parsingResult.getStatus() == KvantumFileUploadContext.KvantumFileUploadContextParsingStatus.SUCCESS )
-		{
-			final KvantumFileUploadContext context = this.parsingResult.getContext();
-			try
-			{
-				final FileItemIterator itemIterator = ServerImplementation.getImplementation().getGlobalFileUpload()
-						.getItemIterator( context );
-				FileItemStream item;
-				while ( itemIterator.hasNext() )
-				{
-					item = itemIterator.next();
-					if ( !item.isFormField() )
-					{
-						continue; // We do not handle files, that is up to the application implementations
-					}
-					try ( final InputStream inputStream = item.openStream() )
-					{
-						final List<String> lines = new ArrayList<>();
-						try ( BufferedReader bufferedReader = new BufferedReader(
-								new InputStreamReader( inputStream ) ) )
-						{
-							String line;
-							while ( ( line = bufferedReader.readLine() ) != null )
-							{
-								lines.add( line );
-							}
-						}
-						if ( lines.size() != 1 )
-						{
-							Logger.warn( "FileItem simple field line count is not 0 (Request: {})", getParent() );
-							continue;
-						}
-						this.getVariables().put( item.getFieldName(), lines.get( 0 ) );
-					}
-				}
-			} catch ( final FileUploadException | IOException e )
-			{
-				e.printStackTrace();
-			}
-		} else
-		{
-			Logger.warn( "Failed to parse multipart request: {}", parsingResult.getStatus() );
-		}
-	}
+    public MultipartPostRequest(final AbstractRequest parent, final String rawRequest) {
+        super(parent, rawRequest, true);
+    }
 
-	@Override public EntityType getEntityType()
-	{
-		return EntityType.FORM_MULTIPART;
-	}
+    @Override protected void parseRequest(final String rawRequest) {
+        this.parsingResult = KvantumFileUploadContext.from(this.getParent());
+        if (parsingResult.getStatus()
+            == KvantumFileUploadContext.KvantumFileUploadContextParsingStatus.SUCCESS) {
+            final KvantumFileUploadContext context = this.parsingResult.getContext();
+            try {
+                final FileItemIterator itemIterator =
+                    ServerImplementation.getImplementation().getGlobalFileUpload()
+                        .getItemIterator(context);
+                FileItemStream item;
+                while (itemIterator.hasNext()) {
+                    item = itemIterator.next();
+                    if (!item.isFormField()) {
+                        continue; // We do not handle files, that is up to the application implementations
+                    }
+                    try (final InputStream inputStream = item.openStream()) {
+                        final List<String> lines = new ArrayList<>();
+                        try (BufferedReader bufferedReader = new BufferedReader(
+                            new InputStreamReader(inputStream))) {
+                            String line;
+                            while ((line = bufferedReader.readLine()) != null) {
+                                lines.add(line);
+                            }
+                        }
+                        if (lines.size() != 1) {
+                            Logger.warn("FileItem simple field line count is not 0 (Request: {})",
+                                getParent());
+                            continue;
+                        }
+                        this.getVariables().put(item.getFieldName(), lines.get(0));
+                    }
+                }
+            } catch (final FileUploadException | IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Logger.warn("Failed to parse multipart request: {}", parsingResult.getStatus());
+        }
+    }
+
+    @Override public EntityType getEntityType() {
+        return EntityType.FORM_MULTIPART;
+    }
 }

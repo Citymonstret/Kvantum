@@ -21,12 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.io.IOException;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
 import lombok.NonNull;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
@@ -35,55 +29,53 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 
-final class IntellectualFileSystem extends FileSystem
-{
+import java.io.IOException;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-	IntellectualFileSystem(@NonNull final java.nio.file.Path coreFolder)
-	{
-		super( coreFolder, new FileCacheImplementation() );
-	}
+final class IntellectualFileSystem extends FileSystem {
 
-	void registerFileWatcher()
-	{
-		this.actOnSubPaths( this.getPath( "" ) );
-	}
+    IntellectualFileSystem(@NonNull final java.nio.file.Path coreFolder) {
+        super(coreFolder, new FileCacheImplementation());
+    }
 
-	private void actOnSubPaths(@NonNull final Path path)
-	{
-		final Collection<Path> subPaths = path.getSubPaths().stream().filter( Path::isFolder )
-				.filter( p -> !Arrays.asList( "log", "config", "storage" ).contains( p.getEntityName() ) )
-				.collect( Collectors.toList() );
-		subPaths.forEach( this::registerCacheWatcher );
-		subPaths.forEach( this::actOnSubPaths );
-	}
+    void registerFileWatcher() {
+        this.actOnSubPaths(this.getPath(""));
+    }
 
-	private void registerCacheWatcher(@NonNull final Path path)
-	{
-		if ( CoreConfig.debug )
-		{
-			Logger.debug( "Registering cache invalidation watcher for: {}", path.getEntityName() );
-		}
-		final FileWatcher fileWatcher = ServerImplementation.getImplementation().getFileWatcher();
-		try
-		{
-			path.registerWatcher( fileWatcher, this::eventListener );
-		} catch ( final IOException e )
-		{
-			e.printStackTrace();
-		}
-	}
+    private void actOnSubPaths(@NonNull final Path path) {
+        final Collection<Path> subPaths = path.getSubPaths().stream().filter(Path::isFolder)
+            .filter(p -> !Arrays.asList("log", "config", "storage").contains(p.getEntityName()))
+            .collect(Collectors.toList());
+        subPaths.forEach(this::registerCacheWatcher);
+        subPaths.forEach(this::actOnSubPaths);
+    }
 
-	@SuppressWarnings("unused") private void eventListener(@NonNull final Path path,
-			@NonNull final WatchEvent.Kind<?> eventKind)
-	{
-		//
-		// Ignore file creation and temporary job files
-		//
-		if ( StandardWatchEventKinds.ENTRY_CREATE.equals( eventKind ) || path.toString().contains( "___jb_" ) )
-		{
-			return;
-		}
-		Logger.info( "Removing cache entry for: {}", path );
-		ServerImplementation.getImplementation().getCacheManager().removeFileCache( path );
-	}
+    private void registerCacheWatcher(@NonNull final Path path) {
+        if (CoreConfig.debug) {
+            Logger.debug("Registering cache invalidation watcher for: {}", path.getEntityName());
+        }
+        final FileWatcher fileWatcher = ServerImplementation.getImplementation().getFileWatcher();
+        try {
+            path.registerWatcher(fileWatcher, this::eventListener);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unused") private void eventListener(@NonNull final Path path,
+        @NonNull final WatchEvent.Kind<?> eventKind) {
+        //
+        // Ignore file creation and temporary job files
+        //
+        if (StandardWatchEventKinds.ENTRY_CREATE.equals(eventKind) || path.toString()
+            .contains("___jb_")) {
+            return;
+        }
+        Logger.info("Removing cache entry for: {}", path);
+        ServerImplementation.getImplementation().getCacheManager().removeFileCache(path);
+    }
 }

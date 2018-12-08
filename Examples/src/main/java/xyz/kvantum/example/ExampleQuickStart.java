@@ -21,18 +21,16 @@
  */
 package xyz.kvantum.example;
 
-import static xyz.kvantum.server.api.views.Routes.get;
-
 import xyz.kvantum.server.implementation.QuickStart;
 
-public class ExampleQuickStart
-{
+import static xyz.kvantum.server.api.views.Routes.get;
 
-	public static void main(final String[] args)
-	{
+public class ExampleQuickStart {
 
-		QuickStart.newStandaloneServer();
-		get( "home", (request, response) -> response.setResponse( "Home page!" ) );
-	}
+    public static void main(final String[] args) {
+
+        QuickStart.newStandaloneServer();
+        get("home", (request, response) -> response.setResponse("Home page!"));
+    }
 
 }

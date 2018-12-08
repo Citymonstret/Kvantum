@@ -26,14 +26,13 @@ import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
-@CommandDeclaration(command = "dump", description = "Dump information from the router", usage = "/dump") public class Dump
-		extends Command
-{
+@CommandDeclaration(command = "dump", description = "Dump information from the router", usage = "/dump")
+public class Dump extends Command {
 
-	@Override public boolean onCommand(CommandInstance instance)
-	{
-		ServerImplementation.getImplementation().getRouter().dump( ServerImplementation.getImplementation() );
-		return true;
-	}
+    @Override public boolean onCommand(CommandInstance instance) {
+        ServerImplementation.getImplementation().getRouter()
+            .dump(ServerImplementation.getImplementation());
+        return true;
+    }
 
 }

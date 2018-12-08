@@ -23,47 +23,43 @@ package xyz.kvantum.server.api.verification;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import java.util.Collection;
-import java.util.Collections;
 import lombok.Builder;
 import lombok.Singular;
 import xyz.kvantum.server.api.verification.rules.NotNull;
 
-public class Verifier<T>
-{
+import java.util.Collection;
+import java.util.Collections;
 
-	private final Collection<Rule<T>> rules;
+public class Verifier<T> {
 
-	private boolean nullable = false;
+    private final Collection<Rule<T>> rules;
 
-	@Builder private Verifier(@Singular("withRule") final Collection<Rule<T>> rules, final boolean nullable)
-	{
-		this.rules = ImmutableList.copyOf( rules );
-		this.nullable = nullable;
-	}
+    private boolean nullable = false;
 
-	/**
-	 * Verify an object and get a list of all the broken verification rules
-	 *
-	 * @param object Object to verify
-	 * @return Collection of broken rules, empty if the supplied object is valid
-	 */
-	public Collection<Rule<T>> verify(final T object)
-	{
-		if ( !this.nullable && object == null )
-		{
-			return Collections.singletonList( new NotNull<T>() );
-		}
-		final ImmutableCollection.Builder<Rule<T>> ruleBuilder = ImmutableList.builder();
-		for ( final Rule<T> rule : this.rules )
-		{
-			if ( rule.test( object ) )
-			{
-				continue;
-			}
-			ruleBuilder.add( rule );
-		}
-		return ruleBuilder.build();
-	}
+    @Builder private Verifier(@Singular("withRule") final Collection<Rule<T>> rules,
+        final boolean nullable) {
+        this.rules = ImmutableList.copyOf(rules);
+        this.nullable = nullable;
+    }
+
+    /**
+     * Verify an object and get a list of all the broken verification rules
+     *
+     * @param object Object to verify
+     * @return Collection of broken rules, empty if the supplied object is valid
+     */
+    public Collection<Rule<T>> verify(final T object) {
+        if (!this.nullable && object == null) {
+            return Collections.singletonList(new NotNull<T>());
+        }
+        final ImmutableCollection.Builder<Rule<T>> ruleBuilder = ImmutableList.builder();
+        for (final Rule<T> rule : this.rules) {
+            if (rule.test(object)) {
+                continue;
+            }
+            ruleBuilder.add(rule);
+        }
+        return ruleBuilder.build();
+    }
 
 }

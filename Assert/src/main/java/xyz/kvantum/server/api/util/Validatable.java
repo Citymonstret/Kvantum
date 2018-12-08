@@ -24,14 +24,13 @@ package xyz.kvantum.server.api.util;
 /**
  * An object that can be validated
  */
-@SuppressWarnings("unused") @FunctionalInterface public interface Validatable
-{
+@SuppressWarnings("unused") @FunctionalInterface public interface Validatable {
 
-	/**
-	 * Check whether or not the object is valid
-	 *
-	 * @return {@code true} if the object is valid, {@code} false if not
-	 */
-	boolean isValid();
+    /**
+     * Check whether or not the object is valid
+     *
+     * @return {@code true} if the object is valid, {@code} false if not
+     */
+    boolean isValid();
 
 }

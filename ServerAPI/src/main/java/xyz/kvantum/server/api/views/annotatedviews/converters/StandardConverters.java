@@ -25,18 +25,17 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
-@UtilityClass public class StandardConverters
-{
+@UtilityClass public class StandardConverters {
 
-	public static final String HTML = "html";
-	public static final String JSON = "json";
-	public static final String XML = "xml";
+    public static final String HTML = "html";
+    public static final String JSON = "json";
+    public static final String XML = "xml";
 
-	public static void registerStandardConverters(@NonNull final AnnotatedViewManager staticViewManager)
-	{
-		new HtmlConverter( staticViewManager );
-		new JsonConverter( staticViewManager );
-		new XmlConverter( staticViewManager );
-	}
+    public static void registerStandardConverters(
+        @NonNull final AnnotatedViewManager staticViewManager) {
+        new HtmlConverter(staticViewManager);
+        new JsonConverter(staticViewManager);
+        new XmlConverter(staticViewManager);
+    }
 
 }

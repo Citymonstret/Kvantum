@@ -25,12 +25,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
@@ -41,106 +35,103 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 /**
  * The utility file that handles all runtime caching
  */
-@SuppressWarnings("ALL") public final class CacheManager implements ICacheManager
-{
+@SuppressWarnings("ALL") public final class CacheManager implements ICacheManager {
 
-	private final Cache<String, String> cachedIncludes;
-	private final Cache<String, CachedFile> cachedFiles;
-	private final Cache<Integer, IAccount> cachedAccounts;
-	private final Cache<String, Integer> cachedAccountIds;
-	private final Cache<String, CachedResponse> cachedBodies;
+    private final Cache<String, String> cachedIncludes;
+    private final Cache<String, CachedFile> cachedFiles;
+    private final Cache<Integer, IAccount> cachedAccounts;
+    private final Cache<String, Integer> cachedAccountIds;
+    private final Cache<String, CachedResponse> cachedBodies;
 
-	public CacheManager()
-	{
-		cachedIncludes = Caffeine.newBuilder()
-				.expireAfterWrite( CoreConfig.Cache.cachedIncludesExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedIncludesMaxItems ).build();
-		cachedFiles = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedFilesMaxItems ).build();
-		cachedAccounts = Caffeine.newBuilder()
-				.expireAfterWrite( CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedAccountsMaxItems )
-				.removalListener( new RemovalListener<Integer, IAccount>()
-				{
-					@Override public void onRemoval(@Nullable Integer key, @Nullable IAccount value,
-							@Nonnull RemovalCause cause)
-					{
-						value.saveState();
-					}
-				} ).<Integer, IAccount> build();
-		cachedBodies = Caffeine.newBuilder().expireAfterWrite( CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedBodiesMaxItems ).build();
-		cachedAccountIds = Caffeine.newBuilder()
-				.expireAfterWrite( CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS )
-				.maximumSize( CoreConfig.Cache.cachedAccountIdsMaxItems ).build();
-	}
+    public CacheManager() {
+        cachedIncludes = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedIncludesExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedIncludesMaxItems).build();
+        cachedFiles = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedFilesExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedFilesMaxItems).build();
+        cachedAccounts = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedAccountsMaxItems)
+            .removalListener(new RemovalListener<Integer, IAccount>() {
+                @Override public void onRemoval(@Nullable Integer key, @Nullable IAccount value,
+                    @Nonnull RemovalCause cause) {
+                    value.saveState();
+                }
+            }).<Integer, IAccount>build();
+        cachedBodies = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedBodiesExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedBodiesMaxItems).build();
+        cachedAccountIds = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedAccountIdsMaxItems).build();
+    }
 
-	@Override public String getCachedInclude(@NonNull final String group)
-	{
-		return this.cachedIncludes.getIfPresent( group );
-	}
+    @Override public String getCachedInclude(@NonNull final String group) {
+        return this.cachedIncludes.getIfPresent(group);
+    }
 
-	@Override public Optional<IAccount> getCachedAccount(final int id)
-	{
-		return Optional.ofNullable( cachedAccounts.getIfPresent( id ) );
-	}
+    @Override public Optional<IAccount> getCachedAccount(final int id) {
+        return Optional.ofNullable(cachedAccounts.getIfPresent(id));
+    }
 
-	@Override public Optional<Integer> getCachedId(@NonNull final String username)
-	{
-		return Optional.ofNullable( cachedAccountIds.getIfPresent( username ) );
-	}
+    @Override public Optional<Integer> getCachedId(@NonNull final String username) {
+        return Optional.ofNullable(cachedAccountIds.getIfPresent(username));
+    }
 
-	@Override public void setCachedAccount(@NonNull final IAccount account)
-	{
-		this.cachedAccounts.put( account.getId(), account );
-		this.cachedAccountIds.put( account.getUsername(), account.getId() );
-	}
+    @Override public void setCachedAccount(@NonNull final IAccount account) {
+        this.cachedAccounts.put(account.getId(), account);
+        this.cachedAccountIds.put(account.getUsername(), account.getId());
+    }
 
-	@Override public Collection<IAccount> getAllStoredAccounts()
-	{
-		return Collections.unmodifiableCollection( this.cachedAccounts.asMap().values() );
-	}
+    @Override public Collection<IAccount> getAllStoredAccounts() {
+        return Collections.unmodifiableCollection(this.cachedAccounts.asMap().values());
+    }
 
-	@Override public void deleteAccount(@NonNull final IAccount account)
-	{
-		this.cachedAccounts.invalidate( account.getId() );
-		this.cachedAccountIds.invalidate( account.getUsername() );
-	}
+    @Override public void deleteAccount(@NonNull final IAccount account) {
+        this.cachedAccounts.invalidate(account.getId());
+        this.cachedAccountIds.invalidate(account.getUsername());
+    }
 
-	@Override public Optional<CachedFile> getCachedFile(@NonNull final Path file)
-	{
-		return Optional.ofNullable( cachedFiles.getIfPresent( file.toString() ) );
-	}
+    @Override public Optional<CachedFile> getCachedFile(@NonNull final Path file) {
+        return Optional.ofNullable(cachedFiles.getIfPresent(file.toString()));
+    }
 
-	@Override public void setCachedFile(@NonNull final Path file, @NonNull final CachedFile content)
-	{
-		cachedFiles.put( file.toString(), content );
-	}
+    @Override
+    public void setCachedFile(@NonNull final Path file, @NonNull final CachedFile content) {
+        cachedFiles.put(file.toString(), content);
+    }
 
-	@Override public void setCachedInclude(@NonNull final String group, @NonNull final String document)
-	{
-		this.cachedIncludes.put( group, document );
-	}
+    @Override
+    public void setCachedInclude(@NonNull final String group, @NonNull final String document) {
+        this.cachedIncludes.put(group, document);
+    }
 
-	@Override public void removeFileCache(@NonNull final Path path)
-	{
-		this.cachedFiles.invalidate( path.toString() );
-	}
+    @Override public void removeFileCache(@NonNull final Path path) {
+        this.cachedFiles.invalidate(path.toString());
+    }
 
-	@Override public boolean hasCache(@NonNull final RequestHandler view)
-	{
-		return this.cachedBodies.getIfPresent( view.toString() ) != null;
-	}
-	@Override public void setCache(@NonNull final RequestHandler view, @NonNull final ResponseBody responseBody)
-	{
-		this.cachedBodies.put( view.toString(), new CachedResponse( responseBody ) );
-	}
-	@Override public CachedResponse getCache(@NonNull final RequestHandler view)
-	{
-		return this.cachedBodies.getIfPresent( view.toString() );
-	}
+    @Override public boolean hasCache(@NonNull final RequestHandler view) {
+        return this.cachedBodies.getIfPresent(view.toString()) != null;
+    }
+
+    @Override public void setCache(@NonNull final RequestHandler view,
+        @NonNull final ResponseBody responseBody) {
+        this.cachedBodies.put(view.toString(), new CachedResponse(responseBody));
+    }
+
+    @Override public CachedResponse getCache(@NonNull final RequestHandler view) {
+        return this.cachedBodies.getIfPresent(view.toString());
+    }
 
 }

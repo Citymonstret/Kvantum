@@ -23,52 +23,46 @@ package xyz.kvantum.server.api.event;
 
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
-import java.lang.reflect.Method;
 import lombok.Getter;
 import lombok.NonNull;
 
-@Getter
-@SuppressWarnings( { "WeakerAccess" } )
-public final class ListenerMethod
-{
+import java.lang.reflect.Method;
 
-	private final Lambda lambda;
-	private final Class eventType;
-	private final Object instance;
+@Getter @SuppressWarnings({"WeakerAccess"}) public final class ListenerMethod {
 
-	public ListenerMethod(@NonNull final Method method, @NonNull final Object instance, @NonNull final Class eventType)
-			throws Throwable
-	{
-		this.eventType = eventType;
-		this.instance = instance;
-		this.lambda = LambdaFactory.create( method );
-	}
+    private final Lambda lambda;
+    private final Class eventType;
+    private final Object instance;
 
-	public void invoke(@NonNull final Object instance)
-	{
-		if ( !instance.getClass().equals( eventType ) )
-		{
-			throw new IllegalArgumentException( String.
-					format( "Mis-matched event types. Requires '%s', but was given '%s'", eventType.getSimpleName(),
-							instance.getClass().getSimpleName() ) );
-		}
-		this.lambda.invoke_for_void( this.instance, instance );
-	}
+    public ListenerMethod(@NonNull final Method method, @NonNull final Object instance,
+        @NonNull final Class eventType) throws Throwable {
+        this.eventType = eventType;
+        this.instance = instance;
+        this.lambda = LambdaFactory.create(method);
+    }
 
-	@Override public boolean equals(@NonNull final Object obj)
-	{
-		return ( obj != null && obj.getClass().equals( this.getClass() ) && obj.toString().equals( this.toString() ) );
-	}
+    public void invoke(@NonNull final Object instance) {
+        if (!instance.getClass().equals(eventType)) {
+            throw new IllegalArgumentException(String.
+                format("Mis-matched event types. Requires '%s', but was given '%s'",
+                    eventType.getSimpleName(), instance.getClass().getSimpleName()));
+        }
+        this.lambda.invoke_for_void(this.instance, instance);
+    }
 
-	@Override public int hashCode()
-	{
-		return this.toString().hashCode();
-	}
+    @Override public boolean equals(@NonNull final Object obj) {
+        return (obj != null && obj.getClass().equals(this.getClass()) && obj.toString()
+            .equals(this.toString()));
+    }
 
-	@Override public String toString()
-	{
-		// type-event_type
-		return String.format( "%s-%s", instance.getClass().getSimpleName(), eventType.getSimpleName() );
-	}
+    @Override public int hashCode() {
+        return this.toString().hashCode();
+    }
+
+    @Override public String toString() {
+        // type-event_type
+        return String
+            .format("%s-%s", instance.getClass().getSimpleName(), eventType.getSimpleName());
+    }
 
 }

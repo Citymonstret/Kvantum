@@ -24,12 +24,10 @@ package xyz.kvantum.server.implementation.tempfiles;
 import xyz.kvantum.server.api.util.ITempFileManager;
 import xyz.kvantum.server.api.util.ITempFileManagerFactory;
 
-final public class TempFileManagerFactory implements ITempFileManagerFactory
-{
+final public class TempFileManagerFactory implements ITempFileManagerFactory {
 
-	@Override public ITempFileManager newTempFileManager()
-	{
-		return new TempFileManager();
-	}
+    @Override public ITempFileManager newTempFileManager() {
+        return new TempFileManager();
+    }
 
 }

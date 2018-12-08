@@ -30,91 +30,82 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
 
-@SuppressWarnings("unused") class ExampleSession
-{
+@SuppressWarnings("unused") class ExampleSession {
 
-	private static final KvantumPojoFactory<SessionPojo> pojoFactory = KvantumPojoFactory.forClass( SessionPojo.class );
+    private static final KvantumPojoFactory<SessionPojo> pojoFactory =
+        KvantumPojoFactory.forClass(SessionPojo.class);
 
-	ExampleSession()
-	{
-		ServerImplementation.getImplementation().getRouter().scanAndAdd( this );
-	}
+    ExampleSession() {
+        ServerImplementation.getImplementation().getRouter().scanAndAdd(this);
+    }
 
-	@ViewMatcher(filter = "session", name = "debugSession", httpMethod = HttpMethod.GET) public final void debugSession(
-			final AbstractRequest request, final Response response)
-	{
-		//
-		// A simple visit counter
-		//
-		final Counter counter = request.getSession().getOrCompute( "visits", string -> new Counter() );
+    @ViewMatcher(filter = "session", name = "debugSession", httpMethod = HttpMethod.GET)
+    public final void debugSession(final AbstractRequest request, final Response response) {
+        //
+        // A simple visit counter
+        //
+        final Counter counter =
+            request.getSession().getOrCompute("visits", string -> new Counter());
 
-		//
-		// Convert the java object to a KvantumPojo instance
-		//
-		final KvantumPojo<SessionPojo> pojo = pojoFactory.of( new SessionPojo( request.getSession() ) );
+        //
+        // Convert the java object to a KvantumPojo instance
+        //
+        final KvantumPojo<SessionPojo> pojo = pojoFactory.of(new SessionPojo(request.getSession()));
 
-		//
-		// Update the java object
-		//
-		pojo.set( "message", "You have visited a total of " + counter.increment() + " times!" );
+        //
+        // Update the java object
+        //
+        pojo.set("message", "You have visited a total of " + counter.increment() + " times!");
 
-		//
-		// Add the object to the model
-		//
-		request.addModel( "pojo", pojo );
+        //
+        // Add the object to the model
+        //
+        request.addModel("pojo", pojo);
 
-		//
-		// Render the object
-		//
-		response.setResponse( "<h1><b>Session: {{pojo.id}}</b></h1><br/>Message: {{pojo.message}}" );
-	}
+        //
+        // Render the object
+        //
+        response.setResponse("<h1><b>Session: {{pojo.id}}</b></h1><br/>Message: {{pojo.message}}");
+    }
 
-	private static final class Counter
-	{
+    private static final class Counter {
 
-		private int visits;
+        private int visits;
 
-		private Counter()
-		{
-			this.visits = 0;
-		}
+        private Counter() {
+            this.visits = 0;
+        }
 
-		private synchronized int increment()
-		{
-			return ++visits;
-		}
-	}
+        private synchronized int increment() {
+            return ++visits;
+        }
+    }
 
-	private static final class SessionPojo
-	{
 
-		private String id;
-		private String message;
+    private static final class SessionPojo {
 
-		private SessionPojo(final ISession iSession)
-		{
-			this.id = iSession.get( "id" ).toString();
-		}
+        private String id;
+        private String message;
 
-		public String getId()
-		{
-			return id;
-		}
+        private SessionPojo(final ISession iSession) {
+            this.id = iSession.get("id").toString();
+        }
 
-		public void setId(String id)
-		{
-			this.id = id;
-		}
+        public String getId() {
+            return id;
+        }
 
-		public String getMessage()
-		{
-			return message;
-		}
+        public void setId(String id) {
+            this.id = id;
+        }
 
-		public void setMessage(String message)
-		{
-			this.message = message;
-		}
-	}
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
 
 }

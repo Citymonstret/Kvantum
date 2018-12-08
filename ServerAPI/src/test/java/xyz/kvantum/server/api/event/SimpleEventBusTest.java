@@ -24,62 +24,51 @@ package xyz.kvantum.server.api.event;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class SimpleEventBusTest
-{
+class SimpleEventBusTest {
 
-	private static boolean indicateSuccess = false;
+    private static boolean indicateSuccess = false;
 
-	public static final class TestListenerClass
-	{
-		@Listener
-		public void onString(final String string)
-		{
-			new RuntimeException( "Found a string: " + string ).printStackTrace();
-			indicateSuccess = true;
-		}
+    private SimpleEventBus createEventBus() {
+        return new SimpleEventBus();
+    }
 
-	}
+    @Test void createListeners() {
+        final SimpleEventBus eventBus = createEventBus();
+        eventBus.registerListeners(new TestListenerClass());
+        Assertions.assertEquals(1, eventBus.getMethods(String.class.getName()).size());
+    }
 
-	private SimpleEventBus createEventBus()
-	{
-		return new SimpleEventBus();
-	}
+    @Test void throwAsync() {
+        try {
+            final EventBus bus = createEventBus();
+            bus.registerListeners(new TestListenerClass());
+            Assertions.assertDoesNotThrow(() -> {
+                bus.throwAsync("Hello World").get();
+            });
+            Assertions.assertTrue(indicateSuccess);
+        } finally {
+            indicateSuccess = false;
+        }
+    }
 
-	@Test void createListeners()
-	{
-		final SimpleEventBus eventBus = createEventBus();
-		eventBus.registerListeners( new TestListenerClass() );
-		Assertions.assertEquals( 1, eventBus.getMethods( String.class.getName() ).size() );
-	}
+    @Test void throwSync() {
+        try {
+            final EventBus bus = createEventBus();
+            bus.registerListeners(new TestListenerClass());
+            final String event = "Hello World!";
+            Assertions.assertEquals(event, bus.throwSync(event));
+            Assertions.assertTrue(indicateSuccess);
+        } finally {
+            indicateSuccess = false;
+        }
+    }
 
-	@Test void throwAsync()
-	{
-		try
-		{
-			final EventBus bus = createEventBus();
-			bus.registerListeners( new TestListenerClass() );
-			Assertions.assertDoesNotThrow( () -> {
-				bus.throwAsync( "Hello World" ).get();
-			} );
-			Assertions.assertTrue( indicateSuccess );
-		} finally
-		{
-			indicateSuccess = false;
-		}
-	}
 
-	@Test void throwSync()
-	{
-		try
-		{
-			final EventBus bus = createEventBus();
-			bus.registerListeners( new TestListenerClass() );
-			final String event = "Hello World!";
-			Assertions.assertEquals( event, bus.throwSync( event ) );
-			Assertions.assertTrue( indicateSuccess );
-		} finally
-		{
-			indicateSuccess = false;
-		}
-	}
+    public static final class TestListenerClass {
+        @Listener public void onString(final String string) {
+            new RuntimeException("Found a string: " + string).printStackTrace();
+            indicateSuccess = true;
+        }
+
+    }
 }

@@ -26,14 +26,12 @@ import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
-@CommandDeclaration(command = "stop", description = "Stop the server", usage = "/stop") public class Stop
-		extends Command
-{
+@CommandDeclaration(command = "stop", description = "Stop the server", usage = "/stop")
+public class Stop extends Command {
 
-	@Override public boolean onCommand(CommandInstance instance)
-	{
-		ServerImplementation.getImplementation().stopServer();
-		return true;
-	}
+    @Override public boolean onCommand(CommandInstance instance) {
+        ServerImplementation.getImplementation().stopServer();
+        return true;
+    }
 
 }

@@ -21,80 +21,69 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * Utility class for dealing with singleton instances
  */
-@SuppressWarnings("ALL") @UtilityClass public class InstanceFactory
-{
+@SuppressWarnings("ALL") @UtilityClass public class InstanceFactory {
 
-	/**
-	 * Bind the given instance to a named static field.
-	 *
-	 * @param t Instance
-	 * @param fieldName Field to bind to
-	 * @param <T> Instance type
-	 */
-	public static <T> void setupInstance(@NonNull final T t, @NonNull final String fieldName)
-	{
-		try
-		{
-			final Field field = t.getClass().getDeclaredField( fieldName );
-			if ( !field.isAccessible() )
-			{
-				field.setAccessible( true );
-			}
-			field.set( null, t );
+    /**
+     * Bind the given instance to a named static field.
+     *
+     * @param t         Instance
+     * @param fieldName Field to bind to
+     * @param <T>       Instance type
+     */
+    public static <T> void setupInstance(@NonNull final T t, @NonNull final String fieldName) {
+        try {
+            final Field field = t.getClass().getDeclaredField(fieldName);
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+            }
+            field.set(null, t);
 
-			Assert.equals( field.get( null ).equals( t ), true );
-		} catch ( final Exception e )
-		{
-			e.printStackTrace();
-		}
-	}
+            Assert.equals(field.get(null).equals(t), true);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Bind the given instance to a static field named "instance"
-	 *
-	 * @param t Instance
-	 * @param <T> Instance type
-	 * @see #setupInstance(Object, String) To specify the field name
-	 */
-	public static <T> void setupInstance(@NonNull final T t)
-	{
-		setupInstance( t, "instance" );
-	}
+    /**
+     * Bind the given instance to a static field named "instance"
+     *
+     * @param t   Instance
+     * @param <T> Instance type
+     * @see #setupInstance(Object, String) To specify the field name
+     */
+    public static <T> void setupInstance(@NonNull final T t) {
+        setupInstance(t, "instance");
+    }
 
-	/**
-	 * Bind the given instance all static fields matching the instance type.
-	 *
-	 * @param t Instance
-	 * @param <T> Instance type
-	 */
-	public static <T> void setupInstanceAutomagic(@NonNull final T t)
-	{
-		for ( final Field field : t.getClass().getDeclaredFields() )
-		{
-			if ( Modifier.isStatic( field.getModifiers() ) && field.getType().equals( t.getClass() ) )
-			{
-				try
-				{
-					field.setAccessible( true );
-					if ( field.get( null ) != null )
-					{
-						continue;
-					}
-					field.set( null, t );
-				} catch ( IllegalAccessException e )
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+    /**
+     * Bind the given instance all static fields matching the instance type.
+     *
+     * @param t   Instance
+     * @param <T> Instance type
+     */
+    public static <T> void setupInstanceAutomagic(@NonNull final T t) {
+        for (final Field field : t.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers()) && field.getType().equals(t.getClass())) {
+                try {
+                    field.setAccessible(true);
+                    if (field.get(null) != null) {
+                        continue;
+                    }
+                    field.set(null, t);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 }

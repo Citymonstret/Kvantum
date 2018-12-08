@@ -21,32 +21,30 @@
  */
 package xyz.kvantum.server.api.views;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 import lombok.NonNull;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Static file view server CSS files, without any preprocessing.
  */
-public final class CSSView extends StaticFileView implements CacheApplicable
-{
+public final class CSSView extends StaticFileView implements CacheApplicable {
 
-	public CSSView(@NonNull final String filter, @NonNull final Map<String, Object> options)
-	{
-		super( filter, options, "css", Collections.singletonList( FileExtension.CSS ) );
-		super.relatedFolderPath = "/assets/css";
-		super.setOption( "extension", "css" );
-		super.defaultFilePattern = "${file}.css";
-	}
+    public CSSView(@NonNull final String filter, @NonNull final Map<String, Object> options) {
+        super(filter, options, "css", Collections.singletonList(FileExtension.CSS));
+        super.relatedFolderPath = "/assets/css";
+        super.setOption("extension", "css");
+        super.defaultFilePattern = "${file}.css";
+    }
 
-	@Override public boolean isApplicable(@NonNull final AbstractRequest r)
-	{
-		final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
-		return cacheApplicableBoolean.orElse( true );
-	}
+    @Override public boolean isApplicable(@NonNull final AbstractRequest r) {
+        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe("cacheApplicable");
+        return cacheApplicableBoolean.orElse(true);
+    }
 
 }

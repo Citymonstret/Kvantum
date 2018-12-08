@@ -21,11 +21,6 @@
  */
 package xyz.kvantum.velocity;
 
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -36,50 +31,53 @@ import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-public class SyntaxHandler extends TemplateSyntaxHandler
-{
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
-	SyntaxHandler(TemplateHandler templateHandler)
-	{
-		super( templateHandler );
-	}
+public class SyntaxHandler extends TemplateSyntaxHandler {
 
-	@Override protected String handle(RequestHandler requestHandler, AbstractRequest request, String in)
-	{
-		String out = in;
-		final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
-		final Map<String, Object> objects = new HashMap<>();
+    SyntaxHandler(TemplateHandler templateHandler) {
+        super(templateHandler);
+    }
 
-		for ( final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get().getProviders() )
-		{
-			factories.put( factory.providerName().toLowerCase( Locale.ENGLISH ), factory );
-		}
-		final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory( request );
-		if ( z != null )
-		{
-			factories.put( z.providerName().toLowerCase( Locale.ENGLISH ), z );
-		}
-		factories.putAll( request.getModels() );
-		factories.put( "request", request );
+    @Override
+    protected String handle(RequestHandler requestHandler, AbstractRequest request, String in) {
+        String out = in;
+        final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
+        final Map<String, Object> objects = new HashMap<>();
 
-		for ( final Map.Entry<String, ProviderFactory<? extends VariableProvider>> entry : factories.entrySet() )
-		{
-			final Map<String, Object> entryObjects = new HashMap<>();
-			final Optional<? extends VariableProvider> providerOptional = entry.getValue().get( request );
-			if ( !providerOptional.isPresent() )
-			{
-				continue;
-			}
-			final VariableProvider provider = providerOptional.get();
-			entryObjects.putAll( provider.getAll() );
-			objects.put( entry.getKey(), entryObjects );
-		}
+        for (final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get()
+            .getProviders()) {
+            factories.put(factory.providerName().toLowerCase(Locale.ENGLISH), factory);
+        }
+        final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory(request);
+        if (z != null) {
+            factories.put(z.providerName().toLowerCase(Locale.ENGLISH), z);
+        }
+        factories.putAll(request.getModels());
+        factories.put("request", request);
 
-		final VelocityContext context = new VelocityContext( objects );
-		final StringWriter writer = new StringWriter();
-		Velocity.evaluate( context, writer, "SyntaxHandler", out );
-		out = writer.toString();
-		return out;
-	}
+        for (final Map.Entry<String, ProviderFactory<? extends VariableProvider>> entry : factories
+            .entrySet()) {
+            final Map<String, Object> entryObjects = new HashMap<>();
+            final Optional<? extends VariableProvider> providerOptional =
+                entry.getValue().get(request);
+            if (!providerOptional.isPresent()) {
+                continue;
+            }
+            final VariableProvider provider = providerOptional.get();
+            entryObjects.putAll(provider.getAll());
+            objects.put(entry.getKey(), entryObjects);
+        }
+
+        final VelocityContext context = new VelocityContext(objects);
+        final StringWriter writer = new StringWriter();
+        Velocity.evaluate(context, writer, "SyntaxHandler", out);
+        out = writer.toString();
+        return out;
+    }
 
 }

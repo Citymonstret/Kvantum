@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.io.PrintStream;
 import lombok.NonNull;
 import lombok.val;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -30,40 +29,38 @@ import xyz.kvantum.server.api.logging.LogContext;
 import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.util.ColorUtil;
 
+import java.io.PrintStream;
+
 /**
  * The default log handler.
  */
-@SuppressWarnings("WeakerAccess") public class DefaultLogWrapper implements LogWrapper
-{
+@SuppressWarnings("WeakerAccess") public class DefaultLogWrapper implements LogWrapper {
 
-	@Override public void log(@NonNull final LogContext logContext)
-	{
-		final val map = logContext.toMap();
-		final String replacedMessage = CoreConfig.Logging.logFormat
-				.replace( "${applicationPrefix}", map.get( "applicationPrefix" ) )
-				.replace( "${logPrefix}", map.get( "logPrefix" ) ).replace( "${thread}", map.get( "thread" ) )
-				.replace( "${timeStamp}", map.get( "timeStamp" ) ).replace( "${message}", map.get( "message" ) );
+    @Override public void log(@NonNull final LogContext logContext) {
+        final val map = logContext.toMap();
+        final String replacedMessage = CoreConfig.Logging.logFormat
+            .replace("${applicationPrefix}", map.get("applicationPrefix"))
+            .replace("${logPrefix}", map.get("logPrefix")).replace("${thread}", map.get("thread"))
+            .replace("${timeStamp}", map.get("timeStamp"))
+            .replace("${message}", map.get("message"));
 
-		if ( ServerImplementation.hasImplementation() )
-		{
-			final PrintStream stream = ( ( SimpleServer ) ServerImplementation.getImplementation() ).logStream;
-			if ( stream != null )
-			{
-				stream.println( ColorUtil.getStripped( replacedMessage ) );
-			}
-		}
-		System.out.println( ColorUtil.getReplaced( replacedMessage ) );
-	}
+        if (ServerImplementation.hasImplementation()) {
+            final PrintStream stream =
+                ((SimpleServer) ServerImplementation.getImplementation()).logStream;
+            if (stream != null) {
+                stream.println(ColorUtil.getStripped(replacedMessage));
+            }
+        }
+        System.out.println(ColorUtil.getReplaced(replacedMessage));
+    }
 
-	@Override public void log(@NonNull final String s)
-	{
-		System.out.println( s );
-		( ( SimpleServer ) ServerImplementation.getImplementation() ).logStream.println( s );
-	}
+    @Override public void log(@NonNull final String s) {
+        System.out.println(s);
+        ((SimpleServer) ServerImplementation.getImplementation()).logStream.println(s);
+    }
 
-	@Override public void breakLine()
-	{
-		System.out.print( "\n" );
-	}
+    @Override public void breakLine() {
+        System.out.print("\n");
+    }
 
 }

@@ -24,18 +24,16 @@ package xyz.kvantum.server.api.util;
 /**
  * Exception thrown when an assertion in {@link Assert} fails
  */
-@SuppressWarnings("WeakerAccess") public final class AssertionError extends RuntimeException
-{
+@SuppressWarnings("WeakerAccess") public final class AssertionError extends RuntimeException {
 
-	/**
-	 * Constructor
-	 *
-	 * @param o Object that failed the assertion
-	 * @param s Reason why the assertion failed
-	 */
-	public AssertionError(final Object o, final String s)
-	{
-		super( "'" + o + "' didn't pass the assertion check; " + s );
-	}
+    /**
+     * Constructor
+     *
+     * @param o Object that failed the assertion
+     * @param s Reason why the assertion failed
+     */
+    public AssertionError(final Object o, final String s) {
+        super("'" + o + "' didn't pass the assertion check; " + s);
+    }
 
 }

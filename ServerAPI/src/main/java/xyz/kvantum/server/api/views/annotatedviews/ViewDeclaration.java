@@ -25,15 +25,14 @@ import lombok.Data;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-@Data final class ViewDeclaration
-{
+@Data final class ViewDeclaration {
 
-	private String filter;
-	private String name;
-	private Class<? extends Middleware>[] middleware;
-	private boolean cache = true;
-	private boolean forceHttps = true;
-	private HttpMethod httpMethod = HttpMethod.ALL;
-	private OutputConverter outputConverter = null;
+    private String filter;
+    private String name;
+    private Class<? extends Middleware>[] middleware;
+    private boolean cache = true;
+    private boolean forceHttps = true;
+    private HttpMethod httpMethod = HttpMethod.ALL;
+    private OutputConverter outputConverter = null;
 
 }

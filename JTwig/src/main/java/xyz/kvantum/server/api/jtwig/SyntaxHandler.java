@@ -21,10 +21,6 @@
  */
 package xyz.kvantum.server.api.jtwig;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 import org.jtwig.environment.DefaultEnvironmentConfiguration;
@@ -37,69 +33,67 @@ import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-public class SyntaxHandler extends TemplateSyntaxHandler
-{
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
-	private final EnvironmentConfiguration configuration = new DefaultEnvironmentConfiguration();
-	private final Map<String, JtwigTemplate> templateStorage = new HashMap<>();
+public class SyntaxHandler extends TemplateSyntaxHandler {
 
-	SyntaxHandler(TemplateHandler templateHandler)
-	{
-		super( templateHandler );
-	}
+    private final EnvironmentConfiguration configuration = new DefaultEnvironmentConfiguration();
+    private final Map<String, JtwigTemplate> templateStorage = new HashMap<>();
 
-	@Override protected String handle(final RequestHandler requestHandler, final AbstractRequest request,
-			final String in)
-	{
-		String out = in;
-		JtwigTemplate template = null;
-		boolean shouldCache = false;
-		if ( templateStorage.containsKey( requestHandler.getName() ) )
-		{
-			template = templateStorage.get( requestHandler.getName() );
-		} else
-		{
-			shouldCache = true;
-		}
+    SyntaxHandler(TemplateHandler templateHandler) {
+        super(templateHandler);
+    }
 
-		if ( template == null )
-		{
-			template = JtwigTemplate.inlineTemplate( out, configuration );
-			if ( shouldCache )
-			{
-				templateStorage.put( requestHandler.getName(), template );
-			}
-		}
+    @Override
+    protected String handle(final RequestHandler requestHandler, final AbstractRequest request,
+        final String in) {
+        String out = in;
+        JtwigTemplate template = null;
+        boolean shouldCache = false;
+        if (templateStorage.containsKey(requestHandler.getName())) {
+            template = templateStorage.get(requestHandler.getName());
+        } else {
+            shouldCache = true;
+        }
 
-		final JtwigModel model = JtwigModel.newModel();
-		final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
+        if (template == null) {
+            template = JtwigTemplate.inlineTemplate(out, configuration);
+            if (shouldCache) {
+                templateStorage.put(requestHandler.getName(), template);
+            }
+        }
 
-		for ( final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get().getProviders() )
-		{
-			factories.put( factory.providerName().toLowerCase( Locale.ENGLISH ), factory );
-		}
-		final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory( request );
-		if ( z != null )
-		{
-			factories.put( z.providerName().toLowerCase( Locale.ENGLISH ), z );
-		}
-		factories.putAll( request.getModels() );
-		factories.put( "request", request );
+        final JtwigModel model = JtwigModel.newModel();
+        final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
 
-		for ( final Map.Entry<String, ProviderFactory<? extends VariableProvider>> entry : factories.entrySet() )
-		{
-			final Map<String, Object> entryObjects = new HashMap<>();
-			final Optional<? extends VariableProvider> providerOptional = entry.getValue().get( request );
-			if ( !providerOptional.isPresent() )
-			{
-				continue;
-			}
-			final VariableProvider provider = providerOptional.get();
-			entryObjects.putAll( provider.getAll() );
-			model.with( entry.getKey(), entryObjects );
-		}
+        for (final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get()
+            .getProviders()) {
+            factories.put(factory.providerName().toLowerCase(Locale.ENGLISH), factory);
+        }
+        final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory(request);
+        if (z != null) {
+            factories.put(z.providerName().toLowerCase(Locale.ENGLISH), z);
+        }
+        factories.putAll(request.getModels());
+        factories.put("request", request);
 
-		out = template.render( model );
-		return out;
-	}
+        for (final Map.Entry<String, ProviderFactory<? extends VariableProvider>> entry : factories
+            .entrySet()) {
+            final Map<String, Object> entryObjects = new HashMap<>();
+            final Optional<? extends VariableProvider> providerOptional =
+                entry.getValue().get(request);
+            if (!providerOptional.isPresent()) {
+                continue;
+            }
+            final VariableProvider provider = providerOptional.get();
+            entryObjects.putAll(provider.getAll());
+            model.with(entry.getKey(), entryObjects);
+        }
+
+        out = template.render(model);
+        return out;
+    }
 }

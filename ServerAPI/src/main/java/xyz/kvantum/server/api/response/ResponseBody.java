@@ -21,15 +21,14 @@
  */
 package xyz.kvantum.server.api.response;
 
-public interface ResponseBody extends HeaderProvider
-{
+public interface ResponseBody extends HeaderProvider {
 
-	Header getHeader();
+    Header getHeader();
 
-	ResponseStream getResponseStream();
+    ResponseStream getResponseStream();
 
-	boolean isText();
+    boolean isText();
 
-	boolean supportsGzip();
+    boolean supportsGzip();
 
 }

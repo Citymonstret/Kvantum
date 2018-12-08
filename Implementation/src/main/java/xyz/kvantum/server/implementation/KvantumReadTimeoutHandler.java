@@ -22,15 +22,14 @@
 package xyz.kvantum.server.implementation;
 
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import java.util.concurrent.TimeUnit;
 import xyz.kvantum.server.api.config.CoreConfig;
 
-final class KvantumReadTimeoutHandler extends ReadTimeoutHandler
-{
+import java.util.concurrent.TimeUnit;
 
-	KvantumReadTimeoutHandler()
-	{
-		super( CoreConfig.timeout, TimeUnit.valueOf( CoreConfig.timeoutUnit ) );
-	}
+final class KvantumReadTimeoutHandler extends ReadTimeoutHandler {
+
+    KvantumReadTimeoutHandler() {
+        super(CoreConfig.timeout, TimeUnit.valueOf(CoreConfig.timeoutUnit));
+    }
 
 }

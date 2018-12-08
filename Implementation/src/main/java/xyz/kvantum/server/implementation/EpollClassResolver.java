@@ -29,17 +29,14 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 /**
  * Class resolver that returns native Epoll implementations
  */
-final class EpollClassResolver implements NioClassResolver.ClassProvider
-{
+final class EpollClassResolver implements NioClassResolver.ClassProvider {
 
-	@Override public MultithreadEventLoopGroup getEventLoopGroup(final int threads)
-	{
-		return new EpollEventLoopGroup( threads );
-	}
+    @Override public MultithreadEventLoopGroup getEventLoopGroup(final int threads) {
+        return new EpollEventLoopGroup(threads);
+    }
 
-	@Override public Class<? extends ServerChannel> getServerSocketChannelClass()
-	{
-		return EpollServerSocketChannel.class;
-	}
+    @Override public Class<? extends ServerChannel> getServerSocketChannelClass() {
+        return EpollServerSocketChannel.class;
+    }
 
 }

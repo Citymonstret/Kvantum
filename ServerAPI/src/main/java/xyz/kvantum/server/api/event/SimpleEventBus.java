@@ -24,94 +24,85 @@ package xyz.kvantum.server.api.event;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import lombok.NonNull;
+import xyz.kvantum.server.api.logging.Logger;
+
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import lombok.NonNull;
-import xyz.kvantum.server.api.logging.Logger;
 
 /**
  * Simple {@link EventBus} implementation using a cached thread pool to handle
  * asynchronous events
  */
-public final class SimpleEventBus extends EventBus
-{
+public final class SimpleEventBus extends EventBus {
 
-	private final Object lock = new Object();
+    private final Object lock = new Object();
 
-	private final ExecutorService executorService;
-	private final Multimap<String, ListenerMethod> listenerMethodMultimap = MultimapBuilder.hashKeys().hashSetValues()
-			.build();
+    private final ExecutorService executorService;
+    private final Multimap<String, ListenerMethod> listenerMethodMultimap =
+        MultimapBuilder.hashKeys().hashSetValues().build();
 
-	public SimpleEventBus()
-	{
-		super( true );
-		this.executorService = Executors.newCachedThreadPool( new ThreadFactoryBuilder().setDaemon( false )
-				.setNameFormat( "kvantum-events-%s" ).build() );
-	}
+    public SimpleEventBus() {
+        super(true);
+        this.executorService = Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setDaemon(false).setNameFormat("kvantum-events-%s").build());
+    }
 
-	@Override protected void registerListenersInternally(@NonNull Collection<ListenerMethod> listenerMethods)
-	{
-		synchronized ( this.lock )
-		{
-			for ( final ListenerMethod listenerMethod : listenerMethods )
-			{
-				if ( listenerMethodMultimap.containsEntry( listenerMethod.getEventType(), listenerMethod ) )
-				{
-					Logger.error( "Listener method with name {} has already been registered in event bus. Skipping.",
-							listenerMethod.toString() );
-					return;
-				}
-				listenerMethodMultimap.put( getClassName( listenerMethod.getEventType() ), listenerMethod );
-			}
-		}
-	}
+    @Override protected void registerListenersInternally(
+        @NonNull Collection<ListenerMethod> listenerMethods) {
+        synchronized (this.lock) {
+            for (final ListenerMethod listenerMethod : listenerMethods) {
+                if (listenerMethodMultimap
+                    .containsEntry(listenerMethod.getEventType(), listenerMethod)) {
+                    Logger.error(
+                        "Listener method with name {} has already been registered in event bus. Skipping.",
+                        listenerMethod.toString());
+                    return;
+                }
+                listenerMethodMultimap
+                    .put(getClassName(listenerMethod.getEventType()), listenerMethod);
+            }
+        }
+    }
 
-	public final Collection<ListenerMethod> getMethods(@NonNull final String eventType)
-	{
-		final Collection<ListenerMethod> methods;
-		synchronized ( this.lock )
-		{
-			methods = this.listenerMethodMultimap.get( eventType );
-		}
-		return methods;
-	}
+    public final Collection<ListenerMethod> getMethods(@NonNull final String eventType) {
+        final Collection<ListenerMethod> methods;
+        synchronized (this.lock) {
+            methods = this.listenerMethodMultimap.get(eventType);
+        }
+        return methods;
+    }
 
-	private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods, @NonNull final T event)
-	{
-		return () -> {
-			for ( final ListenerMethod method : methods )
-			{
-				method.invoke( event );
-			}
-			return event;
-		};
-	}
+    private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
+        @NonNull final T event) {
+        return () -> {
+            for (final ListenerMethod method : methods) {
+                method.invoke(event);
+            }
+            return event;
+        };
+    }
 
-	private String getClassName(@NonNull final Class clazz)
-	{
-		return clazz.getName();
-	}
+    private String getClassName(@NonNull final Class clazz) {
+        return clazz.getName();
+    }
 
-	@Override protected <T> Future<T> throwAsync(@NonNull T event)
-	{
-		final Collection<ListenerMethod> methods = getMethods( getClassName( event.getClass() ) );
-		return this.executorService.submit( createRunnable( methods, event ) );
-	}
+    @Override protected <T> Future<T> throwAsync(@NonNull T event) {
+        final Collection<ListenerMethod> methods = getMethods(getClassName(event.getClass()));
+        return this.executorService.submit(createRunnable(methods, event));
+    }
 
-	@Override protected <T> T throwSync(@NonNull T event)
-	{
-		try
-		{
-			final Collection<ListenerMethod> methods = getMethods( getClassName( event.getClass() ) );
-			return this.createRunnable( methods, event ).call();
-		} catch ( final Throwable throwable )
-		{
-			Logger.error( "Failed to call event of type {}", event.getClass() );
-			throwable.printStackTrace();
-		}
-		return event;
-	}
+    @Override protected <T> T throwSync(@NonNull T event) {
+        try {
+            final Collection<ListenerMethod> methods = getMethods(getClassName(event.getClass()));
+            return this.createRunnable(methods, event).call();
+        } catch (final Throwable throwable) {
+            Logger.error("Failed to call event of type {}", event.getClass());
+            throwable.printStackTrace();
+        }
+        return event;
+    }
 }

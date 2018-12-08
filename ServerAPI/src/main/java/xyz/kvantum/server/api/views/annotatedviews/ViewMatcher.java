@@ -21,28 +21,28 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews;
 
+import xyz.kvantum.server.api.request.HttpMethod;
+import xyz.kvantum.server.api.views.requesthandler.Middleware;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import xyz.kvantum.server.api.request.HttpMethod;
-import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.METHOD) public @interface ViewMatcher
-{
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.METHOD) public @interface ViewMatcher {
 
-	String filter();
+    String filter();
 
-	String name() default "";
+    String name() default "";
 
-	Class<? extends Middleware>[] middlewares() default Middleware.class;
+    Class<? extends Middleware>[] middlewares() default Middleware.class;
 
-	boolean cache() default false;
+    boolean cache() default false;
 
-	boolean forceHTTPS() default false;
+    boolean forceHTTPS() default false;
 
-	HttpMethod httpMethod() default HttpMethod.ALL;
+    HttpMethod httpMethod() default HttpMethod.ALL;
 
-	String outputType() default "";
+    String outputType() default "";
 
 }

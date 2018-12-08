@@ -21,50 +21,40 @@
  */
 package xyz.kvantum.crush;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import xyz.kvantum.crush.syntax.Comment;
-import xyz.kvantum.crush.syntax.ForEachBlock;
-import xyz.kvantum.crush.syntax.IfStatement;
-import xyz.kvantum.crush.syntax.Include;
-import xyz.kvantum.crush.syntax.Macro;
-import xyz.kvantum.crush.syntax.MetaBlock;
-import xyz.kvantum.crush.syntax.Syntax;
-import xyz.kvantum.crush.syntax.Variable;
+import xyz.kvantum.crush.syntax.*;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.template.TemplateHandler;
 
-public final class CrushEngine extends TemplateHandler
-{
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
-	private static CrushEngine instance;
-	final Collection<Syntax> syntaxCollection = new LinkedHashSet<>();
+public final class CrushEngine extends TemplateHandler {
 
-	private CrushEngine()
-	{
-		super( CoreConfig.TemplatingEngine.CRUSH, "CrushEngine" );
-	}
+    private static CrushEngine instance;
+    final Collection<Syntax> syntaxCollection = new LinkedHashSet<>();
 
-	static CrushEngine getInstance()
-	{
-		if ( instance == null )
-		{
-			instance = new CrushEngine();
-		}
-		return instance;
-	}
+    private CrushEngine() {
+        super(CoreConfig.TemplatingEngine.CRUSH, "CrushEngine");
+    }
 
-	public void onLoad()
-	{
-		this.syntaxCollection.add( new Include() );
-		this.syntaxCollection.add( new Comment() );
-		this.syntaxCollection.add( new MetaBlock() );
-		this.syntaxCollection.add( new IfStatement() );
-		this.syntaxCollection.add( new ForEachBlock() );
-		this.syntaxCollection.add( new Variable() );
-		this.syntaxCollection.add( new Macro() );
+    static CrushEngine getInstance() {
+        if (instance == null) {
+            instance = new CrushEngine();
+        }
+        return instance;
+    }
 
-		ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
-	}
+    public void onLoad() {
+        this.syntaxCollection.add(new Include());
+        this.syntaxCollection.add(new Comment());
+        this.syntaxCollection.add(new MetaBlock());
+        this.syntaxCollection.add(new IfStatement());
+        this.syntaxCollection.add(new ForEachBlock());
+        this.syntaxCollection.add(new Variable());
+        this.syntaxCollection.add(new Macro());
+
+        ServerImplementation.getImplementation().getProcedure()
+            .addProcedure("syntax", new SyntaxHandler(this));
+    }
 }

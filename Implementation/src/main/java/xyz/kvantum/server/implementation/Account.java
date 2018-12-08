@@ -21,17 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import net.sf.oval.constraint.Min;
 import net.sf.oval.constraint.NotEmpty;
 import org.mongodb.morphia.annotations.Entity;
@@ -53,6 +43,9 @@ import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.StringList;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Implementation of {@link IAccount} that also fully supports {@link KvantumObjectFactory} and {@link
  * KvantumPojoFactory}
@@ -60,212 +53,178 @@ import xyz.kvantum.server.api.util.StringList;
  * @see #getKvantumPojoFactory()
  * @see #getKvantumAccountFactory()
  */
-@KvantumObject(checkValidity = true) @EqualsAndHashCode(of = { "username",
-		"id" }) @NoArgsConstructor @Entity("accounts") @SuppressWarnings("WeakerAccess") public final class Account
-		implements IAccount
-{
+@KvantumObject(checkValidity = true) @EqualsAndHashCode(of = {"username", "id"}) @NoArgsConstructor
+@Entity("accounts") @SuppressWarnings("WeakerAccess") public final class Account
+    implements IAccount {
 
-	@Getter private static final KvantumObjectFactory<Account> kvantumAccountFactory = KvantumObjectFactory
-			.from( Account.class );
-	@Getter private static final KvantumPojoFactory<IAccount> kvantumPojoFactory = KvantumPojoFactory
-			.forClass( IAccount.class );
+    @Getter private static final KvantumObjectFactory<Account> kvantumAccountFactory =
+        KvantumObjectFactory.from(Account.class);
+    @Getter private static final KvantumPojoFactory<IAccount> kvantumPojoFactory =
+        KvantumPojoFactory.forClass(IAccount.class);
 
-	private static final String KEY_ROLE_LIST = "internalRoleList";
+    private static final String KEY_ROLE_LIST = "internalRoleList";
+    private final Map<Class<? extends AccountExtension>, AccountExtension> extensions =
+        new ConcurrentHashMap<>();
+    @Min(-1) @KvantumField @Id @Getter private int id;
+    @NotEmpty @KvantumField @Getter @NonNull private String username;
+    @KvantumField @NonNull private String password;
+    @NonNull private Map<String, String> data;
+    @Setter @Transient private transient IAccountManager manager;
+    private StringList rawRoleList;
+    private Collection<AccountRole> roleList;
 
-	@Min(-1) @KvantumField @Id @Getter private int id;
-	@NotEmpty @KvantumField @Getter @NonNull private String username;
-	@KvantumField @NonNull private String password;
-	@NonNull private Map<String, String> data;
-	@Setter @Transient private transient IAccountManager manager;
-	private final Map<Class<? extends AccountExtension>, AccountExtension> extensions =
-			new ConcurrentHashMap<>();
+    public Account(final int id, final String username, final String password,
+        final Map<String, String> data) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.data = data;
+    }
 
-	private StringList rawRoleList;
-	private Collection<AccountRole> roleList;
+    @KvantumConstructor
+    public Account(@KvantumInsert(value = "id", defaultValue = "-1") final int userID,
+        @KvantumInsert(value = "username") final String username,
+        @KvantumInsert("password") final String password) {
+        this(userID, username, password, getDefaultDataSet());
+    }
 
-	public Account(final int id, final String username, final String password, final Map<String, String> data)
-	{
-		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.data = data;
-	}
+    private static Map<String, String> getDefaultDataSet() {
+        final Map<String, String> map = new ConcurrentHashMap<>();
+        map.put("created", "true");
+        return map;
+    }
 
-	@KvantumConstructor public Account(@KvantumInsert(value = "id", defaultValue = "-1") final int userID,
-			@KvantumInsert(value = "username") final String username, @KvantumInsert("password") final String password)
-	{
-		this( userID, username, password, getDefaultDataSet() );
-	}
+    @Override @Ignore public Map<String, String> getRawData() {
+        return new HashMap<>(data);
+    }
 
-	private static Map<String, String> getDefaultDataSet()
-	{
-		final Map<String, String> map = new ConcurrentHashMap<>();
-		map.put( "created", "true" );
-		return map;
-	}
+    @Override public void internalMetaUpdate(final String key, final String value) {
+        this.data.put(key, value);
+    }
 
-	@Override @Ignore public Map<String, String> getRawData()
-	{
-		return new HashMap<>( data );
-	}
+    @Override public boolean passwordMatches(final String password) {
+        return IAccountManager.checkPassword(password, this.password);
+    }
 
-	@Override public void internalMetaUpdate(final String key, final String value)
-	{
-		this.data.put( key, value );
-	}
+    @Override public Optional<String> getData(final String key) {
+        Assert.notEmpty(key);
 
-	@Override public boolean passwordMatches(final String password)
-	{
-		return IAccountManager.checkPassword( password, this.password );
-	}
+        return Optional.ofNullable(data.get(key));
+    }
 
-	@Override public Optional<String> getData(final String key)
-	{
-		Assert.notEmpty( key );
+    @Override public void setData(final String key, final String value) {
+        Assert.notEmpty(key);
+        Assert.notEmpty(value);
 
-		return Optional.ofNullable( data.get( key ) );
-	}
+        if (data.containsKey(key)) {
+            removeData(key);
+        }
+        this.data.put(key, value);
+        this.manager.setData(this, key, value);
+    }
 
-	@Override public void setData(final String key, final String value)
-	{
-		Assert.notEmpty( key );
-		Assert.notEmpty( value );
+    @Override public void removeData(final String key) {
+        Assert.notEmpty(key);
 
-		if ( data.containsKey( key ) )
-		{
-			removeData( key );
-		}
-		this.data.put( key, value );
-		this.manager.setData( this, key, value );
-	}
+        if (!data.containsKey(key)) {
+            return;
+        }
+        this.data.remove(key);
+        this.manager.removeData(this, key);
+    }
 
-	@Override public void removeData(final String key)
-	{
-		Assert.notEmpty( key );
+    @Override @Ignore public Collection<AccountRole> getAccountRoles() {
+        if (this.roleList == null) {
+            this.roleList = new HashSet<>();
+            this.rawRoleList = new StringList(getData(KEY_ROLE_LIST).orElse(""));
+            for (final String string : rawRoleList) {
+                final Optional<AccountRole> roleOptional = manager.getAccountRole(string);
+                if (roleOptional.isPresent()) {
+                    this.roleList.add(roleOptional.get());
+                } else {
+                    Logger.warn("Account [{}] has account role [{}] stored,"
+                            + " but the role is not registered in  the account manager", getUsername(),
+                        string);
+                }
+            }
+        }
+        return this.roleList;
+    }
 
-		if ( !data.containsKey( key ) )
-		{
-			return;
-		}
-		this.data.remove( key );
-		this.manager.removeData( this, key );
-	}
+    @Override public void addRole(@NonNull final AccountRole role) {
+        if (this.roleList == null) {
+            this.getAccountRoles();
+        }
+        if (this.roleList.contains(role)) {
+            return;
+        }
+        this.roleList.add(role);
+        this.rawRoleList.add(role.getRoleIdentifier());
+        this.setData(KEY_ROLE_LIST, rawRoleList.toString());
+    }
 
-	@Override @Ignore public Collection<AccountRole> getAccountRoles()
-	{
-		if ( this.roleList == null )
-		{
-			this.roleList = new HashSet<>();
-			this.rawRoleList = new StringList( getData( KEY_ROLE_LIST ).orElse( "" ) );
-			for ( final String string : rawRoleList )
-			{
-				final Optional<AccountRole> roleOptional = manager.getAccountRole( string );
-				if ( roleOptional.isPresent() )
-				{
-					this.roleList.add( roleOptional.get() );
-				} else
-				{
-					Logger.warn( "Account [{}] has account role [{}] stored,"
-							+ " but the role is not registered in  the account manager", getUsername(), string );
-				}
-			}
-		}
-		return this.roleList;
-	}
+    @Override public void removeRole(@NonNull final AccountRole role) {
+        if (this.roleList == null) {
+            this.getAccountRoles();
+        }
+        if (this.roleList.contains(role)) {
+            this.roleList.remove(role);
+            this.rawRoleList.remove(role.getRoleIdentifier());
+            this.setData(KEY_ROLE_LIST, rawRoleList.toString());
+        }
+    }
 
-	@Override public void addRole(@NonNull final AccountRole role)
-	{
-		if ( this.roleList == null )
-		{
-			this.getAccountRoles();
-		}
-		if ( this.roleList.contains( role ) )
-		{
-			return;
-		}
-		this.roleList.add( role );
-		this.rawRoleList.add( role.getRoleIdentifier() );
-		this.setData( KEY_ROLE_LIST, rawRoleList.toString() );
-	}
+    @Override
+    public <T extends AccountExtension> T attachExtension(@NonNull final Class<T> extension) {
+        if (this.getExtension(extension).isPresent()) {
+            throw new IllegalArgumentException("Cannot attach an extension twice");
+        }
+        try {
+            final T instance = AccountExtension.createInstance(extension);
+            instance.attach(this);
+            this.extensions.put(extension, instance);
+            return instance;
+        } catch (final Exception e) {
+            return null;
+        }
+    }
 
-	@Override public void removeRole(@NonNull final AccountRole role)
-	{
-		if ( this.roleList == null )
-		{
-			this.getAccountRoles();
-		}
-		if ( this.roleList.contains( role ) )
-		{
-			this.roleList.remove( role );
-			this.rawRoleList.remove( role.getRoleIdentifier() );
-			this.setData( KEY_ROLE_LIST, rawRoleList.toString() );
-		}
-	}
+    @SuppressWarnings("ALL") @Override public <T extends AccountExtension> Optional<T> getExtension(
+        @NonNull final Class<T> extension) {
+        final Object extensionInstance = this.extensions.get(extension);
+        if (extensionInstance == null) {
+            return Optional.empty();
+        }
+        return Optional.of((T) extensionInstance);
+    }
 
-	@Override public <T extends AccountExtension> T attachExtension(@NonNull final Class<T> extension)
-	{
-		if ( this.getExtension( extension ).isPresent() )
-		{
-			throw new IllegalArgumentException( "Cannot attach an extension twice" );
-		}
-		try
-		{
-			final T instance = AccountExtension.createInstance( extension );
-			instance.attach( this );
-			this.extensions.put( extension, instance );
-			return instance;
-		} catch ( final Exception e )
-		{
-			return null;
-		}
-	}
+    @Override public String getSuppliedPassword() {
+        return this.password;
+    }
 
-	@SuppressWarnings( "ALL" )
-	@Override public <T extends AccountExtension> Optional<T> getExtension(@NonNull final Class<T> extension)
-	{
-		final Object extensionInstance = this.extensions.get( extension );
-		if ( extensionInstance == null )
-		{
-			return Optional.empty();
-		}
-		return Optional.of( (T) extensionInstance );
-	}
+    @Override public void saveState() {
+        for (final AccountExtension extension : this.extensions.values()) {
+            extension.saveState();
+        }
+    }
 
-	@Override public String getSuppliedPassword()
-	{
-		return this.password;
-	}
+    @Override public boolean isPermitted(@NonNull final String permissionKey) {
+        if (this.roleList == null) {
+            this.getAccountRoles();
+        }
+        //
+        // Loop through every role, and return on first match.
+        // We do not cache the results, as roles are hot-swappable
+        //
+        for (final AccountRole role : this.getAccountRoles()) {
+            if (role.hasPermission(permissionKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override public void saveState()
-	{
-		for ( final AccountExtension extension : this.extensions.values() )
-		{
-			extension.saveState();
-		}
-	}
-
-	@Override public boolean isPermitted(@NonNull final String permissionKey)
-	{
-		if ( this.roleList == null )
-		{
-			this.getAccountRoles();
-		}
-		//
-		// Loop through every role, and return on first match.
-		// We do not cache the results, as roles are hot-swappable
-		//
-		for ( final AccountRole role : this.getAccountRoles() )
-		{
-			if ( role.hasPermission( permissionKey ) )
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override public KvantumPojo<IAccount> toKvantumPojo()
-	{
-		return kvantumPojoFactory.of( this );
-	}
+    @Override public KvantumPojo<IAccount> toKvantumPojo() {
+        return kvantumPojoFactory.of(this);
+    }
 }

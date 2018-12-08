@@ -21,23 +21,22 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class FileExtensionTest
-{
+import java.util.Optional;
 
-	@Test void getExtension()
-	{
-		final String string1 = ".txt";
-		final String string2 = "JPEG";
-		final Optional<FileExtension> ext1 = FileExtension.getExtension( string1 );
-		final Optional<FileExtension> ext2 = FileExtension.getExtension( string2 );
-		Assertions.assertTrue( ext1.isPresent() );
-		Assertions.assertTrue( ext2.isPresent() );
-		Assertions.assertEquals( FileExtension.TXT, ext1.get() );
-		Assertions.assertEquals( FileExtension.JPEG, ext2.get() );
-	}
+class FileExtensionTest {
+
+    @Test void getExtension() {
+        final String string1 = ".txt";
+        final String string2 = "JPEG";
+        final Optional<FileExtension> ext1 = FileExtension.getExtension(string1);
+        final Optional<FileExtension> ext2 = FileExtension.getExtension(string2);
+        Assertions.assertTrue(ext1.isPresent());
+        Assertions.assertTrue(ext2.isPresent());
+        Assertions.assertEquals(FileExtension.TXT, ext1.get());
+        Assertions.assertEquals(FileExtension.JPEG, ext2.get());
+    }
 
 }

@@ -27,45 +27,40 @@ import xyz.kvantum.server.api.exceptions.KvantumException;
 /**
  * Use this class to manage the {@link Kvantum} instances
  */
-public final class ServerImplementation
-{
+public final class ServerImplementation {
 
-	private static Kvantum intellectualServer;
+    private static Kvantum intellectualServer;
 
-	/**
-	 * Register the server implementation used in the application instance Cannot be used if the instance is already
-	 * registered, use {@link #getImplementation()} to check for null.
-	 *
-	 * @param intellectualServer Server instance
-	 * @throws KvantumException if the instance is already set
-	 */
-	public static void registerServerImplementation(@NonNull final Kvantum intellectualServer)
-	{
-		if ( ServerImplementation.intellectualServer != null )
-		{
-			throw new KvantumException( "Trying to replace server implementation" );
-		}
-		ServerImplementation.intellectualServer = intellectualServer;
-	}
+    /**
+     * Register the server implementation used in the application instance Cannot be used if the instance is already
+     * registered, use {@link #getImplementation()} to check for null.
+     *
+     * @param intellectualServer Server instance
+     * @throws KvantumException if the instance is already set
+     */
+    public static void registerServerImplementation(@NonNull final Kvantum intellectualServer) {
+        if (ServerImplementation.intellectualServer != null) {
+            throw new KvantumException("Trying to replace server implementation");
+        }
+        ServerImplementation.intellectualServer = intellectualServer;
+    }
 
-	/**
-	 * Get the registered implementation
-	 *
-	 * @return Implementation or mull
-	 */
-	public static Kvantum getImplementation()
-	{
-		return intellectualServer;
-	}
+    /**
+     * Get the registered implementation
+     *
+     * @return Implementation or mull
+     */
+    public static Kvantum getImplementation() {
+        return intellectualServer;
+    }
 
-	/**
-	 * Check if an implementation has been registered
-	 *
-	 * @return True if an implementation has been registered
-	 */
-	public static boolean hasImplementation()
-	{
-		return getImplementation() != null;
-	}
+    /**
+     * Check if an implementation has been registered
+     *
+     * @return True if an implementation has been registered
+     */
+    public static boolean hasImplementation() {
+        return getImplementation() != null;
+    }
 
 }

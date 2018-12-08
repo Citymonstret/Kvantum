@@ -21,12 +21,6 @@
  */
 package xyz.kvantum.server.api.views;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -34,56 +28,52 @@ import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileExtension;
 
-public class StandardView extends StaticFileView implements CacheApplicable
-{
+import java.util.*;
+import java.util.stream.Collectors;
 
-	private static final String CONSTANT_EXCLUDE_EXTENSIONS = "excludeExtensions";
+public class StandardView extends StaticFileView implements CacheApplicable {
 
-	public StandardView(String filter, Map<String, Object> options)
-	{
-		super( filter, options, "STANDARD", new ArrayList<>( Arrays.asList( FileExtension.values() ) ) );
+    private static final String CONSTANT_EXCLUDE_EXTENSIONS = "excludeExtensions";
 
-		if ( options.containsKey( CONSTANT_EXCLUDE_EXTENSIONS ) )
-		{
-			final List<FileExtension> toRemove = new ArrayList<>();
-			final List list = ( List ) options.get( CONSTANT_EXCLUDE_EXTENSIONS );
-			for ( Object o : list )
-			{
-				toRemove.addAll( super.extensionList.stream().filter( extension -> extension.matches( o.toString() ) )
-						.collect( Collectors.toList() ) );
-			}
-			super.extensionList.removeAll( toRemove );
-		}
-	}
+    public StandardView(String filter, Map<String, Object> options) {
+        super(filter, options, "STANDARD", new ArrayList<>(Arrays.asList(FileExtension.values())));
 
-	@Override public boolean isApplicable(AbstractRequest r)
-	{
-		final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
-		return cacheApplicableBoolean.orElse( false );
-	}
+        if (options.containsKey(CONSTANT_EXCLUDE_EXTENSIONS)) {
+            final List<FileExtension> toRemove = new ArrayList<>();
+            final List list = (List) options.get(CONSTANT_EXCLUDE_EXTENSIONS);
+            for (Object o : list) {
+                toRemove.addAll(super.extensionList.stream()
+                    .filter(extension -> extension.matches(o.toString()))
+                    .collect(Collectors.toList()));
+            }
+            super.extensionList.removeAll(toRemove);
+        }
+    }
 
-	@Override public void handle(final AbstractRequest r, final Response response)
-	{
-		super.handle( r, response ); // SUPER IMPORTANT!!!!!
+    @Override public boolean isApplicable(AbstractRequest r) {
+        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe("cacheApplicable");
+        return cacheApplicableBoolean.orElse(false);
+    }
 
-		final FileExtension extension = r.getMetaUnsafe( "extension" );
-		switch ( extension )
-		{
-		case PDF:
-		case TXT:
-		case ZIP:
-		{
-			final Path path = r.getMetaUnsafe( "file" );
-			final String fileName = path.getEntityName();
+    @Override public void handle(final AbstractRequest r, final Response response) {
+        super.handle(r, response); // SUPER IMPORTANT!!!!!
 
-			response.getHeader().set( Header.HEADER_CONTENT_DISPOSITION,
-					String.format( "attachment; filename=\"%s.%s\"", fileName, extension.getOption() ) );
-			response.getHeader().set( Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary" );
-			// response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
-		}
-		break;
-		default:
-			break;
-		}
-	}
+        final FileExtension extension = r.getMetaUnsafe("extension");
+        switch (extension) {
+            case PDF:
+            case TXT:
+            case ZIP: {
+                final Path path = r.getMetaUnsafe("file");
+                final String fileName = path.getEntityName();
+
+                response.getHeader().set(Header.HEADER_CONTENT_DISPOSITION, String
+                    .format("attachment; filename=\"%s.%s\"", fileName, extension.getOption()));
+                response.getHeader().set(Header.HEADER_CONTENT_TRANSFER_ENCODING, "binary");
+                // response.getHeader().set( Header.HEADER_CONTENT_LENGTH, "" + r.<Long>getMetaUnsafe( "file_length" ) );
+            }
+            break;
+            default:
+                break;
+        }
+    }
 }

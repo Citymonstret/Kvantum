@@ -21,17 +21,14 @@
  */
 package xyz.kvantum.server.api.response;
 
-public final class ImmutableResponseStream extends SimpleResponseStream
-{
+public final class ImmutableResponseStream extends SimpleResponseStream {
 
-	public ImmutableResponseStream(final byte[] bytes)
-	{
-		super( bytes );
-	}
+    public ImmutableResponseStream(final byte[] bytes) {
+        super(bytes);
+    }
 
-	@Override public void push(byte[] bytes)
-	{
-		throw new UnsupportedOperationException( "Cannot write to immutable stream" );
-	}
+    @Override public void push(byte[] bytes) {
+        throw new UnsupportedOperationException("Cannot write to immutable stream");
+    }
 
 }

@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.server.api.views.errors;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -32,62 +30,56 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.views.View;
 
-public class ViewException extends View
-{
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
-	private static String template = "not loaded";
+public class ViewException extends View {
 
-	static
-	{
-		initTemplate();
-	}
+    private static String template = "not loaded";
 
-	private final Throwable in;
+    static {
+        initTemplate();
+    }
 
-	public ViewException(final Throwable in)
-	{
-		super( "", "exception" );
-		this.in = in;
-	}
+    private final Throwable in;
 
-	private static void initTemplate()
-	{
-		final String resourcePath = "template/exception.html";
-		final Path folder = ServerImplementation.getImplementation().getFileSystem().getPath( "templates" );
-		if ( !folder.exists() )
-		{
-			if ( !folder.create() )
-			{
-				Message.COULD_NOT_CREATE_FOLDER.log( folder );
-				return;
-			}
-		}
-		final Path path = folder.getPath( "exception.html" );
-		if ( !path.exists() )
-		{
-			if ( !path.create() )
-			{
-				Logger.error( "could not create file: '{}'", path );
-				return;
-			}
-			try
-			{
-				FileUtils.copyResource( resourcePath, path.getJavaPath() );
-			} catch ( Exception e )
-			{
-				e.printStackTrace();
-			}
-		}
-		template = path.readFile();
-	}
+    public ViewException(final Throwable in) {
+        super("", "exception");
+        this.in = in;
+    }
 
-	@Override public Response generate(AbstractRequest request)
-	{
-		StringWriter sw = new StringWriter();
-		in.printStackTrace( new PrintWriter( sw ) );
-		return new Response().setResponse( template.replace( "{{path}}", request.getQuery().getResource() )
-				.replace( "{{exception}}", in.toString() )
-				.replace( "{{cause}}", sw.toString().replace( System.getProperty( "line.separator" ), "<br/>\n" ) )
-				.replace( "{{message}}", in.getMessage() != null ? in.getMessage() : "" ) );
-	}
+    private static void initTemplate() {
+        final String resourcePath = "template/exception.html";
+        final Path folder =
+            ServerImplementation.getImplementation().getFileSystem().getPath("templates");
+        if (!folder.exists()) {
+            if (!folder.create()) {
+                Message.COULD_NOT_CREATE_FOLDER.log(folder);
+                return;
+            }
+        }
+        final Path path = folder.getPath("exception.html");
+        if (!path.exists()) {
+            if (!path.create()) {
+                Logger.error("could not create file: '{}'", path);
+                return;
+            }
+            try {
+                FileUtils.copyResource(resourcePath, path.getJavaPath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        template = path.readFile();
+    }
+
+    @Override public Response generate(AbstractRequest request) {
+        StringWriter sw = new StringWriter();
+        in.printStackTrace(new PrintWriter(sw));
+        return new Response().setResponse(
+            template.replace("{{path}}", request.getQuery().getResource())
+                .replace("{{exception}}", in.toString()).replace("{{cause}}",
+                sw.toString().replace(System.getProperty("line.separator"), "<br/>\n"))
+                .replace("{{message}}", in.getMessage() != null ? in.getMessage() : ""));
+    }
 }

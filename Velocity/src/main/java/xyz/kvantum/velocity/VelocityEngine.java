@@ -26,29 +26,25 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.template.TemplateHandler;
 
-public class VelocityEngine extends TemplateHandler
-{
+public class VelocityEngine extends TemplateHandler {
 
-	private static VelocityEngine instance;
+    private static VelocityEngine instance;
 
-	private VelocityEngine()
-	{
-		super( CoreConfig.TemplatingEngine.VELOCITY, "VelocityEngine" );
-	}
+    private VelocityEngine() {
+        super(CoreConfig.TemplatingEngine.VELOCITY, "VelocityEngine");
+    }
 
-	public static VelocityEngine getInstance()
-	{
-		if ( instance == null )
-		{
-			instance = new VelocityEngine();
-		}
-		return instance;
-	}
+    public static VelocityEngine getInstance() {
+        if (instance == null) {
+            instance = new VelocityEngine();
+        }
+        return instance;
+    }
 
-	@Override public void onLoad()
-	{
-		Velocity.init();
-		ServerImplementation.getImplementation().getProcedure().addProcedure( "syntax", new SyntaxHandler( this ) );
-	}
+    @Override public void onLoad() {
+        Velocity.init();
+        ServerImplementation.getImplementation().getProcedure()
+            .addProcedure("syntax", new SyntaxHandler(this));
+    }
 
 }

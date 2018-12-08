@@ -29,14 +29,12 @@ import xyz.kvantum.server.api.response.Response;
  * {@link Decorator} implementation that specifically decorates {@link Header headers}. <p> Extended by {@link
  * xyz.kvantum.server.api.views.decorators.CacheDecorator}
  */
-public abstract class HeaderDecorator implements Decorator
-{
+public abstract class HeaderDecorator implements Decorator {
 
-	@Override public final void decorate(@NonNull final Response response)
-	{
-		this.decorate( response.getHeader() );
-	}
+    @Override public final void decorate(@NonNull final Response response) {
+        this.decorate(response.getHeader());
+    }
 
-	public abstract void decorate(Header header);
+    public abstract void decorate(Header header);
 
 }

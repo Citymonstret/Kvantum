@@ -27,19 +27,18 @@ import java.util.Optional;
 /**
  * Manages per-request temporary files
  */
-@SuppressWarnings("unused") public interface ITempFileManager
-{
+@SuppressWarnings("unused") public interface ITempFileManager {
 
-	/**
-	 * Create a new temporary file
-	 *
-	 * @return new temporary file, if it was successfully created
-	 */
-	Optional<Path> createTempFile();
+    /**
+     * Create a new temporary file
+     *
+     * @return new temporary file, if it was successfully created
+     */
+    Optional<Path> createTempFile();
 
-	/**
-	 * Delete all temporary files created in this manager
-	 */
-	void clearTempFiles();
+    /**
+     * Delete all temporary files created in this manager
+     */
+    void clearTempFiles();
 
 }

@@ -21,41 +21,36 @@
  */
 package xyz.kvantum.server.api.logging;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Getter;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-public class InternalJlineManager
-{
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-	private static InternalJlineManager instance;
-	@Getter private final Terminal terminal;
-	@Getter private final LineReader lineReader;
+public class InternalJlineManager {
 
-	private InternalJlineManager() throws Exception
-	{
-		Logger.getLogger( "org.jline" ).setLevel( Level.ALL );
-		terminal = TerminalBuilder.builder().dumb( true ).build();
-		lineReader = LineReaderBuilder.builder().terminal( terminal ).appName( "Kvantum" ).build();
-	}
+    private static InternalJlineManager instance;
+    @Getter private final Terminal terminal;
+    @Getter private final LineReader lineReader;
 
-	public static InternalJlineManager getInstance()
-	{
-		if ( instance == null )
-		{
-			try
-			{
-				instance = new InternalJlineManager();
-			} catch ( Exception e )
-			{
-				e.printStackTrace();
-			}
-		}
-		return instance;
-	}
+    private InternalJlineManager() throws Exception {
+        Logger.getLogger("org.jline").setLevel(Level.ALL);
+        terminal = TerminalBuilder.builder().dumb(true).build();
+        lineReader = LineReaderBuilder.builder().terminal(terminal).appName("Kvantum").build();
+    }
+
+    public static InternalJlineManager getInstance() {
+        if (instance == null) {
+            try {
+                instance = new InternalJlineManager();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return instance;
+    }
 
 }

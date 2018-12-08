@@ -94,9 +94,8 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
  * @see AuthenticationRequiredMiddleware
  * @see DebugMiddleware
  */
-public abstract class Middleware
-{
+public abstract class Middleware {
 
-	public abstract void handle(final AbstractRequest request, final MiddlewareQueue queue);
+    public abstract void handle(final AbstractRequest request, final MiddlewareQueue queue);
 
 }

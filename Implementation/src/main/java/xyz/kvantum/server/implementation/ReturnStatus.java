@@ -21,34 +21,33 @@
  */
 package xyz.kvantum.server.implementation;
 
-import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.util.AsciiString;
 
-final class ReturnStatus extends Throwable
-{
+import javax.annotation.Nullable;
 
-	private static final String MESSAGE_FORMAT = "Status: %s";
+final class ReturnStatus extends Throwable {
 
-	@Getter private AsciiString status;
+    private static final String MESSAGE_FORMAT = "Status: %s";
 
-	@Setter @Getter private WorkerContext applicableContext;
+    @Getter private AsciiString status;
 
-	ReturnStatus(@NonNull final AsciiString status, @Nullable final WorkerContext applicableContext)
-	{
-		super( String.format( MESSAGE_FORMAT, status ) );
-		this.status = status;
-		this.applicableContext = applicableContext;
-	}
+    @Setter @Getter private WorkerContext applicableContext;
 
-	ReturnStatus(@NonNull final AsciiString status, @Nullable final WorkerContext applicableContext,
-			@NonNull final Throwable cause)
-	{
-		super( String.format( MESSAGE_FORMAT, status ), cause );
-		this.status = status;
-		this.applicableContext = applicableContext;
-	}
+    ReturnStatus(@NonNull final AsciiString status,
+        @Nullable final WorkerContext applicableContext) {
+        super(String.format(MESSAGE_FORMAT, status));
+        this.status = status;
+        this.applicableContext = applicableContext;
+    }
+
+    ReturnStatus(@NonNull final AsciiString status, @Nullable final WorkerContext applicableContext,
+        @NonNull final Throwable cause) {
+        super(String.format(MESSAGE_FORMAT, status), cause);
+        this.status = status;
+        this.applicableContext = applicableContext;
+    }
 
 }

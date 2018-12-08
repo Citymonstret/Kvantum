@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.io.File;
-import java.util.Optional;
-import java.util.function.Function;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,37 +30,37 @@ import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.util.Assert;
 
+import java.io.File;
+import java.util.Optional;
+import java.util.function.Function;
+
 /**
  * <p> This class is used when initializing a new {@link ServerContext} instance. </p> <p> ServerContext instances are
  * created using {@link ServerContextBuilder}. A new {@link ServerContextBuilder} can be initialized using either {@link
  * ServerContext#builder()} or by using {@code new ServerContextBuilder()} </p>
  */
-@Setter @Getter @Builder @SuppressWarnings("WeakerAccess") public final class ServerContext
-{
+@Setter @Getter @Builder @SuppressWarnings("WeakerAccess") public final class ServerContext {
 
-	@Builder.Default private boolean standalone = true;
-	@NonNull private File coreFolder;
-	@NonNull private LogWrapper logWrapper;
-	@NonNull private Router router;
-	@NonNull private Function<ServerContext, SimpleServer> serverSupplier;
+    @Builder.Default private boolean standalone = true;
+    @NonNull private File coreFolder;
+    @NonNull private LogWrapper logWrapper;
+    @NonNull private Router router;
+    @NonNull private Function<ServerContext, SimpleServer> serverSupplier;
 
-	/**
-	 * Creates a server instance using this context. Will print any exceptions, but if the server cannot be initialized
-	 * a null optional will be returned.
-	 */
-	public final Optional<Kvantum> create()
-	{
-		Assert.equals( coreFolder.getAbsolutePath().indexOf( '!' ) == -1, true,
-				"Cannot use a folder with '!' path as core folder" );
-		SimpleServer simpleServer = null;
-		try
-		{
-			simpleServer = serverSupplier.apply( this );
-		} catch ( final Exception e )
-		{
-			e.printStackTrace();
-		}
-		return Optional.ofNullable( simpleServer );
-	}
+    /**
+     * Creates a server instance using this context. Will print any exceptions, but if the server cannot be initialized
+     * a null optional will be returned.
+     */
+    public final Optional<Kvantum> create() {
+        Assert.equals(coreFolder.getAbsolutePath().indexOf('!') == -1, true,
+            "Cannot use a folder with '!' path as core folder");
+        SimpleServer simpleServer = null;
+        try {
+            simpleServer = serverSupplier.apply(this);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.ofNullable(simpleServer);
+    }
 
 }

@@ -21,11 +21,9 @@
  */
 package xyz.kvantum.server.implementation.error;
 
-final public class KvantumStartException extends KvantumException
-{
+final public class KvantumStartException extends KvantumException {
 
-	public KvantumStartException(final String s, final Throwable cause)
-	{
-		super( "Couldn't start Kvantum: " + s, cause );
-	}
+    public KvantumStartException(final String s, final Throwable cause) {
+        super("Couldn't start Kvantum: " + s, cause);
+    }
 }

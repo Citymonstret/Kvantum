@@ -23,16 +23,15 @@ package xyz.kvantum.server.api.repository;
 
 import java.util.Collection;
 
-@FunctionalInterface public interface Sorter<T>
-{
+@FunctionalInterface public interface Sorter<T> {
 
-	/**
-	 * Sort a given collection and return a new collection. This is because it is assumed that all given collections are
-	 * immutable.
-	 *
-	 * @param collection Collection to be sorted
-	 * @return Sorted collection
-	 */
-	<C extends Collection<? extends T>> C sort(C collection);
+    /**
+     * Sort a given collection and return a new collection. This is because it is assumed that all given collections are
+     * immutable.
+     *
+     * @param collection Collection to be sorted
+     * @return Sorted collection
+     */
+    <C extends Collection<? extends T>> C sort(C collection);
 
 }

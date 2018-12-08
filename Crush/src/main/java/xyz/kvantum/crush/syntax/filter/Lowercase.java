@@ -21,20 +21,18 @@
  */
 package xyz.kvantum.crush.syntax.filter;
 
-import java.util.Locale;
 import xyz.kvantum.crush.syntax.Filter;
 
-final public class Lowercase extends Filter
-{
+import java.util.Locale;
 
-	public Lowercase()
-	{
-		super( "lowercase" );
-	}
+final public class Lowercase extends Filter {
 
-	public Object handle(String objectName, Object in)
-	{
-		return in.toString().toLowerCase( Locale.ENGLISH );
-	}
+    public Lowercase() {
+        super("lowercase");
+    }
+
+    public Object handle(String objectName, Object in) {
+        return in.toString().toLowerCase(Locale.ENGLISH);
+    }
 
 }

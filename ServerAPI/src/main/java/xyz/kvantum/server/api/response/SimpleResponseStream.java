@@ -27,51 +27,42 @@ import lombok.NonNull;
 /**
  * Response stream with a single input write
  */
-public class SimpleResponseStream extends ResponseStream implements KnownLengthStream
-{
+public class SimpleResponseStream extends ResponseStream implements KnownLengthStream {
 
-	@Getter
-	private byte[] bytes;
-	private int read = 0;
+    @Getter private byte[] bytes;
+    private int read = 0;
 
-	public SimpleResponseStream(final byte[] bytes)
-	{
-		this.bytes = new byte[ bytes.length ];
-		System.arraycopy( bytes, 0, this.bytes, 0, bytes.length );
-	}
+    public SimpleResponseStream(final byte[] bytes) {
+        this.bytes = new byte[bytes.length];
+        System.arraycopy(bytes, 0, this.bytes, 0, bytes.length);
+    }
 
-	@Override public byte[] read(int amount)
-	{
-		int toRead = Math.min( this.getOffer(), amount );
-		final byte[] bytes = new byte[ toRead ];
-		System.arraycopy( this.bytes, read, bytes, 0, toRead );
-		this.read += bytes.length;
-		if ( this.bytes.length <= this.read )
-		{
-			this.finish();
-		}
-		return bytes;
-	}
+    @Override public byte[] read(int amount) {
+        int toRead = Math.min(this.getOffer(), amount);
+        final byte[] bytes = new byte[toRead];
+        System.arraycopy(this.bytes, read, bytes, 0, toRead);
+        this.read += bytes.length;
+        if (this.bytes.length <= this.read) {
+            this.finish();
+        }
+        return bytes;
+    }
 
-	@Override public int getOffer()
-	{
-		return this.bytes.length - read;
-	}
+    @Override public int getOffer() {
+        return this.bytes.length - read;
+    }
 
-	@Override public int getLength()
-	{
-		return this.getBytes().length;
-	}
+    @Override public int getLength() {
+        return this.getBytes().length;
+    }
 
-	@Override public byte[] getAll()
-	{
-		return this.getBytes();
-	}
+    @Override public byte[] getAll() {
+        return this.getBytes();
+    }
 
-	@Override public void replaceBytes(@NonNull final byte[] bytes)
-	{
-		this.bytes = bytes;
-		this.read = 0;
-	}
+    @Override public void replaceBytes(@NonNull final byte[] bytes) {
+        this.bytes = bytes;
+        this.read = 0;
+    }
 
 }

@@ -23,16 +23,13 @@ package xyz.kvantum.velocity;
 
 import xyz.kvantum.server.api.addon.AddOn;
 
-public class VelocityPlugin extends AddOn
-{
+public class VelocityPlugin extends AddOn {
 
-	@Override protected void onEnable()
-	{
-		VelocityEngine.getInstance().load();
-	}
+    @Override protected void onEnable() {
+        VelocityEngine.getInstance().load();
+    }
 
-	@Override protected void onDisable()
-	{
-	}
+    @Override protected void onDisable() {
+    }
 
 }

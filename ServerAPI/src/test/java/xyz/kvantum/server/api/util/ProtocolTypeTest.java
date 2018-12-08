@@ -21,18 +21,17 @@
  */
 package xyz.kvantum.server.api.util;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class ProtocolTypeTest
-{
+import java.util.Optional;
 
-	@Test void getByName()
-	{
-		final Optional<ProtocolType> protocolTypeOptional = ProtocolType.getByName( "HTTPS" );
-		Assertions.assertTrue( protocolTypeOptional.isPresent() );
-		Assertions.assertEquals( ProtocolType.HTTPS, protocolTypeOptional.get() );
-	}
+class ProtocolTypeTest {
+
+    @Test void getByName() {
+        final Optional<ProtocolType> protocolTypeOptional = ProtocolType.getByName("HTTPS");
+        Assertions.assertTrue(protocolTypeOptional.isPresent());
+        Assertions.assertEquals(ProtocolType.HTTPS, protocolTypeOptional.get());
+    }
 
 }

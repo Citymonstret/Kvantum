@@ -33,31 +33,31 @@ import org.slf4j.LoggerFactory;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 
-public abstract class MongoApplicationStructure extends ApplicationStructure
-{
+public abstract class MongoApplicationStructure extends ApplicationStructure {
 
-	@Getter private final MongoClient mongoClient;
-	@Getter private final Morphia morphia;
-	@Getter private final Datastore morphiaDatastore;
+    @Getter private final MongoClient mongoClient;
+    @Getter private final Morphia morphia;
+    @Getter private final Datastore morphiaDatastore;
 
-	MongoApplicationStructure(final String applicationName)
-	{
-		super( applicationName );
+    MongoApplicationStructure(final String applicationName) {
+        super(applicationName);
 
-		// Turn off the really annoying MongoDB spam :/
-		{
-			LoggerContext loggerContext = ( LoggerContext ) LoggerFactory.getILoggerFactory();
-			Logger rootLogger = loggerContext.getLogger( "org.mongodb.driver" );
-			rootLogger.setLevel( Level.OFF );
-		}
+        // Turn off the really annoying MongoDB spam :/
+        {
+            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
+            rootLogger.setLevel(Level.OFF);
+        }
 
-		this.mongoClient = new MongoClient( new MongoClientURI( CoreConfig.MongoDB.uri ) );
-		this.accountManager = createNewAccountManager();
-		xyz.kvantum.server.api.logging.Logger.info( "Initialized MongoApplicationStructure: {}", this.applicationName );
+        this.mongoClient = new MongoClient(new MongoClientURI(CoreConfig.MongoDB.uri));
+        this.accountManager = createNewAccountManager();
+        xyz.kvantum.server.api.logging.Logger
+            .info("Initialized MongoApplicationStructure: {}", this.applicationName);
 
-		this.morphia = new Morphia();
-		this.morphia.mapPackage( "com.github.intellectualsites.kvantum.implementation" );
-		this.morphiaDatastore = morphia.createDatastore( this.mongoClient, CoreConfig.MongoDB.dbMorphia );
-	}
+        this.morphia = new Morphia();
+        this.morphia.mapPackage("com.github.intellectualsites.kvantum.implementation");
+        this.morphiaDatastore =
+            morphia.createDatastore(this.mongoClient, CoreConfig.MongoDB.dbMorphia);
+    }
 
 }

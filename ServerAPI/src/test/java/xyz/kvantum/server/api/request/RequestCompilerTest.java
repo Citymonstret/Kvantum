@@ -21,21 +21,21 @@
  */
 package xyz.kvantum.server.api.request;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import xyz.kvantum.server.api.request.RequestCompiler.HeaderPair;
 
-class RequestCompilerTest
-{
+import java.util.Optional;
 
-	@Test void compileHeader()
-	{
-		final Optional<HeaderPair> headerPairOptional = RequestCompiler.compileHeader( "Random-Header: value" );
-		Assertions.assertNotNull( headerPairOptional );
-		Assertions.assertTrue( headerPairOptional.isPresent() );
-		final HeaderPair headerPair = headerPairOptional.get();
-		Assertions.assertEquals( "random-header", headerPair.getKey().toString() );
-		Assertions.assertEquals( "value", headerPair.getValue().toString() );
-	}
+class RequestCompilerTest {
+
+    @Test void compileHeader() {
+        final Optional<HeaderPair> headerPairOptional =
+            RequestCompiler.compileHeader("Random-Header: value");
+        Assertions.assertNotNull(headerPairOptional);
+        Assertions.assertTrue(headerPairOptional.isPresent());
+        final HeaderPair headerPair = headerPairOptional.get();
+        Assertions.assertEquals("random-header", headerPair.getKey().toString());
+        Assertions.assertEquals("value", headerPair.getValue().toString());
+    }
 }

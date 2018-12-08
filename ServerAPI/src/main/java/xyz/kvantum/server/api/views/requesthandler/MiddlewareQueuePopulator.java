@@ -24,41 +24,33 @@ package xyz.kvantum.server.api.views.requesthandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public final class MiddlewareQueuePopulator
-{
+public final class MiddlewareQueuePopulator {
 
-	private final Collection<Class<? extends Middleware>> middleware = new ArrayList<>();
+    private final Collection<Class<? extends Middleware>> middleware = new ArrayList<>();
 
-	public void add(final Class<? extends Middleware> middleware)
-	{
-		if ( Middleware.class == middleware )
-		{
-			return;
-		}
-		try
-		{
-			middleware.getConstructor();
-		} catch ( final Exception e )
-		{
-			e.printStackTrace();
-			return;
-		}
-		this.middleware.add( middleware );
-	}
+    public void add(final Class<? extends Middleware> middleware) {
+        if (Middleware.class == middleware) {
+            return;
+        }
+        try {
+            middleware.getConstructor();
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        this.middleware.add(middleware);
+    }
 
-	public MiddlewareQueue generateQueue()
-	{
-		final MiddlewareQueue queue = new MiddlewareQueue();
-		middleware.forEach( clazz -> {
-			try
-			{
-				queue.add( clazz.newInstance() );
-			} catch ( final Exception e )
-			{
-				e.printStackTrace();
-			}
-		} );
-		return queue;
-	}
+    public MiddlewareQueue generateQueue() {
+        final MiddlewareQueue queue = new MiddlewareQueue();
+        middleware.forEach(clazz -> {
+            try {
+                queue.add(clazz.newInstance());
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return queue;
+    }
 
 }

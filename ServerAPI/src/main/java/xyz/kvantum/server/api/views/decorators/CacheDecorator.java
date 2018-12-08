@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.views.decorators;
 
-import java.util.Date;
 import lombok.Builder;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.HeaderOption;
@@ -29,39 +28,36 @@ import xyz.kvantum.server.api.util.MapBuilder;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.Decorator;
 
-@Builder public final class CacheDecorator
-{
+import java.util.Date;
 
-	@Builder.Default public boolean cachePublic = true;
+@Builder public final class CacheDecorator {
 
-	@Builder.Default private long maxAge = 0L;
+    @Builder.Default public boolean cachePublic = true;
 
-	@Builder.Default private boolean noStore = false;
+    @Builder.Default private long maxAge = 0L;
 
-	@Builder.Default private boolean noCache = false;
+    @Builder.Default private boolean noStore = false;
 
-	@Builder.Default private String expires = "";
+    @Builder.Default private boolean noCache = false;
 
-	public Decorator getDecorator()
-	{
-		final MapBuilder<HeaderOption, String> builder = MapBuilder.newHashMap();
-		final StringBuilder cacheBuilder = new StringBuilder();
-		cacheBuilder.append( cachePublic ? "public" : "private" );
-		cacheBuilder.append( ", max-age=" ).append( maxAge );
-		if ( expires.isEmpty() )
-		{
-			expires = TimeUtil.getHTTPTimeStamp( new Date( System.currentTimeMillis() + maxAge ) );
-		}
-		if ( noCache )
-		{
-			cacheBuilder.append( ", no-cache" );
-		}
-		if ( noStore )
-		{
-			cacheBuilder.append( ", no-store" );
-		}
-		builder.put( Header.HEADER_CACHE_CONTROL, cacheBuilder.toString() );
-		return new Headers( builder.get() );
-	}
+    @Builder.Default private String expires = "";
+
+    public Decorator getDecorator() {
+        final MapBuilder<HeaderOption, String> builder = MapBuilder.newHashMap();
+        final StringBuilder cacheBuilder = new StringBuilder();
+        cacheBuilder.append(cachePublic ? "public" : "private");
+        cacheBuilder.append(", max-age=").append(maxAge);
+        if (expires.isEmpty()) {
+            expires = TimeUtil.getHTTPTimeStamp(new Date(System.currentTimeMillis() + maxAge));
+        }
+        if (noCache) {
+            cacheBuilder.append(", no-cache");
+        }
+        if (noStore) {
+            cacheBuilder.append(", no-store");
+        }
+        builder.put(Header.HEADER_CACHE_CONTROL, cacheBuilder.toString());
+        return new Headers(builder.get());
+    }
 
 }

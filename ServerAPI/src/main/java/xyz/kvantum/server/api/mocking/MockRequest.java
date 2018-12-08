@@ -24,28 +24,23 @@ package xyz.kvantum.server.api.mocking;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 
-public class MockRequest extends AbstractRequest
-{
+public class MockRequest extends AbstractRequest {
 
-	public MockRequest(final Query query)
-	{
-		this.setQuery( query );
-	}
+    public MockRequest(final Query query) {
+        this.setQuery(query);
+    }
 
-	@Override public void onCompileFinish()
-	{
-	}
+    @Override public void onCompileFinish() {
+    }
 
-	@Override protected AbstractRequest newRequest(String query)
-	{
-		return new MockRequest( AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( HttpMethod.GET, this.getProtocolType(), query ) ) );
-	}
+    @Override protected AbstractRequest newRequest(String query) {
+        return new MockRequest(AbstractRequest.QueryCache.getInstance()
+            .getQuery(new QueryParameters(HttpMethod.GET, this.getProtocolType(), query)));
+    }
 
-	@Override public void requestSession()
-	{
-	}
+    @Override public void requestSession() {
+    }
 
-	@Override public void dumpRequest()
-	{
-	}
+    @Override public void dumpRequest() {
+    }
 }

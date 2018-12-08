@@ -21,75 +21,65 @@
  */
 package xyz.kvantum.server.api.views;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Created 2015-04-19 for Kvantum
  *
  * @author Citymonstret
  */
-public class HTMLView extends StaticFileView implements CacheApplicable
-{
+public class HTMLView extends StaticFileView implements CacheApplicable {
 
-	public HTMLView(String filter, Map<String, Object> options)
-	{
-		super( filter, options, "html", Collections.singletonList( FileExtension.HTML ) );
-		super.setOption( "extension", "html" );
-		super.defaultFilePattern = "${file}.html";
-	}
+    public HTMLView(String filter, Map<String, Object> options) {
+        super(filter, options, "html", Collections.singletonList(FileExtension.HTML));
+        super.setOption("extension", "html");
+        super.defaultFilePattern = "${file}.html";
+    }
 
-	@Override public HTMLProvider getFactory(final AbstractRequest r)
-	{
-		return new HTMLProvider( r );
-	}
+    @Override public HTMLProvider getFactory(final AbstractRequest r) {
+        return new HTMLProvider(r);
+    }
 
-	@Override public boolean isApplicable(AbstractRequest r)
-	{
-		final Optional<Boolean> cacheApplicableBoolean = getOptionSafe( "cacheApplicable" );
-		return cacheApplicableBoolean.orElse( true );
-	}
+    @Override public boolean isApplicable(AbstractRequest r) {
+        final Optional<Boolean> cacheApplicableBoolean = getOptionSafe("cacheApplicable");
+        return cacheApplicableBoolean.orElse(true);
+    }
 
-	public static class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider
-	{
+    public static class HTMLProvider implements ProviderFactory<HTMLProvider>, VariableProvider {
 
-		private final Map<String, String> storage = new HashMap<>();
+        private final Map<String, String> storage = new HashMap<>();
 
-		HTMLProvider(final AbstractRequest r)
-		{
-			storage.put( "name", r.getMeta( "html_file" ) + ".html" );
-		}
+        HTMLProvider(final AbstractRequest r) {
+            storage.put("name", r.getMeta("html_file") + ".html");
+        }
 
-		@Override public Optional<HTMLProvider> get(AbstractRequest r)
-		{
-			return Optional.of( this );
-		}
+        @Override public Optional<HTMLProvider> get(AbstractRequest r) {
+            return Optional.of(this);
+        }
 
-		@Override public String providerName()
-		{
-			return "document";
-		}
+        @Override public String providerName() {
+            return "document";
+        }
 
-		@Override public boolean contains(String variable)
-		{
-			return storage.containsKey( variable );
-		}
+        @Override public boolean contains(String variable) {
+            return storage.containsKey(variable);
+        }
 
-		@Override public Object get(String variable)
-		{
-			return storage.get( variable );
-		}
+        @Override public Object get(String variable) {
+            return storage.get(variable);
+        }
 
-		@Override public Map<String, Object> getAll()
-		{
-			return new HashMap<>( this.storage );
-		}
-	}
+        @Override public Map<String, Object> getAll() {
+            return new HashMap<>(this.storage);
+        }
+    }
 }

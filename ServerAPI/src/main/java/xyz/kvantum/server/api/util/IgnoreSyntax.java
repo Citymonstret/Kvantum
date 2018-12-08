@@ -24,6 +24,5 @@ package xyz.kvantum.server.api.util;
 /**
  * Use this to indicate that this should be skipped by syntax processors (such as Crush)
  */
-public interface IgnoreSyntax
-{
+public interface IgnoreSyntax {
 }

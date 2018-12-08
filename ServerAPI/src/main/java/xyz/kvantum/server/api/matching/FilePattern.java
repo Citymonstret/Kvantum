@@ -22,91 +22,84 @@
 package xyz.kvantum.server.api.matching;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.VariableHolder;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE) public final class FilePattern
-{
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-	private static final Pattern PATTERN_VARIABLE = Pattern.compile( "\\$\\{(?<variable>[A-Za-z0-9]*)}" );
+@AllArgsConstructor(access = AccessLevel.PRIVATE) public final class FilePattern {
 
-	private final String pattern;
-	private final Map<String, String> variableMap;
+    private static final Pattern PATTERN_VARIABLE =
+        Pattern.compile("\\$\\{(?<variable>[A-Za-z0-9]*)}");
 
-	public static FilePattern compile(@NonNull final String in)
-	{
-		final Matcher matcher = PATTERN_VARIABLE.matcher( in );
-		final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
-		while ( matcher.find() )
-		{
-			mapBuilder.put( matcher.group(), matcher.group( "variable" ) );
-		}
-		return new FilePattern( in, mapBuilder.build() );
-	}
+    private final String pattern;
+    private final Map<String, String> variableMap;
 
-	public FileMatcher matcher(final VariableHolder holder)
-	{
-		return new FileMatcher( holder );
-	}
+    public static FilePattern compile(@NonNull final String in) {
+        final Matcher matcher = PATTERN_VARIABLE.matcher(in);
+        final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
+        while (matcher.find()) {
+            mapBuilder.put(matcher.group(), matcher.group("variable"));
+        }
+        return new FilePattern(in, mapBuilder.build());
+    }
 
-	@SuppressWarnings("WeakerAccess") final public static class FilePatternException extends KvantumException
-	{
+    public FileMatcher matcher(final VariableHolder holder) {
+        return new FileMatcher(holder);
+    }
 
-		private FilePatternException(final String message)
-		{
-			super( "Failed to handle file pattern: " + message );
-		}
-	}
+    @SuppressWarnings("WeakerAccess") final public static class FilePatternException
+        extends KvantumException {
 
-	@SuppressWarnings("WeakerAccess") public class FileMatcher
-	{
+        private FilePatternException(final String message) {
+            super("Failed to handle file pattern: " + message);
+        }
+    }
 
-		private final Map<String, String> variableMapping;
-		private String compiledName = null;
 
-		private FileMatcher(@NonNull final VariableHolder variableHolder)
-		{
-			final ImmutableMap.Builder<String, String> variableMappingBuilder = ImmutableMap.builder();
-			final Map<String, String> requestVariables = variableHolder.getVariables();
-			for ( final Map.Entry<String, String> entry : variableMap.entrySet() )
-			{
-				if ( !requestVariables.containsKey( entry.getValue() ) )
-				{
-					break;
-				}
-				variableMappingBuilder.put( entry.getValue(), requestVariables.get( entry.getValue() ) );
-			}
-			this.variableMapping = variableMappingBuilder.build();
-		}
+    @SuppressWarnings("WeakerAccess") public class FileMatcher {
 
-		public boolean matches()
-		{
-			return this.variableMapping.size() == variableMap.size();
-		}
+        private final Map<String, String> variableMapping;
+        private String compiledName = null;
 
-		public String getFileName()
-		{
-			if ( this.compiledName == null )
-			{
-				if ( !this.matches() )
-				{
-					throw new FilePatternException( "Trying to use #getFileName when matches = false" );
-				}
-				String rawName = pattern;
-				for ( final Map.Entry<String, String> variable : variableMap.entrySet() )
-				{
-					rawName = rawName.replace( variable.getKey(), this.variableMapping.get( variable.getValue() ) );
-				}
-				this.compiledName = rawName;
-			}
-			return this.compiledName;
-		}
-	}
+        private FileMatcher(@NonNull final VariableHolder variableHolder) {
+            final ImmutableMap.Builder<String, String> variableMappingBuilder =
+                ImmutableMap.builder();
+            final Map<String, String> requestVariables = variableHolder.getVariables();
+            for (final Map.Entry<String, String> entry : variableMap.entrySet()) {
+                if (!requestVariables.containsKey(entry.getValue())) {
+                    break;
+                }
+                variableMappingBuilder
+                    .put(entry.getValue(), requestVariables.get(entry.getValue()));
+            }
+            this.variableMapping = variableMappingBuilder.build();
+        }
+
+        public boolean matches() {
+            return this.variableMapping.size() == variableMap.size();
+        }
+
+        public String getFileName() {
+            if (this.compiledName == null) {
+                if (!this.matches()) {
+                    throw new FilePatternException(
+                        "Trying to use #getFileName when matches = false");
+                }
+                String rawName = pattern;
+                for (final Map.Entry<String, String> variable : variableMap.entrySet()) {
+                    rawName = rawName
+                        .replace(variable.getKey(), this.variableMapping.get(variable.getValue()));
+                }
+                this.compiledName = rawName;
+            }
+            return this.compiledName;
+        }
+    }
 
 }

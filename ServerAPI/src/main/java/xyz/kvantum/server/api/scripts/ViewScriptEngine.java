@@ -21,54 +21,47 @@
  */
 package xyz.kvantum.server.api.scripts;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.util.FileUtils;
 
-final class ViewScriptEngine extends KvantumScriptEngine
-{
+import javax.script.Bindings;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
-	@Getter private final Path path;
+final class ViewScriptEngine extends KvantumScriptEngine {
 
-	ViewScriptEngine(@NonNull final ScriptEngineManager scriptEngineManager, @NonNull final Path path)
-	{
-		super( scriptEngineManager );
-		this.path = path;
+    @Getter private final Path path;
 
-		if ( this.path.getSubPaths().isEmpty() )
-		{
-			try
-			{
-				FileUtils.copyResource( "scripts/folderStructure.js",
-						path.getPath( "folderStructure.js" ).getJavaPath() );
-			} catch ( final Exception e )
-			{
-				e.printStackTrace();
-			}
-		}
-	}
+    ViewScriptEngine(@NonNull final ScriptEngineManager scriptEngineManager,
+        @NonNull final Path path) {
+        super(scriptEngineManager);
+        this.path = path;
 
-	Bindings getBindings()
-	{
-		return this.getEngine().createBindings();
-	}
+        if (this.path.getSubPaths().isEmpty()) {
+            try {
+                FileUtils.copyResource("scripts/folderStructure.js",
+                    path.getPath("folderStructure.js").getJavaPath());
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	boolean evaluate(@NonNull final Path script, @NonNull final Bindings bindings)
-	{
-		final String content = script.readFile();
-		try
-		{
-			this.getEngine().eval( content, bindings );
-			return true;
-		} catch ( final ScriptException e )
-		{
-			e.printStackTrace();
-		}
-		return false;
-	}
+    Bindings getBindings() {
+        return this.getEngine().createBindings();
+    }
+
+    boolean evaluate(@NonNull final Path script, @NonNull final Bindings bindings) {
+        final String content = script.readFile();
+        try {
+            this.getEngine().eval(content, bindings);
+            return true;
+        } catch (final ScriptException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
 }

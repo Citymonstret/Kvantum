@@ -23,15 +23,12 @@ package xyz.kvantum.crush;
 
 import xyz.kvantum.server.api.addon.AddOn;
 
-public class CrushPlugin extends AddOn
-{
+public class CrushPlugin extends AddOn {
 
-	@Override protected void onEnable()
-	{
-		CrushEngine.getInstance().load();
-	}
+    @Override protected void onEnable() {
+        CrushEngine.getInstance().load();
+    }
 
-	@Override protected void onDisable()
-	{
-	}
+    @Override protected void onDisable() {
+    }
 }

@@ -21,52 +21,46 @@
  */
 package xyz.kvantum.server.api.account;
 
+import lombok.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Consumer;
-import lombok.NonNull;
 
 /**
  * Decorates accounts on initialization
  */
-public class AccountDecorator
-{
+public class AccountDecorator {
 
-	private final Collection<Consumer<IAccount>> consumers;
+    private final Collection<Consumer<IAccount>> consumers;
 
-	private AccountDecorator(@NonNull final Collection<Consumer<IAccount>> consumers)
-	{
-		this.consumers = Collections.unmodifiableCollection( consumers );
-	}
+    private AccountDecorator(@NonNull final Collection<Consumer<IAccount>> consumers) {
+        this.consumers = Collections.unmodifiableCollection(consumers);
+    }
 
-	public void decorateAccount(@NonNull final IAccount account)
-	{
-		this.consumers.forEach( consumer -> consumer.accept( account ) );
-	}
+    @SafeVarargs public static AccountDecorator with(final Consumer<IAccount>... consumers) {
+        return new AccountDecorator(Arrays.asList(consumers));
+    }
 
-	@SafeVarargs public static AccountDecorator with(final Consumer<IAccount> ...consumers)
-	{
-		return new AccountDecorator( Arrays.asList( consumers ) );
-	}
+    @SuppressWarnings("ALL") public static AccountDecorator with(final Object... objects) {
+        final Collection<Consumer<IAccount>> consumers = new ArrayList<>();
+        for (final Object object : objects) {
+            if (object instanceof Consumer) {
+                consumers.add((Consumer<IAccount>) object);
+            } else if (object instanceof Class) {
+                final Class<? extends AccountExtension> extension =
+                    (Class<? extends AccountExtension>) object;
+                final Consumer<IAccount> consumer = account -> account.attachExtension(extension);
+                consumers.add(consumer);
+            }
+        }
+        return new AccountDecorator(consumers);
+    }
 
-	@SuppressWarnings( "ALL" ) public static AccountDecorator with(final Object ...objects)
-	{
-		final Collection<Consumer<IAccount>> consumers = new ArrayList<>();
-		for ( final Object object : objects )
-		{
-			if ( object instanceof Consumer )
-			{
-				consumers.add( ( Consumer<IAccount>) object );
-			} else if ( object instanceof Class )
-			{
-				final Class<? extends AccountExtension> extension = (Class<? extends AccountExtension>) object;
-				final Consumer<IAccount> consumer = account -> account.attachExtension( extension );
-				consumers.add( consumer );
-			}
-		}
-		return new AccountDecorator( consumers );
-	}
+    public void decorateAccount(@NonNull final IAccount account) {
+        this.consumers.forEach(consumer -> consumer.accept(account));
+    }
 
 }

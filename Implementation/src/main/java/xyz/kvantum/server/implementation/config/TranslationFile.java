@@ -21,54 +21,50 @@
  */
 package xyz.kvantum.server.implementation.config;
 
-import java.io.File;
-import java.util.Locale;
 import lombok.NonNull;
 import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.config.YamlConfiguration;
 import xyz.kvantum.server.api.logging.LogModes;
 
-final public class TranslationFile extends YamlConfiguration implements ITranslationManager
-{
+import java.io.File;
+import java.util.Locale;
 
-	public TranslationFile(final File folder) throws Exception
-	{
-		super( "translations", new File( folder, "translations.yml" ) );
-		this.loadFile();
-		for ( final Message message : Message.values() )
-		{
-			final String nameSpace;
-			switch ( message.getMode() )
-			{
-			case LogModes.MODE_DEBUG:
-				nameSpace = "debug";
-				break;
-			case LogModes.MODE_INFO:
-				nameSpace = "info";
-				break;
-			case LogModes.MODE_ERROR:
-				nameSpace = "error";
-				break;
-			case LogModes.MODE_WARNING:
-				nameSpace = "warning";
-				break;
-			default:
-				nameSpace = "info";
-				break;
-			}
-			this.setIfNotExists( nameSpace + "." + message.name().toLowerCase( Locale.ENGLISH ), message.toString() );
-		}
-		this.saveFile();
-	}
+final public class TranslationFile extends YamlConfiguration implements ITranslationManager {
 
-	@Override public boolean containsTranslation(@NonNull final String translation)
-	{
-		return this.contains( translation );
-	}
+    public TranslationFile(final File folder) throws Exception {
+        super("translations", new File(folder, "translations.yml"));
+        this.loadFile();
+        for (final Message message : Message.values()) {
+            final String nameSpace;
+            switch (message.getMode()) {
+                case LogModes.MODE_DEBUG:
+                    nameSpace = "debug";
+                    break;
+                case LogModes.MODE_INFO:
+                    nameSpace = "info";
+                    break;
+                case LogModes.MODE_ERROR:
+                    nameSpace = "error";
+                    break;
+                case LogModes.MODE_WARNING:
+                    nameSpace = "warning";
+                    break;
+                default:
+                    nameSpace = "info";
+                    break;
+            }
+            this.setIfNotExists(nameSpace + "." + message.name().toLowerCase(Locale.ENGLISH),
+                message.toString());
+        }
+        this.saveFile();
+    }
 
-	@Override public String getTranslation(@NonNull final String translation)
-	{
-		return this.get( translation );
-	}
+    @Override public boolean containsTranslation(@NonNull final String translation) {
+        return this.contains(translation);
+    }
+
+    @Override public String getTranslation(@NonNull final String translation) {
+        return this.get(translation);
+    }
 }

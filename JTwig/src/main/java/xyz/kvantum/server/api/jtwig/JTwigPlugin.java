@@ -23,15 +23,12 @@ package xyz.kvantum.server.api.jtwig;
 
 import xyz.kvantum.server.api.addon.AddOn;
 
-public class JTwigPlugin extends AddOn
-{
+public class JTwigPlugin extends AddOn {
 
-	@Override protected void onEnable()
-	{
-		JTwigEngine.getInstance().load();
-	}
+    @Override protected void onEnable() {
+        JTwigEngine.getInstance().load();
+    }
 
-	@Override protected void onDisable()
-	{
-	}
+    @Override protected void onDisable() {
+    }
 }

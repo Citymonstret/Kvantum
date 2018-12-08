@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.crush;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import xyz.kvantum.crush.syntax.Syntax;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.template.TemplateSyntaxHandler;
@@ -32,42 +29,42 @@ import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-public final class SyntaxHandler extends TemplateSyntaxHandler
-{
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
-	private final CrushEngine crushEngine;
+public final class SyntaxHandler extends TemplateSyntaxHandler {
 
-	SyntaxHandler(final CrushEngine crushEngine)
-	{
-		super( crushEngine );
-		this.crushEngine = crushEngine;
-	}
+    private final CrushEngine crushEngine;
 
-	@Override public String handle(final RequestHandler requestHandler, final AbstractRequest request, final String in)
-	{
-		String out = in;
-		final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
-		for ( final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get().getProviders() )
-		{
-			factories.put( factory.providerName().toLowerCase( Locale.ENGLISH ), factory );
-		}
-		final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory( request );
-		if ( z != null )
-		{
-			factories.put( z.providerName().toLowerCase( Locale.ENGLISH ), z );
-		}
-		factories.put( "request", request );
-		factories.putAll( request.getModels() );
-		// This is how the crush engine works.
-		// Quite simple, yet powerful!
-		for ( final Syntax syntax : crushEngine.syntaxCollection )
-		{
-			if ( syntax.matches( out ) )
-			{
-				out = syntax.handle( out, request, factories );
-			}
-		}
+    SyntaxHandler(final CrushEngine crushEngine) {
+        super(crushEngine);
+        this.crushEngine = crushEngine;
+    }
 
-		return out;
-	}
+    @Override
+    public String handle(final RequestHandler requestHandler, final AbstractRequest request,
+        final String in) {
+        String out = in;
+        final Map<String, ProviderFactory<? extends VariableProvider>> factories = new HashMap<>();
+        for (final ProviderFactory<? extends VariableProvider> factory : TemplateManager.get()
+            .getProviders()) {
+            factories.put(factory.providerName().toLowerCase(Locale.ENGLISH), factory);
+        }
+        final ProviderFactory<? extends VariableProvider> z = requestHandler.getFactory(request);
+        if (z != null) {
+            factories.put(z.providerName().toLowerCase(Locale.ENGLISH), z);
+        }
+        factories.put("request", request);
+        factories.putAll(request.getModels());
+        // This is how the crush engine works.
+        // Quite simple, yet powerful!
+        for (final Syntax syntax : crushEngine.syntaxCollection) {
+            if (syntax.matches(out)) {
+                out = syntax.handle(out, request, factories);
+            }
+        }
+
+        return out;
+    }
 }

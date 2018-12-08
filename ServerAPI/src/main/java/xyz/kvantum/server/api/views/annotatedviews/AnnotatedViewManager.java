@@ -23,13 +23,6 @@ package xyz.kvantum.server.api.views.annotatedviews;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
@@ -40,111 +33,102 @@ import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-public final class AnnotatedViewManager
-{
+import java.lang.reflect.Method;
+import java.util.*;
 
-	private final Class<?>[] parameters = new Class<?>[] { AbstractRequest.class };
-	private final Class<?>[] alternativeParameters = new Class<?>[] { AbstractRequest.class, Response.class };
-	private final Map<String, OutputConverter> converters = new HashMap<>();
+public final class AnnotatedViewManager {
 
-	public AnnotatedViewManager()
-	{
-		StandardConverters.registerStandardConverters( this );
-	}
+    private final Class<?>[] parameters = new Class<?>[] {AbstractRequest.class};
+    private final Class<?>[] alternativeParameters =
+        new Class<?>[] {AbstractRequest.class, Response.class};
+    private final Map<String, OutputConverter> converters = new HashMap<>();
 
-	public <T> Collection<? extends RequestHandler> generate(@NonNull final T viewDeclaration) throws Exception
-	{
-		final Class<?> clazz = viewDeclaration.getClass();
-		final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods = ReflectionUtils
-				.getAnnotatedMethods( ViewMatcher.class, clazz );
-		final ImmutableCollection.Builder<RequestHandler> builder = ImmutableList.builder();
-		( ( IConsumer<ReflectionUtils.AnnotatedMethod<ViewMatcher>> ) annotatedMethod -> {
-			final Method m = annotatedMethod.getMethod();
-			final boolean usesAlternate = Arrays.equals( m.getParameterTypes(), alternativeParameters );
-			final ViewMatcher matcher = annotatedMethod.getAnnotation();
-			final ViewDeclaration declaration = new ViewDeclaration();
+    public AnnotatedViewManager() {
+        StandardConverters.registerStandardConverters(this);
+    }
 
-			if ( !usesAlternate && !Response.class.equals( m.getReturnType() ) && matcher.outputType().isEmpty() )
-			{
-				new IllegalArgumentException( m.getName() + " doesn't return response" ).printStackTrace();
-			} else
-			{
-				if ( !usesAlternate && !Arrays.equals( m.getParameterTypes(), parameters ) )
-				{
-					new IllegalArgumentException( "M has wrong parameter types" ).printStackTrace();
-				} else
-				{
-					declaration.setCache( matcher.cache() );
-					declaration.setFilter( matcher.filter() );
-					declaration.setMiddleware( matcher.middlewares() );
-					declaration.setForceHttps( matcher.forceHTTPS() );
-					declaration.setHttpMethod( matcher.httpMethod() );
-					if ( !matcher.outputType().isEmpty() && converters
-							.containsKey( matcher.outputType().toLowerCase( Locale.ENGLISH ) ) )
-					{
-						final OutputConverter outputConverter = converters
-								.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) );
-						if ( !outputConverter.getClasses().contains( m.getReturnType() ) )
-						{
-							new IllegalArgumentException( m.getName() + " should return one of " + CollectionUtil
-									.smartJoin( outputConverter.getClasses(), Class::getSimpleName, ", " ) )
-									.printStackTrace();
-						} else
-						{
-							declaration.setOutputConverter(
-									converters.get( matcher.outputType().toLowerCase( Locale.ENGLISH ) ) );
-						}
-					}
-					if ( matcher.name().isEmpty() )
-					{
-						declaration.setName( m.getName() );
-					} else
-					{
-						declaration.setName( matcher.name() );
-					}
+    public <T> Collection<? extends RequestHandler> generate(@NonNull final T viewDeclaration)
+        throws Exception {
+        final Class<?> clazz = viewDeclaration.getClass();
+        final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
+            ReflectionUtils.getAnnotatedMethods(ViewMatcher.class, clazz);
+        final ImmutableCollection.Builder<RequestHandler> builder = ImmutableList.builder();
+        ((IConsumer<ReflectionUtils.AnnotatedMethod<ViewMatcher>>) annotatedMethod -> {
+            final Method m = annotatedMethod.getMethod();
+            final boolean usesAlternate =
+                Arrays.equals(m.getParameterTypes(), alternativeParameters);
+            final ViewMatcher matcher = annotatedMethod.getAnnotation();
+            final ViewDeclaration declaration = new ViewDeclaration();
 
-					RequestHandler view = null;
-					if ( matcher.cache() )
-					{
-						try
-						{
-							view = new CachedAnnotatedView<>( declaration,
-									new ResponseMethod<>( m, viewDeclaration, declaration.getOutputConverter() ) );
-						} catch ( Throwable throwable )
-						{
-							throwable.printStackTrace();
-						}
-					} else
-					{
-						try
-						{
-							view = new AnnotatedView<>( declaration,
-									new ResponseMethod<>( m, viewDeclaration, declaration.getOutputConverter() ) );
-						} catch ( Throwable throwable )
-						{
-							throwable.printStackTrace();
-						}
-					}
+            if (!usesAlternate && !Response.class.equals(m.getReturnType()) && matcher.outputType()
+                .isEmpty()) {
+                new IllegalArgumentException(m.getName() + " doesn't return response")
+                    .printStackTrace();
+            } else {
+                if (!usesAlternate && !Arrays.equals(m.getParameterTypes(), parameters)) {
+                    new IllegalArgumentException("M has wrong parameter types").printStackTrace();
+                } else {
+                    declaration.setCache(matcher.cache());
+                    declaration.setFilter(matcher.filter());
+                    declaration.setMiddleware(matcher.middlewares());
+                    declaration.setForceHttps(matcher.forceHTTPS());
+                    declaration.setHttpMethod(matcher.httpMethod());
+                    if (!matcher.outputType().isEmpty() && converters
+                        .containsKey(matcher.outputType().toLowerCase(Locale.ENGLISH))) {
+                        final OutputConverter outputConverter =
+                            converters.get(matcher.outputType().toLowerCase(Locale.ENGLISH));
+                        if (!outputConverter.getClasses().contains(m.getReturnType())) {
+                            new IllegalArgumentException(
+                                m.getName() + " should return one of " + CollectionUtil
+                                    .smartJoin(outputConverter.getClasses(), Class::getSimpleName,
+                                        ", ")).printStackTrace();
+                        } else {
+                            declaration.setOutputConverter(
+                                converters.get(matcher.outputType().toLowerCase(Locale.ENGLISH)));
+                        }
+                    }
+                    if (matcher.name().isEmpty()) {
+                        declaration.setName(m.getName());
+                    } else {
+                        declaration.setName(matcher.name());
+                    }
 
-					if ( view == null )
-					{
-						return;
-					}
+                    RequestHandler view = null;
+                    if (matcher.cache()) {
+                        try {
+                            view = new CachedAnnotatedView<>(declaration,
+                                new ResponseMethod<>(m, viewDeclaration,
+                                    declaration.getOutputConverter()));
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            view = new AnnotatedView<>(declaration,
+                                new ResponseMethod<>(m, viewDeclaration,
+                                    declaration.getOutputConverter()));
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
 
-					for ( final Class<? extends Middleware> middleware : matcher.middlewares() )
-					{
-						view.getMiddlewareQueuePopulator().add( middleware );
-					}
+                    if (view == null) {
+                        return;
+                    }
 
-					builder.add( view );
-				}
-			}
-		} ).foreach( annotatedMethods );
-		return builder.build();
-	}
+                    for (final Class<? extends Middleware> middleware : matcher.middlewares()) {
+                        view.getMiddlewareQueuePopulator().add(middleware);
+                    }
 
-	@SuppressWarnings("WeakerAccess") public void registerConverter(@NonNull final OutputConverter converter)
-	{
-		converters.put( converter.getKey().toLowerCase( Locale.ENGLISH ), converter );
-	}
+                    builder.add(view);
+                }
+            }
+        }).foreach(annotatedMethods);
+        return builder.build();
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void registerConverter(@NonNull final OutputConverter converter) {
+        converters.put(converter.getKey().toLowerCase(Locale.ENGLISH), converter);
+    }
 }

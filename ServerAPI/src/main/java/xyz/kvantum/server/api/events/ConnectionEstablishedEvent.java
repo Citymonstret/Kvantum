@@ -25,20 +25,17 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.kvantum.server.api.event.Cancellable;
 
-public final class ConnectionEstablishedEvent extends Event implements Cancellable
-{
+public final class ConnectionEstablishedEvent extends Event implements Cancellable {
 
-	@Getter private final String ip;
-	@Getter @Setter private boolean cancelled;
+    @Getter private final String ip;
+    @Getter @Setter private boolean cancelled;
 
-	public ConnectionEstablishedEvent(final String ip)
-	{
-		super( "connectionEstablishedEvent" );
-		this.ip = ip;
-	}
+    public ConnectionEstablishedEvent(final String ip) {
+        super("connectionEstablishedEvent");
+        this.ip = ip;
+    }
 
-	@Override public void cancel()
-	{
-		this.setCancelled( true );
-	}
+    @Override public void cancel() {
+        this.setCancelled(true);
+    }
 }

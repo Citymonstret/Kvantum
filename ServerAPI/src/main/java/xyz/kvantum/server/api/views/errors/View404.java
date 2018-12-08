@@ -24,19 +24,17 @@ package xyz.kvantum.server.api.views.errors;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.response.Header;
 
-public class View404 extends xyz.kvantum.server.api.views.errors.Error
-{
+public class View404 extends xyz.kvantum.server.api.views.errors.Error {
 
-	private View404(final String url)
-	{
-		super( Header.STATUS_NOT_FOUND, "Not Found: " + url );
-	}
+    private View404(final String url) {
+        super(Header.STATUS_NOT_FOUND, "Not Found: " + url);
+    }
 
-	public static View404 construct(final String url)
-	{
-		final String webAddress = CoreConfig.webAddress.endsWith( "/" ) ? CoreConfig.webAddress
-				.substring( 0, CoreConfig.webAddress.length() - 1 ) : CoreConfig.webAddress;
-		return new View404( webAddress + url );
-	}
+    public static View404 construct(final String url) {
+        final String webAddress = CoreConfig.webAddress.endsWith("/") ?
+            CoreConfig.webAddress.substring(0, CoreConfig.webAddress.length() - 1) :
+            CoreConfig.webAddress;
+        return new View404(webAddress + url);
+    }
 
 }

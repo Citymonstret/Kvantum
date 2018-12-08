@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.api.matching;
 
-import java.util.Collection;
-import java.util.Collections;
-import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -33,99 +30,97 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Router that is responsible for {@link RequestHandler} matching
  */
-@SuppressWarnings({ "WeakerAccess", "unused" }) public abstract class Router
-{
+@SuppressWarnings({"WeakerAccess", "unused"}) public abstract class Router {
 
-	@Getter private final AnnotatedViewManager annotatedViewManager = new AnnotatedViewManager();
+    @Getter private final AnnotatedViewManager annotatedViewManager = new AnnotatedViewManager();
 
-	/**
-	 * Attempt to match a request to a {@link RequestHandler}
-	 *
-	 * @param request Request to be matched
-	 * @return Depends on implementation, but should return either the matched {@link RequestHandler} or null, may also
-	 * return a Status 404 View.
-	 */
-	public abstract RequestHandler match(AbstractRequest request);
+    /**
+     * Attempt to match a request to a {@link RequestHandler}
+     *
+     * @param request Request to be matched
+     * @return Depends on implementation, but should return either the matched {@link RequestHandler} or null, may also
+     * return a Status 404 View.
+     */
+    public abstract RequestHandler match(AbstractRequest request);
 
-	/**
-	 * Add a new {@link RequestHandler} to the router
-	 *
-	 * @param handler RequestHandler that is to be registered
-	 * @return The added {@link RequestHandler}
-	 */
-	@Nullable public abstract <T extends RequestHandler> T add(T handler);
+    /**
+     * Add a new {@link RequestHandler} to the router
+     *
+     * @param handler RequestHandler that is to be registered
+     * @return The added {@link RequestHandler}
+     */
+    @Nullable public abstract <T extends RequestHandler> T add(T handler);
 
-	/**
-	 * Add a collection containing {@link RequestHandler RequestHandlers} to the router
-	 *
-	 * @param handlers RequestHandlers that are to be registered
-	 */
-	public final Collection<? extends RequestHandler> addAll(
-			@NonNull final Collection<? extends RequestHandler> handlers)
-	{
-		handlers.forEach( this::add );
-		return handlers;
-	}
+    /**
+     * Add a collection containing {@link RequestHandler RequestHandlers} to the router
+     *
+     * @param handlers RequestHandlers that are to be registered
+     */
+    public final Collection<? extends RequestHandler> addAll(
+        @NonNull final Collection<? extends RequestHandler> handlers) {
+        handlers.forEach(this::add);
+        return handlers;
+    }
 
-	/**
-	 * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and register all constructed
-	 * {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView StaticViews}
-	 *
-	 * @param instance Instance to be scanned
-	 */
-	public final <T> Collection<? extends RequestHandler> scanAndAdd(@NonNull final T instance)
-	{
-		return this.addAll( this.scan( instance ) );
-	}
+    /**
+     * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and register all constructed
+     * {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView StaticViews}
+     *
+     * @param instance Instance to be scanned
+     */
+    public final <T> Collection<? extends RequestHandler> scanAndAdd(@NonNull final T instance) {
+        return this.addAll(this.scan(instance));
+    }
 
-	/**
-	 * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and return a collection of
-	 * constructed {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView}
-	 *
-	 * @param instance Instance to be scanned
-	 * @return Constructed views
-	 */
-	public final <T> Collection<? extends RequestHandler> scan(@NonNull final T instance)
-	{
-		try
-		{
-			return this.annotatedViewManager.generate( instance );
-		} catch ( final Exception e )
-		{
-			e.printStackTrace();
-		}
-		return Collections.emptyList();
-	}
+    /**
+     * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and return a collection of
+     * constructed {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView}
+     *
+     * @param instance Instance to be scanned
+     * @return Constructed views
+     */
+    public final <T> Collection<? extends RequestHandler> scan(@NonNull final T instance) {
+        try {
+            return this.annotatedViewManager.generate(instance);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
 
-	/**
-	 * Attempts to remove a RequestHandler from the Router
-	 *
-	 * @param handler RequestHandler to be removed
-	 */
-	public abstract <T extends RequestHandler> void remove(T handler);
+    /**
+     * Attempts to remove a RequestHandler from the Router
+     *
+     * @param handler RequestHandler to be removed
+     */
+    public abstract <T extends RequestHandler> void remove(T handler);
 
-	/**
-	 * Clear all handlers from the router
-	 */
-	public abstract void clear();
+    /**
+     * Clear all handlers from the router
+     */
+    public abstract void clear();
 
-	/**
-	 * Dump Router contents onto the server log
-	 *
-	 * @param server Server instance
-	 */
-	@SneakyThrows public void dump(@NonNull final Kvantum server)
-	{
-		throw new NotImplementedException( "Dump has not been overridden by the Router implementation" );
-	}
+    /**
+     * Dump Router contents onto the server log
+     *
+     * @param server Server instance
+     */
+    @SneakyThrows public void dump(@NonNull final Kvantum server) {
+        throw new NotImplementedException(
+            "Dump has not been overridden by the Router implementation");
+    }
 
-	/**
-	 * Get all registered {@link RequestHandler request handlers}
-	 *
-	 * @return Immutable collection containing all request handlers
-	 */
-	public abstract Collection<RequestHandler> getAll();
+    /**
+     * Get all registered {@link RequestHandler request handlers}
+     *
+     * @return Immutable collection containing all request handlers
+     */
+    public abstract Collection<RequestHandler> getAll();
 }

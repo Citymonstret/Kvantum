@@ -21,68 +21,62 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import lombok.experimental.UtilityClass;
 
 /**
  * Utility class providing methods for dealing with timestamps
  */
-@SuppressWarnings("WeakerAccess") @UtilityClass public final class TimeUtil
-{
+@SuppressWarnings("WeakerAccess") @UtilityClass public final class TimeUtil {
 
-	public final static SimpleDateFormat logFileFormat;
-	public final static SimpleDateFormat httpFormat;
-	public final static SimpleDateFormat logFormat;
-	public static final SimpleDateFormat accessLogFormat;
+    public final static SimpleDateFormat logFileFormat;
+    public final static SimpleDateFormat httpFormat;
+    public final static SimpleDateFormat logFormat;
+    public static final SimpleDateFormat accessLogFormat;
 
-	static
-	{
-		httpFormat = new SimpleDateFormat( "EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.ENGLISH );
-		logFormat = new SimpleDateFormat( "HH:mm:ss", Locale.ENGLISH );
-		logFileFormat = new SimpleDateFormat( "dd MMM yyyy kk-mm-ss", Locale.ENGLISH );
-		accessLogFormat = new SimpleDateFormat( "dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH );
-	}
+    static {
+        httpFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.ENGLISH);
+        logFormat = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+        logFileFormat = new SimpleDateFormat("dd MMM yyyy kk-mm-ss", Locale.ENGLISH);
+        accessLogFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
+    }
 
-	/**
-	 * Get a log formatted timestamp
-	 *
-	 * @return log formatted timestamp
-	 */
-	public static String getTimeStamp()
-	{
-		return getTimeStamp( logFormat, new Date() );
-	}
+    /**
+     * Get a log formatted timestamp
+     *
+     * @return log formatted timestamp
+     */
+    public static String getTimeStamp() {
+        return getTimeStamp(logFormat, new Date());
+    }
 
-	/**
-	 * Returns a string with date formatted with HTTP-date format as defined by RFC 7231
-	 *
-	 * @param date Date from which the timestamp is generated
-	 * @return RFC 7231 formatted timestamp
-	 */
-	public static String getHTTPTimeStamp(final Date date)
-	{
-		return getTimeStamp( httpFormat, date );
-	}
+    /**
+     * Returns a string with date formatted with HTTP-date format as defined by RFC 7231
+     *
+     * @param date Date from which the timestamp is generated
+     * @return RFC 7231 formatted timestamp
+     */
+    public static String getHTTPTimeStamp(final Date date) {
+        return getTimeStamp(httpFormat, date);
+    }
 
-	public static String getAccessLogTimeStamp(final long time)
-	{
-		return getTimeStamp( accessLogFormat, new Date( time ) );
-	}
+    public static String getAccessLogTimeStamp(final long time) {
+        return getTimeStamp(accessLogFormat, new Date(time));
+    }
 
-	/**
-	 * Returns a string with current timestamp formatted with HTTP-date format as defined by RFC 7231
-	 *
-	 * @return RFC 7231 formatted timestamp
-	 */
-	public static String getHTTPTimeStamp()
-	{
-		return getTimeStamp( httpFormat, new Date() );
-	}
+    /**
+     * Returns a string with current timestamp formatted with HTTP-date format as defined by RFC 7231
+     *
+     * @return RFC 7231 formatted timestamp
+     */
+    public static String getHTTPTimeStamp() {
+        return getTimeStamp(httpFormat, new Date());
+    }
 
-	public static String getTimeStamp(final SimpleDateFormat format, final Date date)
-	{
-		return format.format( date );
-	}
+    public static String getTimeStamp(final SimpleDateFormat format, final Date date) {
+        return format.format(date);
+    }
 }

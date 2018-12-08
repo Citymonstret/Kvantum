@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.server.api.scripts;
 
-import java.util.Map;
-import javax.script.Bindings;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
@@ -32,53 +30,48 @@ import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.View;
 
-public class ScriptView extends View
-{
+import javax.script.Bindings;
+import java.util.Map;
 
-	private static ScriptManager scriptManager;
-	private final Path script;
-	private final ViewScriptEngine viewScriptEngine;
-	public ScriptView(final String filter, final Map<String, Object> options)
-	{
-		super( filter, "script", options, HttpMethod.ALL );
-		if ( !options.containsKey( "script" ) )
-		{
-			throw new IllegalArgumentException( "No script provided for script type..." );
-		}
-		this.viewScriptEngine = getScriptManager().getViewScriptEngine();
-		this.script = this.viewScriptEngine.getPath().getPath( options.get( "script" ).toString() );
-		if ( !script.exists() )
-		{
-			Logger.error( "Provided script ({}) does not exist...", options.get( "script" ) );
-		}
-	}
+public class ScriptView extends View {
 
-	private static ScriptManager getScriptManager()
-	{
-		if ( scriptManager == null )
-		{
-			scriptManager = new ScriptManager( ServerImplementation.getImplementation() );
-		}
-		return scriptManager;
-	}
+    private static ScriptManager scriptManager;
+    private final Path script;
+    private final ViewScriptEngine viewScriptEngine;
 
-	@Override protected void handle(final AbstractRequest request, final Response response)
-	{
-		final Bindings bindings = this.viewScriptEngine.getBindings();
-		bindings.put( "Kvantum", ServerImplementation.getImplementation() );
-		bindings.put( "request", request );
-		bindings.put( "response", response );
-		bindings.put( "GET", request.getQuery().getParameters() );
-		if ( request.getPostRequest() != null )
-		{
-			bindings.put( "POST", request.getPostRequest().get() );
-		}
-		bindings.put( "options", this.options );
-		if ( !this.viewScriptEngine.evaluate( this.script, bindings ) )
-		{
-			response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
-			response.setResponse( "Failed to handle script..." );
-		}
-	}
+    public ScriptView(final String filter, final Map<String, Object> options) {
+        super(filter, "script", options, HttpMethod.ALL);
+        if (!options.containsKey("script")) {
+            throw new IllegalArgumentException("No script provided for script type...");
+        }
+        this.viewScriptEngine = getScriptManager().getViewScriptEngine();
+        this.script = this.viewScriptEngine.getPath().getPath(options.get("script").toString());
+        if (!script.exists()) {
+            Logger.error("Provided script ({}) does not exist...", options.get("script"));
+        }
+    }
+
+    private static ScriptManager getScriptManager() {
+        if (scriptManager == null) {
+            scriptManager = new ScriptManager(ServerImplementation.getImplementation());
+        }
+        return scriptManager;
+    }
+
+    @Override protected void handle(final AbstractRequest request, final Response response) {
+        final Bindings bindings = this.viewScriptEngine.getBindings();
+        bindings.put("Kvantum", ServerImplementation.getImplementation());
+        bindings.put("request", request);
+        bindings.put("response", response);
+        bindings.put("GET", request.getQuery().getParameters());
+        if (request.getPostRequest() != null) {
+            bindings.put("POST", request.getPostRequest().get());
+        }
+        bindings.put("options", this.options);
+        if (!this.viewScriptEngine.evaluate(this.script, bindings)) {
+            response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
+            response.setResponse("Failed to handle script...");
+        }
+    }
 
 }

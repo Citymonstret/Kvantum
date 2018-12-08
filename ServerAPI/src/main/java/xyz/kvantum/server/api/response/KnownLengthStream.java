@@ -26,24 +26,25 @@ import lombok.NonNull;
 /**
  * A stream (such as {@link ResponseStream}) with a known length.
  */
-public interface KnownLengthStream
-{
+public interface KnownLengthStream {
 
-	/**
-	 * Get the length of the content provided by the stream
-	 */
-	int getLength();
+    /**
+     * Get the length of the content provided by the stream
+     */
+    int getLength();
 
-	/**
-	 * Get the entire content provided by the stream as a single byte array
-	 * @return byte array with length {@link #getLength()}
-	 */
-	byte[] getAll();
+    /**
+     * Get the entire content provided by the stream as a single byte array
+     *
+     * @return byte array with length {@link #getLength()}
+     */
+    byte[] getAll();
 
-	/**
-	 * Replace the content provided by the stream
-	 * @param bytes byte array
-	 */
-	void replaceBytes(@NonNull final byte[] bytes);
+    /**
+     * Replace the content provided by the stream
+     *
+     * @param bytes byte array
+     */
+    void replaceBytes(@NonNull final byte[] bytes);
 
 }

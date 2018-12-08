@@ -21,14 +21,7 @@
  */
 package xyz.kvantum.server.api.account;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import net.sf.oval.ConstraintViolation;
 import net.sf.oval.Validator;
 import net.sf.oval.constraint.NotEmpty;
@@ -38,34 +31,34 @@ import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
-@Getter @RequiredArgsConstructor @EqualsAndHashCode @ToString @SuppressWarnings({ "unused",
-		"WeakerAccess" }) public final class AccountDO
-{
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-	@Getter private static final KvantumPojoFactory<AccountDO> kvantumPojoFactory = KvantumPojoFactory
-			.forClass( AccountDO.class );
-	private static final Validator validator = new Validator();
+@Getter @RequiredArgsConstructor @EqualsAndHashCode @ToString
+@SuppressWarnings({"unused", "WeakerAccess"}) public final class AccountDO {
 
-	@NotNegative private final int id;
+    @Getter private static final KvantumPojoFactory<AccountDO> kvantumPojoFactory =
+        KvantumPojoFactory.forClass(AccountDO.class);
+    private static final Validator validator = new Validator();
 
-	@NotEmpty @NotNull @NonNull private final String username;
+    @NotNegative private final int id;
 
-	@NonNull @NotNull private final Collection<AccountRole> accountRoles;
+    @NotEmpty @NotNull @NonNull private final String username;
 
-	public AccountDO(@NotNull final IAccount account)
-	{
-		this.id = account.getId();
-		this.username = account.getUsername();
-		this.accountRoles = new ArrayList<>( account.getAccountRoles() );
-	}
+    @NonNull @NotNull private final Collection<AccountRole> accountRoles;
 
-	public List<ConstraintViolation> validate()
-	{
-		return validator.validate( this );
-	}
+    public AccountDO(@NotNull final IAccount account) {
+        this.id = account.getId();
+        this.username = account.getUsername();
+        this.accountRoles = new ArrayList<>(account.getAccountRoles());
+    }
 
-	public KvantumPojo<AccountDO> toPojo()
-	{
-		return kvantumPojoFactory.of( this );
-	}
+    public List<ConstraintViolation> validate() {
+        return validator.validate(this);
+    }
+
+    public KvantumPojo<AccountDO> toPojo() {
+        return kvantumPojoFactory.of(this);
+    }
 }

@@ -28,30 +28,28 @@ import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 
-@RequiredArgsConstructor @EqualsAndHashCode(of = "applicationName") public abstract class ApplicationStructure
-{
+@RequiredArgsConstructor @EqualsAndHashCode(of = "applicationName")
+public abstract class ApplicationStructure {
 
-	protected final String applicationName;
+    protected final String applicationName;
 
-	@Getter protected IAccountManager accountManager;
+    @Getter protected IAccountManager accountManager;
 
-	@Getter protected ISessionDatabase sessionDatabase;
+    @Getter protected ISessionDatabase sessionDatabase;
 
-	public abstract IAccountManager createNewAccountManager();
+    public abstract IAccountManager createNewAccountManager();
 
-	@Override public String toString()
-	{
-		return this.applicationName;
-	}
+    @Override public String toString() {
+        return this.applicationName;
+    }
 
-	/**
-	 * Register application specific views, this is just a placeholder method that makes sure that the views are added
-	 * after all dependencies are setup
-	 *
-	 * @param server Server implementation (utility reference)
-	 */
-	public void registerViews(final Kvantum server)
-	{
-		// Override me
-	}
+    /**
+     * Register application specific views, this is just a placeholder method that makes sure that the views are added
+     * after all dependencies are setup
+     *
+     * @param server Server implementation (utility reference)
+     */
+    public void registerViews(final Kvantum server) {
+        // Override me
+    }
 }

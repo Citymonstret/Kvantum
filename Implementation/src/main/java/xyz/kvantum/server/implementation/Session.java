@@ -21,16 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.Synchronized;
+import lombok.*;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.session.ISession;
@@ -38,77 +29,70 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-@EqualsAndHashCode(of = { "sessionKey" }) @SuppressWarnings("unused") public final class Session
-		implements ISession, VariableProvider
-{
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
-	@Getter private static final KvantumPojoFactory<ISession> kvantumPojoFactory = KvantumPojoFactory
-			.forClass( ISession.class );
-	private static long id = 0L;
+@EqualsAndHashCode(of = {"sessionKey"}) @SuppressWarnings("unused") public final class Session
+    implements ISession, VariableProvider {
 
-	private final Map<String, Object> sessionStorage;
+    @Getter private static final KvantumPojoFactory<ISession> kvantumPojoFactory =
+        KvantumPojoFactory.forClass(ISession.class);
+    private static long id = 0L;
 
-	@Getter private boolean deleted = false;
+    private final Map<String, Object> sessionStorage;
 
-	@Setter @Getter private AsciiString sessionKey;
+    @Getter private boolean deleted = false;
 
-	Session()
-	{
-		this.sessionKey = AsciiString.randomUUIDAsciiString();
-		this.sessionStorage = new ConcurrentHashMap<>();
-		this.sessionStorage.put( "id", "n/a" );
-	}
+    @Setter @Getter private AsciiString sessionKey;
 
-	@Override @Synchronized public boolean contains(final String variable)
-	{
-		return sessionStorage.containsKey( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
-	}
+    Session() {
+        this.sessionKey = AsciiString.randomUUIDAsciiString();
+        this.sessionStorage = new ConcurrentHashMap<>();
+        this.sessionStorage.put("id", "n/a");
+    }
 
-	@Override @Synchronized public Object get(final String variable)
-	{
-		return sessionStorage.get( Assert.notNull( variable ).toLowerCase( Locale.ENGLISH ) );
-	}
+    @Override @Synchronized public boolean contains(final String variable) {
+        return sessionStorage.containsKey(Assert.notNull(variable).toLowerCase(Locale.ENGLISH));
+    }
 
-	@Override public void setDeleted()
-	{
-		this.deleted = true;
-	}
+    @Override @Synchronized public Object get(final String variable) {
+        return sessionStorage.get(Assert.notNull(variable).toLowerCase(Locale.ENGLISH));
+    }
 
-	@Override @Synchronized public Map<String, Object> getAll()
-	{
-		return new HashMap<>( sessionStorage );
-	}
+    @Override public void setDeleted() {
+        this.deleted = true;
+    }
 
-	@Override @Synchronized public ISession set(@NonNull final String s, @NonNull final Object o)
-	{
-		if ( o == null )
-		{
-			sessionStorage.remove( s );
-		} else
-		{
-			sessionStorage.put( s.toLowerCase( Locale.ENGLISH ), o );
-		}
-		return this;
-	}
+    @Override @Synchronized public Map<String, Object> getAll() {
+        return new HashMap<>(sessionStorage);
+    }
 
-	@Override public KvantumPojo<ISession> toKvantumPojo()
-	{
-		return kvantumPojoFactory.of( this );
-	}
+    @Override @Synchronized public ISession set(@NonNull final String s, @NonNull final Object o) {
+        if (o == null) {
+            sessionStorage.remove(s);
+        } else {
+            sessionStorage.put(s.toLowerCase(Locale.ENGLISH), o);
+        }
+        return this;
+    }
 
-	@Override @SuppressWarnings("ALL") public <T> T getOrCompute(@NonNull final String key,
-			@NonNull final Function<String, ? extends T> function)
-	{
-		final T object;
-		if ( !this.contains( key ) )
-		{
-			object = function.apply( key );
-			this.set( key, object );
-		} else
-		{
-			object = ( T ) get( key );
-		}
-		return object;
-	}
+    @Override public KvantumPojo<ISession> toKvantumPojo() {
+        return kvantumPojoFactory.of(this);
+    }
+
+    @Override @SuppressWarnings("ALL") public <T> T getOrCompute(@NonNull final String key,
+        @NonNull final Function<String, ? extends T> function) {
+        final T object;
+        if (!this.contains(key)) {
+            object = function.apply(key);
+            this.set(key, object);
+        } else {
+            object = (T) get(key);
+        }
+        return object;
+    }
 
 }

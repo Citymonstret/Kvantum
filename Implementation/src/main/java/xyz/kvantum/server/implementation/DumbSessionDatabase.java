@@ -21,36 +21,31 @@
  */
 package xyz.kvantum.server.implementation;
 
-import javax.annotation.Nullable;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
 import xyz.kvantum.server.api.util.AsciiString;
 
+import javax.annotation.Nullable;
+
 /**
  * Session database without any functionality
  */
-public final class DumbSessionDatabase implements ISessionDatabase
-{
+public final class DumbSessionDatabase implements ISessionDatabase {
 
-	@Override public void setup() throws Exception
-	{
-	}
+    @Override public void setup() throws Exception {
+    }
 
-	@Nullable @Override public SessionLoad getSessionLoad(final AsciiString sessionID)
-	{
-		return null; // Nullable
-	}
+    @Nullable @Override public SessionLoad getSessionLoad(final AsciiString sessionID) {
+        return null; // Nullable
+    }
 
-	@Override public void storeSession(final ISession session)
-	{
-	}
+    @Override public void storeSession(final ISession session) {
+    }
 
-	@Override public void updateSession(final AsciiString session)
-	{
-	}
+    @Override public void updateSession(final AsciiString session) {
+    }
 
-	@Override public void deleteSession(final AsciiString session)
-	{
-	}
+    @Override public void deleteSession(final AsciiString session) {
+    }
 }

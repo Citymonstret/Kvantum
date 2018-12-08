@@ -27,21 +27,18 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
-final class HtmlConverter extends OutputConverter
-{
+final class HtmlConverter extends OutputConverter {
 
-	HtmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
-	{
-		super( "html", String.class );
-		annotatedViewManager.registerConverter( this );
-	}
+    HtmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager) {
+        super("html", String.class);
+        annotatedViewManager.registerConverter(this);
+    }
 
-	@Override protected Response generateResponse(final Object input)
-	{
-		final Response response = new Response();
-		response.setResponse( input.toString() );
-		response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML );
-		return response;
-	}
+    @Override protected Response generateResponse(final Object input) {
+        final Response response = new Response();
+        response.setResponse(input.toString());
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_HTML);
+        return response;
+    }
 
 }

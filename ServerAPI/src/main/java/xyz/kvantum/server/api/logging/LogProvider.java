@@ -24,14 +24,13 @@ package xyz.kvantum.server.api.logging;
 /**
  * Interface for classes that may provide log messages
  */
-@FunctionalInterface public interface LogProvider
-{
+@FunctionalInterface public interface LogProvider {
 
-	/**
-	 * Log prefix
-	 *
-	 * @return Log prefix
-	 */
-	String getLogIdentifier();
+    /**
+     * Log prefix
+     *
+     * @return Log prefix
+     */
+    String getLogIdentifier();
 
 }

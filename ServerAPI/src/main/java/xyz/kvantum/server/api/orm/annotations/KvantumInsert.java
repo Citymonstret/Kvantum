@@ -26,21 +26,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.PARAMETER) public @interface KvantumInsert
-{
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.PARAMETER) public @interface KvantumInsert {
 
-	/**
-	 * Name of the {@link KvantumField} that is associated with this constructor parameter
-	 *
-	 * @return Name of associated {@link KvantumField}
-	 */
-	String value();
+    /**
+     * Name of the {@link KvantumField} that is associated with this constructor parameter
+     *
+     * @return Name of associated {@link KvantumField}
+     */
+    String value();
 
-	/**
-	 * Default value (will be parsed and converted to appropriate type)
-	 *
-	 * @return Default value, {@code null} by default
-	 */
-	String defaultValue() default "null";
+    /**
+     * Default value (will be parsed and converted to appropriate type)
+     *
+     * @return Default value, {@code null} by default
+     */
+    String defaultValue() default "null";
 
 }

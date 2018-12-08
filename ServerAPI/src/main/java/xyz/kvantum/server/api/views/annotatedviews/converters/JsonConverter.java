@@ -28,23 +28,20 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
-final class JsonConverter extends OutputConverter
-{
+final class JsonConverter extends OutputConverter {
 
-	JsonConverter(@NonNull final AnnotatedViewManager annotatedViewManager)
-	{
-		super( "json", JSONObject.class, String.class );
-		annotatedViewManager.registerConverter( this );
-	}
+    JsonConverter(@NonNull final AnnotatedViewManager annotatedViewManager) {
+        super("json", JSONObject.class, String.class);
+        annotatedViewManager.registerConverter(this);
+    }
 
-	@Override protected Response generateResponse(@NonNull final Object input)
-	{
-		final Response response = new Response();
-		response.getHeader().set( Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON );
-		response.getHeader().set( Header.X_CONTENT_TYPE_OPTIONS, "nosniff" );
-		response.getHeader().set( Header.X_FRAME_OPTIONS, "deny" );
-		response.getHeader().set( Header.CONTENT_SECURITY_POLICY, "default-src 'none'" );
-		response.setResponse( input.toString() );
-		return response;
-	}
+    @Override protected Response generateResponse(@NonNull final Object input) {
+        final Response response = new Response();
+        response.getHeader().set(Header.HEADER_CONTENT_TYPE, Header.CONTENT_TYPE_JSON);
+        response.getHeader().set(Header.X_CONTENT_TYPE_OPTIONS, "nosniff");
+        response.getHeader().set(Header.X_FRAME_OPTIONS, "deny");
+        response.getHeader().set(Header.CONTENT_SECURITY_POLICY, "default-src 'none'");
+        response.setResponse(input.toString());
+        return response;
+    }
 }

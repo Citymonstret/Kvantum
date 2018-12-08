@@ -21,12 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,65 +29,65 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.util.RequestManager;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) public class GenericServerTest
-{
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
 
-	protected File temporaryFolder;
-	protected Kvantum serverInstance;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-	private File getFileIfNotExists(final String name)
-	{
-		final File file = new File( name );
-		if ( file.exists() )
-		{
-			return getFileIfNotExists( name + ( 'a' + ( char ) ( Math.random() * 26 ) ) );
-		}
-		return file;
-	}
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) public class GenericServerTest {
 
-	@BeforeAll void initAll()
-	{
-		this.temporaryFolder = getFileIfNotExists( "temporaryFolder" );
-		if ( !this.temporaryFolder.mkdir() )
-		{
-			System.out.println( "ERROR: Failed to create temporary folder: " + temporaryFolder );
-			System.exit( -1 );
-		}
+    protected File temporaryFolder;
+    protected Kvantum serverInstance;
 
-		CoreConfig.setPreConfigured( true );
-		CoreConfig.exitOnStop = false;
+    private File getFileIfNotExists(final String name) {
+        final File file = new File(name);
+        if (file.exists()) {
+            return getFileIfNotExists(name + ('a' + (char) (Math.random() * 26)));
+        }
+        return file;
+    }
 
-		final ServerContext.ServerContextBuilder serverContextBuilder = ServerContext.builder();
-		assertNotNull( serverContextBuilder );
+    @BeforeAll void initAll() {
+        this.temporaryFolder = getFileIfNotExists("temporaryFolder");
+        if (!this.temporaryFolder.mkdir()) {
+            System.out.println("ERROR: Failed to create temporary folder: " + temporaryFolder);
+            System.exit(-1);
+        }
 
-		final RequestManager.RequestManagerBuilder requestManagerBuilder = RequestManager.builder();
-		assertNotNull( requestManagerBuilder );
+        CoreConfig.setPreConfigured(true);
+        CoreConfig.exitOnStop = false;
 
-		final RequestManager requestManager = requestManagerBuilder.build();
-		assertNotNull( requestManager );
-		assertNotNull( requestManager.getError404Generator() );
+        final ServerContext.ServerContextBuilder serverContextBuilder = ServerContext.builder();
+        assertNotNull(serverContextBuilder);
 
-		final ServerContext serverContext = serverContextBuilder.standalone( true ).coreFolder( temporaryFolder )
-				.logWrapper( new DefaultLogWrapper() ).router( requestManager ).serverSupplier( StandaloneServer::new )
-				.build();
-		assertNotNull( serverContext );
+        final RequestManager.RequestManagerBuilder requestManagerBuilder = RequestManager.builder();
+        assertNotNull(requestManagerBuilder);
 
-		final Optional<Kvantum> serverOptional = serverContext.create();
-		assertTrue( serverOptional.isPresent() );
+        final RequestManager requestManager = requestManagerBuilder.build();
+        assertNotNull(requestManager);
+        assertNotNull(requestManager.getError404Generator());
 
-		this.serverInstance = serverOptional.get();
-	}
+        final ServerContext serverContext =
+            serverContextBuilder.standalone(true).coreFolder(temporaryFolder)
+                .logWrapper(new DefaultLogWrapper()).router(requestManager)
+                .serverSupplier(StandaloneServer::new).build();
+        assertNotNull(serverContext);
 
-	@AfterAll void tearDownAll()
-	{
-		try
-		{
+        final Optional<Kvantum> serverOptional = serverContext.create();
+        assertTrue(serverOptional.isPresent());
 
-			FileUtils.deleteDirectory( temporaryFolder );
-		} catch ( IOException e )
-		{
-			e.printStackTrace();
-		}
-	}
+        this.serverInstance = serverOptional.get();
+    }
+
+    @AfterAll void tearDownAll() {
+        try {
+
+            FileUtils.deleteDirectory(temporaryFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -23,10 +23,6 @@ package xyz.kvantum.server.api.request;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,77 +33,72 @@ import xyz.kvantum.server.api.exceptions.RequestException;
 import xyz.kvantum.server.api.request.AbstractRequest.QueryParameters;
 import xyz.kvantum.server.api.util.AsciiString;
 
-@SuppressWarnings({ "unused", "WeakerAccess" }) @UtilityClass public final class RequestCompiler
-{
+import java.util.Locale;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-	private static final Timer TIMER_COMPILE_QUERY;
+@SuppressWarnings({"unused", "WeakerAccess"}) @UtilityClass public final class RequestCompiler {
 
-	static
-	{
-		if ( ServerImplementation.getImplementation() != null )
-		{
-			TIMER_COMPILE_QUERY = ServerImplementation.getImplementation().getMetrics()
-					.getRegistry().timer( MetricRegistry.name( RequestCompiler.class, "compileQuery" ) );
-		} else
-		{
-			TIMER_COMPILE_QUERY = null;
-		}
-	}
+    private static final Timer TIMER_COMPILE_QUERY;
+    private static final Pattern PATTERN_QUERY = Pattern.compile(
+        "(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!%]*) "
+            + "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?");
+    private static final Pattern PATTERN_HEADER =
+        Pattern.compile("(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)");
+    private static final String KEY = "key";
+    private static final String VALUE = "value";
+    private static final String METHOD = "method";
+    private static final String RESOURCE = "resource";
 
-	private static final Pattern PATTERN_QUERY = Pattern.compile(
-			"(?<method>[A-Za-z]+) (?<resource>[/\\-A-Za-z0-9.?=&:@!%]*) "
-					+ "(?<protocol>(?<prottype>[A-Za-z]+)/(?<protver>[A-Za-z0-9.]+))?" );
-	private static final Pattern PATTERN_HEADER = Pattern.compile( "(?<key>[A-Za-z-_0-9]+)\\s*:\\s*(?<value>.*$)" );
+    static {
+        if (ServerImplementation.getImplementation() != null) {
+            TIMER_COMPILE_QUERY =
+                ServerImplementation.getImplementation().getMetrics().getRegistry()
+                    .timer(MetricRegistry.name(RequestCompiler.class, "compileQuery"));
+        } else {
+            TIMER_COMPILE_QUERY = null;
+        }
+    }
 
-	private static final String KEY = "key";
-	private static final String VALUE = "value";
-	private static final String METHOD = "method";
-	private static final String RESOURCE = "resource";
+    public static Optional<HeaderPair> compileHeader(@NonNull final String line) {
+        final Matcher matcher = PATTERN_HEADER.matcher(line);
+        if (!matcher.matches()) {
+            return Optional.empty();
+        }
+        final AsciiString key = AsciiString.of(matcher.group(KEY).toLowerCase(Locale.ENGLISH));
+        final AsciiString value = AsciiString.of(matcher.group(VALUE), false);
+        return Optional.of(new HeaderPair(key, value));
+    }
 
-	public static Optional<HeaderPair> compileHeader(@NonNull final String line)
-	{
-		final Matcher matcher = PATTERN_HEADER.matcher( line );
-		if ( !matcher.matches() )
-		{
-			return Optional.empty();
-		}
-		final AsciiString key = AsciiString.of( matcher.group( KEY ).toLowerCase( Locale.ENGLISH ) );
-		final AsciiString value = AsciiString.of( matcher.group( VALUE ), false );
-		return Optional.of( new HeaderPair( key, value ) );
-	}
+    public static void compileQuery(@NonNull final AbstractRequest request,
+        @NonNull final String line) throws IllegalArgumentException, RequestException {
+        final Timer.Context timer = TIMER_COMPILE_QUERY.time();
+        final Matcher matcher = PATTERN_QUERY.matcher(line);
+        if (!matcher.matches()) {
+            timer.close();
+            throw new IllegalArgumentException("Not a query line");
+        }
+        if (CoreConfig.verbose) {
+            ServerImplementation.getImplementation().log("Query: " + matcher.group());
+        }
+        final Optional<HttpMethod> methodOptional = HttpMethod.getByName(matcher.group(METHOD));
+        if (!methodOptional.isPresent()) {
+            timer.close();
+            throw new RequestException("Unknown request method: " + matcher.group(METHOD), request);
+        }
+        // request.setQuery( new AbstractRequest.Query( methodOptional.get(), request.getProtocolType(),
+        // 		matcher.group( RESOURCE ) ) );
+        request.setQuery(AbstractRequest.QueryCache.getInstance().getQuery(
+            new QueryParameters(methodOptional.get(), request.getProtocolType(),
+                matcher.group(RESOURCE))));
+        timer.close();
+    }
 
-	public static void compileQuery(@NonNull final AbstractRequest request, @NonNull final String line)
-			throws IllegalArgumentException, RequestException
-	{
-		final Timer.Context timer = TIMER_COMPILE_QUERY.time();
-		final Matcher matcher = PATTERN_QUERY.matcher( line );
-		if ( !matcher.matches() )
-		{
-			timer.close();
-			throw new IllegalArgumentException( "Not a query line" );
-		}
-		if ( CoreConfig.verbose )
-		{
-			ServerImplementation.getImplementation().log( "Query: " + matcher.group() );
-		}
-		final Optional<HttpMethod> methodOptional = HttpMethod.getByName( matcher.group( METHOD ) );
-		if ( !methodOptional.isPresent() )
-		{
-			timer.close();
-			throw new RequestException( "Unknown request method: " + matcher.group( METHOD ), request );
-		}
-		// request.setQuery( new AbstractRequest.Query( methodOptional.get(), request.getProtocolType(),
-		// 		matcher.group( RESOURCE ) ) );
-		request.setQuery( AbstractRequest.QueryCache.getInstance().getQuery( new QueryParameters( methodOptional.get(),
-				request.getProtocolType(), matcher.group( RESOURCE ) ) ) );
-		timer.close();
-	}
+    @Getter @RequiredArgsConstructor public static final class HeaderPair {
 
-	@Getter @RequiredArgsConstructor public static final class HeaderPair
-	{
-
-		@NonNull private final AsciiString key;
-		@NonNull private final AsciiString value;
-	}
+        @NonNull private final AsciiString key;
+        @NonNull private final AsciiString value;
+    }
 
 }

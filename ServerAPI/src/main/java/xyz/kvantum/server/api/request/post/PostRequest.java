@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.api.request.post;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,92 +28,87 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestChild;
 import xyz.kvantum.server.api.util.Assert;
 
-@SuppressWarnings({ "unused", "WeakerAccess " }) public abstract class PostRequest implements RequestChild
-{
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
-	@Getter private final AbstractRequest parent;
-	@Getter(AccessLevel.PROTECTED) private final String rawRequest;
-	@Getter private final Map<String, String> variables;
-	@Getter @Setter(AccessLevel.PROTECTED) private String request;
-	private boolean loaded;
+@SuppressWarnings({"unused", "WeakerAccess "}) public abstract class PostRequest
+    implements RequestChild {
 
-	protected PostRequest(final AbstractRequest parent, final String rawRequest, boolean lazyLoad)
-	{
-		Assert.notNull( parent );
-		Assert.notNull( rawRequest );
+    @Getter private final AbstractRequest parent;
+    @Getter(AccessLevel.PROTECTED) private final String rawRequest;
+    @Getter private final Map<String, String> variables;
+    @Getter @Setter(AccessLevel.PROTECTED) private String request;
+    private boolean loaded;
 
-		this.loaded = false;
-		this.parent = parent;
-		this.rawRequest = rawRequest;
-		this.request = rawRequest; // Can be overridden
-		this.variables = new HashMap<>();
-		if ( !lazyLoad )
-		{
-			this.load();
-		}
-	}
+    protected PostRequest(final AbstractRequest parent, final String rawRequest, boolean lazyLoad) {
+        Assert.notNull(parent);
+        Assert.notNull(rawRequest);
 
-	private void load()
-	{
-		this.parseRequest( rawRequest );
-		this.loaded = true;
-	}
+        this.loaded = false;
+        this.parent = parent;
+        this.rawRequest = rawRequest;
+        this.request = rawRequest; // Can be overridden
+        this.variables = new HashMap<>();
+        if (!lazyLoad) {
+            this.load();
+        }
+    }
 
-	private void checkIfShouldLoad()
-	{
-		if ( this.loaded )
-		{
-			return;
-		}
-		this.load();
-	}
+    private void load() {
+        this.parseRequest(rawRequest);
+        this.loaded = true;
+    }
 
-	protected abstract void parseRequest(String rawRequest);
+    private void checkIfShouldLoad() {
+        if (this.loaded) {
+            return;
+        }
+        this.load();
+    }
 
-	public abstract EntityType getEntityType();
+    protected abstract void parseRequest(String rawRequest);
 
-	/**
-	 * Get a parameter
-	 *
-	 * @param key Parameter key
-	 * @return Parameter value if found, else null
-	 */
-	@Nullable public String get(final String key)
-	{
-		Assert.notNull( key );
+    public abstract EntityType getEntityType();
 
-		this.checkIfShouldLoad();
+    /**
+     * Get a parameter
+     *
+     * @param key Parameter key
+     * @return Parameter value if found, else null
+     */
+    @Nullable public String get(final String key) {
+        Assert.notNull(key);
 
-		if ( !this.getVariables().containsKey( key ) )
-		{
-			return null; // Nullable
-		}
-		return this.getVariables().get( key );
-	}
+        this.checkIfShouldLoad();
 
-	/**
-	 * Check if a parameter is stored
-	 *
-	 * @param key Parameter key
-	 * @return True of the parameter is stored; else false
-	 */
-	public boolean contains(final String key)
-	{
-		Assert.notNull( key );
-		this.checkIfShouldLoad();
-		return this.getVariables().containsKey( key );
-	}
+        if (!this.getVariables().containsKey(key)) {
+            return null; // Nullable
+        }
+        return this.getVariables().get(key);
+    }
 
-	/**
-	 * Get a copy of the internal parameter map
-	 *
-	 * @return copy of the internal map
-	 */
-	final public Map<String, String> get()
-	{
-		this.checkIfShouldLoad();
+    /**
+     * Check if a parameter is stored
+     *
+     * @param key Parameter key
+     * @return True of the parameter is stored; else false
+     */
+    public boolean contains(final String key) {
+        Assert.notNull(key);
+        this.checkIfShouldLoad();
+        return this.getVariables().containsKey(key);
+    }
 
-		return new HashMap<>( this.variables );
-	}
+    /**
+     * Get a copy of the internal parameter map
+     *
+     * @return copy of the internal map
+     */
+    final public Map<String, String> get() {
+        this.checkIfShouldLoad();
+
+        return new HashMap<>(this.variables);
+    }
 
 }

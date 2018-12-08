@@ -23,46 +23,41 @@ package xyz.kvantum.server.implementation;
 
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.ServerChannel;
-import java.util.Locale;
 import lombok.Getter;
 import xyz.kvantum.server.api.logging.Logger;
 
-final class NioClassResolver
-{
+import java.util.Locale;
 
-	@Getter private final ClassProvider classProvider;
+final class NioClassResolver {
 
-	NioClassResolver()
-	{
-		ClassProvider temporary = null;
-		final String osName = System.getProperty( "os.name" );
+    @Getter private final ClassProvider classProvider;
 
-		if ( osName.toLowerCase( Locale.ENGLISH ).startsWith( "linux" ) )
-		{
-			Logger.info( "Using EpollClassResolver" );
-			try
-			{
-				temporary = new EpollClassResolver();
-			} catch ( final Throwable throwable )
-			{
-				Logger.error( "Failed to initialize epoll class resolver: {}", throwable.getMessage() );
-			}
-		}
+    NioClassResolver() {
+        ClassProvider temporary = null;
+        final String osName = System.getProperty("os.name");
 
-		if ( temporary == null )
-		{
-			Logger.info( "Using DefaultClassResolver" );
-			temporary = new DefaultClassResolver();
-		}
+        if (osName.toLowerCase(Locale.ENGLISH).startsWith("linux")) {
+            Logger.info("Using EpollClassResolver");
+            try {
+                temporary = new EpollClassResolver();
+            } catch (final Throwable throwable) {
+                Logger
+                    .error("Failed to initialize epoll class resolver: {}", throwable.getMessage());
+            }
+        }
 
-		this.classProvider = temporary;
-	}
+        if (temporary == null) {
+            Logger.info("Using DefaultClassResolver");
+            temporary = new DefaultClassResolver();
+        }
 
-	interface ClassProvider
-	{
+        this.classProvider = temporary;
+    }
 
-		MultithreadEventLoopGroup getEventLoopGroup(final int threads);
+    interface ClassProvider {
 
-		Class<? extends ServerChannel> getServerSocketChannelClass();
-	}
+        MultithreadEventLoopGroup getEventLoopGroup(final int threads);
+
+        Class<? extends ServerChannel> getServerSocketChannelClass();
+    }
 }

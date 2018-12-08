@@ -26,13 +26,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface KvantumField
-{
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface KvantumField {
 
-	String kvantumName() default "";
+    String kvantumName() default "";
 
-	String defaultValue() default "null";
+    String defaultValue() default "null";
 
-	boolean isRequired() default false;
+    boolean isRequired() default false;
 
 }
