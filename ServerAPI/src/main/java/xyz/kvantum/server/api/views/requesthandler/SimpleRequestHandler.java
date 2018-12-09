@@ -40,6 +40,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
+/**
+ * {@inheritDoc}
+ */
 @SuppressWarnings({"unused", "WeakerAccess"}) public class SimpleRequestHandler
     extends RequestHandler {
 

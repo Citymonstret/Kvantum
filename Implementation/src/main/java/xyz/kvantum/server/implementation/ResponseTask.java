@@ -354,10 +354,18 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
             gzipHandler = null;
         }
 
+        boolean shouldWriteBody;
+        if ( workerContext.getRequest().getQuery().getMethod().hasBody() ) {
+            shouldWriteBody = true;
+        } else {
+            shouldWriteBody = false;
+            body.getHeader().set(Header.HEADER_CONTENT_LENGTH, "0");
+        }
+
         //
         // Send either the transfer encoding or content length, important for keep-alive
         //
-        if (hasKnownLength) {
+        if (shouldWriteBody && hasKnownLength) {
             //
             // If the length is known, we compress before writing
             //
@@ -427,76 +435,80 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
         //
         context.write(buf);
 
-        if (CoreConfig.debug) {
-            Logger.debug("Using direct write from memory: {}", hasKnownLength);
-        }
-
-        int toRead;
-        if (hasKnownLength) {
-            toRead = CoreConfig.Buffer.out;
-        } else {
-            toRead = CoreConfig.Buffer.out - KvantumServerHandler.MAX_LENGTH;
-        }
-
-        if (toRead <= 0) {
-            Logger.warn("buffer.out is less than {}, configured value will be ignored",
-                KvantumServerHandler.MAX_LENGTH);
-            toRead = MAX_LENGTH + 1;
-        }
-
         long actualLength = 0L;
 
-        //
-        // Write the response
-        //
-        while (!responseStream.isFinished()) {
+        if (shouldWriteBody) {
+            if (CoreConfig.debug) {
+                Logger.debug("Using direct write from memory: {}", hasKnownLength);
+            }
+
+            int toRead;
+            if (hasKnownLength) {
+                toRead = CoreConfig.Buffer.out;
+            } else {
+                toRead = CoreConfig.Buffer.out - KvantumServerHandler.MAX_LENGTH;
+            }
+
+            if (toRead <= 0) {
+                Logger.warn("buffer.out is less than {}, configured value will be ignored",
+                    KvantumServerHandler.MAX_LENGTH);
+                toRead = MAX_LENGTH + 1;
+            }
+
             //
-            // Read as much data as possible from the respone stream
+            // Write the response
             //
-            byte[] bytes = responseStream.read(toRead);
-            if (bytes != null && bytes.length > 0) {
+            while (!responseStream.isFinished()) {
                 //
-                // If the length is known, write data directly
+                // Read as much data as possible from the respone stream
                 //
-                if (hasKnownLength) {
-                    context.write(bytes);
-                    actualLength = bytes.length;
-                } else {
+                byte[] bytes = responseStream.read(toRead);
+                if (bytes != null && bytes.length > 0) {
                     //
-                    // If the length isn't known, we first compress (if applicable) and then write using
-                    // the chunked transfer encoding format
+                    // If the length is known, write data directly
                     //
-                    if (workerContext.isGzip()) {
-                        try {
-                            bytes = gzipHandler.compress(bytes);
-                        } catch (final IOException e) {
-                            new KvantumException("( GZIP ) Failed to compress the bytes")
-                                .printStackTrace();
-                            continue;
+                    if (hasKnownLength) {
+                        context.write(bytes);
+                        actualLength = bytes.length;
+                    } else {
+                        //
+                        // If the length isn't known, we first compress (if applicable) and then write using
+                        // the chunked transfer encoding format
+                        //
+                        if (workerContext.isGzip()) {
+                            try {
+                                bytes = gzipHandler.compress(bytes);
+                            } catch (final IOException e) {
+                                new KvantumException("( GZIP ) Failed to compress the bytes").printStackTrace();
+                                continue;
+                            }
                         }
+
+                        actualLength += bytes.length;
+
+                        context.write(AsciiString.of(Integer.toHexString(bytes.length)).getValue());
+                        context.write(KvantumServerHandler.CRLF);
+                        context.write(bytes);
+                        context.write(KvantumServerHandler.CRLF);
+                        //
+                        // When using this mode we need to make sure that everything is written, so the
+                        // client doesn't time out
+                        //
+                        context.flush().newSucceededFuture().awaitUninterruptibly();
                     }
-
-                    actualLength += bytes.length;
-
-                    context.write(AsciiString.of(Integer.toHexString(bytes.length)).getValue());
-                    context.write(KvantumServerHandler.CRLF);
-                    context.write(bytes);
-                    context.write(KvantumServerHandler.CRLF);
-                    //
-                    // When using this mode we need to make sure that everything is written, so the
-                    // client doesn't time out
-                    //
-                    context.flush().newSucceededFuture().awaitUninterruptibly();
                 }
             }
-        }
 
-        //
-        // If we're using the chunked encoding format
-        // write the end chunk
-        //
-        if (!hasKnownLength) {
-            context.write(KvantumServerHandler.END_CHUNK);
+            //
+            // If we're using the chunked encoding format
+            // write the end chunk
+            //
+            if (!hasKnownLength) {
+                context.write(KvantumServerHandler.END_CHUNK);
+            }
+        } /* shouldWriteToClient */ else if (CoreConfig.debug) {
+            Logger.debug("Skipping body, because method {} does not require body",
+                workerContext.getRequest().getQuery().getMethod());
         }
 
         timerWriteToClient.stop();
