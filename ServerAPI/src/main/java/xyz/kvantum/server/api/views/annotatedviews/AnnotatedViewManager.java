@@ -33,6 +33,7 @@ import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -47,7 +48,7 @@ public final class AnnotatedViewManager {
         StandardConverters.registerStandardConverters(this);
     }
 
-    public <T> Collection<? extends RequestHandler> generate(@NonNull final T viewDeclaration)
+    public <T> Collection<? extends RequestHandler> generate(@Nonnull @NonNull final T viewDeclaration)
         throws Exception {
         final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =

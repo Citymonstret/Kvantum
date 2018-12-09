@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -47,7 +48,7 @@ import java.util.Optional;
      * @param string String to match, may not be null
      * @return matched protocol type if found
      */
-    public static Optional<ProtocolType> getByName(@NonNull final String string) {
+    @Nonnull public static Optional<ProtocolType> getByName(@Nonnull @NonNull final String string) {
         Assert.notEmpty(string);
 
         if (CACHE == null) {

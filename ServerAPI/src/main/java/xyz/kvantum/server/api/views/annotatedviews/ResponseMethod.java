@@ -30,6 +30,7 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.ViewReturn;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
@@ -66,7 +67,7 @@ final public class ResponseMethod<T, C>
         return (Response) output;
     }
 
-    @Override public void accept(final AbstractRequest request, final Response response) {
+    @Override public void accept(final AbstractRequest request, @Nonnull @NonNull final Response response) {
         response.copyFrom(handle(request));
     }
 

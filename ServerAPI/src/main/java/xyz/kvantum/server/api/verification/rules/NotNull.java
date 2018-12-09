@@ -21,15 +21,18 @@
  */
 package xyz.kvantum.server.api.verification.rules;
 
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.verification.Rule;
+
+import javax.annotation.Nonnull;
 
 public final class NotNull<T> implements Rule<T> {
 
-    @Override public String getRuleDescription() {
+    @Nonnull @Contract(pure = true) @Override public String getRuleDescription() {
         return "Supplied object cannot be null";
     }
 
-    @Override public boolean test(final Object o) {
+    @Contract(value = "null -> false; !null -> true", pure = true) @Override public boolean test(final Object o) {
         return o != null;
     }
 

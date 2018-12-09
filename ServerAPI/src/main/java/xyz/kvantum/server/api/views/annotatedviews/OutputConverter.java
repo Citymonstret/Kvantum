@@ -26,6 +26,7 @@ import lombok.NonNull;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.CollectionUtil;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -34,12 +35,11 @@ public abstract class OutputConverter {
     @Getter private final String key;
     @Getter private final Collection<Class> classes;
 
-    protected OutputConverter(@NonNull final String key, @NonNull final Class<?>... classes) {
+    protected OutputConverter(@Nonnull @NonNull final String key, @Nonnull @NonNull final Class<?>... classes) {
         this.key = key;
         this.classes = CollectionUtil.arrayToCollection(HashSet::new, classes);
     }
 
-    @SuppressWarnings("WeakerAccess")
     protected abstract Response generateResponse(final Object input);
 
 }

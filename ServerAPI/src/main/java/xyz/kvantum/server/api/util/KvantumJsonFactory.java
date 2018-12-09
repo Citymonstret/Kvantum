@@ -24,14 +24,18 @@ package xyz.kvantum.server.api.util;
 import com.google.gson.JsonPrimitive;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Utilities for common JSON procedures
@@ -63,11 +67,11 @@ import java.util.Map;
         return new JSONObject();
     }
 
-    public <T> JSONObject toJSONObject(final Map<String, T> map) {
+    @Nonnull @Contract("_ -> new") public <T> JSONObject toJSONObject(final Map<String, T> map) {
         return new JSONObject(MapUtil.convertMap(map, Object::toString));
     }
 
-    public JSONArray toJsonArray(final Collection<?> collection) {
+    public JSONArray toJsonArray(@Nonnull final Collection<?> collection) {
         final JSONArray array = new JSONArray();
         for (final Object o : collection) {
             if (o instanceof KvantumPojo) {
@@ -86,11 +90,8 @@ import java.util.Map;
      * @param in String
      * @return Parsed primitive
      */
-    public static JsonPrimitive stringToPrimitive(final String in) {
-        if (in == null) {
-            return new JsonPrimitive("");
-        }
-        return new JsonPrimitive(in);
+    @Nonnull @Contract("null -> new; !null -> new") public static JsonPrimitive stringToPrimitive(@Nullable final String in) {
+        return new JsonPrimitive(Objects.requireNonNullElse(in, ""));
     }
 
 }

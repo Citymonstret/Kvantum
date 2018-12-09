@@ -28,6 +28,7 @@ import com.intellectualsites.commands.parser.impl.IntegerParser;
 import com.intellectualsites.commands.parser.impl.StringParser;
 import lombok.experimental.UtilityClass;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -52,7 +53,7 @@ import java.util.Optional;
      * @param field Type
      * @return Parser, if it exists
      */
-    public static Optional<Parser<?>> getPrimitiveParser(final Field field) {
+    @Nonnull public static Optional<Parser<?>> getPrimitiveParser(@Nonnull final Field field) {
         return Optional.ofNullable(primitiveParserMap.getOrDefault(field.getGenericType(), null));
     }
 
@@ -73,7 +74,7 @@ import java.util.Optional;
             this.hasRange = false;
         }
 
-        @Override public ParserResult<Byte> parse(final String in) {
+        @Nonnull @Override public ParserResult<Byte> parse(final String in) {
             Byte value = null;
 
             try {
@@ -115,7 +116,7 @@ import java.util.Optional;
             this.hasRange = true;
         }
 
-        @Override public ParserResult<Character> parse(final String in) {
+        @Nonnull @Override public ParserResult<Character> parse(final String in) {
             Character value = null;
 
             try {
@@ -157,7 +158,7 @@ import java.util.Optional;
             this.hasRange = true;
         }
 
-        @Override public ParserResult<Short> parse(final String in) {
+        @Nonnull @Override public ParserResult<Short> parse(final String in) {
             Short value = null;
 
             try {
@@ -199,7 +200,7 @@ import java.util.Optional;
             this.hasRange = true;
         }
 
-        @Override public ParserResult<Long> parse(final String in) {
+        @Nonnull @Override public ParserResult<Long> parse(final String in) {
             Long value = null;
 
             try {
@@ -242,7 +243,7 @@ import java.util.Optional;
             this.hasRange = true;
         }
 
-        @Override public ParserResult<Float> parse(final String in) {
+        @Nonnull @Override public ParserResult<Float> parse(final String in) {
             Float value = null;
 
             try {
@@ -285,7 +286,7 @@ import java.util.Optional;
             this.hasRange = true;
         }
 
-        @Override public ParserResult<Double> parse(final String in) {
+        @Nonnull @Override public ParserResult<Double> parse(final String in) {
             Double value = null;
 
             try {

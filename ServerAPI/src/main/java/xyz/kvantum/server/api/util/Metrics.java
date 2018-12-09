@@ -26,8 +26,10 @@ import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -140,19 +142,19 @@ import java.util.function.Consumer;
         }
     }
 
-    public double convertRate(final double rate) {
+    @Contract(pure = true) public double convertRate(final double rate) {
         return rate * TimeUnit.SECONDS.toSeconds(1);
     }
 
-    public String getRateUnit() {
+    @Nonnull @Contract(pure = true) public String getRateUnit() {
         return TimeUnit.SECONDS.name();
     }
 
-    public String getDurationUnit() {
+    @Nonnull @Contract(pure = true) public String getDurationUnit() {
         return TimeUnit.MILLISECONDS.name();
     }
 
-    public double convertDuration(final double duration) {
+    @Contract(pure = true) public double convertDuration(final double duration) {
         return duration * durationFactor;
     }
 

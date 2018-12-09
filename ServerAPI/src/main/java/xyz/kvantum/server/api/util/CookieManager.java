@@ -29,6 +29,7 @@ import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Cookie;
 
+import javax.annotation.Nonnull;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,8 +62,8 @@ import java.util.regex.Pattern;
      * @param request HTTP Request
      * @return an array containing the cookies
      */
-    public static ListMultimap<AsciiString, Cookie> getCookies(
-        @NonNull final AbstractRequest request) {
+     @Nonnull public static ListMultimap<AsciiString, Cookie> getCookies(
+        @Nonnull @NonNull final AbstractRequest request) {
         // Assert that the request is still valid
         Assert.isValid(request);
         // Extract the cookie header

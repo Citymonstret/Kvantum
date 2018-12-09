@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.views.requesthandler;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
@@ -34,6 +35,7 @@ import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -88,7 +90,7 @@ import java.util.function.BiConsumer;
         }
     }
 
-    public final SimpleRequestHandler addToRouter(final Router router) {
+    @NonNull public final SimpleRequestHandler addToRouter(@Nonnull @NonNull final Router router) {
         return router.add(this);
     }
 
@@ -103,7 +105,7 @@ import java.util.function.BiConsumer;
         return this.pattern;
     }
 
-    @Override public boolean matches(final AbstractRequest request) {
+    @Override public boolean matches(@Nonnull @NonNull final AbstractRequest request) {
         final HttpMethod requestMethod = request.getQuery().getMethod();
         if (this.httpMethod != HttpMethod.ALL && this.httpMethod != requestMethod) {
             if (CoreConfig.debug) {
@@ -122,17 +124,17 @@ import java.util.function.BiConsumer;
         return map != null;
     }
 
-    @Override public final Response generate(final AbstractRequest r) {
+    @Override public final Response generate(@Nonnull @NonNull final AbstractRequest r) {
         final Response response = new Response(this);
         generator.accept(r, response);
         return response;
     }
 
-    @Override public String getName() {
+    @Contract(pure = true) @Override public String getName() {
         return this.internalName;
     }
 
-    @Override public final boolean forceHTTPS() {
+    @Contract(pure = true) @Override public final boolean forceHTTPS() {
         return this.forceHTTPS;
     }
 }

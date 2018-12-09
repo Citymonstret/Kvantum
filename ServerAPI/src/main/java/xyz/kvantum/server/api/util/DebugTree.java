@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Singular;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,7 +41,7 @@ import java.util.Map;
 
     @Singular("entry") private final Map<String, Object> entries;
 
-    public String toString() {
+    @Nonnull public String toString() {
         final StringBuilder builder = new StringBuilder("# ").append(name).append(NEW_LINE);
         for (final Map.Entry<String, Object> entry : entries.entrySet()) {
             if (entry.getValue() instanceof Map) {

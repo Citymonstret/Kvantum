@@ -23,9 +23,11 @@ package xyz.kvantum.server.api.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.logging.Logger;
 
+import javax.annotation.Nonnull;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -45,7 +47,7 @@ import java.util.Map;
      * @param path         Path where the resource should be pasted
      * @throws Exception All exceptions are thrown
      */
-    public static void copyResource(@NonNull final String resourcePath, @NonNull final Path path)
+    public static void copyResource(@NonNull final String resourcePath, @Nonnull @NonNull final Path path)
         throws Exception {
         if (!Files.exists(path.getParent())) {
             Files.createDirectory(path.getParent());
@@ -76,7 +78,7 @@ import java.util.Map;
         throws Exception {
         Assert.notNull(zipFile, files);
 
-        final Map<String, String> env = new HashMap<String, String>() {
+        final Map<String, String> env = new HashMap<>() {
             {
                 put("create", "true");
             }
@@ -97,7 +99,7 @@ import java.util.Map;
      * @param folder Folder to create
      * @return Input (regardless if created or not)
      */
-    public static File attemptFolderCreation(@NonNull final File folder) {
+    @Nonnull @Contract("_ -> param1") public static File attemptFolderCreation(@Nonnull @NonNull final File folder) {
         if (!folder.exists() && !folder.mkdirs()) {
             Message.COULD_NOT_CREATE_FOLDER.log(folder);
         }

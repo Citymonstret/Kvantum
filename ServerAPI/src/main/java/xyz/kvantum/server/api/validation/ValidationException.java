@@ -21,9 +21,13 @@
  */
 package xyz.kvantum.server.api.validation;
 
+import lombok.NonNull;
+
+import javax.annotation.Nonnull;
+
 @SuppressWarnings("WeakerAccess") public class ValidationException extends Exception {
 
-    public ValidationException(RequestValidation.ValidationResult result) {
+    public ValidationException(@Nonnull @NonNull RequestValidation.ValidationResult result) {
         super("Validation Failed: " + result.getRequest() + " failed validation: " + result
             .getMessage());
     }

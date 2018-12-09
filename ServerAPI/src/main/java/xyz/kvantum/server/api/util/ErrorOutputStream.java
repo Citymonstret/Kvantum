@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.logging.LogWrapper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -38,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 
     @NonNull private final LogWrapper logWrapper;
 
-    @Override public void flush() throws IOException {
+    @Override public void flush() {
         String message = new String(toByteArray(), StandardCharsets.UTF_8);
         if (message.endsWith(System.lineSeparator())) {
             message = message.substring(0, message.length() - System.lineSeparator().length());

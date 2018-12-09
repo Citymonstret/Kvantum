@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.util;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,7 +43,7 @@ import java.util.Map;
      * @param <O>       Output type
      * @return Converted map
      */
-    public static <I, O> Map<String, O> convertMap(@NonNull final Map<String, I> input,
+    @Nonnull public static <I, O> Map<String, O> convertMap(@Nonnull @NonNull final Map<String, I> input,
         @NonNull final Converter<I, O> converter) {
         final Map<String, O> output = new HashMap<>(input.size());
         input.forEach((key, value) -> output.put(key, converter.convert(value)));
@@ -66,8 +67,8 @@ import java.util.Map;
      * @param <V>       Value type
      * @return joined string
      */
-    public static <K, V> String join(@NonNull final Map<K, V> map, @NonNull final String combiner,
-        @NonNull final String separator) {
+    @Nonnull public static <K, V> String join(@Nonnull @NonNull final Map<K, V> map, @Nonnull @NonNull final String combiner,
+        @Nonnull @NonNull final String separator) {
         if (map.isEmpty()) {
             return "";
         }

@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
      * @param collection Collection to be cleared
      * @return Size of collection before clearing
      */
-    public static int clear(@NonNull final Collection collection) {
+    public static int clear(@Nonnull @NonNull final Collection collection) {
         final int size = collection.size();
         collection.clear();
         return size;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
      * @param <T>        Type
      * @return list of strings
      */
-    public static <T> List<String> toStringList(@NonNull final Collection<T> collection) {
+    public static <T> List<String> toStringList(@Nonnull @NonNull final Collection<T> collection) {
         final List<String> returnList = new ArrayList<>(collection.size());
         collection.forEach(o -> returnList.add(o.toString()));
         return returnList;

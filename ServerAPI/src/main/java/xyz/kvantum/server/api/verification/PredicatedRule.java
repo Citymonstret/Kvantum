@@ -24,7 +24,9 @@ package xyz.kvantum.server.api.verification;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE) public final class PredicatedRule<T>
@@ -33,12 +35,12 @@ import java.util.function.Predicate;
     @NonNull private final String description;
     @NonNull private final Predicate<T> predicate;
 
-    public static <T> PredicatedRule<T> create(final String description,
+    @Nonnull @Contract("_, _ -> new") public static <T> PredicatedRule<T> create(final String description,
         final Predicate<T> predicate) {
         return new PredicatedRule<>(description, predicate);
     }
 
-    @Override public String getRuleDescription() {
+    @Contract(pure = true) @Override public String getRuleDescription() {
         return this.description;
     }
 

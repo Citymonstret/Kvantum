@@ -23,7 +23,9 @@ package xyz.kvantum.server.api.util;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -59,7 +61,7 @@ import java.util.StringTokenizer;
         return this.content.remove(string);
     }
 
-    @SuppressWarnings("WeakerAccess") public boolean addAll(@Nullable final String string) {
+    @Contract("null -> true") @SuppressWarnings("WeakerAccess") public boolean addAll(@Nullable final String string) {
         if (string != null && !string.isEmpty()) {
             final StringTokenizer tokenizer = new StringTokenizer(string, ",");
             while (tokenizer.hasMoreTokens()) {
@@ -85,7 +87,7 @@ import java.util.StringTokenizer;
         return this.content.add(string);
     }
 
-    @Override public boolean remove(@NonNull final Object o) {
+    @Contract("null -> false") @Override public boolean remove(@Nonnull @NonNull final Object o) {
         return o instanceof String && this.remove((String) o);
     }
 
@@ -119,7 +121,7 @@ import java.util.StringTokenizer;
      * @param string Item
      * @return True if the list contains the item, else false
      */
-    public boolean contains(@NonNull final String string) {
+    @Contract(pure = true) public boolean contains(@Nonnull @NonNull final String string) {
         return this.content.contains(string);
     }
 
@@ -128,7 +130,7 @@ import java.util.StringTokenizer;
      *
      * @return Joined list
      */
-    @Override public String toString() {
+    @Nonnull @Override public String toString() {
         return CollectionUtil.join(this.content, ",");
     }
 
@@ -140,11 +142,11 @@ import java.util.StringTokenizer;
         return this.content.size();
     }
 
-    @Override public boolean isEmpty() {
+    @Contract(pure = true) @Override public boolean isEmpty() {
         return this.content.isEmpty();
     }
 
-    @Override public boolean contains(@NonNull final Object o) {
+    @Contract(pure = true) @Override public boolean contains(@Nonnull @NonNull final Object o) {
         return o instanceof String && this.contains((String) o);
     }
 
@@ -153,15 +155,15 @@ import java.util.StringTokenizer;
      *
      * @return list iterator
      */
-    @Override public Iterator<String> iterator() {
+    @Nonnull @Override public Iterator<String> iterator() {
         return this.content.iterator();
     }
 
-    @Override public Object[] toArray() {
+    @Nonnull @Override public Object[] toArray() {
         return this.content.toArray();
     }
 
-    @Override @SuppressWarnings("ALL") public <T> T[] toArray(@NonNull final T[] ts) {
+    @Nonnull @Override @SuppressWarnings("ALL") public <T> T[] toArray(@Nonnull @NonNull final T[] ts) {
         return this.content.toArray(ts);
     }
 }

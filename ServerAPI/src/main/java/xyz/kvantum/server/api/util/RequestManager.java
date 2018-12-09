@@ -37,6 +37,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.View404;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -135,7 +136,7 @@ import java.util.*;
      * @return The request handler if it was created, null otherwise
      */
     @Nullable @Override @SuppressWarnings("all") public RequestHandler add(
-        @NonNull final RequestHandler view) {
+        @Nonnull  @NonNull final RequestHandler view) {
         //
         // make sure the view pattern isn't registered yet
         //
@@ -163,7 +164,7 @@ import java.util.*;
         return view;
     }
 
-    public void sortViews() {
+    private void sortViews() {
         if (!changed) {
             return;
         }

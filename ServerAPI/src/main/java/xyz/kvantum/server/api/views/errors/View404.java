@@ -21,8 +21,11 @@
  */
 package xyz.kvantum.server.api.views.errors;
 
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.response.Header;
+
+import javax.annotation.Nonnull;
 
 public class View404 extends xyz.kvantum.server.api.views.errors.Error {
 
@@ -30,7 +33,7 @@ public class View404 extends xyz.kvantum.server.api.views.errors.Error {
         super(Header.STATUS_NOT_FOUND, "Not Found: " + url);
     }
 
-    public static View404 construct(final String url) {
+    @Nonnull @Contract("_ -> new") public static View404 construct(final String url) {
         final String webAddress = CoreConfig.webAddress.endsWith("/") ?
             CoreConfig.webAddress.substring(0, CoreConfig.webAddress.length() - 1) :
             CoreConfig.webAddress;

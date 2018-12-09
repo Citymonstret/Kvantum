@@ -21,8 +21,10 @@
  */
 package xyz.kvantum.server.api.util;
 
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.response.Header;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
@@ -71,7 +73,7 @@ import java.util.*;
         this.comment = comment;
     }
 
-    public static Optional<FileExtension> getExtension(final String string) {
+    @Nonnull public static Optional<FileExtension> getExtension(@Nonnull final String string) {
         String workingString = string;
         if (string.startsWith(".")) {
             workingString = string.substring(1);
@@ -84,23 +86,23 @@ import java.util.*;
         return Optional.empty();
     }
 
-    public String getComment(final String comment) {
+    @Nonnull @Contract(pure = true) public String getComment(final String comment) {
         return this.comment.replace("{cmt}", comment);
     }
 
-    public ReadType getReadType() {
+    @Contract(pure = true) public ReadType getReadType() {
         return readType;
     }
 
-    public AsciiString getContentType() {
+    @Contract(pure = true) public AsciiString getContentType() {
         return contentType;
     }
 
-    public String getOption() {
+    @Contract(pure = true) public String getOption() {
         return option;
     }
 
-    public boolean isImage() {
+    @Contract(pure = true) public boolean isImage() {
         return IMAGE.contains(this);
     }
 
@@ -117,7 +119,7 @@ import java.util.*;
         return false;
     }
 
-    public String getExtension() {
+    @Contract(pure = true) public String getExtension() {
         return this.extension;
     }
 

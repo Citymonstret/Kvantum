@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.validation;
 
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.request.post.PostRequest;
@@ -41,17 +42,17 @@ import java.util.*;
         }
     }
 
-    @SneakyThrows @SuppressWarnings("ALL")
+    @Contract(value = "_ -> param1", pure = true) @SneakyThrows @SuppressWarnings("ALL")
     private static <T> RequestValidation<T> castValidator(final RequestValidation validator) {
         return (RequestValidation<T>) validator;
     }
 
-    private static RequestValidation<PostRequest> asPostRequestValidator(
+    @Contract(value = "_ -> param1", pure = true) private static RequestValidation<PostRequest> asPostRequestValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }
 
-    private static RequestValidation<AbstractRequest.Query> asQueryValidator(
+    @Contract(value = "_ -> param1", pure = true) private static RequestValidation<AbstractRequest.Query> asQueryValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }

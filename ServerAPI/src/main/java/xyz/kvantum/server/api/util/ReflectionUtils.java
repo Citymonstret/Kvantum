@@ -27,6 +27,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
+import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,8 +46,8 @@ import java.util.List;
      * @param clazz Class in which the annotations are to be searched for
      * @return List containing the found annotations
      */
-    public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(
-        @NonNull final Class<A> a, @NonNull final Class<?> clazz) {
+    @Nonnull  public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(
+        @Nonnull @NonNull final Class<A> a, @Nonnull @NonNull final Class<?> clazz) {
         Assert.notNull(a, clazz);
 
         final List<AnnotatedMethod<A>> annotatedMethods = new ArrayList<>();

@@ -21,11 +21,15 @@
  */
 package xyz.kvantum.server.api.views.requesthandler;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
+
+import javax.annotation.Nonnull;
 
 public final class DebugMiddleware extends Middleware {
 
-    @Override public void handle(final AbstractRequest request, final MiddlewareQueue queue) {
+    @Override public void handle(@Nonnull @NonNull final AbstractRequest request,
+        @Nonnull @NonNull final MiddlewareQueue queue) {
         request.useAlternateOutcome("debug");
         queue.handle(request);
     }
