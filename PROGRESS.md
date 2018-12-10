@@ -31,6 +31,8 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 #### 1.3 Misc
 * Connection Throttling
 * Keep-Alive Support
+* Non-blocking implementation using Netty
+* GZIP compression support
 
 ## 2 View/Request Handling
 #### 2.1 All views
@@ -68,6 +70,7 @@ Kvantum allows views/request handlers to be defined through:
     * Support for response conversion (example: From String to HTMl and JSONObject to JSON String)
 * Fluent builder-patterns (Kvantum#createSimpleRequestHandler and SimpleRequestHandler#builder)
 * OOP (by extending View, or other more specific implementations for different levels of abstraction)
+* Lambda based patterns using Routes
 
 ##### 2.3.1 REST API
 Kvantum comes with some utilities and rest based views to allow the creation of REST based APIs
@@ -82,6 +85,7 @@ Kvantum provides support for the following templating engines:
 * JTWig
 * Apache Velocity
 * Crush (Custom engine developed alongside Kvantum)
+* can be expanded using plugins
 
 #### 2.5 Sessions
 Kvantum provides a session system. Sessions can either be loaded automatically and stored in client cookies, or be loaded on requests.
@@ -95,6 +99,7 @@ Kvantum has a built in console command system that can be extended programmatica
 * /help - Show a list of supported console commands
 * /account - Account management
 * /show - Show license and warranty information
+* /generate - Generate view declarations from folder structures
 
 ## 4 (Misc) API
 ### 4.1 Account System
@@ -108,6 +113,8 @@ Kvantum comes with an account system, that is meant to remove the need for accou
 * Password management
 * Account role (permission) system with API and persistent role storage
 * Account registration verification API
+* Account extension and meta data system
+* Account decoration
 
 ### 4.2 Plugin System
 Kvantum has a plugin system implementation that allows plugins to be loaded by the server at runtime
@@ -144,4 +151,9 @@ Kvantum includes its own POJO utilities.
 
 ### 4.12 Quick Start Utilities
 Different utility methods to make launching a server instance and registering routes very simple. This
-is done using (with many others not mentioned here) the ServerContextBuilder, QuickStart and Routes.
+is done using (with many others not mentioned here) the ServerContextBuilder, QuickStart and Routes. There
+is also a search engine system that can be used to create simple search query handlers. 
+
+### 4.13 Event Bus
+Kvantum has a custom built event bus, that can be used to listen and react to various events.
+It can also be used by plugins, and extensions, to create custom events.

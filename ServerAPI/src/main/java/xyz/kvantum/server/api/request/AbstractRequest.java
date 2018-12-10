@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.request;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Contract;

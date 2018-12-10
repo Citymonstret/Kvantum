@@ -90,7 +90,7 @@ We are using JitPack as our maven repo
 <dependency>
     <groupId>xyz.kvantum.Kvantum</groupId>
     <artifactId>Implementation</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
 </dependency>
 ```
 
