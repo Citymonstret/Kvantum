@@ -76,9 +76,7 @@ Press `Import` and select `...path/to/project/code_style.xml`
 `Import Scheme > Eclipse XML Profile` and then select `..path/to/project/code_style.xml`
 
 ### Maven
-[![](https://jitpack.io/v/IntellectualSites/Kvantum.svg)](https://jitpack.io/#IntellectualSites/Kvantum)
 
-We are using JitPack as our maven repo
 ```xml
 <repositories>
     <repository>
