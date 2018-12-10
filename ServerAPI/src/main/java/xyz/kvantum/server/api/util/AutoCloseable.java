@@ -58,7 +58,8 @@ public abstract class AutoCloseable implements java.lang.AutoCloseable {
         closeable.stream().filter(AutoCloseable::exists).forEach(close);
     }
 
-    @Contract(pure = true) private static <T> boolean exists(@Nullable final WeakReference<T> reference) {
+    @Contract(pure = true)
+    private static <T> boolean exists(@Nullable final WeakReference<T> reference) {
         return reference != null && reference.get() != null;
     }
 

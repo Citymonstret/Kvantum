@@ -43,8 +43,8 @@ import java.util.Map;
      * @param <O>       Output type
      * @return Converted map
      */
-    @Nonnull public static <I, O> Map<String, O> convertMap(@Nonnull @NonNull final Map<String, I> input,
-        @NonNull final Converter<I, O> converter) {
+    @Nonnull public static <I, O> Map<String, O> convertMap(
+        @Nonnull @NonNull final Map<String, I> input, @NonNull final Converter<I, O> converter) {
         final Map<String, O> output = new HashMap<>(input.size());
         input.forEach((key, value) -> output.put(key, converter.convert(value)));
         return output;
@@ -67,8 +67,8 @@ import java.util.Map;
      * @param <V>       Value type
      * @return joined string
      */
-    @Nonnull public static <K, V> String join(@Nonnull @NonNull final Map<K, V> map, @Nonnull @NonNull final String combiner,
-        @Nonnull @NonNull final String separator) {
+    @Nonnull public static <K, V> String join(@Nonnull @NonNull final Map<K, V> map,
+        @Nonnull @NonNull final String combiner, @Nonnull @NonNull final String separator) {
         if (map.isEmpty()) {
             return "";
         }

@@ -121,6 +121,13 @@ import java.util.function.BiConsumer;
 
     CommandManager getCommandManager();
 
+    /**
+     * Get the executor service registered in the {@link Kvantum}
+     * implementation. This can safely be used by extensions to
+     * Kvantum, and is the preferred method of implementing new exectuors
+     *
+     * @return Executor service
+     */
     ExecutorService getExecutorService();
 
     /**

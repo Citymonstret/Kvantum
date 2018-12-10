@@ -45,8 +45,9 @@ final class AddOnClassLoader extends URLClassLoader {
 
     @Getter @Setter(AccessLevel.PROTECTED) private boolean disabling;
 
-    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager, @Nonnull @NonNull final File file,
-        @NonNull final String name) throws AddOnLoaderException, MalformedURLException {
+    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager,
+        @Nonnull @NonNull final File file, @NonNull final String name)
+        throws AddOnLoaderException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, addOnManager.getClass().getClassLoader());
 
         this.addOnManager = addOnManager;
@@ -59,9 +60,9 @@ final class AddOnClassLoader extends URLClassLoader {
         }
     }
 
-    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager, @Nonnull @NonNull final File file,
-        @NonNull final String mainFile, @NonNull final String name)
-        throws AddOnLoaderException, MalformedURLException {
+    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager,
+        @Nonnull @NonNull final File file, @NonNull final String mainFile,
+        @NonNull final String name) throws AddOnLoaderException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, addOnManager.getClass().getClassLoader());
 
         this.addOnManager = addOnManager;

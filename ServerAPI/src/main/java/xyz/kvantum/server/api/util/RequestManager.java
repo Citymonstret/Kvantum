@@ -136,7 +136,7 @@ import java.util.*;
      * @return The request handler if it was created, null otherwise
      */
     @Nullable @Override @SuppressWarnings("all") public RequestHandler add(
-        @Nonnull  @NonNull final RequestHandler view) {
+        @Nonnull @NonNull final RequestHandler view) {
         //
         // make sure the view pattern isn't registered yet
         //

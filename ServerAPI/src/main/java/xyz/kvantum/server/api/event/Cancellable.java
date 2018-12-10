@@ -37,6 +37,7 @@ public interface Cancellable {
     /**
      * Indicate that the event has been cancelled
      */
+    @SuppressWarnings("unused")
     void cancel();
 
 }

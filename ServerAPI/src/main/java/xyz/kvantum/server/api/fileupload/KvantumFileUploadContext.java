@@ -54,7 +54,8 @@ final public class KvantumFileUploadContext implements UploadContext {
      * @param request Incoming request
      * @return Parsing result
      */
-    @Nonnull @Contract("_ -> new") public static KvantumFileUploadContextParsingResult from(final AbstractRequest request) {
+    @Nonnull @Contract("_ -> new") public static KvantumFileUploadContextParsingResult from(
+        @Nonnull final AbstractRequest request) {
         if (request.getQuery().getMethod() == HttpMethod.POST && request.getHeader("Content-Type")
             .startsWith("multipart")) {
             final KvantumFileUploadContext context = new KvantumFileUploadContext(request,
@@ -89,10 +90,11 @@ final public class KvantumFileUploadContext implements UploadContext {
     /**
      * Request parsing status
      */
-    public enum KvantumFileUploadContextParsingStatus {/**
-     * Content parsed successfully
-     */
-    SUCCESS,
+    public enum KvantumFileUploadContextParsingStatus {
+        /**
+        * Content parsed successfully
+        */
+        SUCCESS,
         /**
          * Content length header is not a number
          */

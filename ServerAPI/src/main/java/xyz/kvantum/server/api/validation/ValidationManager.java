@@ -47,12 +47,14 @@ import java.util.*;
         return (RequestValidation<T>) validator;
     }
 
-    @Contract(value = "_ -> param1", pure = true) private static RequestValidation<PostRequest> asPostRequestValidator(
+    @Contract(value = "_ -> param1", pure = true)
+    private static RequestValidation<PostRequest> asPostRequestValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }
 
-    @Contract(value = "_ -> param1", pure = true) private static RequestValidation<AbstractRequest.Query> asQueryValidator(
+    @Contract(value = "_ -> param1", pure = true)
+    private static RequestValidation<AbstractRequest.Query> asQueryValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }

@@ -46,7 +46,7 @@ import java.util.List;
      * @param clazz Class in which the annotations are to be searched for
      * @return List containing the found annotations
      */
-    @Nonnull  public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(
+    @Nonnull public static <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(
         @Nonnull @NonNull final Class<A> a, @Nonnull @NonNull final Class<?> clazz) {
         Assert.notNull(a, clazz);
 

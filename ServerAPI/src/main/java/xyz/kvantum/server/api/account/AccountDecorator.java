@@ -32,7 +32,8 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 /**
- * Decorates accounts on initialization
+ * Decorates {@link IAccount accounts} on initialization.
+ * Preferably registered using {@link IAccountManager#addAccountDecorator(AccountDecorator)}
  */
 public class AccountDecorator {
 
@@ -42,10 +43,21 @@ public class AccountDecorator {
         this.consumers = Collections.unmodifiableCollection(consumers);
     }
 
-    @Nonnull @Contract("_ -> new") @SafeVarargs public static AccountDecorator with(final Consumer<IAccount>... consumers) {
+    /**
+     * @see #with(Object...)
+     */
+    @Nonnull @Contract("_ -> new") @SafeVarargs public static AccountDecorator with(
+        final Consumer<IAccount>... consumers) {
         return new AccountDecorator(Arrays.asList(consumers));
     }
 
+    /**
+     * Create a new decorator with the specified decorators.
+     *
+     * @param objects This can be {@link Consumer Consumers accepting IAccount}
+     *                or any class extending {@link AccountExtension}
+     * @return Created account decorator
+     */
     @Nonnull @Contract("_ -> new") @SuppressWarnings("ALL") public static AccountDecorator with(
         @Nonnull final Object... objects) {
         final Collection<Consumer<IAccount>> consumers = new ArrayList<>();
@@ -62,6 +74,12 @@ public class AccountDecorator {
         return new AccountDecorator(consumers);
     }
 
+    /**
+     * Decorate an account with all of the decorators registered in this
+     * {@link AccountDecorator}
+     *
+     * @param account {@link IAccount} to decorate
+     */
     public void decorateAccount(@NonNull final IAccount account) {
         this.consumers.forEach(consumer -> consumer.accept(account));
     }

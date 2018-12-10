@@ -38,16 +38,19 @@ import xyz.kvantum.server.api.account.roles.SimpleAccountRole;
         super(ADMIN_IDENTIFIER);
     }
 
-    @Contract(pure = true) @Override public boolean hasPermission(@NonNull final String permissionKey) {
+    @Contract(pure = true) @Override
+    public boolean hasPermission(@NonNull final String permissionKey) {
         return true;
     }
 
-    @Contract(pure = true) @Override public boolean addPermission(@NonNull final String permissionKey) {
+    @Contract(pure = true) @Override
+    public boolean addPermission(@NonNull final String permissionKey) {
         // Cannot add administrator permission
         return false;
     }
 
-    @Contract(pure = true) @Override public boolean removePermission(@NonNull final String permissionKey) {
+    @Contract(pure = true) @Override
+    public boolean removePermission(@NonNull final String permissionKey) {
         // Cannot remove administrator permission
         return false;
     }

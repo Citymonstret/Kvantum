@@ -134,7 +134,8 @@ import java.util.stream.Collectors;
         return this.string.charAt(i);
     }
 
-    @Nonnull @Contract(pure = true) @Override public CharSequence subSequence(final int i, final int i1) {
+    @Nonnull @Contract(pure = true) @Override
+    public CharSequence subSequence(final int i, final int i1) {
         return this.string.subSequence(i, i1);
     }
 
@@ -146,7 +147,8 @@ import java.util.stream.Collectors;
         return this.hashCode;
     }
 
-    @Contract(value = "null -> false", pure = true) @Override public boolean equals(final Object object) {
+    @Contract(value = "null -> false", pure = true) @Override
+    public boolean equals(final Object object) {
         if (object == null) {
             return false;
         }
@@ -196,7 +198,8 @@ import java.util.stream.Collectors;
         return localString.contains(otherString);
     }
 
-    @Contract(value = "null -> false", pure = true) public boolean equals(@NonNull final CharSequence other) {
+    @Contract(value = "null -> false", pure = true)
+    public boolean equals(@NonNull final CharSequence other) {
         return this.string.equals(other.toString());
     }
 
@@ -226,7 +229,8 @@ import java.util.stream.Collectors;
     /**
      * Delegate for {@link String#endsWith(String)}
      */
-    @Contract(pure = true) @SuppressWarnings("WeakerAccess") public boolean endsWith(@NonNull final String string) {
+    @Contract(pure = true) @SuppressWarnings("WeakerAccess") public boolean endsWith(
+        @NonNull final String string) {
         return this.string.endsWith(string);
     }
 

@@ -103,8 +103,8 @@ import java.util.concurrent.ConcurrentHashMap;
      * @return Generated factory
      * @throws IllegalArgumentException If the class does not fit the specifications of a Kvantum object
      */
-    @SuppressWarnings("ALL") public static <T> KvantumObjectFactory<T> from(@Nonnull final Class<T> clazz)
-        throws IllegalArgumentException {
+    @SuppressWarnings("ALL") public static <T> KvantumObjectFactory<T> from(
+        @Nonnull final Class<T> clazz) throws IllegalArgumentException {
         final KvantumObject kvantumObject;
         if ((kvantumObject = clazz.getAnnotation(KvantumObject.class)) == null) {
             throw new IllegalArgumentException(String
@@ -274,7 +274,8 @@ import java.util.concurrent.ConcurrentHashMap;
     @NoArgsConstructor(access = AccessLevel.PRIVATE) public final class GetBuilderInstance
         extends BuilderInstance {
 
-        @Override protected Map<String, String> getParameters(@Nonnull final AbstractRequest request) {
+        @Override
+        protected Map<String, String> getParameters(@Nonnull final AbstractRequest request) {
             return request.getQuery().getParameters();
         }
     }
@@ -283,7 +284,8 @@ import java.util.concurrent.ConcurrentHashMap;
     @NoArgsConstructor(access = AccessLevel.PRIVATE) public final class PostBuilderInstance
         extends BuilderInstance {
 
-        @Nonnull @Override protected Map<String, String> getParameters(@Nonnull final AbstractRequest request) {
+        @Nonnull @Override
+        protected Map<String, String> getParameters(@Nonnull final AbstractRequest request) {
             return request.getPostRequest().get();
         }
     }

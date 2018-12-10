@@ -91,6 +91,12 @@ import java.util.concurrent.ConcurrentHashMap;
      */
     Optional<IAccount> createAccount(String username, String password);
 
+    /**
+     * Create an account from a placeholder {@link IAccount}
+     *
+     * @param temporary Placeholder data object
+     * @return Created account
+     */
     Optional<IAccount> createAccount(IAccount temporary);
 
     /**

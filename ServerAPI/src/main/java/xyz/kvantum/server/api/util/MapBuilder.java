@@ -102,7 +102,8 @@ final public class MapBuilder<K, V> {
      * @param map Other map
      * @return {@code this} builder
      */
-    @Nonnull @Contract("_ -> this") public MapBuilder<K, V> putAll(@Nonnull @NonNull final Map<K, V> map) {
+    @Nonnull @Contract("_ -> this") public MapBuilder<K, V> putAll(
+        @Nonnull @NonNull final Map<K, V> map) {
         this.internalMap.putAll(map);
         return this;
     }

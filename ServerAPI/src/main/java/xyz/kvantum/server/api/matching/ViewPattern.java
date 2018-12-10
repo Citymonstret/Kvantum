@@ -241,7 +241,8 @@ import java.util.regex.Pattern;
             return ".";
         }
 
-        @Nonnull @Contract(pure = true) @Override public String toRegexBlock(final boolean nextOptional) {
+        @Nonnull @Contract(pure = true) @Override
+        public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[.§]*";
             } else {
@@ -257,7 +258,8 @@ import java.util.regex.Pattern;
             return "/";
         }
 
-        @Nonnull @Contract(pure = true) @Override public String toRegexBlock(final boolean nextOptional) {
+        @Nonnull @Contract(pure = true) @Override
+        public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[\\/]*";
             } else {

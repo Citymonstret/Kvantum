@@ -48,8 +48,8 @@ public final class AnnotatedViewManager {
         StandardConverters.registerStandardConverters(this);
     }
 
-    public <T> Collection<? extends RequestHandler> generate(@Nonnull @NonNull final T viewDeclaration)
-        throws Exception {
+    public <T> Collection<? extends RequestHandler> generate(
+        @Nonnull @NonNull final T viewDeclaration) throws Exception {
         final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
             ReflectionUtils.getAnnotatedMethods(ViewMatcher.class, clazz);

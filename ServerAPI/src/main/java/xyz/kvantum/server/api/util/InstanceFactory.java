@@ -40,7 +40,8 @@ import java.lang.reflect.Modifier;
      * @param fieldName Field to bind to
      * @param <T>       Instance type
      */
-    public static <T> void setupInstance(@Nonnull @NonNull final T t, @Nonnull @NonNull final String fieldName) {
+    public static <T> void setupInstance(@Nonnull @NonNull final T t,
+        @Nonnull @NonNull final String fieldName) {
         try {
             final Field field = t.getClass().getDeclaredField(fieldName);
             if (!field.isAccessible()) {

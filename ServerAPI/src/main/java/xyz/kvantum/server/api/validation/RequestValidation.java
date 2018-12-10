@@ -58,7 +58,8 @@ import javax.annotation.Nonnull;
             this.message = null;
         }
 
-        public ValidationResult(@Nonnull @NonNull final RequestChild request, final String message) {
+        public ValidationResult(@Nonnull @NonNull final RequestChild request,
+            final String message) {
             this.request = request.getParent();
             this.success = false;
             this.message = message;

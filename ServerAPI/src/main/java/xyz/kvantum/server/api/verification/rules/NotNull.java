@@ -32,7 +32,8 @@ public final class NotNull<T> implements Rule<T> {
         return "Supplied object cannot be null";
     }
 
-    @Contract(value = "null -> false; !null -> true", pure = true) @Override public boolean test(final Object o) {
+    @Contract(value = "null -> false; !null -> true", pure = true) @Override
+    public boolean test(final Object o) {
         return o != null;
     }
 

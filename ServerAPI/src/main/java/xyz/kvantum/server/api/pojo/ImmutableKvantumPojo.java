@@ -114,7 +114,8 @@ public final class ImmutableKvantumPojo<Pojo> {
         return this.instance.hashCode();
     }
 
-    @Contract(value = "null -> false", pure = true) @Override public boolean equals(final Object object) {
+    @Contract(value = "null -> false", pure = true) @Override
+    public boolean equals(final Object object) {
         if (object == null) {
             return false;
         } else if (object instanceof KvantumPojo) {

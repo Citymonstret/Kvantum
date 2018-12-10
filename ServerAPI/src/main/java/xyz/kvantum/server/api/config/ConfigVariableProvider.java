@@ -21,10 +21,12 @@
  */
 package xyz.kvantum.server.api.config;
 
+import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -52,11 +54,16 @@ public class ConfigVariableProvider
         return instance;
     }
 
-    public void add(final ConfigProvider provider) {
+    /**
+     * Add a configuration provider to this configuration variable provider
+     *
+     * @param provider Provider to add
+     */
+    public void add(@Nonnull @NonNull final ConfigProvider provider) {
         configurations.put(provider.toString(), new WeakReference<>(provider));
     }
 
-    @Override public Optional<ConfigVariableProvider> get(AbstractRequest r) {
+    @Override public Optional<ConfigVariableProvider> get(final AbstractRequest r) {
         return Optional.of(this);
     }
 

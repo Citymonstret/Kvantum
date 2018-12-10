@@ -60,8 +60,8 @@ import java.util.Map;
         this.queryPojo = queryFactory.of(queryObject);
     }
 
-    @Contract(pure = true) @SuppressWarnings("all") private static <T> Class<T> getClass(
-        @Nonnull final T instance) {
+    @Contract(pure = true) @SuppressWarnings("all")
+    private static <T> Class<T> getClass(@Nonnull final T instance) {
         return (Class<T>) instance.getClass();
     }
 

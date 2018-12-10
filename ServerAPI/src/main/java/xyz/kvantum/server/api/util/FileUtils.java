@@ -47,8 +47,8 @@ import java.util.Map;
      * @param path         Path where the resource should be pasted
      * @throws Exception All exceptions are thrown
      */
-    public static void copyResource(@NonNull final String resourcePath, @Nonnull @NonNull final Path path)
-        throws Exception {
+    public static void copyResource(@NonNull final String resourcePath,
+        @Nonnull @NonNull final Path path) throws Exception {
         if (!Files.exists(path.getParent())) {
             Files.createDirectory(path.getParent());
         }
@@ -99,7 +99,8 @@ import java.util.Map;
      * @param folder Folder to create
      * @return Input (regardless if created or not)
      */
-    @Nonnull @Contract("_ -> param1") public static File attemptFolderCreation(@Nonnull @NonNull final File folder) {
+    @Nonnull @Contract("_ -> param1") public static File attemptFolderCreation(
+        @Nonnull @NonNull final File folder) {
         if (!folder.exists() && !folder.mkdirs()) {
             Message.COULD_NOT_CREATE_FOLDER.log(folder);
         }

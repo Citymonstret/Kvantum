@@ -24,10 +24,12 @@ package xyz.kvantum.server.api.core;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Synchronized;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+import javax.annotation.Nonnull;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -76,7 +78,7 @@ import java.util.*;
         this.setChanged();
     }
 
-    public boolean hasHandlers() {
+    @Contract(pure = true) public boolean hasHandlers() {
         return !this.handlers.isEmpty();
     }
 
@@ -128,7 +130,7 @@ import java.util.*;
     /**
      * @return A new WorkerProcedureInstance
      */
-    public final WorkerProcedureInstance getInstance() {
+    @Nonnull @Contract(" -> new") public final WorkerProcedureInstance getInstance() {
         return new WorkerProcedureInstance();
     }
 
@@ -146,7 +148,7 @@ import java.util.*;
 
         private final String uniqueID = UUID.randomUUID().toString();
 
-        @Override public final Class<String> getType() {
+        @Contract(pure = true) @Override public final Class<String> getType() {
             return String.class;
         }
 
@@ -154,8 +156,7 @@ import java.util.*;
 
 
     /**
-     * An instance containing the handlers from the WorkerProcedure, that are split into Byte & String Handlers (to make
-     * them easier to use in the worker)
+     * An instance containing the handlers from the WorkerProcedure
      * <p>
      * The instance gets updated automatically when the WorkerProcedure is updated
      */
@@ -170,11 +171,11 @@ import java.util.*;
             this.containsHandlers = !stringHandlers.isEmpty();
         }
 
-        public Collection<StringHandler> getStringHandlers() {
+        @Contract(pure = true) public Collection<StringHandler> getStringHandlers() {
             return this.stringHandlers;
         }
 
-        public boolean containsHandlers() {
+        @Contract(pure = true) public boolean containsHandlers() {
             return hasHandlers();
         }
     }

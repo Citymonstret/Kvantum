@@ -32,8 +32,7 @@ import java.util.UUID;
 /**
  * Abstract class used to declare an addon. All addons should have a main class that extends this class.
  */
-@EqualsAndHashCode @ToString public abstract class AddOn
-    implements LogProvider {
+@EqualsAndHashCode @ToString public abstract class AddOn implements LogProvider {
 
     @Getter private final UUID uuid = UUID.randomUUID();
     @Getter @Setter(AccessLevel.PACKAGE) private boolean enabled;

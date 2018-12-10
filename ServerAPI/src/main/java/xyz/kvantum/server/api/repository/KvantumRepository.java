@@ -28,6 +28,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+/**
+ * Repository used internally throughout Kvantum.
+ * <p>
+ * A repository is any object that can hold objects that can be
+ * accessed using a specified ID (of any given type ID). A repository
+ * may (but does not necessarily have to) support the following actions:
+ * <ul>
+ * <li>Access all objects</li>
+ * <li>Access objects by key</li>
+ * <li>Access objects through queries</li>
+ * <li>Insert objects</li>
+ * <li>Delete objects</li>
+ * </ul>
+ *
+ * @param <T>  Object type
+ * @param <ID> ID type
+ */
 @SuppressWarnings("unused") public interface KvantumRepository<T, ID> {
 
     /**

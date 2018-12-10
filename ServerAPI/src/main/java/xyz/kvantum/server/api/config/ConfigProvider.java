@@ -22,10 +22,12 @@
 package xyz.kvantum.server.api.config;
 
 import lombok.EqualsAndHashCode;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.util.Assert;
 
 /**
  * This is the configuration file that allows us to access configuration file variables
+ * {@inheritDoc}
  */
 @EqualsAndHashCode(of = "name") @SuppressWarnings("WeakerAccess")
 public abstract class ConfigProvider implements ConfigurationFile {
@@ -44,7 +46,7 @@ public abstract class ConfigProvider implements ConfigurationFile {
         ConfigVariableProvider.getInstance().add(this);
     }
 
-    @Override public String toString() {
+    @Contract(pure = true) @Override public String toString() {
         return this.name;
     }
 

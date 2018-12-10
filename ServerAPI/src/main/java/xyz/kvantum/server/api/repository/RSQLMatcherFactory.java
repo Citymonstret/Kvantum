@@ -31,7 +31,8 @@ import javax.annotation.Nonnull;
  */
 public final class RSQLMatcherFactory<V> implements MatcherFactory<String, V> {
 
-    @Nonnull @Contract("_ -> new") @Override public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
+    @Nonnull @Contract("_ -> new") @Override
+    public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
         return new RSQLMatcher<>(queryObject);
     }
 

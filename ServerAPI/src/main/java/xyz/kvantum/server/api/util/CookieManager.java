@@ -62,7 +62,7 @@ import java.util.regex.Pattern;
      * @param request HTTP Request
      * @return an array containing the cookies
      */
-     @Nonnull public static ListMultimap<AsciiString, Cookie> getCookies(
+    @Nonnull public static ListMultimap<AsciiString, Cookie> getCookies(
         @Nonnull @NonNull final AbstractRequest request) {
         // Assert that the request is still valid
         Assert.isValid(request);

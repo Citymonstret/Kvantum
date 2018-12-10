@@ -35,7 +35,8 @@ import java.util.function.Predicate;
     @NonNull private final String description;
     @NonNull private final Predicate<T> predicate;
 
-    @Nonnull @Contract("_, _ -> new") public static <T> PredicatedRule<T> create(final String description,
+    @Nonnull @Contract("_, _ -> new")
+    public static <T> PredicatedRule<T> create(final String description,
         final Predicate<T> predicate) {
         return new PredicatedRule<>(description, predicate);
     }

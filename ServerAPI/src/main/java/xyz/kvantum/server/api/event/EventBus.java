@@ -138,7 +138,8 @@ import java.util.concurrent.Future;
         return this.toString().hashCode();
     }
 
-    @Contract(value = "null -> false", pure = true) @Override public final boolean equals(final Object obj) {
+    @Contract(value = "null -> false", pure = true) @Override
+    public final boolean equals(final Object obj) {
         return obj != null && obj.getClass().equals(getClass()) && ((EventBus) obj).name
             .equalsIgnoreCase(this.name);
     }

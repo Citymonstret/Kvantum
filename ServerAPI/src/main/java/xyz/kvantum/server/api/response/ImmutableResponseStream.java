@@ -28,8 +28,7 @@ import org.jetbrains.annotations.Contract;
  */
 public final class ImmutableResponseStream extends SimpleResponseStream {
 
-    @SuppressWarnings("WeakerAccess")
-    public ImmutableResponseStream(final byte[] bytes) {
+    @SuppressWarnings("WeakerAccess") public ImmutableResponseStream(final byte[] bytes) {
         super(bytes);
     }
 

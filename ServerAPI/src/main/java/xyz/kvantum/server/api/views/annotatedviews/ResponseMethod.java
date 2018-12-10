@@ -67,7 +67,8 @@ final public class ResponseMethod<T, C>
         return (Response) output;
     }
 
-    @Override public void accept(final AbstractRequest request, @Nonnull @NonNull final Response response) {
+    @Override
+    public void accept(final AbstractRequest request, @Nonnull @NonNull final Response response) {
         response.copyFrom(handle(request));
     }
 

@@ -439,8 +439,8 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key, @Nullable final String value,
-        final boolean allowDuplicates) {
+    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key,
+        @Nullable final String value, final boolean allowDuplicates) {
         return this.set(key, AsciiString.of(value, false), allowDuplicates);
     }
 
@@ -452,8 +452,8 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key, @Nullable final AsciiString value,
-        final boolean allowDuplicates) {
+    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key,
+        @Nullable final AsciiString value, final boolean allowDuplicates) {
         if (value == null || !allowDuplicates) {
             this.headers.removeAll(key);
         }

@@ -141,7 +141,8 @@ public final class KvantumPojoFactory<Object> {
      * @param collection Collection
      * @return Stream of {@link KvantumPojo} objects
      */
-    public Collection<KvantumPojo> getPojoCollection(@Nonnull @NonNull final Collection<Object> collection) {
+    public Collection<KvantumPojo> getPojoCollection(
+        @Nonnull @NonNull final Collection<Object> collection) {
         if (collection.isEmpty()) {
             return Collections.emptyList();
         }

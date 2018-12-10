@@ -148,8 +148,8 @@ import java.util.stream.Collectors;
      * @param clazz Addon class
      * @return Instance, if it can be found
      */
-    @Nonnull @SuppressWarnings("WeakerAccess") public <T extends AddOn> Optional<T> getAddOnInstance(
-        @Nonnull @NonNull final Class<T> clazz) {
+    @Nonnull @SuppressWarnings("WeakerAccess")
+    public <T extends AddOn> Optional<T> getAddOnInstance(@Nonnull @NonNull final Class<T> clazz) {
         return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null).
             map(AddOnClassLoader::getAddOn).filter(addOn -> addOn.getClass().equals(clazz))
             .map(clazz::cast).findAny();
@@ -167,8 +167,7 @@ import java.util.stream.Collectors;
      *
      * @param clazz Addon class
      */
-    public <T extends AddOn> void unloadAddon(
-        @NonNull final Class<T> clazz) {
+    public <T extends AddOn> void unloadAddon(@NonNull final Class<T> clazz) {
         getAddOnInstance(clazz).ifPresent(this::unloadAddon);
     }
 
@@ -201,8 +200,8 @@ import java.util.stream.Collectors;
      * @return New AddOn instance
      * @throws AddOnManagerException If anything goes wrong
      */
-    public <T extends AddOn> AddOn reloadAddon(
-        @Nonnull @NonNull final T addOn) throws AddOnManagerException {
+    public <T extends AddOn> AddOn reloadAddon(@Nonnull @NonNull final T addOn)
+        throws AddOnManagerException {
         if (addOn.isEnabled()) {
             addOn.disable();
         }

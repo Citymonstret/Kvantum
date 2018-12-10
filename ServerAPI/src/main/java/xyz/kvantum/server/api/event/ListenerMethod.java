@@ -52,7 +52,8 @@ import java.lang.reflect.Method;
         this.lambda.invoke_for_void(this.instance, instance);
     }
 
-    @Contract(value = "null -> false", pure = true) @Override public boolean equals(final Object obj) {
+    @Contract(value = "null -> false", pure = true) @Override
+    public boolean equals(final Object obj) {
         return (obj != null && obj.getClass().equals(this.getClass()) && obj.toString()
             .equals(this.toString()));
     }

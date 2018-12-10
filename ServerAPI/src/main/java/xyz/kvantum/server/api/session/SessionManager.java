@@ -79,8 +79,8 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-    private void saveCookies(@Nonnull @NonNull final AbstractRequest r, @Nonnull @NonNull final ISession session,
-        @NonNull final AsciiString sessionID) {
+    private void saveCookies(@Nonnull @NonNull final AbstractRequest r,
+        @Nonnull @NonNull final ISession session, @NonNull final AsciiString sessionID) {
         r.postponedCookies.add(
             ResponseCookie.builder().cookie(SESSION_KEY).value(sessionID).httpOnly(true).build());
         r.postponedCookies.add(
@@ -100,7 +100,8 @@ import java.util.concurrent.TimeUnit;
         return session;
     }
 
-    public void deleteSession(@NonNull final AbstractRequest r, @Nonnull @NonNull final HeaderProvider re) {
+    public void deleteSession(@NonNull final AbstractRequest r,
+        @Nonnull @NonNull final HeaderProvider re) {
         re.getHeader().removeCookie(SESSION_KEY);
     }
 

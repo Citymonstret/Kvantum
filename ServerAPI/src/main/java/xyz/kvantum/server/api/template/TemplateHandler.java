@@ -27,8 +27,8 @@ import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 
-@RequiredArgsConstructor
-@EqualsAndHashCode(of = {"engineName"}) public abstract class TemplateHandler {
+@RequiredArgsConstructor @EqualsAndHashCode(of = {"engineName"})
+public abstract class TemplateHandler {
 
     @Getter private final CoreConfig.TemplatingEngine engineEnum;
     @Getter private final String engineName;

@@ -45,8 +45,8 @@ import java.util.function.Predicate;
      * @param <T>        Object type
      * @return Either the found object, or null
      */
-    @Nonnull public static <T> Optional<T> getFirst(@Nonnull @NonNull final Collection<T> collection,
-        @NonNull final Predicate<T> predicate) {
+    @Nonnull public static <T> Optional<T> getFirst(
+        @Nonnull @NonNull final Collection<T> collection, @NonNull final Predicate<T> predicate) {
         return collection.stream().filter(predicate).findFirst();
     }
 
@@ -92,8 +92,8 @@ import java.util.function.Predicate;
      * @param <T>      Type
      * @return assigned array
      */
-    @Nonnull @Contract("_, _ -> param1") public static <T> T[] arrayAssign(@Nonnull @NonNull final T[] array,
-        @Nonnull @NonNull final Provider<T> provider) {
+    @Nonnull @Contract("_, _ -> param1") public static <T> T[] arrayAssign(
+        @Nonnull @NonNull final T[] array, @Nonnull @NonNull final Provider<T> provider) {
         for (int i = 0; i < array.length; i++) {
             array[i] = provider.provide();
         }

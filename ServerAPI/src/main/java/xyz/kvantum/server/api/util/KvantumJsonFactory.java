@@ -90,7 +90,8 @@ import java.util.Objects;
      * @param in String
      * @return Parsed primitive
      */
-    @Nonnull @Contract("null -> new; !null -> new") public static JsonPrimitive stringToPrimitive(@Nullable final String in) {
+    @Nonnull @Contract("null -> new; !null -> new") public static JsonPrimitive stringToPrimitive(
+        @Nullable final String in) {
         return new JsonPrimitive(Objects.requireNonNullElse(in, ""));
     }
 

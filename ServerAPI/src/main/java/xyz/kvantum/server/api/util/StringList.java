@@ -61,7 +61,8 @@ import java.util.StringTokenizer;
         return this.content.remove(string);
     }
 
-    @Contract("null -> true") @SuppressWarnings("WeakerAccess") public boolean addAll(@Nullable final String string) {
+    @Contract("null -> true") @SuppressWarnings("WeakerAccess")
+    public boolean addAll(@Nullable final String string) {
         if (string != null && !string.isEmpty()) {
             final StringTokenizer tokenizer = new StringTokenizer(string, ",");
             while (tokenizer.hasMoreTokens()) {
@@ -163,7 +164,8 @@ import java.util.StringTokenizer;
         return this.content.toArray();
     }
 
-    @Nonnull @Override @SuppressWarnings("ALL") public <T> T[] toArray(@Nonnull @NonNull final T[] ts) {
+    @Nonnull @Override @SuppressWarnings("ALL")
+    public <T> T[] toArray(@Nonnull @NonNull final T[] ts) {
         return this.content.toArray(ts);
     }
 }

@@ -29,6 +29,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A stateful data extension to {@link IAccount}.
+ * Preferably registered using {@link AccountDecorator account decorators}
+ */
 @SuppressWarnings({"unused", "WeakerAccess"}) public abstract class AccountExtension {
 
     private static final Map<Class<? extends AccountExtension>, Constructor<? extends AccountExtension>>

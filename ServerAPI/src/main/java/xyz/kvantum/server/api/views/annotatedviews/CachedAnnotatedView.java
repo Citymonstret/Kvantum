@@ -39,11 +39,13 @@ final class CachedAnnotatedView<C> extends View implements CacheApplicable {
         this.forceHTTPS = viewDeclaration.isForceHttps();
     }
 
-    @Contract(pure = true) @Override public boolean passes(@Nullable final AbstractRequest request) {
+    @Contract(pure = true) @Override
+    public boolean passes(@Nullable final AbstractRequest request) {
         return true;
     }
 
-    @Contract(pure = true) @Override public boolean isApplicable(@Nullable final AbstractRequest r) {
+    @Contract(pure = true) @Override
+    public boolean isApplicable(@Nullable final AbstractRequest r) {
         return true;
     }
 }

@@ -80,7 +80,8 @@ public final class SimpleEventBus extends EventBus {
         return methods;
     }
 
-    @Nonnull @Contract(pure = true) private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
+    @Nonnull @Contract(pure = true)
+    private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
         @NonNull final T event) {
         return () -> {
             for (final ListenerMethod method : methods) {

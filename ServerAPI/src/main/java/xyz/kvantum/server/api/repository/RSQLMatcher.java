@@ -54,8 +54,8 @@ public final class RSQLMatcher<V> extends Matcher<String, V> {
         return this.predicate.test(value);
     }
 
-    @Contract(pure = true) @SuppressWarnings("ALL") private Class<V> getClass(
-        @Nonnull @NonNull final V instance) {
+    @Contract(pure = true) @SuppressWarnings("ALL")
+    private Class<V> getClass(@Nonnull @NonNull final V instance) {
         return (Class<V>) instance.getClass();
     }
 

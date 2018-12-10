@@ -33,7 +33,6 @@ import java.util.List;
  * This is the configuration implementation that is meant to control all easily accessible variables for the web server.
  * This is generated into ".kvantum\config\server.yml" and is loaded on runtime
  */
-@SuppressWarnings("WeakerAccess")
 @Configuration(implementation = ConfigurationImplementation.YAML, name = "server")
 public class CoreConfig {
 

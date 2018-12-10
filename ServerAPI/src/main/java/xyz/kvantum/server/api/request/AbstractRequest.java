@@ -122,7 +122,8 @@ public abstract class AbstractRequest
 
     public void addModel(@NonNull final String name, @NonNull final VariableProvider provider) {
         final ProviderFactory<VariableProvider> providerFactory = new ProviderFactory<>() {
-            @Nonnull @Contract(pure = true) @Override public Optional<VariableProvider> get(AbstractRequest r) {
+            @Nonnull @Contract(pure = true) @Override
+            public Optional<VariableProvider> get(AbstractRequest r) {
                 return Optional.of(provider);
             }
 

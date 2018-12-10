@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  *
  * @param <Q> Query Type
  * @param <V> Value type
- * {@inheritDoc}
+ *            {@inheritDoc}
  */
 @RequiredArgsConstructor public abstract class Matcher<Q, V> implements Predicate<V> {
 

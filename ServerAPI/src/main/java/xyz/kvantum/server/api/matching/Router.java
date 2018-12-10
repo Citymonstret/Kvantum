@@ -31,6 +31,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,14 +66,14 @@ import java.util.Collections;
      * @param handlers RequestHandlers that are to be registered
      */
     @Contract("_ -> param1") public final Collection<? extends RequestHandler> addAll(
-        @NonNull final Collection<? extends RequestHandler> handlers) {
+        @Nonnull @NonNull final Collection<? extends RequestHandler> handlers) {
         handlers.forEach(this::add);
         return handlers;
     }
 
     /**
      * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and register all constructed
-     * {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView StaticViews}
+     * {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher StaticViews}
      *
      * @param instance Instance to be scanned
      */
@@ -82,7 +83,7 @@ import java.util.Collections;
 
     /**
      * Scan a class for {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher} and return a collection of
-     * constructed {@link xyz.kvantum.server.api.views.annotatedviews.AnnotatedView}
+     * constructed {@link xyz.kvantum.server.api.views.annotatedviews.ViewMatcher}
      *
      * @param instance Instance to be scanned
      * @return Constructed views
