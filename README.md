@@ -82,15 +82,15 @@ We are using JitPack as our maven repo
 ```xml
 <repositories>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>Incendo</id>
+        <url>https://incendo.org/mvn/repository/maven-releases/</url>
     </repository>
 </repositories>
 
 <dependency>
-    <groupId>xyz.kvantum.Kvantum</groupId>
+    <groupId>xyz.kvantum</groupId>
     <artifactId>Implementation</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
 </dependency>
 ```
 
