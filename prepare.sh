@@ -10,6 +10,7 @@ echo Exectuing gradlew build tasks!
 ./gradlew licenseFormat
 ./gradlew -Dorg.gradle.project.sign=true -Dorg.gradle.project.full=true build
 ./gradlew -Dorg.gradle.project.sign=true -Dorg.gradle.project.full=true signArchives
+./gradlew shadowJar
 
 echo
 echo Replacing version variables
