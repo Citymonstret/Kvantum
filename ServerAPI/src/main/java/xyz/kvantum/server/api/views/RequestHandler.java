@@ -37,6 +37,7 @@ import xyz.kvantum.server.api.validation.ValidationManager;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueue;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -77,8 +78,8 @@ public abstract class RequestHandler {
      * @param methodName Name of the method ( in the class, or any parent super classes )
      * @throws Exception If anything goes wrong
      */
-    public void registerAlternateOutcome(@NonNull final String identifier,
-        @NonNull final String methodName) throws Throwable {
+    public void registerAlternateOutcome(@Nonnull @NonNull final String identifier,
+        @Nonnull @NonNull final String methodName) throws Throwable {
         Assert.notEmpty(identifier);
         Assert.notEmpty(methodName);
 
@@ -106,7 +107,7 @@ public abstract class RequestHandler {
      *
      * @param decorator Decorator
      */
-    public void addResponseDecorator(@NonNull final Decorator decorator) {
+    public void addResponseDecorator(@Nonnull @NonNull final Decorator decorator) {
         this.decorators.add(decorator);
     }
 
@@ -117,7 +118,7 @@ public abstract class RequestHandler {
      * @param identifier Method identifier
      * @return Alternate outcome method, if present
      */
-    public Optional<Lambda> getAlternateOutcomeMethod(@NonNull final String identifier) {
+    public Optional<Lambda> getAlternateOutcomeMethod(@Nonnull @NonNull final String identifier) {
         if (alternateOutcomes.containsKey(identifier)) {
             return Optional.of(alternateOutcomes.get(identifier));
         }
@@ -145,7 +146,7 @@ public abstract class RequestHandler {
      * @param request Requested to serve
      * @return Generated response
      */
-    @Nullable public final Response handle(final AbstractRequest request) {
+    @Nullable public final Response handle(@Nonnull @NonNull final AbstractRequest request) {
         Assert.isValid(request);
 
         //

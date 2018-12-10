@@ -24,9 +24,12 @@ package xyz.kvantum.server.api.views.rest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Map;
@@ -51,7 +54,7 @@ import java.util.Optional;
 
     private final Collection<RequestRequirement> requirements = new ArrayDeque<>();
 
-    private static <K, V> Optional<V> mapOptional(Map<K, V> map, K instance) {
+    private static <K, V> Optional<V> mapOptional(@Nonnull @NonNull final Map<K, V> map, K instance) {
         if (map.containsKey(instance)) {
             return Optional.of(map.get(instance));
         } else {
@@ -59,12 +62,12 @@ import java.util.Optional;
         }
     }
 
-    public RequestRequirements addRequirement(final RequestRequirement requirement) {
+    @NonNull @Contract(value = "_ -> this") public RequestRequirements addRequirement(@Nonnull @NonNull final RequestRequirement requirement) {
         this.requirements.add(requirement);
         return this;
     }
 
-    public RequirementStatus testRequirements(final AbstractRequest request) {
+    public RequirementStatus testRequirements(@Nonnull @NonNull final AbstractRequest request) {
         RequirementStatus status;
         for (final RequestRequirement requirement : this.requirements) {
             if (!(status = requirement.test(request)).passed) {
@@ -80,7 +83,8 @@ import java.util.Optional;
             super(key);
         }
 
-        @Override protected Optional<String> getVariable(AbstractRequest request, String key) {
+        @Nonnull @Override protected Optional<String> getVariable(@Nonnull @NonNull final AbstractRequest request,
+            @Nonnull @NonNull final String key) {
             return mapOptional(request.getQuery().getParameters(), key);
         }
     }
@@ -92,7 +96,8 @@ import java.util.Optional;
             super(key);
         }
 
-        @Override protected Optional<String> getVariable(AbstractRequest request, String key) {
+        @Nonnull @Override protected Optional<String> getVariable(@Nonnull @NonNull final AbstractRequest request,
+            @Nonnull @NonNull final String key) {
             return mapOptional(request.getPostRequest().get(), key);
         }
     }
@@ -102,13 +107,13 @@ import java.util.Optional;
 
         private final String key;
 
-        public VariableRequirement(final String key) {
+        public VariableRequirement(@Nonnull @NonNull final String key) {
             this.key = key;
         }
 
-        protected abstract Optional<String> getVariable(AbstractRequest request, String key);
+        @Nonnull protected abstract Optional<String> getVariable(@Nonnull  AbstractRequest request, @Nonnull String key);
 
-        @Override final RequirementStatus test(AbstractRequest request) {
+        @Override final RequirementStatus test(final AbstractRequest request) {
             Optional<String> optional = getVariable(request, key);
             RequirementStatus.Builder builder = RequirementStatus.builder();
             if (optional.isPresent()) {
@@ -134,11 +139,11 @@ import java.util.Optional;
         @Getter private String internalMessage;
         private boolean passed = true;
 
-        public static Builder builder() {
+        @Nonnull @Contract(" -> new") public static Builder builder() {
             return new Builder();
         }
 
-        public boolean passed() {
+        @Contract(pure = true) public boolean passed() {
             return this.passed;
         }
 
@@ -146,22 +151,23 @@ import java.util.Optional;
 
             private final RequirementStatus requirementStatus = new RequirementStatus();
 
-            public Builder message(final String message) {
+            @Contract("_ -> this") public Builder message(final String message) {
                 requirementStatus.message = message;
                 return this;
             }
 
-            public Builder internalMessage(final String internalMessage) {
+            @SuppressWarnings("ALL")
+            @Contract("_ -> this") public Builder internalMessage(final String internalMessage) {
                 requirementStatus.internalMessage = internalMessage;
                 return this;
             }
 
-            public Builder passed(final boolean passed) {
+            @Contract("_ -> this") public Builder passed(final boolean passed) {
                 requirementStatus.passed = passed;
                 return this;
             }
 
-            public RequirementStatus get() {
+            @Contract(pure = true) public RequirementStatus get() {
                 return requirementStatus;
             }
 

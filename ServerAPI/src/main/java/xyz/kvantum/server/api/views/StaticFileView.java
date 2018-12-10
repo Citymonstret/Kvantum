@@ -91,8 +91,18 @@ import java.util.function.Consumer;
     }
 
     @Override public void handle(final AbstractRequest r, final Response response) {
-        final Path path = (Path) r.getMeta("file");
-        final FileExtension extension = (FileExtension) r.getMeta("extension");
+        final Object pathRaw = r.getMeta("file");
+        if (pathRaw == null) {
+            Logger.error("Encountered null \"file\" value in StaticFileView: {}", this.getName());
+            return;
+        }
+        final Path path = (Path) pathRaw;
+        final Object extensionRaw = r.getMeta("extension");
+        if (extensionRaw == null) {
+            Logger.error("Encountered null \"extension\" value in StaticFileView: {}", this.getName());
+            return;
+        }
+        final FileExtension extension = (FileExtension) extensionRaw;
         response.getHeader().set(Header.HEADER_CONTENT_TYPE, extension.getContentType());
         final java.nio.file.Path javaPath = path.getJavaPath();
 
@@ -117,7 +127,10 @@ import java.util.function.Consumer;
             final Consumer<Integer> writer = accepted -> {
                 byte[] bytes = new byte[accepted];
                 try {
-                    inputStream.read(bytes, responseStream.getRead(), accepted);
+                    final int read = inputStream.read(bytes, responseStream.getRead(), accepted);
+                    if (CoreConfig.debug && read != bytes.length) {
+                        Logger.debug("StaticFileView: accepted was {0} but {1} was read", accepted, read);
+                    }
                 } catch (final IOException e) {
                     e.printStackTrace();
                 }

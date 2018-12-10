@@ -31,6 +31,9 @@ import xyz.kvantum.server.api.util.FileExtension;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * {@inheritDoc}
+ */
 public class StandardView extends StaticFileView implements CacheApplicable {
 
     private static final String CONSTANT_EXCLUDE_EXTENSIONS = "excludeExtensions";

@@ -26,23 +26,25 @@ import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * Static file view server CSS files, without any preprocessing.
+ * {@inheritDoc}
  */
 public final class CSSView extends StaticFileView implements CacheApplicable {
 
-    public CSSView(@NonNull final String filter, @NonNull final Map<String, Object> options) {
+    public CSSView(@Nonnull @NonNull final String filter, @Nonnull @NonNull final Map<String, Object> options) {
         super(filter, options, "css", Collections.singletonList(FileExtension.CSS));
         super.relatedFolderPath = "/assets/css";
         super.setOption("extension", "css");
         super.defaultFilePattern = "${file}.css";
     }
 
-    @Override public boolean isApplicable(@NonNull final AbstractRequest r) {
+    @Override public boolean isApplicable(@Nonnull @NonNull final AbstractRequest r) {
         final Optional<Boolean> cacheApplicableBoolean = getOptionSafe("cacheApplicable");
         return cacheApplicableBoolean.orElse(true);
     }

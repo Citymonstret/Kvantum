@@ -61,7 +61,7 @@ import java.util.function.BiConsumer;
     /**
      * Whether or not the request should be forced over HTTPS
      */
-    private boolean forceHTTPS = false;
+    private boolean forceHTTPS;
 
     /**
      * The internal (unique) identifier for this request handler
@@ -86,9 +86,7 @@ import java.util.function.BiConsumer;
         this.pattern = pattern;
         this.generator = generator;
         this.forceHTTPS = forceHTTPS;
-        if (httpMethod == null) {
-            this.httpMethod = HttpMethod.ALL;
-        } else {
+        if (httpMethod != null) {
             this.httpMethod = httpMethod;
         }
     }

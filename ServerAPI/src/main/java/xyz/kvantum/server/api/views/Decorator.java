@@ -30,6 +30,11 @@ import xyz.kvantum.server.api.response.Response;
  */
 @FunctionalInterface public interface Decorator {
 
+    /**
+     * Decorate a given response
+     *
+     * @param response Response to decorate
+     */
     void decorate(Response response);
 
 }

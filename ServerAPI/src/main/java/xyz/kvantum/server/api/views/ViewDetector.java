@@ -30,7 +30,7 @@ import java.util.*;
 /**
  * Can be used to detect file structures that could be served by the standard library of {@link View views}
  */
-@SuppressWarnings({"unused", "WeakerAccess"}) public final class ViewDetector {
+@SuppressWarnings("unused") public final class ViewDetector {
 
     private final String basePath;
     private final Collection<String> ignore;

@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.views.rest;
 
+import lombok.NonNull;
+import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -29,10 +31,12 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 import xyz.kvantum.server.api.views.RequestHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class RestHandler extends RequestHandler implements IgnoreSyntax {
 
     private static final Response RESPONSE_METHOD_NOT_ALLOWED =
@@ -46,11 +50,11 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax {
         this.responseHandlers = new ArrayList<>();
     }
 
-    public void registerHandler(final RestResponse restResponse) {
+    public void registerHandler(@Nonnull @NonNull final RestResponse restResponse) {
         this.responseHandlers.add(restResponse);
     }
 
-    @Override public boolean matches(final AbstractRequest request) {
+    @Override public boolean matches(@Nonnull @NonNull final AbstractRequest request) {
         Assert.isValid(request);
 
         for (final RestResponse restResponse : responseHandlers) {
@@ -63,7 +67,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax {
         return false;
     }
 
-    @Nullable @Override public Response generate(AbstractRequest request) {
+    @Nullable @Override public Response generate(@Nonnull @NonNull final AbstractRequest request) {
         final RestResponse restResponse = (RestResponse) request.getMeta("restResponse");
         if (restResponse == null) {
             return null; // Nullable
@@ -101,7 +105,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax {
         return response;
     }
 
-    @Override public String getName() {
+    @Contract(pure = true) @Override public String getName() {
         return "RESTHandler";
     }
 

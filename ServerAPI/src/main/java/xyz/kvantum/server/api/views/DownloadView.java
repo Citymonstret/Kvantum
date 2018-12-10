@@ -29,10 +29,12 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
  * Static file view that will server all files as attachments
+ * {@inheritDoc}
  */
 public final class DownloadView extends StaticFileView implements IgnoreSyntax {
 
@@ -41,7 +43,7 @@ public final class DownloadView extends StaticFileView implements IgnoreSyntax {
         super.relatedFolderPath = "/assets/downloads";
     }
 
-    @Override public void handle(final AbstractRequest r, final Response response) {
+    @Override public void handle(@Nonnull @NonNull final AbstractRequest r, @Nonnull @NonNull final Response response) {
         final Path path = r.getMetaUnsafe("path");
         final String fileName = path.getEntityName();
         final FileExtension extension = r.getMetaUnsafe("extension");

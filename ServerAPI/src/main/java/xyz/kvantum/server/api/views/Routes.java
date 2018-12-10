@@ -29,6 +29,7 @@ import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
 
+import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
 
 /**
@@ -42,8 +43,8 @@ import java.util.function.BiConsumer;
      * @param filter   Route filter
      * @param function Route generator
      */
-    public static void get(final String filter,
-        final BiConsumer<AbstractRequest, Response> function) {
+    public static void get(@Nonnull @NonNull final String filter,
+        @Nonnull @NonNull final BiConsumer<AbstractRequest, Response> function) {
         handle(filter, HttpMethod.GET, function);
     }
 
@@ -53,13 +54,13 @@ import java.util.function.BiConsumer;
      * @param filter   Route filter
      * @param function Route generator
      */
-    public static void post(final String filter,
-        final BiConsumer<AbstractRequest, Response> function) {
+    public static void post(@Nonnull @NonNull final String filter,
+        @Nonnull @NonNull final BiConsumer<AbstractRequest, Response> function) {
         handle(filter, HttpMethod.POST, function);
     }
 
-    private static void handle(@NonNull final String filter, @NonNull final HttpMethod method,
-        @NonNull final BiConsumer<AbstractRequest, Response> function) {
+    private static void handle(@Nonnull @NonNull final String filter, @Nonnull @NonNull final HttpMethod method,
+        @Nonnull @NonNull final BiConsumer<AbstractRequest, Response> function) {
         ServerImplementation.getImplementation().getRouter().add(
             SimpleRequestHandler.builder().generator(function).pattern(filter).httpMethod(method)
                 .build());
