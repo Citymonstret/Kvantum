@@ -47,7 +47,7 @@ import java.util.Optional;
      *
      * @param args Command line arguments
      */
-    public static void main(final String[] args) throws Throwable {
+    public static void main(final String[] arguments) throws Throwable {
         //
         // Determine whether or not the server is running with extended
         // privileges. Not doing this will affect port binding
@@ -83,7 +83,7 @@ import java.util.Optional;
         //
         final Options options = new Options();
         final JCommander jCommander = new JCommander(options);
-        jCommander.parse(args);
+        jCommander.parse(arguments);
         jCommander.setProgramName("Kvantum");
 
         if (options.help) {

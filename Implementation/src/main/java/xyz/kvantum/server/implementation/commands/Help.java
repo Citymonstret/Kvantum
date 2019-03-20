@@ -43,7 +43,7 @@ public class Help extends PaginatedCommand<Command> {
         return true;
     }
 
-    @Override public boolean onCommand(PaginatedCommandInstance<Command> paginatedCommandInstance) {
+    @Override public boolean onCommand(PaginatedCommand<Command>.PaginatedCommandInstance paginatedCommandInstance) {
         final PaginationFactory.Page<Command> commandPage = paginatedCommandInstance.getPage();
         Message.CMD_HELP_HEADER
             .log(commandPage.getPageNum() + 1, this.getPaginationFactory().getPages().size());
