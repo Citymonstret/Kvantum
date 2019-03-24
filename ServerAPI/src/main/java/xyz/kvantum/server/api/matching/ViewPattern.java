@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.matching;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
@@ -237,12 +236,11 @@ import java.util.regex.Pattern;
 
     private static final class Dot extends Part {
 
-        @Nonnull @Contract(pure = true) @Override public String toString() {
+        @Nonnull @Override public String toString() {
             return ".";
         }
 
-        @Nonnull @Contract(pure = true) @Override
-        public String toRegexBlock(final boolean nextOptional) {
+        @Nonnull @Override public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[.§]*";
             } else {
@@ -254,12 +252,11 @@ import java.util.regex.Pattern;
 
     private static final class Split extends Part {
 
-        @Nonnull @Contract(pure = true) @Override public String toString() {
+        @Nonnull @Override public String toString() {
             return "/";
         }
 
-        @Nonnull @Contract(pure = true) @Override
-        public String toRegexBlock(final boolean nextOptional) {
+        @Nonnull @Override public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[\\/]*";
             } else {

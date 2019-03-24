@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,24 +24,33 @@ package xyz.kvantum.server.api.verification;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
+/**
+ * {@link Rule} that used {@link Predicate predicates} to test objects
+ * {@inheritDoc}
+ */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE) public final class PredicatedRule<T>
     implements Rule<T> {
 
     @NonNull private final String description;
     @NonNull private final Predicate<T> predicate;
 
-    @Nonnull @Contract("_, _ -> new")
-    public static <T> PredicatedRule<T> create(final String description,
+    /**
+     * Create a new {@link PredicatedRule}
+     *
+     * @param description Rule description, cannot be null
+     * @param predicate   Predicate, cannot be null
+     * @return Created rule
+     */
+    @Nonnull public static <T> PredicatedRule<T> create(final String description,
         final Predicate<T> predicate) {
         return new PredicatedRule<>(description, predicate);
     }
 
-    @Contract(pure = true) @Override public String getRuleDescription() {
+    @Override public String getRuleDescription() {
         return this.description;
     }
 

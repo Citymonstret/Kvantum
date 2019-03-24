@@ -1,5 +1,4 @@
 dependencies {
-    compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
     // CSV
     // compile 'org.apache.commons:commons-csv:1.6'
     // Performance monitoring

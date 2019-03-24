@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -383,7 +383,7 @@ public class SimpleServer implements Kvantum {
     protected void onStart() {
     }
 
-    @SuppressWarnings("ALL") @Override @Synchronized public final boolean start() {
+    @Override @Synchronized public final boolean start() {
         if (CoreConfig.gzip) {
             gzipHandlerPool = new ObjectPool<>(CoreConfig.Pools.gzipHandlers, GzipHandler::new);
         }

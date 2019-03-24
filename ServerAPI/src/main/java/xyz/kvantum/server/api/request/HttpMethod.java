@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.request;
 
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.util.Assert;
 
 import java.util.HashMap;
@@ -46,6 +45,9 @@ import java.util.Optional;
      */
     PUT,
 
+    /**
+     *
+     */
     PATCH,
 
     /**
@@ -89,7 +91,8 @@ import java.util.Optional;
         return Optional.ofNullable(METHOD_CACHE.get(fixed));
     }
 
-    @Contract(pure = true) public boolean hasBody() {
+    public boolean hasBody() {
         return this.hasBody;
     }
+
 }

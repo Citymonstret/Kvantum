@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.util;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -32,7 +31,9 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 /**
- * Represents a list of strings, that is stored inside of a string, with the format: string1,string2,string3,string4...
+ * Represents a list of strings, that is stored inside of a string, with the
+ * format: string1,string2,string3,string4...
+ * {@inheritDoc}
  */
 @SuppressWarnings("unused") public final class StringList
     implements Collection<String>, AsciiStringable {
@@ -61,8 +62,7 @@ import java.util.StringTokenizer;
         return this.content.remove(string);
     }
 
-    @Contract("null -> true") @SuppressWarnings("WeakerAccess")
-    public boolean addAll(@Nullable final String string) {
+    @SuppressWarnings("WeakerAccess") public boolean addAll(@Nullable final String string) {
         if (string != null && !string.isEmpty()) {
             final StringTokenizer tokenizer = new StringTokenizer(string, ",");
             while (tokenizer.hasMoreTokens()) {
@@ -88,7 +88,7 @@ import java.util.StringTokenizer;
         return this.content.add(string);
     }
 
-    @Contract("null -> false") @Override public boolean remove(@Nonnull @NonNull final Object o) {
+    @Override public boolean remove(@Nonnull @NonNull final Object o) {
         return o instanceof String && this.remove((String) o);
     }
 
@@ -122,7 +122,7 @@ import java.util.StringTokenizer;
      * @param string Item
      * @return True if the list contains the item, else false
      */
-    @Contract(pure = true) public boolean contains(@Nonnull @NonNull final String string) {
+    public boolean contains(@Nonnull @NonNull final String string) {
         return this.content.contains(string);
     }
 
@@ -143,11 +143,11 @@ import java.util.StringTokenizer;
         return this.content.size();
     }
 
-    @Contract(pure = true) @Override public boolean isEmpty() {
+    @Override public boolean isEmpty() {
         return this.content.isEmpty();
     }
 
-    @Contract(pure = true) @Override public boolean contains(@Nonnull @NonNull final Object o) {
+    @Override public boolean contains(@Nonnull @NonNull final Object o) {
         return o instanceof String && this.contains((String) o);
     }
 
@@ -168,4 +168,5 @@ import java.util.StringTokenizer;
     public <T> T[] toArray(@Nonnull @NonNull final T[] ts) {
         return this.content.toArray(ts);
     }
+
 }

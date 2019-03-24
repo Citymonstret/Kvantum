@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
@@ -57,7 +56,7 @@ public final class KvantumPojoFactory<Object> {
      * @param <Object>  Class Type
      * @return Constructed Factory
      */
-    @Nonnull @Contract("_ -> new") public static <Object> KvantumPojoFactory<Object> forClass(
+    @Nonnull public static <Object> KvantumPojoFactory<Object> forClass(
         @NonNull final Class<Object> pojoClass) {
         final ImmutableMap.Builder<String, PojoGetter<Object>> getterBuilder =
             ImmutableMap.builder();
@@ -131,7 +130,7 @@ public final class KvantumPojoFactory<Object> {
      * @param instance POJO Instance
      * @return Instance
      */
-    @Nonnull @Contract("_ -> new") public KvantumPojo<Object> of(@NonNull final Object instance) {
+    @Nonnull public KvantumPojo<Object> of(@NonNull final Object instance) {
         return new KvantumPojo<>(this, instance, getters, setters);
     }
 
@@ -149,4 +148,5 @@ public final class KvantumPojoFactory<Object> {
         return collection.stream().map(this.mapper)
             .collect(Collectors.toCollection(ArrayList::new));
     }
+
 }

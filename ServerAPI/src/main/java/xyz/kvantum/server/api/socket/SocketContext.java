@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -73,7 +72,7 @@ import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
      *
      * @return true if the socket is connected over SSL (is a {@link SSLSocket})
      */
-    @Contract(pure = true) public boolean isSSL() {
+    public boolean isSSL() {
         return this.protocolType == HTTPS;
     }
 
@@ -82,7 +81,7 @@ import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
      *
      * @return socket address
      */
-    @Contract(pure = true) public InetSocketAddress getAddress() {
+    public InetSocketAddress getAddress() {
         return (InetSocketAddress) this.socketAddress;
     }
 

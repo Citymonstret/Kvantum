@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,7 +355,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
         }
 
         boolean shouldWriteBody;
-        if ( workerContext.getRequest().getQuery().getMethod().hasBody() ) {
+        if (workerContext.getRequest().getQuery().getMethod().hasBody()) {
             shouldWriteBody = true;
         } else {
             shouldWriteBody = false;
@@ -479,7 +479,8 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
                             try {
                                 bytes = gzipHandler.compress(bytes);
                             } catch (final IOException e) {
-                                new KvantumException("( GZIP ) Failed to compress the bytes").printStackTrace();
+                                new KvantumException("( GZIP ) Failed to compress the bytes")
+                                    .printStackTrace();
                                 continue;
                             }
                         }

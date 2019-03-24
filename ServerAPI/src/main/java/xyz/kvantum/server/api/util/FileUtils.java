@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.logging.Logger;
 
@@ -99,8 +98,7 @@ import java.util.Map;
      * @param folder Folder to create
      * @return Input (regardless if created or not)
      */
-    @Nonnull @Contract("_ -> param1") public static File attemptFolderCreation(
-        @Nonnull @NonNull final File folder) {
+    @Nonnull public static File attemptFolderCreation(@Nonnull @NonNull final File folder) {
         if (!folder.exists() && !folder.mkdirs()) {
             Message.COULD_NOT_CREATE_FOLDER.log(folder);
         }

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
 import lombok.Getter;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
@@ -52,8 +51,7 @@ import java.lang.reflect.Method;
         this.lambda.invoke_for_void(this.instance, instance);
     }
 
-    @Contract(value = "null -> false", pure = true) @Override
-    public boolean equals(final Object obj) {
+    @Override public boolean equals(final Object obj) {
         return (obj != null && obj.getClass().equals(this.getClass()) && obj.toString()
             .equals(this.toString()));
     }

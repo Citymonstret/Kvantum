@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.views.requesthandler;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Setter;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
@@ -131,11 +130,12 @@ import java.util.function.BiConsumer;
         return response;
     }
 
-    @Contract(pure = true) @Override public String getName() {
+    @Override public String getName() {
         return this.internalName;
     }
 
-    @Contract(pure = true) @Override public final boolean forceHTTPS() {
+    @Override public final boolean forceHTTPS() {
         return this.forceHTTPS;
     }
+
 }

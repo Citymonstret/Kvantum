@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.response.Header;
 
 import javax.annotation.Nonnull;
@@ -86,23 +85,23 @@ import java.util.*;
         return Optional.empty();
     }
 
-    @Nonnull @Contract(pure = true) public String getComment(final String comment) {
+    @Nonnull public String getComment(final String comment) {
         return this.comment.replace("{cmt}", comment);
     }
 
-    @Contract(pure = true) public ReadType getReadType() {
+    public ReadType getReadType() {
         return readType;
     }
 
-    @Contract(pure = true) public AsciiString getContentType() {
+    public AsciiString getContentType() {
         return contentType;
     }
 
-    @Contract(pure = true) public String getOption() {
+    public String getOption() {
         return option;
     }
 
-    @Contract(pure = true) public boolean isImage() {
+    public boolean isImage() {
         return IMAGE.contains(this);
     }
 
@@ -119,10 +118,12 @@ import java.util.*;
         return false;
     }
 
-    @Contract(pure = true) public String getExtension() {
+    public String getExtension() {
         return this.extension;
     }
 
     public enum ReadType {
         TEXT, BYTES
-    }}
+    }
+
+}

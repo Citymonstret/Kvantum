@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.util;
 import com.google.gson.JsonPrimitive;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -67,7 +66,8 @@ import java.util.Objects;
         return new JSONObject();
     }
 
-    @Nonnull @Contract("_ -> new") public <T> JSONObject toJSONObject(final Map<String, T> map) {
+    @SuppressWarnings("unused") @Nonnull
+    public <T> JSONObject toJSONObject(final Map<String, T> map) {
         return new JSONObject(MapUtil.convertMap(map, Object::toString));
     }
 
@@ -90,8 +90,7 @@ import java.util.Objects;
      * @param in String
      * @return Parsed primitive
      */
-    @Nonnull @Contract("null -> new; !null -> new") public static JsonPrimitive stringToPrimitive(
-        @Nullable final String in) {
+    @Nonnull public static JsonPrimitive stringToPrimitive(@Nullable final String in) {
         return new JsonPrimitive(Objects.requireNonNullElse(in, ""));
     }
 

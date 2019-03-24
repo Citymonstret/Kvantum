@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,21 @@
  */
 package xyz.kvantum.server.api.verification.rules;
 
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.verification.Rule;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Rule that forces the test object to be non-null
+ * {@inheritDoc}
+ */
 public final class NotNull<T> implements Rule<T> {
 
-    @Nonnull @Contract(pure = true) @Override public String getRuleDescription() {
+    @Nonnull @Override public String getRuleDescription() {
         return "Supplied object cannot be null";
     }
 
-    @Contract(value = "null -> false; !null -> true", pure = true) @Override
-    public boolean test(final Object o) {
+    @Override public boolean test(final Object o) {
         return o != null;
     }
 

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import org.jetbrains.annotations.Contract;
-
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -36,6 +34,7 @@ import java.util.function.Consumer;
  * <p>
  * This class implements {@link java.lang.AutoCloseable} so any {@link AutoCloseable} objects may be used in
  * try-with-resources
+ * {@inheritDoc}
  */
 public abstract class AutoCloseable implements java.lang.AutoCloseable {
 
@@ -58,7 +57,6 @@ public abstract class AutoCloseable implements java.lang.AutoCloseable {
         closeable.stream().filter(AutoCloseable::exists).forEach(close);
     }
 
-    @Contract(pure = true)
     private static <T> boolean exists(@Nullable final WeakReference<T> reference) {
         return reference != null && reference.get() != null;
     }

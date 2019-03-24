@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.matching;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.exceptions.NotImplementedException;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -65,7 +64,7 @@ import java.util.Collections;
      *
      * @param handlers RequestHandlers that are to be registered
      */
-    @Contract("_ -> param1") public final Collection<? extends RequestHandler> addAll(
+    public final Collection<? extends RequestHandler> addAll(
         @Nonnull @NonNull final Collection<? extends RequestHandler> handlers) {
         handlers.forEach(this::add);
         return handlers;
@@ -98,7 +97,9 @@ import java.util.Collections;
     }
 
     /**
-     * Attempts to remove a RequestHandler from the Router
+     * Attempts to remove a RequestHandler from the Router. Requires
+     * the view to have been added, or else the method might throw
+     * an exception.
      *
      * @param handler RequestHandler to be removed
      */
@@ -125,4 +126,5 @@ import java.util.Collections;
      * @return Immutable collection containing all request handlers
      */
     public abstract Collection<RequestHandler> getAll();
+
 }

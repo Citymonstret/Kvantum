@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 /**
  * {@link Decorator} implementation that specifically decorates {@link Header headers}. <p> Extended by {@link
  * xyz.kvantum.server.api.views.decorators.CacheDecorator}
- *
+ * <p>
  * {@inheritDoc}
  */
 public abstract class HeaderDecorator implements Decorator {

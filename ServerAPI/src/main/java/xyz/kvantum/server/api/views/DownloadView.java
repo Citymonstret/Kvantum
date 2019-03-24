@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ public final class DownloadView extends StaticFileView implements IgnoreSyntax {
         super.relatedFolderPath = "/assets/downloads";
     }
 
-    @Override public void handle(@Nonnull @NonNull final AbstractRequest r, @Nonnull @NonNull final Response response) {
+    @Override public void handle(@Nonnull @NonNull final AbstractRequest r,
+        @Nonnull @NonNull final Response response) {
         final Path path = r.getMetaUnsafe("path");
         final String fileName = path.getEntityName();
         final FileExtension extension = r.getMetaUnsafe("extension");

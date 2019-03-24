@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.fileupload.UploadContext;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 
@@ -36,9 +35,10 @@ import java.io.InputStream;
 
 /**
  * Wrapper for {@link UploadContext}
+ * {@inheritDoc}
  */
 @SuppressWarnings("all") @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final public class KvantumFileUploadContext implements UploadContext {
+public final class KvantumFileUploadContext implements UploadContext {
 
     private final AbstractRequest request;
     private final InputStream inputStream;
@@ -54,7 +54,7 @@ final public class KvantumFileUploadContext implements UploadContext {
      * @param request Incoming request
      * @return Parsing result
      */
-    @Nonnull @Contract("_ -> new") public static KvantumFileUploadContextParsingResult from(
+    @Nonnull public static KvantumFileUploadContextParsingResult from(
         @Nonnull final AbstractRequest request) {
         if (request.getQuery().getMethod() == HttpMethod.POST && request.getHeader("Content-Type")
             .startsWith("multipart")) {
@@ -67,7 +67,7 @@ final public class KvantumFileUploadContext implements UploadContext {
             KvantumFileUploadContextParsingStatus.BAD_CONTENT_TYPE, null);
     }
 
-    @Nonnull @Contract(pure = true) @Override public String getCharacterEncoding() {
+    @Nonnull @Override public String getCharacterEncoding() {
         return "UTF-8";
     }
 
@@ -83,18 +83,17 @@ final public class KvantumFileUploadContext implements UploadContext {
         return this.request.getHeader("content-length").toLong();
     }
 
-    @Contract(pure = true) @Override public InputStream getInputStream() throws IOException {
+    @Override public InputStream getInputStream() throws IOException {
         return this.inputStream;
     }
 
     /**
      * Request parsing status
      */
-    public enum KvantumFileUploadContextParsingStatus {
-        /**
-        * Content parsed successfully
-        */
-        SUCCESS,
+    public enum KvantumFileUploadContextParsingStatus {/**
+     * Content parsed successfully
+     */
+    SUCCESS,
         /**
          * Content length header is not a number
          */

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.request;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.util.AsciiString;
 
 import javax.annotation.Nonnull;
@@ -42,7 +41,7 @@ import javax.annotation.Nonnull;
      *
      * @return name=value
      */
-    @Nonnull @Contract(pure = true) public String toString() {
+    @Nonnull public String toString() {
         return name + "=" + value;
     }
 }

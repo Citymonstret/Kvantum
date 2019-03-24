@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.google.common.collect.ListMultimap;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.CoreConfig.Cache;
 import xyz.kvantum.server.api.config.Message;
@@ -120,12 +119,11 @@ public abstract class AbstractRequest
 
     public void addModel(@NonNull final String name, @NonNull final VariableProvider provider) {
         final ProviderFactory<VariableProvider> providerFactory = new ProviderFactory<>() {
-            @Nonnull @Contract(pure = true) @Override
-            public Optional<VariableProvider> get(AbstractRequest r) {
+            @Nonnull @Override public Optional<VariableProvider> get(AbstractRequest r) {
                 return Optional.of(provider);
             }
 
-            @Contract(pure = true) @Override public String providerName() {
+            @Override public String providerName() {
                 return name;
             }
         };
@@ -382,7 +380,7 @@ public abstract class AbstractRequest
             }
         }
 
-        @Contract(pure = true) public boolean isValid() {
+        public boolean isValid() {
             return this.mechanism != null && this.username != null && this.password != null;
         }
 

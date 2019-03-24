@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -238,11 +237,11 @@ public class View extends RequestHandler {
      * @param s Key
      * @return True if the option is stored, False if it isn't
      */
-    @Contract(pure = true) final public boolean containsOption(@NonNull final String s) {
+    public final boolean containsOption(@NonNull final String s) {
         return options.containsKey(s);
     }
 
-    @Nonnull @Contract(pure = true) @Override public final String getName() {
+    @Nonnull @Override public final String getName() {
         return this.internalName;
     }
 
@@ -394,7 +393,7 @@ public class View extends RequestHandler {
      * @param request The request from which the URL is fetches
      * @return True if the request matches, false if not
      */
-    @Contract(pure = true, value = "_ -> true") protected boolean passes(@Nullable final AbstractRequest request) {
+    protected boolean passes(@Nullable final AbstractRequest request) {
         return true;
     }
 
@@ -448,7 +447,9 @@ public class View extends RequestHandler {
      * @param key   Option key
      * @param value Option value
      */
-    public void setOption(@Nonnull @NonNull final String key, @Nonnull @NonNull final Object value) {
+    public void setOption(@Nonnull @NonNull final String key,
+        @Nonnull @NonNull final Object value) {
         this.options.put(key, value);
     }
+
 }

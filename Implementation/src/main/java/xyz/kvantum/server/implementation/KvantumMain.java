@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ import java.util.Optional;
 /**
  * Application entry point
  */
-@SuppressWarnings("ALL") final public class KvantumMain {
+@SuppressWarnings({"WeakerAccess", "unused"}) public final class KvantumMain {
 
     /**
      * Launcher method
      *
-     * @param args Command line arguments
+     * @param arguments Command line arguments
      */
     public static void main(final String[] arguments) throws Throwable {
         //
@@ -123,7 +123,10 @@ import java.util.Optional;
                     CoreConfig.port = options.port;
                 }
                 try {
-                    server.get().start();
+                    if (!server.get().start()) {
+                        throw new KvantumInitializationException(
+                            "The server instance was not started");
+                    }
                 } catch (final Exception e) {
                     throw new KvantumInitializationException("Failed to start the server instance",
                         e);
@@ -146,9 +149,7 @@ import java.util.Optional;
     /**
      * Create & Start the server
      *
-     * @param standalone If the server should run as a singleton application, or if its embedded as a library
-     * @param coreFolder The core folder, in which the ".isites" folder is created
-     * @param wrapper    The log wrapper / handler
+     * @param serverContext context to initialize the server with
      * @return Optional of nullable server
      */
     public static Optional<? extends Kvantum> start(final ServerContext serverContext) {
@@ -158,7 +159,9 @@ import java.util.Optional;
         Optional<? extends Kvantum> server = serverContext.create();
         try {
             if (server.isPresent()) {
-                server.get().start();
+                if (!server.get().start()) {
+                    throw new KvantumInitializationException("The server was not started");
+                }
             }
         } catch (final Exception e) {
             e.printStackTrace();

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.logging.Logger;
 
 import javax.annotation.Nonnull;
@@ -80,7 +79,7 @@ public final class SimpleEventBus extends EventBus {
         return methods;
     }
 
-    @Nonnull @Contract(pure = true)
+    @Nonnull
     private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
         @NonNull final T event) {
         return () -> {
@@ -110,4 +109,5 @@ public final class SimpleEventBus extends EventBus {
         }
         return event;
     }
+
 }

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.config;
 
-import org.jetbrains.annotations.Contract;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import xyz.kvantum.server.api.exceptions.KvantumException;
@@ -166,7 +165,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         return null; // Nullable
     }
 
-    @Nonnull @Contract(" -> new") @Override public final Map<String, Object> getAll() {
+    @Nonnull @Override public final Map<String, Object> getAll() {
         return new HashMap<>(this.map);
     }
 
@@ -201,4 +200,5 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
             this.set(key, value);
         }
     }
+
 }

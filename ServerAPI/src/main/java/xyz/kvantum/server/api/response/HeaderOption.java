@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.response;
 
 import lombok.*;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
@@ -65,19 +64,24 @@ import java.util.Map;
         return create(text);
     }
 
-    @Contract("_ -> this") private HeaderOption cacheApplicable(final boolean b) {
+    private HeaderOption cacheApplicable(final boolean b) {
         this.cacheApplicable = b;
         return this;
     }
 
-    @Nonnull @Contract(pure = true) @Override public final String toString() {
+    @Nonnull @Override public final String toString() {
         return this.text.toString();
     }
 
-    @Contract(pure = true) @Override public final AsciiString toAsciiString() {
+    @Override public final AsciiString toAsciiString() {
         return this.text;
     }
 
+    /**
+     * Get the ascii-encoded version of the string that this option represents
+     *
+     * @return ascii encoded string
+     */
     public final byte[] getBytes() {
         return this.toAsciiString().getValue();
     }

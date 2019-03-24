@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.views.decorators;
 
 import lombok.Builder;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.util.MapBuilder;
@@ -44,7 +43,7 @@ import java.util.Date;
 
     @Builder.Default private String expires = "";
 
-    @Nonnull @Contract(" -> new") public Decorator getDecorator() {
+    @Nonnull public Decorator getDecorator() {
         final MapBuilder<HeaderOption, String> builder = MapBuilder.newHashMap();
         final StringBuilder cacheBuilder = new StringBuilder();
         cacheBuilder.append(cachePublic ? "public" : "private");

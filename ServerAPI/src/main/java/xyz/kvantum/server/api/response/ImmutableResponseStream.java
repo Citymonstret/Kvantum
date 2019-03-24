@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,22 @@
  */
 package xyz.kvantum.server.api.response;
 
-import org.jetbrains.annotations.Contract;
-
 /**
+ * Immutable implementation of {@link SimpleResponseStream}
  * {@inheritDoc}
  */
 public final class ImmutableResponseStream extends SimpleResponseStream {
 
+    /**
+     * Construct a new {@link ImmutableResponseStream} with a fixed value
+     *
+     * @param bytes value that will be pushed by this response stream
+     */
     @SuppressWarnings("WeakerAccess") public ImmutableResponseStream(final byte[] bytes) {
         super(bytes);
     }
 
-    @Contract("_ -> fail") @Override public void push(byte[] bytes) {
+    @Override public void push(byte[] bytes) {
         throw new UnsupportedOperationException("Cannot write to immutable stream");
     }
 

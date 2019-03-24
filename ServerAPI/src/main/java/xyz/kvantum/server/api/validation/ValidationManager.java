@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,26 @@
  */
 package xyz.kvantum.server.api.validation;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.request.post.PostRequest;
 
 import java.util.*;
 
+/**
+ * Manager that handles validation of {@link AbstractRequest requests} using
+ * {@link RequestValidation validators}
+ */
 @SuppressWarnings({"unused", "WeakerAccess "}) public class ValidationManager {
 
     private final Map<RequestValidation.ValidationStage, List<RequestValidation>> validators;
     private boolean empty = true;
 
+    /**
+     * Initialize a new {@link ValidationManager}
+     */
     public ValidationManager() {
         this.validators = new HashMap<>();
         for (final RequestValidation.ValidationStage stage : RequestValidation.ValidationStage
@@ -42,37 +49,61 @@ import java.util.*;
         }
     }
 
-    @Contract(value = "_ -> param1", pure = true) @SneakyThrows @SuppressWarnings("ALL")
+    @SneakyThrows @SuppressWarnings("ALL")
     private static <T> RequestValidation<T> castValidator(final RequestValidation validator) {
         return (RequestValidation<T>) validator;
     }
 
-    @Contract(value = "_ -> param1", pure = true)
     private static RequestValidation<PostRequest> asPostRequestValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }
 
-    @Contract(value = "_ -> param1", pure = true)
     private static RequestValidation<AbstractRequest.Query> asQueryValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }
 
+    /**
+     * Check whether or not the {@link ValidationManager manager} instance contains
+     * any {@link RequestValidation validator} instances
+     *
+     * @return true if the manager does not contain any validators, else true
+     */
     public boolean isEmpty() {
         return this.empty;
     }
 
+    /**
+     * Get a {@link List list} containing all {@link RequestValidation validators} for a given
+     * {@link xyz.kvantum.server.api.validation.RequestValidation.ValidationStage validation stage}
+     *
+     * @param stage state for which to get the validators
+     * @return unmodifiable collection containing the validators
+     */
     public List<RequestValidation> getValidators(final RequestValidation.ValidationStage stage) {
         return Collections.unmodifiableList(validators.get(stage));
     }
 
-    public void addValidator(final RequestValidation validator) {
+    /**
+     * Register a link {@link RequestValidation validator} in this {@link ValidationManager manager}
+     *
+     * @param validator validator to register, cannot be null
+     */
+    public void addValidator(@NonNull final RequestValidation validator) {
         this.empty = false;
         this.validators.get(validator.getStage()).add(validator);
     }
 
-    public void validate(final AbstractRequest request) throws ValidationException {
+    /**
+     * Validate a {@link AbstractRequest request} using the {@link RequestValidation validators}
+     * registered in this {@link ValidationManager manager}, throws an exception if the request
+     * fails the validation at any of the validation stages
+     *
+     * @param request request to validate, cannot be null
+     * @throws ValidationException on failure, containing result about the failure
+     */
+    public void validate(@NonNull final AbstractRequest request) throws ValidationException {
         if (request.getQuery().getMethod() == HttpMethod.POST) {
             for (final RequestValidation<?> validator : this
                 .getValidators(RequestValidation.ValidationStage.POST_PARAMETERS)) {

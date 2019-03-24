@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ import java.util.Optional;
  */
 public final class CSSView extends StaticFileView implements CacheApplicable {
 
-    public CSSView(@Nonnull @NonNull final String filter, @Nonnull @NonNull final Map<String, Object> options) {
+    public CSSView(@Nonnull @NonNull final String filter,
+        @Nonnull @NonNull final Map<String, Object> options) {
         super(filter, options, "css", Collections.singletonList(FileExtension.CSS));
         super.relatedFolderPath = "/assets/css";
         super.setOption("extension", "css");

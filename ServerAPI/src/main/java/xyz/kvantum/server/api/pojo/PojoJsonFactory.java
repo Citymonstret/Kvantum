@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.pojo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -33,7 +32,7 @@ public final class PojoJsonFactory<Pojo> {
 
     private final KvantumPojoFactory<Pojo> kvantumPojoFactory;
 
-    @Nonnull @Contract("_ -> new") JSONObject toJson(@Nonnull final KvantumPojo<Pojo> kvantumPojo) {
+    @Nonnull JSONObject toJson(@Nonnull final KvantumPojo<Pojo> kvantumPojo) {
         return new JSONObject(kvantumPojo.getAll());
     }
 

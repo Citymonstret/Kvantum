@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,8 @@ import java.util.function.BiConsumer;
         handle(filter, HttpMethod.POST, function);
     }
 
-    private static void handle(@Nonnull @NonNull final String filter, @Nonnull @NonNull final HttpMethod method,
+    private static void handle(@Nonnull @NonNull final String filter,
+        @Nonnull @NonNull final HttpMethod method,
         @Nonnull @NonNull final BiConsumer<AbstractRequest, Response> function) {
         ServerImplementation.getImplementation().getRouter().add(
             SimpleRequestHandler.builder().generator(function).pattern(filter).httpMethod(method)

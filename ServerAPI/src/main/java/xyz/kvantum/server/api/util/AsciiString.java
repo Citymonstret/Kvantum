@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.util;
 import com.google.common.base.Charsets;
 import com.google.common.collect.HashBiMap;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
@@ -109,11 +108,11 @@ import java.util.stream.Collectors;
         return asciiString;
     }
 
-    @Nonnull @Contract("_ -> new") public static AsciiString of(@NonNull final byte[] string) {
+    @Nonnull public static AsciiString of(@NonNull final byte[] string) {
         return new AsciiString(string);
     }
 
-    @Contract(pure = true) public boolean isEmpty() {
+    public boolean isEmpty() {
         return this.length() == 0;
     }
 
@@ -122,33 +121,31 @@ import java.util.stream.Collectors;
      *
      * @return Bytes
      */
-    @Contract(pure = true) public byte[] getValue() {
+    public byte[] getValue() {
         return this.value;
     }
 
-    @Contract(pure = true) @Override public int length() {
+    @Override public int length() {
         return this.string.length();
     }
 
-    @Contract(pure = true) @Override public char charAt(final int i) {
+    @Override public char charAt(final int i) {
         return this.string.charAt(i);
     }
 
-    @Nonnull @Contract(pure = true) @Override
-    public CharSequence subSequence(final int i, final int i1) {
+    @Nonnull @Override public CharSequence subSequence(final int i, final int i1) {
         return this.string.subSequence(i, i1);
     }
 
-    @Contract(pure = true) @Override @SuppressWarnings("ALL") public String toString() {
+    @Override @SuppressWarnings("ALL") public String toString() {
         return this.string;
     }
 
-    @Contract(pure = true) @Override public int hashCode() {
+    @Override public int hashCode() {
         return this.hashCode;
     }
 
-    @Contract(value = "null -> false", pure = true) @Override
-    public boolean equals(final Object object) {
+    @Override public boolean equals(final Object object) {
         if (object == null) {
             return false;
         }
@@ -163,7 +160,7 @@ import java.util.stream.Collectors;
         return false;
     }
 
-    @Contract(pure = true) private boolean compareBytes(@Nonnull @NonNull final byte[] other) {
+    private boolean compareBytes(@Nonnull @NonNull final byte[] other) {
         if (this.value.length != other.length) {
             return false;
         }
@@ -178,7 +175,7 @@ import java.util.stream.Collectors;
     /**
      * Delegate for {@link String#contains(CharSequence)}
      */
-    @Contract(pure = true) public boolean contains(@NonNull final CharSequence other) {
+    public boolean contains(@NonNull final CharSequence other) {
         return this.string.contains(other);
     }
 
@@ -198,7 +195,6 @@ import java.util.stream.Collectors;
         return localString.contains(otherString);
     }
 
-    @Contract(value = "null -> false", pure = true)
     public boolean equals(@NonNull final CharSequence other) {
         return this.string.equals(other.toString());
     }
@@ -229,8 +225,7 @@ import java.util.stream.Collectors;
     /**
      * Delegate for {@link String#endsWith(String)}
      */
-    @Contract(pure = true) @SuppressWarnings("WeakerAccess") public boolean endsWith(
-        @NonNull final String string) {
+    @SuppressWarnings("WeakerAccess") public boolean endsWith(@NonNull final String string) {
         return this.string.endsWith(string);
     }
 
@@ -272,7 +267,7 @@ import java.util.stream.Collectors;
         return of(uppercase);
     }
 
-    @Contract(value = " -> this", pure = true) @Override public AsciiString toAsciiString() {
+    @Override public AsciiString toAsciiString() {
         return this;
     }
 
@@ -282,7 +277,7 @@ import java.util.stream.Collectors;
      *
      * @return Parsed integer
      */
-    @Contract(pure = true) public int toInteger() {
+    public int toInteger() {
         int index = 0;
         int value = 0;
         boolean negative = this.value[0] == 45 /* - */;
@@ -298,7 +293,7 @@ import java.util.stream.Collectors;
         return value;
     }
 
-    @Contract(pure = true) public boolean isInteger() {
+    public boolean isInteger() {
         for (int i = 0; i < this.value.length; i++) {
             final byte b = this.value[i];
 
@@ -321,7 +316,7 @@ import java.util.stream.Collectors;
      *
      * @return Parsed long
      */
-    @Contract(pure = true) public long toLong() {
+    public long toLong() {
         int index = 0;
         long value = 0;
         boolean negative = this.value[0] == 45 /* - */;
@@ -349,7 +344,7 @@ import java.util.stream.Collectors;
             .map(string -> AsciiString.of(string, false)).collect(Collectors.toList());
     }
 
-    @Contract(pure = true) public boolean startsWith(@Nonnull @NonNull final AsciiString part) {
+    public boolean startsWith(@Nonnull @NonNull final AsciiString part) {
         final byte[] other = part.value;
         if (this.value.length < other.length) {
             return false;
@@ -362,7 +357,8 @@ import java.util.stream.Collectors;
         return true;
     }
 
-    @Contract(pure = true) public boolean startsWith(@NonNull final String part) {
+    public boolean startsWith(@NonNull final String part) {
         return this.string.startsWith(part);
     }
+
 }

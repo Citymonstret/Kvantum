@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.account;
 
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.repository.FieldComparator;
 import xyz.kvantum.server.api.repository.MatcherFactory;
 
@@ -34,7 +33,7 @@ import javax.annotation.Nonnull;
 public final class AccountMatcherFactory<A extends IAccount, B extends IAccount>
     implements MatcherFactory<A, B> {
 
-    @Nonnull @Contract("_ -> new") @Override
+    @Nonnull @Override
     public FieldComparator<? extends A, ? super B> createMatcher(@NonNull final A queryObject) {
         return new FieldComparator<>(queryObject, true, true);
     }

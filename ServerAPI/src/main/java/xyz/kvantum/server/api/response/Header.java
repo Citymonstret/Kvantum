@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
@@ -38,6 +37,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Response Header
+ */
 @SuppressWarnings({"unused", "WeakerAccess"}) public final class Header {
 
     /**
@@ -372,8 +374,8 @@ import java.util.Optional;
      */
     public static final HeaderOption HEADER_RETRY_AFTER = HeaderOption.create("Retry-After");
     private static final AsciiString DEFAULT_FORMAT = AsciiString.of("HTTP/1.1");
-    private final ListMultimap<HeaderOption, AsciiString> headers =
-        MultimapBuilder.hashKeys().arrayListValues().build();
+    @SuppressWarnings("UnstableApiUsage") private final ListMultimap<HeaderOption, AsciiString>
+        headers = MultimapBuilder.hashKeys().arrayListValues().build();
     @Getter private AsciiString status;
     @Getter private AsciiString format;
 
@@ -403,7 +405,7 @@ import java.util.Optional;
      * @param status Response status
      * @return Instance
      */
-    @Contract("_ -> this") public Header setStatus(@NonNull final AsciiString status) {
+    public Header setStatus(@NonNull final AsciiString status) {
         this.status = status;
         this.set(HEADER_STATUS, status);
         return this;
@@ -416,7 +418,7 @@ import java.util.Optional;
      * @param value Header value
      * @return Instance
      */
-    @Contract("_, _ -> this") public Header set(final HeaderOption key, final String value) {
+    public Header set(final HeaderOption key, final String value) {
         return set(key, AsciiString.of(value, false));
     }
 
@@ -427,7 +429,7 @@ import java.util.Optional;
      * @param value Header value
      * @return Instance
      */
-    @Contract("_, _ -> this") public Header set(final HeaderOption key, final AsciiString value) {
+    public Header set(final HeaderOption key, final AsciiString value) {
         return set(key, value, false);
     }
 
@@ -439,8 +441,8 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key,
-        @Nullable final String value, final boolean allowDuplicates) {
+    public Header set(@NonNull final HeaderOption key, @Nullable final String value,
+        final boolean allowDuplicates) {
         return this.set(key, AsciiString.of(value, false), allowDuplicates);
     }
 
@@ -452,8 +454,8 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    @Contract("_, _, _ -> this") public Header set(@NonNull final HeaderOption key,
-        @Nullable final AsciiString value, final boolean allowDuplicates) {
+    public Header set(@NonNull final HeaderOption key, @Nullable final AsciiString value,
+        final boolean allowDuplicates) {
         if (value == null || !allowDuplicates) {
             this.headers.removeAll(key);
         }
@@ -517,7 +519,7 @@ import java.util.Optional;
      * @param cookie Cookie
      * @return Instance
      */
-    @Contract("_ -> this") public Header setCookie(@NonNull final ResponseCookie cookie) {
+    public Header setCookie(@NonNull final ResponseCookie cookie) {
         if (CoreConfig.debug) {
             Logger.debug("Cookie set! Key: {}, Value: {}, Full: {}", cookie.getCookie(),
                 cookie.getValue(), cookie.toString());
@@ -563,8 +565,9 @@ import java.util.Optional;
      *
      * @return Copy of the internal map
      */
-    public Multimap<HeaderOption, AsciiString> getHeaders() {
+    @SuppressWarnings("UnstableApiUsage") public Multimap<HeaderOption, AsciiString> getHeaders() {
         return MultimapBuilder.ListMultimapBuilder.hashKeys(headers.size()).arrayListValues()
             .build(headers);
     }
+
 }

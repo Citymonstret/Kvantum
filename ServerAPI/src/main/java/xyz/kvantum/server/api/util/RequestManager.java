@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,19 +46,49 @@ import java.util.*;
  */
 @SuppressWarnings("unused") public final class RequestManager extends Router {
 
+    /**
+     * The default 404 generator
+     */
     private static final Generator<AbstractRequest, RequestHandler> DEFAULT_404_GENERATOR =
         (request) -> View404.construct(request.getQuery().getFullRequest());
+
+    /**
+     * Comparator used when comparing request handlers, based on their match count
+     */
     private static final Comparator<RequestHandler> REQUEST_HANDLER_COMPARATOR =
         Collections.reverseOrder(Comparator.comparing(RequestHandler::getMatchCount));
+
+    /**
+     * Timer instance
+     */
     private final Timer timer;
+
+    /**
+     * The views that are registered in this handler, used to handle requests
+     */
     @Builder.Default private List<RequestHandler> views =
         Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Instance 404 generator, defaults to {@link #DEFAULT_404_GENERATOR}
+     */
     @Setter @Getter @NonNull @Builder.Default private Generator<AbstractRequest, RequestHandler>
         error404Generator = DEFAULT_404_GENERATOR;
+
+    /**
+     * Request handler with largest match count
+     */
     private RequestHandler currentHead;
+
+    /**
+     * Field to indicate whether or not the match count has changed
+     */
     private boolean changed = true;
 
     @Builder RequestManager() {
+        //
+        // Initializes the request handler sorting system
+        //
         this.timer = new Timer(true);
         System.out.println("Delaying request manager timer initialization for 30 seconds.");
         this.timer.schedule(new TimerTask() {
@@ -81,7 +111,7 @@ import java.util.*;
         }, 30000L);
     }
 
-	/*
+	/* TODO: Revisit this
 	@Listener
 	public void onShutdown(@NonNull final ServerShutdownEvent event)
 	{

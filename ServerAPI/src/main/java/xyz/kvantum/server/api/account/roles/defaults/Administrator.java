@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.account.roles.defaults;
 
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.account.roles.SimpleAccountRole;
 
 /**
@@ -38,20 +37,18 @@ import xyz.kvantum.server.api.account.roles.SimpleAccountRole;
         super(ADMIN_IDENTIFIER);
     }
 
-    @Contract(pure = true) @Override
-    public boolean hasPermission(@NonNull final String permissionKey) {
+    @Override public boolean hasPermission(@NonNull final String permissionKey) {
         return true;
     }
 
-    @Contract(pure = true) @Override
-    public boolean addPermission(@NonNull final String permissionKey) {
+    @Override public boolean addPermission(@NonNull final String permissionKey) {
         // Cannot add administrator permission
         return false;
     }
 
-    @Contract(pure = true) @Override
-    public boolean removePermission(@NonNull final String permissionKey) {
+    @Override public boolean removePermission(@NonNull final String permissionKey) {
         // Cannot remove administrator permission
         return false;
     }
+
 }

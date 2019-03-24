@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import com.github.rutledgepaulv.qbuilders.visitors.PredicateVisitor;
 import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.util.function.Predicate;
@@ -54,8 +53,7 @@ public final class RSQLMatcher<V> extends Matcher<String, V> {
         return this.predicate.test(value);
     }
 
-    @Contract(pure = true) @SuppressWarnings("ALL")
-    private Class<V> getClass(@Nonnull @NonNull final V instance) {
+    @SuppressWarnings("ALL") private Class<V> getClass(@Nonnull @NonNull final V instance) {
         return (Class<V>) instance.getClass();
     }
 

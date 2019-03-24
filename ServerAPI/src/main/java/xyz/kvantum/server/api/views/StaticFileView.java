@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,8 @@ import java.util.function.Consumer;
         final Path path = (Path) pathRaw;
         final Object extensionRaw = r.getMeta("extension");
         if (extensionRaw == null) {
-            Logger.error("Encountered null \"extension\" value in StaticFileView: {}", this.getName());
+            Logger.error("Encountered null \"extension\" value in StaticFileView: {}",
+                this.getName());
             return;
         }
         final FileExtension extension = (FileExtension) extensionRaw;
@@ -129,7 +130,8 @@ import java.util.function.Consumer;
                 try {
                     final int read = inputStream.read(bytes, responseStream.getRead(), accepted);
                     if (CoreConfig.debug && read != bytes.length) {
-                        Logger.debug("StaticFileView: accepted was {0} but {1} was read", accepted, read);
+                        Logger.debug("StaticFileView: accepted was {0} but {1} was read", accepted,
+                            read);
                     }
                 } catch (final IOException e) {
                     e.printStackTrace();

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@ import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -142,19 +140,19 @@ import java.util.function.Consumer;
         }
     }
 
-    @Contract(pure = true) public double convertRate(final double rate) {
+    public double convertRate(final double rate) {
         return rate * TimeUnit.SECONDS.toSeconds(1);
     }
 
-    @Nonnull @Contract(pure = true) public String getRateUnit() {
+    public String getRateUnit() {
         return TimeUnit.SECONDS.name();
     }
 
-    @Nonnull @Contract(pure = true) public String getDurationUnit() {
+    public String getDurationUnit() {
         return TimeUnit.MILLISECONDS.name();
     }
 
-    @Contract(pure = true) public double convertDuration(final double duration) {
+    public double convertDuration(final double duration) {
         return duration * durationFactor;
     }
 

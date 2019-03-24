@@ -28,9 +28,9 @@ allprojects {
     license {
         header rootProject.file('HEADER')
         mapping 'java', 'SLASHSTAR_STYLE'
-        ext.year = 2018
+        ext.year = 2019
     }
-    
+
     repositories {
         maven { url "https://jitpack.io" }
         maven { url "http://repo.maven.apache.org/maven2" }
@@ -153,9 +153,3 @@ subprojects {
 }
 
 description = """"""
-
-task writeVersionToFile {
-    File file = new File(projectDir, "version.txt")
-    new File(projectDir, "old-version.txt").text = file.text
-    file.text = version
-}

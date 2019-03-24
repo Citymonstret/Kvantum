@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -92,8 +91,8 @@ import java.util.function.Predicate;
      * @param <T>      Type
      * @return assigned array
      */
-    @Nonnull @Contract("_, _ -> param1") public static <T> T[] arrayAssign(
-        @Nonnull @NonNull final T[] array, @Nonnull @NonNull final Provider<T> provider) {
+    @Nonnull public static <T> T[] arrayAssign(@Nonnull @NonNull final T[] array,
+        @Nonnull @NonNull final Provider<T> provider) {
         for (int i = 0; i < array.length; i++) {
             array[i] = provider.provide();
         }

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ public class Help extends PaginatedCommand<Command> {
         return true;
     }
 
-    @Override public boolean onCommand(PaginatedCommand<Command>.PaginatedCommandInstance paginatedCommandInstance) {
+    @Override public boolean onCommand(
+        PaginatedCommand<Command>.PaginatedCommandInstance paginatedCommandInstance) {
         final PaginationFactory.Page<Command> commandPage = paginatedCommandInstance.getPage();
         Message.CMD_HELP_HEADER
             .log(commandPage.getPageNum() + 1, this.getPaginationFactory().getPages().size());

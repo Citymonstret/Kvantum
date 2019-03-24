@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.account;
 
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class AccountDecorator {
     /**
      * @see #with(Object...)
      */
-    @Nonnull @Contract("_ -> new") @SafeVarargs public static AccountDecorator with(
+    @Nonnull @SafeVarargs public static AccountDecorator with(
         final Consumer<IAccount>... consumers) {
         return new AccountDecorator(Arrays.asList(consumers));
     }
@@ -58,7 +57,7 @@ public class AccountDecorator {
      *                or any class extending {@link AccountExtension}
      * @return Created account decorator
      */
-    @Nonnull @Contract("_ -> new") @SuppressWarnings("ALL") public static AccountDecorator with(
+    @Nonnull @SuppressWarnings("ALL") public static AccountDecorator with(
         @Nonnull final Object... objects) {
         final Collection<Consumer<IAccount>> consumers = new ArrayList<>();
         for (final Object object : objects) {

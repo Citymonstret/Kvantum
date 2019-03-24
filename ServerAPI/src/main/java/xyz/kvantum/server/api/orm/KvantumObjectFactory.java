@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.intellectualsites.commands.parser.ParserResult;
 import lombok.*;
 import net.sf.oval.ConstraintViolation;
 import net.sf.oval.Validator;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.orm.annotations.KvantumConstructor;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.orm.annotations.KvantumInsert;
@@ -233,7 +232,7 @@ import java.util.concurrent.ConcurrentHashMap;
         return factory;
     }
 
-    @Nonnull @Contract("_ -> new") public BuilderInstance build(final ParameterScope scope) {
+    @Nonnull public BuilderInstance build(final ParameterScope scope) {
         if (scope == ParameterScope.GET) {
             return new GetBuilderInstance();
         } else {

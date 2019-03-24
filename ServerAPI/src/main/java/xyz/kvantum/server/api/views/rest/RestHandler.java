@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.views.rest;
 
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -36,8 +35,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
-public class RestHandler extends RequestHandler implements IgnoreSyntax {
+@SuppressWarnings("unused") public class RestHandler extends RequestHandler
+    implements IgnoreSyntax {
 
     private static final Response RESPONSE_METHOD_NOT_ALLOWED =
         new Response().setHeader(new Header(Header.STATUS_NOT_ALLOWED));
@@ -105,7 +104,7 @@ public class RestHandler extends RequestHandler implements IgnoreSyntax {
         return response;
     }
 
-    @Contract(pure = true) @Override public String getName() {
+    @Override public String getName() {
         return "RESTHandler";
     }
 

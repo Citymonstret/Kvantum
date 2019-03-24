@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.VariableHolder;
 
@@ -42,7 +41,7 @@ import java.util.regex.Pattern;
     private final String pattern;
     private final Map<String, String> variableMap;
 
-    @Nonnull @Contract("_ -> new") public static FilePattern compile(@NonNull final String in) {
+    @Nonnull public static FilePattern compile(@NonNull final String in) {
         final Matcher matcher = PATTERN_VARIABLE.matcher(in);
         final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
         while (matcher.find()) {
@@ -51,7 +50,7 @@ import java.util.regex.Pattern;
         return new FilePattern(in, mapBuilder.build());
     }
 
-    @Nonnull @Contract("_ -> new") public FileMatcher matcher(final VariableHolder holder) {
+    @Nonnull public FileMatcher matcher(final VariableHolder holder) {
         return new FileMatcher(holder);
     }
 

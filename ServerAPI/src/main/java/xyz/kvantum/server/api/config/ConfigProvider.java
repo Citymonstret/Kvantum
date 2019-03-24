@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.config;
 
 import lombok.EqualsAndHashCode;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.util.Assert;
 
 /**
@@ -46,7 +45,7 @@ public abstract class ConfigProvider implements ConfigurationFile {
         ConfigVariableProvider.getInstance().add(this);
     }
 
-    @Contract(pure = true) @Override public String toString() {
+    @Override public String toString() {
         return this.name;
     }
 

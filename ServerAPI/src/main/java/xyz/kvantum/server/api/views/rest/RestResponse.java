@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,14 @@ import java.util.Map;
     @Getter private final String contentType;
     @Getter(AccessLevel.PROTECTED) private final RequestRequirements requestRequirements;
 
-    public RestResponse(@Nonnull @NonNull final HttpMethod httpMethod, @Nonnull @NonNull final ViewPattern viewPattern) {
+    public RestResponse(@Nonnull @NonNull final HttpMethod httpMethod,
+        @Nonnull @NonNull final ViewPattern viewPattern) {
         this(httpMethod, viewPattern, "application/json");
     }
 
     public RestResponse(@Nonnull @NonNull final HttpMethod httpMethod,
-        @Nonnull @NonNull final ViewPattern viewPattern, @Nonnull @NonNull final String contentType) {
+        @Nonnull @NonNull final ViewPattern viewPattern,
+        @Nonnull @NonNull final String contentType) {
         this(httpMethod, viewPattern, contentType, new RequestRequirements());
     }
 

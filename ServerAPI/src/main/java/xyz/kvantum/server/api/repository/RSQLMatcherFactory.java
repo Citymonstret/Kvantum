@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,16 @@
 package xyz.kvantum.server.api.repository;
 
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 
 /**
+ * {@link MatcherFactory} generating instances of {@link RSQLMatcher}
  * {@inheritDoc}
  */
 public final class RSQLMatcherFactory<V> implements MatcherFactory<String, V> {
 
-    @Nonnull @Contract("_ -> new") @Override
-    public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
+    @Nonnull @Override public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
         return new RSQLMatcher<>(queryObject);
     }
 

@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.core;
 
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 
 import javax.annotation.Nonnull;
@@ -41,7 +40,8 @@ public final class ServerImplementation {
      * @param intellectualServer Server instance
      * @throws KvantumException if the instance is already set
      */
-    public static void registerServerImplementation(@Nonnull @NonNull final Kvantum intellectualServer) {
+    public static void registerServerImplementation(
+        @Nonnull @NonNull final Kvantum intellectualServer) {
         if (ServerImplementation.intellectualServer != null) {
             throw new KvantumException("Trying to replace server implementation");
         }
@@ -53,7 +53,7 @@ public final class ServerImplementation {
      *
      * @return Implementation or mull
      */
-    @Contract(pure = true) public static Kvantum getImplementation() {
+    public static Kvantum getImplementation() {
         return intellectualServer;
     }
 
@@ -62,7 +62,7 @@ public final class ServerImplementation {
      *
      * @return True if an implementation has been registered
      */
-    @Contract(pure = true) public static boolean hasImplementation() {
+    public static boolean hasImplementation() {
         return getImplementation() != null;
     }
 

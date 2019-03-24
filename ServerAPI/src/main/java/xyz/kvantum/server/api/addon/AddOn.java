@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.addon;
 
 import lombok.*;
 import net.sf.oval.constraint.NotNull;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogProvider;
 
@@ -31,6 +30,7 @@ import java.util.UUID;
 
 /**
  * Abstract class used to declare an addon. All addons should have a main class that extends this class.
+ * {@inheritDoc}
  */
 @EqualsAndHashCode @ToString public abstract class AddOn implements LogProvider {
 
@@ -71,7 +71,7 @@ import java.util.UUID;
      */
     protected abstract void onDisable();
 
-    @Contract(pure = true) @Override public final String getLogIdentifier() {
+    @Override public final String getLogIdentifier() {
         return this.name;
     }
 

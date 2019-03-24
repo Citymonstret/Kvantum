@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.core;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Synchronized;
-import org.jetbrains.annotations.Contract;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -78,7 +77,7 @@ import java.util.*;
         this.setChanged();
     }
 
-    @Contract(pure = true) public boolean hasHandlers() {
+    public boolean hasHandlers() {
         return !this.handlers.isEmpty();
     }
 
@@ -130,7 +129,7 @@ import java.util.*;
     /**
      * @return A new WorkerProcedureInstance
      */
-    @Nonnull @Contract(" -> new") public final WorkerProcedureInstance getInstance() {
+    @Nonnull public final WorkerProcedureInstance getInstance() {
         return new WorkerProcedureInstance();
     }
 
@@ -148,7 +147,7 @@ import java.util.*;
 
         private final String uniqueID = UUID.randomUUID().toString();
 
-        @Contract(pure = true) @Override public final Class<String> getType() {
+        @Override public final Class<String> getType() {
             return String.class;
         }
 
@@ -171,11 +170,11 @@ import java.util.*;
             this.containsHandlers = !stringHandlers.isEmpty();
         }
 
-        @Contract(pure = true) public Collection<StringHandler> getStringHandlers() {
+        public Collection<StringHandler> getStringHandlers() {
             return this.stringHandlers;
         }
 
-        @Contract(pure = true) public boolean containsHandlers() {
+        public boolean containsHandlers() {
             return hasHandlers();
         }
     }

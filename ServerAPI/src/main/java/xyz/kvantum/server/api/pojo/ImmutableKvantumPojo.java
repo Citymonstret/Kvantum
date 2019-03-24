@@ -5,7 +5,7 @@
  *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
  *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
  *
- *    Copyright (C) 2018 Alexander Söderberg
+ *    Copyright (C) 2019 Alexander Söderberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.Contract;
 import org.json.simple.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -61,7 +60,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return Collection of field names
      */
-    @Nonnull @Contract(pure = true) public Collection<String> getGetterNames() {
+    @Nonnull public Collection<String> getGetterNames() {
         return this.fieldValues.keySet();
     }
 
@@ -71,7 +70,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      * @param key Key to check for
      * @return True if the key exists
      */
-    @Contract(pure = true) public boolean containsGetter(@NonNull final String key) {
+    public boolean containsGetter(@NonNull final String key) {
         return fieldValues.containsKey(key);
     }
 
@@ -93,7 +92,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return JSON object
      */
-    @Nonnull @Contract(" -> new") public JSONObject toJson() {
+    @Nonnull public JSONObject toJson() {
         return new JSONObject(this.getAll());
     }
 
@@ -102,7 +101,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return POJO instance
      */
-    @Contract(pure = true) public Pojo getPojo() {
+    public Pojo getPojo() {
         return this.instance;
     }
 
@@ -114,8 +113,7 @@ public final class ImmutableKvantumPojo<Pojo> {
         return this.instance.hashCode();
     }
 
-    @Contract(value = "null -> false", pure = true) @Override
-    public boolean equals(final Object object) {
+    @Override public boolean equals(final Object object) {
         if (object == null) {
             return false;
         } else if (object instanceof KvantumPojo) {
@@ -124,4 +122,5 @@ public final class ImmutableKvantumPojo<Pojo> {
             return this.instance.equals(object);
         }
     }
+
 }
