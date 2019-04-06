@@ -93,10 +93,9 @@ import java.util.function.Supplier;
     //
     private final ProtocolType protocolType;
 
-    private Timer.Context totalTimer;
     private WorkerContext workerContext;
-    private RequestReader requestReader;
-    private boolean reused = false;
+    RequestReader requestReader;
+    boolean reused = false;
 
     @Override public void handlerAdded(final ChannelHandlerContext context) {
         //
@@ -113,13 +112,13 @@ import java.util.function.Supplier;
         Message.CONNECTION_ACCEPTED.log(workerContext.getSocketContext().getAddress());
     }
 
-    private void createNew(@NonNull final SocketContext socketContext) {
+    void createNew(@NonNull final SocketContext socketContext) {
         this.workerContext = new WorkerContext(ServerImplementation.getImplementation(),
             ServerImplementation.getImplementation().getProcedure().getInstance(), this);
         this.workerContext.setSocketContext(socketContext);
         final Request request = new Request(socketContext);
         this.workerContext.setRequest(request);
-        this.requestReader = new RequestReader(request);
+        this.requestReader = new RequestReader(request, this.workerContext);
     }
 
     @Override public void channelActive(final ChannelHandlerContext ctx) throws Exception {
@@ -148,7 +147,11 @@ import java.util.function.Supplier;
         //
         if (reused && CoreConfig.debug) {
             Logger.debug("Reused socket: {}", this.workerContext.getSocketContext().getIP());
+        } else if (CoreConfig.verbose) {
+            Logger.debug("Continuing reading data for socket: {}", this.workerContext.getSocketContext().getIP());
         }
+
+        this.workerContext.setLastContext(context);
 
         //
         // Always reset "reused" state
@@ -161,18 +164,13 @@ import java.util.function.Supplier;
         final ByteBuf message = (ByteBuf) messageObject;
 
         //
-        // Create a new timer context for each request
-        //
-        if (this.requestReader.isCleared()) {
-            totalTimer = TIMER_READ_REQUEST.time();
-        }
-
-        //
         // Read all available data and try to compile it
         //
         Timer.Context readBytesTimer = TIMER_READ_BYTES.time();
         try {
-            this.requestReader.readBytes(message);
+            while (message.readableBytes() > 0) {
+                this.requestReader.readBytes(message);
+            }
         } catch (final Throwable throwable) {
             new ResponseTask(context, this.workerContext).handleThrowable(throwable, context);
         } finally {
@@ -184,36 +182,8 @@ import java.util.function.Supplier;
         // Handle complete requests
         //
         if (this.requestReader.isDone()) {
-            //
-            // Release content
-            //
-            this.requestReader.clear();
-            this.workerContext.getRequest().onCompileFinish();
-
-            if (CoreConfig.debug) {
-                this.workerContext.getRequest().dumpRequest();
-            }
-
-            //
-            // Close the read timer
-            //
-            this.totalTimer.stop();
-
-            this.handleResponse(context);
-
-            if (workerContext.getRequest().getHeaders()
-                .getOrDefault(KvantumServerHandler.CONNECTION, CLOSE)
-                .equalsIgnoreCase(KvantumServerHandler.KEEP_ALIVE)) {
-                this.reused = true;
-                this.requestReader.clear();
-                this.createNew(workerContext.getSocketContext());
-            }
+            this.workerContext.handleReadCompletion();
         }
-    }
-
-    @SuppressWarnings("unused") private void handleResponse(final ChannelHandlerContext context) {
-        ServerImplementation.getImplementation().getExecutorService()
-            .execute(new ResponseTask(context, this.workerContext));
     }
 
     @Override

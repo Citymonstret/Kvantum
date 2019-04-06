@@ -42,7 +42,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * A simple {@link Router} implementation,
+ * A simple {@link Router} implementation
+ * {@inheritDoc}
  */
 @SuppressWarnings("unused") public final class RequestManager extends Router {
 

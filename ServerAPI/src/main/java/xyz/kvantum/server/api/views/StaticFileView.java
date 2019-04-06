@@ -31,7 +31,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
-import xyz.kvantum.server.api.response.ResponseStream;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.TimeUtil;
 
@@ -117,7 +117,7 @@ import java.util.function.Consumer;
                     path, fileLength, CoreConfig.Buffer.files);
             }
             final InputStream inputStream;
-            final ResponseStream responseStream = new ResponseStream();
+            final KvantumOutputStream responseStream = new KvantumOutputStream();
             try {
                 inputStream = new FileInputStream(javaPath.toFile());
             } catch (final FileNotFoundException e) {

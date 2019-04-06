@@ -25,7 +25,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
-import xyz.kvantum.server.api.request.post.PostRequest;
+import xyz.kvantum.server.api.request.post.RequestEntity;
 
 import java.util.*;
 
@@ -54,7 +54,7 @@ import java.util.*;
         return (RequestValidation<T>) validator;
     }
 
-    private static RequestValidation<PostRequest> asPostRequestValidator(
+    private static RequestValidation<RequestEntity> asPostRequestValidator(
         final RequestValidation validator) {
         return castValidator(validator);
     }

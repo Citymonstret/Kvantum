@@ -32,7 +32,7 @@ import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.memguard.LeakageProne;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
-import xyz.kvantum.server.api.request.post.PostRequest;
+import xyz.kvantum.server.api.request.post.RequestEntity;
 import xyz.kvantum.server.api.response.ResponseCookie;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
@@ -70,12 +70,11 @@ public abstract class AbstractRequest
     @Setter(AccessLevel.PROTECTED) @Getter private ListMultimap<AsciiString, Cookie> cookies =
         ArrayListMultimap.create();
     @Setter(AccessLevel.PROTECTED) @Getter private Query query;
-    @Setter private PostRequest postRequest;
+    @Setter private RequestEntity postRequest;
     @Setter(AccessLevel.PROTECTED) @Getter private SocketContext socket;
-    @NonNull @Setter private ISession session;
+    @Setter private ISession session;
     @Setter @Getter private boolean valid = true;
     @Setter(AccessLevel.PROTECTED) private Authorization authorization;
-    @Getter @Setter private byte[] overloadBytes;
 
     public ITempFileManager getTempFileManager() {
         return this.socket.getTempFileManager();
@@ -137,7 +136,7 @@ public abstract class AbstractRequest
      *
      * @return PostRequest if exists, null if not
      */
-    public PostRequest getPostRequest() {
+    public RequestEntity getPostRequest() {
         return this.postRequest;
     }
 

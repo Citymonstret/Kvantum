@@ -55,7 +55,6 @@ public class SQLiteManager extends AutoCloseable {
     public void executeUpdate(@NonNull final String sql) throws SQLException {
         try (final Statement statement = this.connection.createStatement()) {
             statement.executeUpdate(sql);
-            statement.close();
         }
     }
 

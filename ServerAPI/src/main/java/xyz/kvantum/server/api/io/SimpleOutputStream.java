@@ -19,10 +19,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.response;
+package xyz.kvantum.server.api.io;
 
 import lombok.Getter;
 import lombok.NonNull;
+import xyz.kvantum.server.api.response.KnownLengthStream;
 
 import javax.annotation.Nonnull;
 
@@ -30,12 +31,12 @@ import javax.annotation.Nonnull;
  * Response stream with a single input write
  * {@inheritDoc}
  */
-public class SimpleResponseStream extends ResponseStream implements KnownLengthStream {
+public class SimpleOutputStream extends KvantumOutputStream implements KnownLengthStream {
 
     @Getter private byte[] bytes;
     private int read = 0;
 
-    public SimpleResponseStream(@Nonnull final byte[] bytes) {
+    public SimpleOutputStream(@Nonnull final byte[] bytes) {
         this.bytes = new byte[bytes.length];
         System.arraycopy(bytes, 0, this.bytes, 0, bytes.length);
     }

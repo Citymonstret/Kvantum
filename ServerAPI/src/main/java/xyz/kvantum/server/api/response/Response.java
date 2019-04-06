@@ -23,6 +23,9 @@ package xyz.kvantum.server.api.response;
 
 import lombok.Getter;
 import lombok.NonNull;
+import xyz.kvantum.server.api.io.ImmutableKvantumOutputStream;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
+import xyz.kvantum.server.api.io.SimpleOutputStream;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -35,12 +38,12 @@ import java.nio.charset.StandardCharsets;
  */
 @SuppressWarnings("unused") public class Response implements ResponseBody {
 
-    private static final ResponseStream DEFAULT_RESPONSE_STREAM =
-        new ImmutableResponseStream(new byte[0]);
+    private static final KvantumOutputStream DEFAULT_RESPONSE_STREAM =
+        new ImmutableKvantumOutputStream(new byte[0]);
 
     @Getter private Header header;
     private RequestHandler parent;
-    @Getter private ResponseStream responseStream = DEFAULT_RESPONSE_STREAM;
+    @Getter private KvantumOutputStream responseStream = DEFAULT_RESPONSE_STREAM;
     @Getter private boolean text = false;
 
     /**
@@ -74,10 +77,10 @@ import java.nio.charset.StandardCharsets;
      * @param bytes Bytes to send to the client
      */
     public Response setResponse(final byte[] bytes) {
-        return this.setResponse(new SimpleResponseStream(bytes));
+        return this.setResponse(new SimpleOutputStream(bytes));
     }
 
-    public Response setResponse(@NonNull final ResponseStream stream) {
+    public Response setResponse(@NonNull final KvantumOutputStream stream) {
         this.responseStream = stream;
         return this;
     }

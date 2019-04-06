@@ -21,23 +21,29 @@
  */
 package xyz.kvantum.server.implementation;
 
+import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.Kvantum;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.ResponseBody;
-import xyz.kvantum.server.api.response.ResponseStream;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.socket.SocketContext;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.views.RequestHandler;
 
 import java.nio.charset.StandardCharsets;
+
+import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.CONNECTION;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
 
 @Getter @Setter @RequiredArgsConstructor final class WorkerContext {
 
@@ -52,12 +58,54 @@ import java.nio.charset.StandardCharsets;
 
     private final KvantumServerHandler kvantumServerHandler;
 
+    private final Object lock = new Object();
     private RequestHandler requestHandler;
     private AbstractRequest request;
     private ResponseBody body;
-    private ResponseStream responseStream;
+    private KvantumOutputStream responseStream;
     private boolean gzip = false;
     private SocketContext socketContext;
+    private ChannelHandlerContext lastContext;
+
+    private boolean finished;
+
+    void handleReadCompletion() {
+        if (isFinished()) {
+            return;
+        }
+        synchronized (this.lock) {
+            try {
+                this.finished = true;
+                this.getRequest().onCompileFinish();
+                if (CoreConfig.debug) {
+                    this.getRequest().dumpRequest();
+                }
+                this.handleResponse(this.lastContext);
+                if (getRequest().getHeaders().getOrDefault(CONNECTION, CLOSE).equalsIgnoreCase(KEEP_ALIVE)) {
+                    this.kvantumServerHandler.reused = true;
+                    this.kvantumServerHandler.createNew(getSocketContext());
+                }
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean isFinished() {
+        synchronized (this.lock) {
+            return this.finished;
+        }
+    }
+
+    @SuppressWarnings("unused") private void handleResponse(final ChannelHandlerContext context) {
+        final ResponseTask responseTask = new ResponseTask(context, this);
+        // Either we reuse the old thread, or we create a new one
+        if (Thread.currentThread().getName().startsWith("kvantum-")) {
+            responseTask.run();
+        } else {
+            ServerImplementation.getImplementation().getExecutorService().execute(responseTask);
+        }
+    }
 
     /**
      * TODO: I am fairly confident this would be better somewhere else

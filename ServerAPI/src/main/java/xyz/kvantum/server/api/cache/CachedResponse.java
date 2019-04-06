@@ -24,6 +24,8 @@ package xyz.kvantum.server.api.cache;
 import lombok.NonNull;
 import lombok.ToString;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
+import xyz.kvantum.server.api.io.SimpleOutputStream;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.response.*;
 
@@ -36,7 +38,7 @@ import java.util.UUID;
 
     public final Header header;
     private final UUID uuid = UUID.randomUUID();
-    private final SimpleResponseStream responseStream;
+    private final SimpleOutputStream responseStream;
     private final boolean isText;
     private boolean supportsGzip;
 
@@ -44,25 +46,25 @@ import java.util.UUID;
         this.header = parent.getHeader();
         this.isText = parent.isText();
         this.supportsGzip = parent.supportsGzip();
-        final ResponseStream responseStream = parent.getResponseStream();
+        final KvantumOutputStream responseStream = parent.getResponseStream();
         if (!(responseStream instanceof KnownLengthStream)) {
             throw new IllegalArgumentException(
                 "Supplied parent does not have a known length response stream");
         }
         final KnownLengthStream knownLengthStream = (KnownLengthStream) responseStream;
-        this.responseStream = new SimpleResponseStream(knownLengthStream.getAll());
+        this.responseStream = new SimpleOutputStream(knownLengthStream.getAll());
     }
 
     @Override public Header getHeader() {
         return this.header;
     }
 
-    @Override public ResponseStream getResponseStream() {
+    @Override public KvantumOutputStream getResponseStream() {
         if (CoreConfig.debug) {
             Logger.debug("Creating a new copy of response stream: {}", this);
         }
         // Always return a copy of the response stream
-        return new SimpleResponseStream(responseStream.getBytes());
+        return new SimpleOutputStream(responseStream.getBytes());
     }
 
     @Override public boolean supportsGzip() {

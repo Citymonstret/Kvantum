@@ -23,7 +23,7 @@ package xyz.kvantum.server.api.request.post;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-final public class DummyPostRequest extends PostRequest {
+public final class DummyPostRequest extends RequestEntity {
 
     public DummyPostRequest(final AbstractRequest parent, final String rawRequest) {
         super(parent, rawRequest, false);

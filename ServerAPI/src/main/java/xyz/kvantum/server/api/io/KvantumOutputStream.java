@@ -19,7 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.response;
+package xyz.kvantum.server.api.io;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 /**
  * Custom stream implementation used to write HTTP response bodies
  */
-@RequiredArgsConstructor public class ResponseStream {
+@RequiredArgsConstructor public class KvantumOutputStream {
 
     private static final byte[] EMPTY_RESPONSE = new byte[0];
     private static final long MAX_WAIT = 500L; // Wait time of 500ms

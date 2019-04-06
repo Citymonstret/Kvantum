@@ -29,19 +29,19 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 final public class TempFileManager extends AutoCloseable implements ITempFileManager {
 
-    private final Set<WeakReference<Path>> pathReferences = new HashSet<>();
+    private final Map<String, WeakReference<Path>> pathReferences = new HashMap<>();
 
-    @Override public Optional<Path> createTempFile() {
+    @Override public Optional<Path> createTempFile(final String name) {
         try {
-            final Path path = Files.createTempFile(null, null);
+            final Path path = Files.createTempFile("kvantum-tempfile-", null);
             path.toFile().deleteOnExit();
-            this.pathReferences.add(new WeakReference<>(path));
+            this.pathReferences.put(name, new WeakReference<>(path));
             return Optional.of(path);
         } catch (final IOException e) {
             Logger.error("Failed to create temp file: {}", e.getMessage());
@@ -49,8 +49,16 @@ final public class TempFileManager extends AutoCloseable implements ITempFileMan
         return Optional.empty();
     }
 
+    @Override public Optional<Path> getFile(final String name) {
+        if (pathReferences.containsKey(name)) {
+            final WeakReference<Path> reference = pathReferences.get(name);
+            return Optional.ofNullable(reference.get());
+        }
+        return Optional.empty();
+    }
+
     @Override public void clearTempFiles() {
-        for (final WeakReference<Path> weakReference : this.pathReferences) {
+        for (final WeakReference<Path> weakReference : this.pathReferences.values()) {
             final Path path;
             if ((path = weakReference.get()) != null) {
                 try {

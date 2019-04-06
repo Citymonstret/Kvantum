@@ -32,9 +32,19 @@ import java.util.Optional;
     /**
      * Create a new temporary file
      *
+     * @param name file name
      * @return new temporary file, if it was successfully created
      */
-    Optional<Path> createTempFile();
+    Optional<Path> createTempFile(final String name);
+
+    /**
+     * Attempt to get a file using the file name specified
+     * when creating the temp file
+     *
+     * @param name file name
+     * @return file, if it can be found
+     */
+    Optional<Path> getFile(final String name);
 
     /**
      * Delete all temporary files created in this manager

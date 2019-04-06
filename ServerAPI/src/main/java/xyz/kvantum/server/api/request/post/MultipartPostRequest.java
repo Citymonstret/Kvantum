@@ -25,6 +25,7 @@ import lombok.Getter;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
+import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.fileupload.KvantumFileUploadContext;
 import xyz.kvantum.server.api.logging.Logger;
@@ -34,19 +35,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class MultipartPostRequest extends PostRequest {
+public class MultipartPostRequest extends RequestEntity {
 
     @Getter private KvantumFileUploadContext.KvantumFileUploadContextParsingResult parsingResult;
+    private final InputStream inputStream;
 
-    public MultipartPostRequest(final AbstractRequest parent, final String rawRequest) {
-        super(parent, rawRequest, true);
+    public MultipartPostRequest(final AbstractRequest parent, final InputStream inputStream) {
+        super(parent, "", true);
+        this.inputStream = inputStream;
     }
 
-    @Override protected void parseRequest(final String rawRequest) {
-        this.parsingResult = KvantumFileUploadContext.from(this.getParent());
+    @Override protected void parseRequest(final String ignored) {
+        this.parsingResult = KvantumFileUploadContext.from(this.getParent(), this.inputStream);
         if (parsingResult.getStatus()
             == KvantumFileUploadContext.KvantumFileUploadContextParsingStatus.SUCCESS) {
             final KvantumFileUploadContext context = this.parsingResult.getContext();
@@ -57,24 +65,45 @@ public class MultipartPostRequest extends PostRequest {
                 FileItemStream item;
                 while (itemIterator.hasNext()) {
                     item = itemIterator.next();
-                    if (!item.isFormField()) {
-                        continue; // We do not handle files, that is up to the application implementations
-                    }
                     try (final InputStream inputStream = item.openStream()) {
-                        final List<String> lines = new ArrayList<>();
-                        try (BufferedReader bufferedReader = new BufferedReader(
-                            new InputStreamReader(inputStream))) {
-                            String line;
-                            while ((line = bufferedReader.readLine()) != null) {
-                                lines.add(line);
+                        if (item.isFormField()) {
+                            final List<String> lines = new ArrayList<>();
+                            try (BufferedReader bufferedReader = new BufferedReader(
+                                new InputStreamReader(inputStream))) {
+                                String line;
+                                while ((line = bufferedReader.readLine()) != null) {
+                                    lines.add(line);
+                                }
+                            }
+                            if (lines.size() != 1) {
+                                Logger.warn("FileItem simple field line count is not 0 (Request: {})",
+                                    getParent());
+                                continue;
+                            }
+                            this.getVariables().put(item.getFieldName(), lines.get(0));
+                        } else {
+                            if (CoreConfig.debug && CoreConfig.verbose) {
+                                Logger.info("Found file in multipart form from {0}, with field name {1}", this.getParent(), item.getFieldName());
+                            }
+                            final Optional<Path> tempFile = this.getParent().getTempFileManager().createTempFile(item.getName());
+                            if (!tempFile.isPresent()) {
+                                if (CoreConfig.debug && CoreConfig.verbose) {
+                                    Logger.info("Could not create temp file, skipping file...");
+                                }
+                            } else {
+                                final Path path = tempFile.get();
+                                try (final OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE)) {
+                                    int data;
+                                    while ((data = inputStream.read()) != -1) {
+                                        outputStream.write(data);
+                                    }
+                                }
+                                if (CoreConfig.debug && CoreConfig.verbose) {
+                                    Logger.info("Write file with name {0} from field {1} for request {2}",
+                                        item.getName(), item.getFieldName(), this.getParent());
+                                }
                             }
                         }
-                        if (lines.size() != 1) {
-                            Logger.warn("FileItem simple field line count is not 0 (Request: {})",
-                                getParent());
-                            continue;
-                        }
-                        this.getVariables().put(item.getFieldName(), lines.get(0));
                     }
                 }
             } catch (final FileUploadException | IOException e) {

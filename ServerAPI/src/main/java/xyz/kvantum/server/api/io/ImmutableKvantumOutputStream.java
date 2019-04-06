@@ -19,24 +19,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.response;
+package xyz.kvantum.server.api.io;
 
 /**
- * Immutable implementation of {@link SimpleResponseStream}
+ * Immutable implementation of {@link SimpleOutputStream}
  * {@inheritDoc}
  */
-public final class ImmutableResponseStream extends SimpleResponseStream {
+public final class ImmutableKvantumOutputStream extends SimpleOutputStream {
 
     /**
-     * Construct a new {@link ImmutableResponseStream} with a fixed value
+     * Construct a new {@link ImmutableKvantumOutputStream} with a fixed value
      *
      * @param bytes value that will be pushed by this response stream
      */
-    @SuppressWarnings("WeakerAccess") public ImmutableResponseStream(final byte[] bytes) {
+    public ImmutableKvantumOutputStream(final byte[] bytes) {
         super(bytes);
     }
 
-    @Override public void push(byte[] bytes) {
+    @Override public void push(final byte[] bytes) {
         throw new UnsupportedOperationException("Cannot write to immutable stream");
     }
 

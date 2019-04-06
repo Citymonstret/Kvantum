@@ -35,6 +35,7 @@ import xyz.kvantum.server.api.config.CoreConfig.Buffer;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.core.WorkerProcedure;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.*;
@@ -60,7 +61,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
     @NonNull final WorkerContext workerContext;
 
     @Override public void run() {
-        try (Timer.Context timer = KvantumServerHandler.TIMER_TOTAL_SEND.time()) {
+        try (Timer.Context ignored = KvantumServerHandler.TIMER_TOTAL_SEND.time()) {
             //
             // Attempt to find a handler for the request, or create
             // the appropriate error handler
@@ -156,7 +157,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
         RequestHandler requestHandler = workerContext.getRequestHandler();
         AbstractRequest request = workerContext.getRequest();
         ResponseBody body;
-        ResponseStream responseStream;
+        KvantumOutputStream responseStream;
         boolean cache = false, shouldCache = false;
 
         try {
@@ -216,6 +217,13 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
                     this.writeResponse();
                 }
                 return;
+            }
+
+            final AsciiString expected;
+            if (!(expected = request.getHeader(AsciiString.of("expect"))).isEmpty()) {
+                if (body.getHeader().getStatus().startsWith("200") && expected.startsWith("100")) { // it was okay, so we conform :P
+                    body.getHeader().setStatus(Header.STATUS_CONTINUE);
+                }
             }
 
             responseStream = body.getResponseStream();
@@ -340,7 +348,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
         //
         // Get the respone stream
         //
-        final ResponseStream responseStream =
+        final KvantumOutputStream responseStream =
             workerContext.getResponseStream(); // body.getResponseStream();
         final boolean hasKnownLength = responseStream instanceof KnownLengthStream;
 

@@ -22,7 +22,7 @@
 package xyz.kvantum.server.api.request;
 
 import lombok.NoArgsConstructor;
-import xyz.kvantum.server.api.request.post.PostRequest;
+import xyz.kvantum.server.api.request.post.RequestEntity;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.MapUtil;
 import xyz.kvantum.server.api.util.ProviderFactory;
@@ -38,9 +38,9 @@ import java.util.Optional;
 @NoArgsConstructor public final class PostProviderFactory
     implements ProviderFactory<PostProviderFactory>, VariableProvider {
 
-    private PostRequest p;
+    private RequestEntity p;
 
-    private PostProviderFactory(final PostRequest p) {
+    private PostProviderFactory(final RequestEntity p) {
         this.p = p;
     }
 

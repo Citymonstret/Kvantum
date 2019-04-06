@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings({"unused", "WeakerAccess "}) public abstract class PostRequest
+@SuppressWarnings({"unused", "WeakerAccess "}) public abstract class RequestEntity
     implements RequestChild {
 
     @Getter private final AbstractRequest parent;
@@ -41,7 +41,7 @@ import java.util.Map;
     @Getter @Setter(AccessLevel.PROTECTED) private String request;
     private boolean loaded;
 
-    protected PostRequest(final AbstractRequest parent, final String rawRequest, boolean lazyLoad) {
+    protected RequestEntity(final AbstractRequest parent, final String rawRequest, boolean lazyLoad) {
         Assert.notNull(parent);
         Assert.notNull(rawRequest);
 
@@ -55,16 +55,12 @@ import java.util.Map;
         }
     }
 
-    private void load() {
-        this.parseRequest(rawRequest);
-        this.loaded = true;
-    }
-
-    private void checkIfShouldLoad() {
+    public void load() {
         if (this.loaded) {
             return;
         }
-        this.load();
+        this.parseRequest(rawRequest);
+        this.loaded = true;
     }
 
     protected abstract void parseRequest(String rawRequest);
@@ -80,7 +76,7 @@ import java.util.Map;
     @Nullable public String get(final String key) {
         Assert.notNull(key);
 
-        this.checkIfShouldLoad();
+        this.load();
 
         if (!this.getVariables().containsKey(key)) {
             return null; // Nullable
@@ -96,7 +92,7 @@ import java.util.Map;
      */
     public boolean contains(final String key) {
         Assert.notNull(key);
-        this.checkIfShouldLoad();
+        this.load();
         return this.getVariables().containsKey(key);
     }
 
@@ -106,7 +102,7 @@ import java.util.Map;
      * @return copy of the internal map
      */
     final public Map<String, String> get() {
-        this.checkIfShouldLoad();
+        this.load();
 
         return new HashMap<>(this.variables);
     }

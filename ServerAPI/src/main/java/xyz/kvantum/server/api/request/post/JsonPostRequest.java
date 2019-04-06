@@ -27,7 +27,7 @@ import xyz.kvantum.server.api.util.KvantumJsonFactory;
 
 import java.util.Map;
 
-public class JsonPostRequest extends PostRequest {
+public class JsonPostRequest extends RequestEntity {
 
     public JsonPostRequest(final AbstractRequest parent, final String rawRequest) {
         super(parent, rawRequest, false);

@@ -27,7 +27,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-final public class UrlEncodedPostRequest extends PostRequest {
+public final class UrlEncodedPostRequest extends RequestEntity {
 
     public UrlEncodedPostRequest(final AbstractRequest parent, final String request) {
         super(parent, request, false);

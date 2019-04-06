@@ -23,13 +23,13 @@ package xyz.kvantum.server.api.fileupload;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.fileupload.UploadContext;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 
 import javax.annotation.Nonnull;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -55,11 +55,11 @@ public final class KvantumFileUploadContext implements UploadContext {
      * @return Parsing result
      */
     @Nonnull public static KvantumFileUploadContextParsingResult from(
-        @Nonnull final AbstractRequest request) {
+        @Nonnull final AbstractRequest request, @NonNull final InputStream inputStream) {
         if (request.getQuery().getMethod() == HttpMethod.POST && request.getHeader("Content-Type")
             .startsWith("multipart")) {
             final KvantumFileUploadContext context = new KvantumFileUploadContext(request,
-                new ByteArrayInputStream(request.getOverloadBytes()));
+                /*new ByteArrayInputStream(request.getOverloadBytes())*/ inputStream);
             return new KvantumFileUploadContextParsingResult(
                 KvantumFileUploadContextParsingStatus.SUCCESS, context);
         }

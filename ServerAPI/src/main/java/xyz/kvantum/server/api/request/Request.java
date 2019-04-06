@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.request;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.QueryException;
 import xyz.kvantum.server.api.logging.Logger;
@@ -57,6 +58,9 @@ import java.util.Optional;
     @Override public void onCompileFinish() {
         if (this.getQuery() == null) {
             throw new QueryException("Couldn't find query header...", this);
+        }
+        if (CoreConfig.debug && CoreConfig.verbose) {
+            Logger.debug("Reading cookies (from {})", this);
         }
         this.setCookies(CookieManager.getCookies(this));
         if (this.getHeaders().containsKey(HEADER_AUTHORIZATION)) {

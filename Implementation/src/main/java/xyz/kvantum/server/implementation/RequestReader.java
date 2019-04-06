@@ -22,19 +22,32 @@
 package xyz.kvantum.server.implementation;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.io.KvantumInputStream;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestCompiler;
-import xyz.kvantum.server.api.request.post.*;
+import xyz.kvantum.server.api.request.post.DummyPostRequest;
+import xyz.kvantum.server.api.request.post.EntityType;
+import xyz.kvantum.server.api.request.post.JsonPostRequest;
+import xyz.kvantum.server.api.request.post.MultipartPostRequest;
+import xyz.kvantum.server.api.request.post.RequestEntity;
+import xyz.kvantum.server.api.request.post.UrlEncodedPostRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.util.AsciiString;
+import xyz.kvantum.server.api.util.AutoCloseable;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Read a HTTP request until the first clear line. Does not read the HTTP message. The reader uses {@link
@@ -48,19 +61,38 @@ import java.util.Optional;
         AsciiString.of("application/x-www-form-urlencoded");
     private static final AsciiString CONTENT_TYPE_MULTIPART = AsciiString.of("multipart");
 
+    private final Object lock = new Object();
     @Getter private final StringBuilder builder;
     private final AbstractRequest abstractRequest;
     private char lastCharacter = ' ';
-    private boolean done = false;
+    private AtomicBoolean done = new AtomicBoolean(false);
     private boolean begunLastLine = false;
     private boolean hasQuery = false;
-    private ByteBuf overloadBuffer;
     private int contentLength = -1;
+    @Getter private ReadTarget readTargetz = ReadTarget.REQUEST_HEADERS;
     @Getter private boolean cleared = true;
+    private final WorkerContext context;
 
-    RequestReader(final AbstractRequest abstractRequest) {
+    // Request body
+    private RequestOutputStream overflowStream;
+    private RequestEntityReader requestEntityReader;
+
+    RequestReader(final AbstractRequest abstractRequest, final WorkerContext workerContext) {
         this.abstractRequest = abstractRequest;
+        this.context = workerContext;
         this.builder = new StringBuilder(CoreConfig.Limits.limitRequestLineSize);
+    }
+
+    ReadTarget getReadTarget() {
+        synchronized (this.lock) {
+            return this.readTargetz;
+        }
+    }
+
+    void setReadTarget(final ReadTarget target) {
+        synchronized (this.lock) {
+            this.readTargetz = target;
+        }
     }
 
     /**
@@ -69,7 +101,7 @@ import java.util.Optional;
      * @return true if the HTTP request is read, false if not
      */
     boolean isDone() {
-        return this.done;
+        return this.done.get();
     }
 
     /**
@@ -90,52 +122,8 @@ import java.util.Optional;
     boolean readByte(final byte b) throws Throwable {
         this.cleared = false;
 
-        if (done) {
+        if (isDone() || getReadTarget() == ReadTarget.REQUEST_BODY) {
             return false;
-        }
-
-        if (contentLength != -1) {
-            if (overloadBuffer.readableBytes() >= contentLength) {
-                return false;
-            }
-            this.overloadBuffer.writeByte(b);
-            if (overloadBuffer.readableBytes() == contentLength) {
-                final AsciiString contentType = abstractRequest.getHeader(CONTENT_TYPE);
-                boolean isFormURLEncoded;
-
-                if ((isFormURLEncoded = contentType.startsWith(CONTENT_TYPE_URL_ENCODED))
-                    || (EntityType.JSON.getContentType().startsWith(contentType.toString()))) {
-                    try {
-                        final String content =
-                            overloadBuffer.readCharSequence(contentLength, StandardCharsets.UTF_8)
-                                .toString();
-
-                        if (isFormURLEncoded) {
-                            abstractRequest.setPostRequest(
-                                new UrlEncodedPostRequest(abstractRequest, content));
-                        } else {
-                            abstractRequest
-                                .setPostRequest(new JsonPostRequest(abstractRequest, content));
-                        }
-                    } catch (final Exception e) {
-                        Logger.warn(
-                            "Failed to read url encoded postAbstractRequest (Request: {0}): {1}",
-                            abstractRequest, e.getMessage());
-                    }
-                } else if (contentType.startsWith(CONTENT_TYPE_MULTIPART)) {
-                    byte[] bytes = new byte[contentLength];
-                    overloadBuffer.readBytes(bytes);
-                    abstractRequest.setOverloadBytes(bytes);
-                    abstractRequest.setPostRequest(new MultipartPostRequest(abstractRequest, ""));
-                } else {
-                    Logger.warn("Request provided unknown post request type (Request: {0}): {1}",
-                        abstractRequest, contentType);
-                    abstractRequest.setPostRequest(new DummyPostRequest(abstractRequest, ""));
-                }
-
-                this.done = true;
-            }
-            return true;
         }
 
         final char character = (char) b;
@@ -144,7 +132,8 @@ import java.util.Optional;
             if (character == '\n') {
                 final AsciiString contentLength = abstractRequest.getHeader(CONTENT_LENGTH);
                 if (contentLength.isEmpty()) {
-                    return (done = true);
+                    done.set(true);
+                    return true;
                 }
                 try {
                     this.contentLength = contentLength.toInteger();
@@ -158,8 +147,17 @@ import java.util.Optional;
                     }
                     throw new ReturnStatus(Header.STATUS_ENTITY_TOO_LARGE, null);
                 }
-                this.overloadBuffer = PooledByteBufAllocator.DEFAULT.buffer(
-                    this.contentLength); // ByteBufAllocator.DEFAULT.buffer( this.contentLength );
+
+                if (CoreConfig.debug && CoreConfig.verbose) {
+                    Logger.debug("Creating a new request output stream for {}", this.abstractRequest);
+                }
+
+                this.setReadTarget(ReadTarget.REQUEST_BODY);
+                this.overflowStream = new RequestOutputStream(this.contentLength);
+                this.requestEntityReader = new RequestEntityReader(new KvantumInputStream(overflowStream, this.contentLength));
+                // Submit the reading task
+                ServerImplementation.getImplementation().getExecutorService().submit(this.requestEntityReader);
+                return false; // Indicate that we should read into the stream instead
             } else {
                 begunLastLine = false;
             }
@@ -204,29 +202,20 @@ import java.util.Optional;
      */
     boolean readByte(final int val) throws Throwable {
         if (val == -1) {
-            this.done = true;
+            this.done.set(true);
             return false;
         }
         return this.readByte((byte) val);
     }
 
-    /**
-     * Attempt to read a byte array
-     *
-     * @param bytes Byte array
-     * @return Number of read bytes
-     */
-    int readBytes(final byte[] bytes) throws Throwable {
-        return this.readBytes(bytes, bytes.length);
-    }
-
-    @SuppressWarnings("ALL") int readBytes(final ByteBuf byteBuf) throws Throwable {
+    void readBytes(final ByteBuf byteBuf) throws Throwable {
+        if (this.getReadTarget() == ReadTarget.REQUEST_BODY && !this.overflowStream.canWrite()) {
+            return; // Read nothing, we need to wait!
+        }
         final int length = byteBuf.readableBytes();
-
         final byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes, 0, length);
-
-        return this.readBytes(bytes, length);
+        this.readBytes(bytes, length);
     }
 
     /**
@@ -236,31 +225,155 @@ import java.util.Optional;
      * @param length Length to be read
      * @return Number of read bytes
      */
-    int readBytes(final byte[] bytes, final int length) throws Throwable {
-        int read = 0;
-        for (int i = 0; i < length && i < bytes.length; i++) {
-            if (this.readByte(bytes[i])) {
-                read++;
+    private int readBytes(final byte[] bytes, final int length) throws Throwable {
+        if (this.getReadTarget() == ReadTarget.REQUEST_HEADERS) {
+            int read = 0;
+            for (int i = 0; i < length && i < bytes.length; i++) {
+                if (this.readByte(bytes[i])) {
+                    read++;
+                } else if (this.getReadTarget() == ReadTarget.REQUEST_BODY) {
+                    // We need to copy the remaining data over
+                    final int remaining = length - i;
+                    if (CoreConfig.debug && CoreConfig.verbose) {
+                        Logger.debug("Copying {0} bytes over to request entity (from {1})", remaining,
+                            this.abstractRequest);
+                    }
+                    final byte[] remainingData = new byte[remaining];
+                    System.arraycopy(bytes, i, remainingData, 0, remaining);
+                    this.overflowStream.setBuffer(remainingData);
+                    return read + remainingData.length;
+                }
+                if (this.isDone()) {
+                    break;
+                }
             }
-            if (this.done) {
-                break;
-            }
+            return read;
+        } else {
+            this.overflowStream.setBuffer(bytes);
         }
-        return read;
+        return 0;
     }
 
-    /**
-     * Clear the request reader
-     */
-    public void clear() {
-        this.builder.setLength(0);
-        this.lastCharacter = ' ';
-        if (overloadBuffer != null) {
-            this.overloadBuffer.release();
-            this.overloadBuffer = null;
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE) private class RequestEntityReader
+        extends AutoCloseable implements Runnable {
+
+        private final KvantumInputStream kvantumInputStream;
+
+        @Override public void run() {
+            if (isDone()) {
+                if (CoreConfig.debug && CoreConfig.verbose) {
+                    Logger.debug("RequestEntityReader started but terminated instantly, for request {}", abstractRequest);
+                }
+                return;
+            }
+            if (CoreConfig.debug && CoreConfig.verbose) {
+                Logger.debug("RequestEntityReader reading (from {})", abstractRequest);
+            }
+            // Determine read strategy
+            final AsciiString contentType = abstractRequest.getHeader(CONTENT_TYPE);
+            final RequestEntity requestEntity;
+            boolean isFormURLEncoded;
+            if ((isFormURLEncoded = contentType.startsWith(CONTENT_TYPE_URL_ENCODED)) ||
+                EntityType.JSON.getContentType().startsWith(contentType.toString())) {
+                // Read into memory and then parse the request
+                final StringBuilder builder = new StringBuilder(contentLength);
+                try (final BufferedReader bufferedReader =
+                    new BufferedReader(new InputStreamReader(this.kvantumInputStream))) {
+                    if (CoreConfig.debug && CoreConfig.verbose) {
+                        Logger.debug("RequestEntityReader reading data into memory (from {})", abstractRequest);
+                    }
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        builder.append(line).append("\n");
+                    }
+                } catch (final IOException e) {
+                    Logger.error("Failed to read request entity");
+                    e.printStackTrace();
+                }
+                if (isFormURLEncoded) {
+                    requestEntity = new UrlEncodedPostRequest(abstractRequest, builder.toString());
+                } else {
+                    requestEntity = new JsonPostRequest(abstractRequest, builder.toString());
+                }
+            } else if (contentType.startsWith(CONTENT_TYPE_MULTIPART)) {
+                // It's a multipart form
+                requestEntity = new MultipartPostRequest(abstractRequest, this.kvantumInputStream);
+                requestEntity.load();
+            } else {
+                Logger.warn("Request provided unknown post request type (Request: {0}): {1}",
+                    abstractRequest, contentType);
+                requestEntity = new DummyPostRequest(abstractRequest, "");
+            }
+            abstractRequest.setPostRequest(requestEntity);
+            done.set(true);
+
+            if (CoreConfig.debug && CoreConfig.verbose) {
+                Logger.debug("Completely read request entity (from {})",  abstractRequest);
+            }
+
+            // We don't know if it's finished or not
+            context.handleReadCompletion();
         }
-        this.contentLength = -1;
-        this.cleared = true;
+
+        @Override protected void handleClose() {
+            try {
+                this.kvantumInputStream.close();
+            } catch (final IOException ignored) {
+            }
+        }
+    }
+
+    private class RequestOutputStream extends KvantumOutputStream {
+
+        private final Object lock = new Object();
+        private final int expectedSize;
+
+        @Getter private byte[] buffer;
+        private int read = 0;
+
+        public RequestOutputStream(final int expectedSize) {
+            this.expectedSize = expectedSize;
+        }
+
+        public void setBuffer(final byte[] buffer) {
+            Logger.info("SETTING DATA");
+            synchronized (this.lock) {
+                if (this.isFinished()) {
+                    throw new IllegalStateException("Cannot write when the stream is finished");
+                } else if (!this.canWrite()) {
+                    throw new IllegalStateException("Cannot write when the stream is being read");
+                }
+                this.buffer = buffer;
+                this.read = 0;
+            }
+        }
+
+        @Override public byte[] read(int amount) {
+            final byte[] bytes;
+            synchronized (this.lock) {
+                int toRead = Math.min(this.getOffer(), amount);
+                bytes = new byte[toRead];
+                System.arraycopy(this.buffer, read, bytes, 0, toRead);
+                this.read += bytes.length;
+                if (this.expectedSize <= this.read) {
+                    this.finish();
+                }
+            }
+            return bytes;
+        }
+
+        @Override public int getOffer() {
+            return this.buffer != null ? this.buffer.length - read : 0;
+        }
+
+        public boolean canWrite() {
+            return this.getOffer() <= 0;
+        }
+
+    }
+
+    private enum ReadTarget {
+        REQUEST_HEADERS, REQUEST_BODY
     }
 
 }

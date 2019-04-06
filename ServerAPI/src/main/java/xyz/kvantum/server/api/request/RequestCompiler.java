@@ -77,7 +77,7 @@ import java.util.regex.Pattern;
         final Matcher matcher = PATTERN_QUERY.matcher(line);
         if (!matcher.matches()) {
             timer.close();
-            throw new IllegalArgumentException("Not a query line");
+            throw new IllegalArgumentException(String.format("Not a query line: %s", line));
         }
         if (CoreConfig.verbose) {
             ServerImplementation.getImplementation().log("Query: " + matcher.group());

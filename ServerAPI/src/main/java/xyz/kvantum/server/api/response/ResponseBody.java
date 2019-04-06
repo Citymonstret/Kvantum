@@ -21,11 +21,13 @@
  */
 package xyz.kvantum.server.api.response;
 
+import xyz.kvantum.server.api.io.KvantumOutputStream;
+
 public interface ResponseBody extends HeaderProvider {
 
     Header getHeader();
 
-    ResponseStream getResponseStream();
+    KvantumOutputStream getResponseStream();
 
     boolean isText();
 

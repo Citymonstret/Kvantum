@@ -22,9 +22,10 @@
 package xyz.kvantum.server.api.response;
 
 import lombok.NonNull;
+import xyz.kvantum.server.api.io.KvantumOutputStream;
 
 /**
- * A stream (such as {@link ResponseStream}) with a known length.
+ * A stream (such as {@link KvantumOutputStream}) with a known length.
  */
 public interface KnownLengthStream {
 
