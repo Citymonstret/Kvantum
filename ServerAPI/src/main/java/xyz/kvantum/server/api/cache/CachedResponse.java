@@ -64,7 +64,7 @@ import java.util.UUID;
             Logger.debug("Creating a new copy of response stream: {}", this);
         }
         // Always return a copy of the response stream
-        return new SimpleOutputStream(responseStream.getBytes());
+        return new SimpleOutputStream(responseStream.getInternalBytes());
     }
 
     @Override public boolean supportsGzip() {

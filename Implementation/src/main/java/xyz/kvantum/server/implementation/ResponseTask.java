@@ -466,18 +466,28 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
             //
             // Write the response
             //
+            final byte[] buffer = new byte[toRead];
             while (!responseStream.isFinished()) {
                 //
                 // Read as much data as possible from the respone stream
                 //
-                byte[] bytes = responseStream.read(toRead);
-                if (bytes != null && bytes.length > 0) {
+                final int read = responseStream.read(buffer);
+                if (read != -1) {
+                    // We need to copy the data over to a known length array
+                    byte[] data;
+                    if (read != buffer.length) {
+                        data = new byte[read];
+                        System.arraycopy(buffer, 0, data, 0, data.length);
+                    } else {
+                        data = buffer;
+                    }
+
                     //
                     // If the length is known, write data directly
                     //
                     if (hasKnownLength) {
-                        context.write(bytes);
-                        actualLength = bytes.length;
+                        context.write(data);
+                        actualLength = data.length;
                     } else {
                         //
                         // If the length isn't known, we first compress (if applicable) and then write using
@@ -485,7 +495,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
                         //
                         if (workerContext.isGzip()) {
                             try {
-                                bytes = gzipHandler.compress(bytes);
+                                data = gzipHandler.compress(data);
                             } catch (final IOException e) {
                                 new KvantumException("( GZIP ) Failed to compress the bytes")
                                     .printStackTrace();
@@ -493,11 +503,11 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
                             }
                         }
 
-                        actualLength += bytes.length;
+                        actualLength += data.length;
 
-                        context.write(AsciiString.of(Integer.toHexString(bytes.length)).getValue());
+                        context.write(AsciiString.of(Integer.toHexString(data.length)).getValue());
                         context.write(KvantumServerHandler.CRLF);
-                        context.write(bytes);
+                        context.write(data);
                         context.write(KvantumServerHandler.CRLF);
                         //
                         // When using this mode we need to make sure that everything is written, so the

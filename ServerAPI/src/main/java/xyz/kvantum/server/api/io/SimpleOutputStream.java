@@ -33,39 +33,38 @@ import javax.annotation.Nonnull;
  */
 public class SimpleOutputStream extends KvantumOutputStream implements KnownLengthStream {
 
-    @Getter private byte[] bytes;
+    @Getter private byte[] internalBytes;
     private int read = 0;
 
     public SimpleOutputStream(@Nonnull final byte[] bytes) {
-        this.bytes = new byte[bytes.length];
-        System.arraycopy(bytes, 0, this.bytes, 0, bytes.length);
+        this.internalBytes = new byte[bytes.length];
+        System.arraycopy(bytes, 0, this.internalBytes, 0, bytes.length);
     }
 
-    @Override public byte[] read(int amount) {
-        int toRead = Math.min(this.getOffer(), amount);
-        final byte[] bytes = new byte[toRead];
-        System.arraycopy(this.bytes, read, bytes, 0, toRead);
-        this.read += bytes.length;
-        if (this.bytes.length <= this.read) {
+    @Override public int read(final byte[] buffer) {
+        final int toRead = Math.min(this.getOffer(), buffer.length);
+        System.arraycopy(this.internalBytes, read, buffer, 0, toRead);
+        this.read += toRead;
+        if (this.internalBytes.length <= this.read) {
             this.finish();
         }
-        return bytes;
+        return toRead;
     }
 
     @Override public int getOffer() {
-        return this.bytes.length - read;
+        return this.internalBytes.length - read;
     }
 
     @Override public int getLength() {
-        return this.getBytes().length;
+        return this.getInternalBytes().length;
     }
 
     @Override public byte[] getAll() {
-        return this.getBytes();
+        return this.getInternalBytes();
     }
 
     @Override public void replaceBytes(@NonNull final byte[] bytes) {
-        this.bytes = bytes;
+        this.internalBytes = bytes;
         this.read = 0;
     }
 

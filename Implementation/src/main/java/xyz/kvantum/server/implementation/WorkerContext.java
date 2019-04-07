@@ -67,13 +67,13 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
     private SocketContext socketContext;
     private ChannelHandlerContext lastContext;
 
-    private boolean finished;
+    private volatile boolean finished;
 
     void handleReadCompletion() {
-        if (isFinished()) {
-            return;
-        }
         synchronized (this.lock) {
+            if (this.finished) {
+                return;
+            }
             try {
                 this.finished = true;
                 this.getRequest().onCompileFinish();
@@ -88,12 +88,6 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
             } catch (final Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private boolean isFinished() {
-        synchronized (this.lock) {
-            return this.finished;
         }
     }
 

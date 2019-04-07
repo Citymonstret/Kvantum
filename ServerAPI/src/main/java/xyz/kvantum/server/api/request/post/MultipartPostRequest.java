@@ -22,25 +22,20 @@
 package xyz.kvantum.server.api.request.post;
 
 import lombok.Getter;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.util.Streams;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.fileupload.KvantumFileUploadContext;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public class MultipartPostRequest extends RequestEntity {
@@ -59,54 +54,43 @@ public class MultipartPostRequest extends RequestEntity {
             == KvantumFileUploadContext.KvantumFileUploadContextParsingStatus.SUCCESS) {
             final KvantumFileUploadContext context = this.parsingResult.getContext();
             try {
-                final FileItemIterator itemIterator =
-                    ServerImplementation.getImplementation().getGlobalFileUpload()
-                        .getItemIterator(context);
-                FileItemStream item;
-                while (itemIterator.hasNext()) {
-                    item = itemIterator.next();
-                    try (final InputStream inputStream = item.openStream()) {
-                        if (item.isFormField()) {
-                            final List<String> lines = new ArrayList<>();
-                            try (BufferedReader bufferedReader = new BufferedReader(
-                                new InputStreamReader(inputStream))) {
-                                String line;
-                                while ((line = bufferedReader.readLine()) != null) {
-                                    lines.add(line);
-                                }
-                            }
-                            if (lines.size() != 1) {
-                                Logger.warn("FileItem simple field line count is not 0 (Request: {})",
-                                    getParent());
-                                continue;
-                            }
-                            this.getVariables().put(item.getFieldName(), lines.get(0));
-                        } else {
+                // final FileItemIterator itemIterator =
+                //     ServerImplementation.getImplementation().getGlobalFileUpload()
+                //        .getItemIterator(context);
+
+                final Collection<FileItem> items = ServerImplementation.getImplementation().getGlobalFileUpload()
+                    .parseRequest(context);
+
+                for (final FileItem item : items) {
+                    if (item.isFormField()) {
+                        this.getVariables().put(item.getFieldName(), item.getString());
+                    } else {
+                        if (CoreConfig.debug && CoreConfig.verbose) {
+                            Logger.info("Found file in multipart form from {0}, with field name {1}", this.getParent(), item.getFieldName());
+                        }
+                        final Optional<Path> tempFile = this.getParent().getTempFileManager().createTempFile(item.getName());
+                        if (!tempFile.isPresent()) {
                             if (CoreConfig.debug && CoreConfig.verbose) {
-                                Logger.info("Found file in multipart form from {0}, with field name {1}", this.getParent(), item.getFieldName());
+                                Logger.info("Could not create temp file, skipping file...");
                             }
-                            final Optional<Path> tempFile = this.getParent().getTempFileManager().createTempFile(item.getName());
-                            if (!tempFile.isPresent()) {
-                                if (CoreConfig.debug && CoreConfig.verbose) {
-                                    Logger.info("Could not create temp file, skipping file...");
-                                }
-                            } else {
-                                final Path path = tempFile.get();
-                                try (final OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE)) {
-                                    int data;
-                                    while ((data = inputStream.read()) != -1) {
-                                        outputStream.write(data);
-                                    }
-                                }
-                                if (CoreConfig.debug && CoreConfig.verbose) {
-                                    Logger.info("Write file with name {0} from field {1} for request {2}",
-                                        item.getName(), item.getFieldName(), this.getParent());
-                                }
+                        } else {
+                            final Path path = tempFile.get();
+                            try (final OutputStream outputStream = Files
+                                .newOutputStream(path, StandardOpenOption.WRITE)) {
+                                // int data;
+                                // while ((data = inputStream.read()) != -1) {
+                                //     outputStream.write(data);
+                                // }
+                                Streams.copy(item.getInputStream(), outputStream, false);
+                            }
+                            if (CoreConfig.debug && CoreConfig.verbose) {
+                                Logger.info("Write file with name {0} from field {1} for request {2}",
+                                    item.getName(), item.getFieldName(), this.getParent());
                             }
                         }
                     }
                 }
-            } catch (final FileUploadException | IOException e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         } else {

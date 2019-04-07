@@ -32,7 +32,6 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor public class KvantumOutputStream {
 
-    private static final byte[] EMPTY_RESPONSE = new byte[0];
     private static final long MAX_WAIT = 500L; // Wait time of 500ms
 
     @Getter private boolean finished = false;
@@ -41,7 +40,7 @@ import java.util.function.Consumer;
     private int offer = -1;
     private Consumer<Integer> offerAction, finalizedAction;
 
-    private byte[] buffer;
+    private byte[] buffer; // internal buffer
 
     /**
      * Get the last pushed offer (available data length)
@@ -103,21 +102,22 @@ import java.util.function.Consumer;
      * Read data from the stream, with a specified maximal length. Check return array size for actual length of read
      * data.
      *
-     * @param amount Amount of data that can be read. Must be bigger than 0.
-     * @return Read data.
+     * @param buffer Buffer to write the data into, can't be null and has to have a non-zero length
+     * @return the amount of data written, -1 if the stream is finished
      * @throws IllegalArgumentException If amount is less than or equal to 0.
      * @throws IllegalStateException    If content isn't written to the stream within 500ms of the method call.
      */
-    public byte[] read(int amount) {
-        if (amount <= 0) {
+    public int read(byte[] buffer) {
+        if (buffer == null || buffer.length <= 0) {
             throw new IllegalArgumentException("Amount must be bigger than 0");
         }
+
         if (this.finished) {
-            return EMPTY_RESPONSE;
+            return -1;
         }
 
         // Make sure that we don't try to read more than the offered data
-        amount = Math.min(amount, this.offer);
+        final int amount = Math.min(buffer.length, this.offer);
 
         if (this.offerAction != null) {
             this.offerAction.accept(amount);
@@ -139,7 +139,8 @@ import java.util.function.Consumer;
             this.finalizedAction.accept(read);
         }
 
-        return this.buffer;
+        System.arraycopy(this.buffer, 0, buffer, 0, amount);
+        return amount;
     }
 
     private void checkState() {

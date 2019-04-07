@@ -1,5 +1,6 @@
 package xyz.kvantum.server.api.io;
 
+import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.util.Assert;
 
@@ -7,13 +8,15 @@ import java.io.InputStream;
 
 @SuppressWarnings("WeakerAccess") public class KvantumInputStream extends InputStream {
 
-    private final KvantumOutputStream kvantumOutputStream;
-    private final int bufferSize;
-    private final int maxSize;
+    private final Object lock = new Object();
 
-    private int totalRead = 0;
+    private final KvantumOutputStream kvantumOutputStream;
+    private final int maxSize;
+    private final byte[] bufferedData;
+
+    @Getter private int totalRead = 0;
     private int bufferPointer;
-    private byte[] bufferedData;
+    private volatile int availableData = 0;
 
     public KvantumInputStream(final KvantumOutputStream kvantumOutputStream, final int maxSize) {
         this(kvantumOutputStream, CoreConfig.Buffer.in, maxSize);
@@ -22,42 +25,49 @@ import java.io.InputStream;
     public KvantumInputStream(final KvantumOutputStream kvantumOutputStream, final int bufferSize, final int maxSize) {
         Assert.notNull(kvantumOutputStream, "output stream");
         this.kvantumOutputStream = kvantumOutputStream;
-        this.bufferSize = bufferSize;
         this.maxSize = maxSize;
+        this.bufferedData = new byte[bufferSize];
     }
 
     private int readData() {
-        if (this.kvantumOutputStream.isFinished()) {
-            return -1;
+        synchronized (this.lock) {
+            if (this.kvantumOutputStream.isFinished() || this.kvantumOutputStream.getOffer() == -1) {
+                return -1;
+            }
+            this.availableData = this.kvantumOutputStream.read(bufferedData);
+            if (availableData == -1) {
+                return -1;
+            }
+            // Reset read state
+            this.bufferPointer = 0;
+            return this.availableData;
         }
-        final int offer = this.kvantumOutputStream.getOffer();
-        if (offer == -1) {
-            return -1;
-        }
-        final int readable;
-        if (this.bufferSize != -1) {
-            readable = Math.min(this.bufferSize, offer);
-        } else {
-            readable = offer;
-        }
-        this.bufferedData = this.kvantumOutputStream.read(readable);
-        this.bufferPointer = 0;
-        return this.bufferedData.length;
+    }
+
+    @Override public int available() {
+        return this.maxSize - this.totalRead;
     }
 
     @Override public int read() {
-        // This is here to ensure that the stream NEVER exceeds the upper limit
-        // if (this.totalRead >= this.maxSize) {
-        //     Logger.info("EXCEEDING MAX SIZE ({0} >= {0})", this.totalRead, this.maxSize);
-        //     return -1;
-        // }
-        if (this.bufferedData == null || this.bufferPointer == bufferedData.length) {
-            if (this.readData() <= 0) {
+        synchronized (this.lock) {
+            // This is here to ensure that the stream NEVER exceeds the upper limit
+            if (this.totalRead >= this.maxSize) {
                 return -1;
             }
+
+            if (this.availableData == -1) {
+                return -1;
+            } else if (this.availableData == 0 || this.bufferPointer == this.availableData) {
+                if (this.readData() < 0) {
+                    return -1;
+                }
+            }
+
+            final int data = this.bufferedData[bufferPointer++] & 0xFF;
+
+            totalRead++;
+            return data;
         }
-        totalRead++;
-        return this.bufferedData[bufferPointer++];
     }
 
 }

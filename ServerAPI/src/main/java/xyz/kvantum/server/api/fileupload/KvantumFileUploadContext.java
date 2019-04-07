@@ -90,10 +90,11 @@ public final class KvantumFileUploadContext implements UploadContext {
     /**
      * Request parsing status
      */
-    public enum KvantumFileUploadContextParsingStatus {/**
-     * Content parsed successfully
-     */
-    SUCCESS,
+    public enum KvantumFileUploadContextParsingStatus {
+        /**
+        * Content parsed successfully
+        */
+        SUCCESS,
         /**
          * Content length header is not a number
          */

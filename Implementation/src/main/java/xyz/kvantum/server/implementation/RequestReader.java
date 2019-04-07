@@ -67,7 +67,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
     private char lastCharacter = ' ';
     private AtomicBoolean done = new AtomicBoolean(false);
     private boolean begunLastLine = false;
-    private boolean hasQuery = false;
+    private final AtomicBoolean hasQuery = new AtomicBoolean(false);
     private int contentLength = -1;
     @Getter private ReadTarget readTargetz = ReadTarget.REQUEST_HEADERS;
     @Getter private boolean cleared = true;
@@ -167,9 +167,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
             if (character == '\n') {
                 if (builder.length() != 0) {
                     final String line = builder.toString();
-                    if (!hasQuery) {
+                    if (!this.hasQuery.get()) {
                         RequestCompiler.compileQuery(this.abstractRequest, line);
-                        hasQuery = true;
+                        hasQuery.set(true);
                     } else {
                         final Optional<RequestCompiler.HeaderPair> headerPair =
                             RequestCompiler.compileHeader(line);
@@ -209,13 +209,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
     }
 
     void readBytes(final ByteBuf byteBuf) throws Throwable {
-        if (this.getReadTarget() == ReadTarget.REQUEST_BODY && !this.overflowStream.canWrite()) {
-            return; // Read nothing, we need to wait!
+        synchronized (this.lock) {
+            if (this.getReadTarget() == ReadTarget.REQUEST_BODY && !this.overflowStream.canWrite()) {
+                return; // Read nothing, we need to wait!
+            }
+            final int length = byteBuf.readableBytes();
+            final byte[] bytes = new byte[length];
+            byteBuf.readBytes(bytes, 0, length);
+            this.readBytes(bytes, length);
         }
-        final int length = byteBuf.readableBytes();
-        final byte[] bytes = new byte[length];
-        byteBuf.readBytes(bytes, 0, length);
-        this.readBytes(bytes, length);
     }
 
     /**
@@ -226,32 +228,40 @@ import java.util.concurrent.atomic.AtomicBoolean;
      * @return Number of read bytes
      */
     private int readBytes(final byte[] bytes, final int length) throws Throwable {
-        if (this.getReadTarget() == ReadTarget.REQUEST_HEADERS) {
-            int read = 0;
-            for (int i = 0; i < length && i < bytes.length; i++) {
-                if (this.readByte(bytes[i])) {
-                    read++;
-                } else if (this.getReadTarget() == ReadTarget.REQUEST_BODY) {
-                    // We need to copy the remaining data over
-                    final int remaining = length - i;
-                    if (CoreConfig.debug && CoreConfig.verbose) {
-                        Logger.debug("Copying {0} bytes over to request entity (from {1})", remaining,
-                            this.abstractRequest);
+        synchronized (this.lock) {
+            if (this.getReadTarget() == ReadTarget.REQUEST_HEADERS) {
+                int read = 0;
+                for (int i = 0; i < length && i < bytes.length; i++) {
+                    if (this.readByte(bytes[i])) {
+                        read++;
+                    } else if (this.getReadTarget() == ReadTarget.REQUEST_BODY) {
+                        // We need to copy the remaining data over
+                        final int remaining = length - i;
+                        if (CoreConfig.debug && CoreConfig.verbose) {
+                            Logger.debug("Copying {0} bytes over to request entity (from {1})",
+                                remaining, this.abstractRequest);
+                        }
+                        final byte[] remainingData = new byte[remaining];
+                        System.arraycopy(bytes, i, remainingData, 0, remaining);
+                        this.overflowStream.setBuffer(remainingData);
+
+                        if (remainingData.length < (read + i)) {
+                            throw new IllegalStateException(String.format("%d < %d", remainingData.length,
+                                (read + i)));
+                        }
+
+                        return read + remainingData.length;
                     }
-                    final byte[] remainingData = new byte[remaining];
-                    System.arraycopy(bytes, i, remainingData, 0, remaining);
-                    this.overflowStream.setBuffer(remainingData);
-                    return read + remainingData.length;
+                    if (this.isDone()) {
+                        break;
+                    }
                 }
-                if (this.isDone()) {
-                    break;
-                }
+                return read;
+            } else {
+                this.overflowStream.setBuffer(bytes);
             }
-            return read;
-        } else {
-            this.overflowStream.setBuffer(bytes);
+            return 0;
         }
-        return 0;
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE) private class RequestEntityReader
@@ -296,6 +306,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
                     requestEntity = new JsonPostRequest(abstractRequest, builder.toString());
                 }
             } else if (contentType.startsWith(CONTENT_TYPE_MULTIPART)) {
+                if (CoreConfig.debug && CoreConfig.verbose) {
+                    Logger.debug("Creating a new multipart post request (for {})", abstractRequest);
+                }
                 // It's a multipart form
                 requestEntity = new MultipartPostRequest(abstractRequest, this.kvantumInputStream);
                 requestEntity.load();
@@ -309,6 +322,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
             if (CoreConfig.debug && CoreConfig.verbose) {
                 Logger.debug("Completely read request entity (from {})",  abstractRequest);
+                Logger.debug("Read a total of {}B", this.kvantumInputStream.getTotalRead());
             }
 
             // We don't know if it's finished or not
@@ -328,7 +342,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
         private final Object lock = new Object();
         private final int expectedSize;
 
-        @Getter private byte[] buffer;
+        @Getter private volatile byte[] buffer;
         private int read = 0;
 
         public RequestOutputStream(final int expectedSize) {
@@ -336,7 +350,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
         }
 
         public void setBuffer(final byte[] buffer) {
-            Logger.info("SETTING DATA");
             synchronized (this.lock) {
                 if (this.isFinished()) {
                     throw new IllegalStateException("Cannot write when the stream is finished");
@@ -348,26 +361,34 @@ import java.util.concurrent.atomic.AtomicBoolean;
             }
         }
 
-        @Override public byte[] read(int amount) {
-            final byte[] bytes;
+        @Override public int read(byte[] buffer) {
             synchronized (this.lock) {
-                int toRead = Math.min(this.getOffer(), amount);
-                bytes = new byte[toRead];
-                System.arraycopy(this.buffer, read, bytes, 0, toRead);
-                this.read += bytes.length;
+                if (this.isFinished()) {
+                    return -1;
+                }
+                if (this.buffer == null || this.buffer.length == 0) {
+                    return 0;
+                }
+                int toRead = Math.min(this.buffer.length, buffer.length);
+                System.arraycopy(this.buffer, read, buffer, 0, toRead);
+                this.read += toRead;
                 if (this.expectedSize <= this.read) {
                     this.finish();
                 }
+                return toRead;
             }
-            return bytes;
         }
 
         @Override public int getOffer() {
-            return this.buffer != null ? this.buffer.length - read : 0;
+            synchronized (this.lock) {
+                return this.expectedSize - this.read; // this.buffer != null ? this.buffer.length - read : 0;
+            }
         }
 
         public boolean canWrite() {
-            return this.getOffer() <= 0;
+            synchronized (this.lock) {
+                return this.buffer == null || this.buffer.length - this.read <= 0;// this.getOffer() <= 0;
+            }
         }
 
     }
