@@ -4,8 +4,14 @@ import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.util.Assert;
 
+import javax.annotation.Nonnull;
 import java.io.InputStream;
 
+/**
+ * Input stream that reads data from a {@link KvantumOutputStream}.
+ * Reading from, and writing to the stream is synchronized.
+ * {@inheritDoc}
+ */
 @SuppressWarnings("WeakerAccess") public class KvantumInputStream extends InputStream {
 
     private final Object lock = new Object();
@@ -18,20 +24,38 @@ import java.io.InputStream;
     private int bufferPointer;
     private volatile int availableData = 0;
 
-    public KvantumInputStream(final KvantumOutputStream kvantumOutputStream, final int maxSize) {
+    /**
+     * Construct a new KvantumInputStream, using the file configured buffered
+     * input size
+     *
+     * @param kvantumOutputStream Output stream to read from. Cannot be null.
+     * @param maxSize             Size of the data that is to be read. The stream will never
+     *                            read beyond this point. Has to be positive.
+     */
+    public KvantumInputStream(@Nonnull final KvantumOutputStream kvantumOutputStream,
+        final int maxSize) {
         this(kvantumOutputStream, CoreConfig.Buffer.in, maxSize);
     }
 
-    public KvantumInputStream(final KvantumOutputStream kvantumOutputStream, final int bufferSize, final int maxSize) {
-        Assert.notNull(kvantumOutputStream, "output stream");
-        this.kvantumOutputStream = kvantumOutputStream;
-        this.maxSize = maxSize;
-        this.bufferedData = new byte[bufferSize];
+    /**
+     * Construct a new KvantumInputStream
+     *
+     * @param kvantumOutputStream Output stream to read from. Cannot be null.
+     * @param bufferSize          Size of the read buffer. Has to be positive.
+     * @param maxSize             Size of the data that is to be read. The stream will never
+     *                            read beyond this point. Has to be positive.
+     */
+    public KvantumInputStream(@Nonnull final KvantumOutputStream kvantumOutputStream,
+        final int bufferSize, final int maxSize) {
+        this.kvantumOutputStream = Assert.notNull(kvantumOutputStream, "output stream");
+        this.maxSize = Assert.isPositive(maxSize);
+        this.bufferedData = new byte[Assert.isPositive(bufferSize)];
     }
 
     private int readData() {
         synchronized (this.lock) {
-            if (this.kvantumOutputStream.isFinished() || this.kvantumOutputStream.getOffer() == -1) {
+            if (this.kvantumOutputStream.isFinished()
+                || this.kvantumOutputStream.getOffer() == -1) {
                 return -1;
             }
             this.availableData = this.kvantumOutputStream.read(bufferedData);

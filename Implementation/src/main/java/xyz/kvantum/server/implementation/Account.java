@@ -41,6 +41,7 @@ import xyz.kvantum.server.api.pojo.Ignore;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.api.util.StringList;
 
 import java.util.*;
@@ -55,7 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @KvantumObject(checkValidity = true) @EqualsAndHashCode(of = {"username", "id"}) @NoArgsConstructor
 @Entity("accounts") @SuppressWarnings("WeakerAccess") public final class Account
-    implements IAccount {
+    extends AutoCloseable implements IAccount {
 
     @Getter private static final KvantumObjectFactory<Account> kvantumAccountFactory =
         KvantumObjectFactory.from(Account.class);
@@ -226,5 +227,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @Override public KvantumPojo<IAccount> toKvantumPojo() {
         return kvantumPojoFactory.of(this);
+    }
+
+    @Override protected void handleClose() {
+        this.saveState();
     }
 }

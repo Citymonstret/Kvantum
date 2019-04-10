@@ -19,7 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.kvantum.server.api.views.rest.service;
+package xyz.kvantum.server.api.service;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -27,6 +27,7 @@ import com.google.gson.JsonPrimitive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.val;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.account.roles.AccountRole;
@@ -85,8 +86,7 @@ import java.util.Optional;
                         hasPermission = false;
                     } else {
                         final Optional<IAccount> accountOptional =
-                            ServerImplementation.getImplementation().getApplicationStructure()
-                                .getAccountManager().getAccount(request.getSession());
+                            AccountService.getInstance().getGlobalAccountManager().getAccount(request.getSession());
                         hasPermission = accountOptional
                             .map(iAccount -> iAccount.isPermitted(getPermissionRequirement()))
                             .orElse(false);

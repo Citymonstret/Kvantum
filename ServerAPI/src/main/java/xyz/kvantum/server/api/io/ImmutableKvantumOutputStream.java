@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.io;
 
+import javax.annotation.Nonnull;
+
 /**
  * Immutable implementation of {@link SimpleOutputStream}
  * {@inheritDoc}
@@ -30,13 +32,13 @@ public final class ImmutableKvantumOutputStream extends SimpleOutputStream {
     /**
      * Construct a new {@link ImmutableKvantumOutputStream} with a fixed value
      *
-     * @param bytes value that will be pushed by this response stream
+     * @param bytes value that will be pushed by this response stream. Cannot be null
      */
-    public ImmutableKvantumOutputStream(final byte[] bytes) {
+    public ImmutableKvantumOutputStream(@Nonnull final byte[] bytes) {
         super(bytes);
     }
 
-    @Override public void push(final byte[] bytes) {
+    @Override public void push(@Nonnull final byte[] bytes) {
         throw new UnsupportedOperationException("Cannot write to immutable stream");
     }
 

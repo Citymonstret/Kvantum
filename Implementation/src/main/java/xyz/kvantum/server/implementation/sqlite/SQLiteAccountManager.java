@@ -21,18 +21,25 @@
  */
 package xyz.kvantum.server.implementation.sqlite;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.AccountDecorator;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
+import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.implementation.Account;
 import xyz.kvantum.server.implementation.SQLiteApplicationStructure;
+import xyz.kvantum.server.implementation.commands.AccountCommand;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,6 +47,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor final public class SQLiteAccountManager implements IAccountManager {
 
@@ -48,6 +56,30 @@ import java.util.Optional;
 
     @Getter private final SQLiteApplicationStructure applicationStructure;
     private final Collection<AccountDecorator> decorators = new ArrayList<>();
+    private final Cache<Integer, IAccount> cachedAccounts;
+    private final Cache<String, Integer> cachedAccountIds;
+
+    public SQLiteAccountManager(final SQLiteApplicationStructure applicationStructure) {
+        AccountService.getInstance().setGlobalAccountManager(this);
+        this.applicationStructure = applicationStructure;
+        this.cachedAccounts = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedAccountsMaxItems)
+            .removalListener(
+                (RemovalListener<Integer, IAccount>) (key, value, cause) -> value.saveState()).<Integer, IAccount>build();
+        this.cachedAccountIds = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedAccountIdsMaxItems).build();
+        try {
+            this.setup();
+            if (ServerImplementation.getImplementation().getCommandManager() != null) {
+                ServerImplementation.getImplementation().getCommandManager()
+                    .createCommand(new AccountCommand(applicationStructure));
+            }
+        } catch (final Exception e) {
+            Logger.error("Failed to create account command");
+        }
+    }
 
     private static String getNewSalt() {
         return BCrypt.gensalt();
@@ -105,12 +137,10 @@ import java.util.Optional;
     public Optional<IAccount> getAccount(@NonNull final String username) {
         Assert.notEmpty(username);
 
-        Optional<Integer> accountId =
-            ServerImplementation.getImplementation().getCacheManager().getCachedId(username);
+        Optional<Integer> accountId = getCachedId(username);
         Optional<IAccount> ret = EMPTY_OPTIONAL;
         if (accountId.isPresent()) {
-            ret = ServerImplementation.getImplementation().getCacheManager()
-                .getCachedAccount(accountId.get());
+            ret = getCachedAccount(accountId.get());
         }
         if (ret.isPresent()) {
             return ret;
@@ -126,8 +156,7 @@ import java.util.Optional;
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        ret.ifPresent(account -> ServerImplementation.getImplementation().getCacheManager()
-            .setCachedAccount(account));
+        ret.ifPresent(this::setCachedAccount);
         ret.ifPresent(account -> account.setManager(this));
         ret.ifPresent(
             account -> decorators.forEach(decorator -> decorator.decorateAccount(account)));
@@ -135,8 +164,7 @@ import java.util.Optional;
     }
 
     public Optional<IAccount> getAccount(final int accountId) {
-        Optional<IAccount> ret =
-            ServerImplementation.getImplementation().getCacheManager().getCachedAccount(accountId);
+        Optional<IAccount> ret = getCachedAccount(accountId);
         if (ret.isPresent()) {
             return ret;
         }
@@ -151,8 +179,7 @@ import java.util.Optional;
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        ret.ifPresent(account -> ServerImplementation.getImplementation().getCacheManager()
-            .setCachedAccount(account));
+        ret.ifPresent(this::setCachedAccount);
         ret.ifPresent(account -> account.setManager(this));
         ret.ifPresent(
             account -> decorators.forEach(decorator -> decorator.decorateAccount(account)));
@@ -190,7 +217,8 @@ import java.util.Optional;
         } catch (final SQLException e) {
             e.printStackTrace();
         }
-        ServerImplementation.getImplementation().getCacheManager().deleteAccount(account);
+        this.cachedAccounts.invalidate(account.getId());
+        this.cachedAccountIds.invalidate(account.getUsername());
     }
 
     @Override public void removeData(@NonNull final IAccount account, @NonNull final String key) {
@@ -242,4 +270,18 @@ import java.util.Optional;
         }
         return builder.build();
     }
+
+    private Optional<Integer> getCachedId(@NonNull final String username) {
+        return Optional.ofNullable(cachedAccountIds.getIfPresent(username));
+    }
+
+    private void setCachedAccount(@NonNull final IAccount account) {
+        this.cachedAccounts.put(account.getId(), account);
+        this.cachedAccountIds.put(account.getUsername(), account.getId());
+    }
+
+    private Optional<IAccount> getCachedAccount(final int id) {
+        return Optional.ofNullable(cachedAccounts.getIfPresent(id));
+    }
+
 }

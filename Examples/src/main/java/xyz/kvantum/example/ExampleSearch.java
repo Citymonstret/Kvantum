@@ -26,8 +26,8 @@ import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ParameterScope;
-import xyz.kvantum.server.api.views.rest.service.KvantumSearchService;
-import xyz.kvantum.server.api.views.rest.service.RSQLSearchService;
+import service.KvantumSearchService;
+import service.RSQLSearchService;
 import xyz.kvantum.server.implementation.Account;
 
 class ExampleSearch {

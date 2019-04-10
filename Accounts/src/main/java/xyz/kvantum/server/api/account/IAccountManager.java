@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import org.mindrot.jbcrypt.BCrypt;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.account.roles.defaults.Administrator;
 import xyz.kvantum.server.api.config.Message;
@@ -41,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages {@link IAccount} and depends on {@link ApplicationStructure} <p> The global implementation can be retrieved
- * using {@link Kvantum#getApplicationStructure()} then {@link ApplicationStructure#getAccountManager()} </p>
+ * using {@link Kvantum#getApplicationStructure()} then {@link AccountService#getGlobalAccountManager()} </p>
  */
 @SuppressWarnings("unused") public interface IAccountManager
     extends KvantumRepository<IAccount, Integer> {

@@ -33,8 +33,6 @@ import lombok.SneakyThrows;
 import lombok.Synchronized;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
-import xyz.kvantum.server.api.account.IAccount;
-import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.cache.ICacheManager;
 import xyz.kvantum.server.api.config.ConfigVariableProvider;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -50,7 +48,12 @@ import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.events.ServerStartedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
-import xyz.kvantum.server.api.logging.*;
+import xyz.kvantum.server.api.logging.LogContext;
+import xyz.kvantum.server.api.logging.LogFormatted;
+import xyz.kvantum.server.api.logging.LogModes;
+import xyz.kvantum.server.api.logging.LogProvider;
+import xyz.kvantum.server.api.logging.LogWrapper;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -59,21 +62,24 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionManager;
 import xyz.kvantum.server.api.templates.TemplateManager;
+import xyz.kvantum.server.api.util.ApplicationStructure;
+import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
-import xyz.kvantum.server.api.util.*;
+import xyz.kvantum.server.api.util.ErrorOutputStream;
+import xyz.kvantum.server.api.util.FileUtils;
+import xyz.kvantum.server.api.util.ITempFileManagerFactory;
+import xyz.kvantum.server.api.util.MetaProvider;
+import xyz.kvantum.server.api.util.Metrics;
+import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
-import xyz.kvantum.server.implementation.commands.AccountCommand;
 import xyz.kvantum.server.implementation.config.TranslationFile;
 import xyz.kvantum.server.implementation.error.KvantumException;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 import xyz.kvantum.server.implementation.error.KvantumStartException;
-import xyz.kvantum.server.implementation.mongo.MongoAccountManager;
 import xyz.kvantum.server.implementation.mongo.MongoSessionDatabase;
-import xyz.kvantum.server.implementation.mysql.MySQLAccountManager;
 import xyz.kvantum.server.implementation.mysql.MySQLSessionDatabase;
 import xyz.kvantum.server.implementation.netty.NettyLoggerFactory;
-import xyz.kvantum.server.implementation.sqlite.SQLiteAccountManager;
 import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
 import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
 
@@ -248,25 +254,13 @@ public class SimpleServer implements Kvantum {
 
             switch (CoreConfig.Application.databaseImplementation) {
                 case "sqlite":
-                    applicationStructure = new SQLiteApplicationStructure("core") {
-                        @Override public IAccountManager createNewAccountManager() {
-                            return new SQLiteAccountManager(this);
-                        }
-                    };
+                    applicationStructure = new SQLiteApplicationStructure("core");
                     break;
                 case "mongo":
-                    applicationStructure = new MongoApplicationStructure("core") {
-                        @Override public IAccountManager createNewAccountManager() {
-                            return new MongoAccountManager(this);
-                        }
-                    };
+                    applicationStructure = new MongoApplicationStructure("core");
                     break;
                 case "mysql":
-                    applicationStructure = new MySQLApplicationStructure("core") {
-                        @Override public IAccountManager createNewAccountManager() {
-                            return new MySQLAccountManager(this);
-                        }
-                    };
+                    applicationStructure = new MySQLApplicationStructure("core");
                     break;
                 default:
                     Message.DATABASE_UNKNOWN.log(CoreConfig.Application.databaseImplementation);
@@ -290,15 +284,6 @@ public class SimpleServer implements Kvantum {
             }
         }
 
-        try {
-            this.getApplicationStructure().getAccountManager().setup();
-            if (this.getCommandManager() != null) {
-                getCommandManager().createCommand(new AccountCommand(applicationStructure));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         //
         // Load the session database
         //
@@ -307,18 +292,15 @@ public class SimpleServer implements Kvantum {
             switch (CoreConfig.Application.databaseImplementation.toLowerCase(Locale.ENGLISH)) {
                 case "sqlite":
                     sessionDatabase = new SQLiteSessionDatabase(
-                        (SQLiteApplicationStructure) this.getApplicationStructure()
-                            .getAccountManager().getApplicationStructure());
+                        (SQLiteApplicationStructure) this.getApplicationStructure());
                     break;
                 case "mongo":
                     sessionDatabase = new MongoSessionDatabase(
-                        (MongoApplicationStructure) this.getApplicationStructure()
-                            .getAccountManager().getApplicationStructure());
+                        (MongoApplicationStructure) this.getApplicationStructure());
                     break;
                 case "mysql":
                     sessionDatabase = new MySQLSessionDatabase(
-                        (MySQLApplicationStructure) this.getApplicationStructure()
-                            .getAccountManager().getApplicationStructure());
+                        (MySQLApplicationStructure) this.getApplicationStructure());
                     break;
                 default:
                     Message.DATABASE_SESSION_UNKNOWN
@@ -559,11 +541,6 @@ public class SimpleServer implements Kvantum {
         if (getEventBus() != null) {
             getEventBus().throwEvent(new ServerShutdownEvent(this), false);
         }
-
-        //
-        // Save all stored account states on shutdown
-        //
-        this.cacheManager.getAllStoredAccounts().forEach(IAccount::saveState);
 
         //
         // Gracefully shutdown the file watcher

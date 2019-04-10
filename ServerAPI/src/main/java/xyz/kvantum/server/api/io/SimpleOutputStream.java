@@ -41,7 +41,7 @@ public class SimpleOutputStream extends KvantumOutputStream implements KnownLeng
         System.arraycopy(bytes, 0, this.internalBytes, 0, bytes.length);
     }
 
-    @Override public int read(final byte[] buffer) {
+    @Override public int read(@Nonnull final byte[] buffer) {
         final int toRead = Math.min(this.getOffer(), buffer.length);
         System.arraycopy(this.internalBytes, read, buffer, 0, toRead);
         this.read += toRead;
@@ -59,7 +59,7 @@ public class SimpleOutputStream extends KvantumOutputStream implements KnownLeng
         return this.getInternalBytes().length;
     }
 
-    @Override public byte[] getAll() {
+    @Nonnull @Override public byte[] getAll() {
         return this.getInternalBytes();
     }
 

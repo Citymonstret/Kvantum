@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * Utility class for common {@link Collection collection} operations
  */
-@UtilityClass @SuppressWarnings({"unused", "WeakerAccess"}) public final class CollectionUtil {
+@UtilityClass @SuppressWarnings("unused") public final class CollectionUtil {
 
     /**
      * Clear a collection and return the amount of cleared objects

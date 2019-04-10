@@ -63,6 +63,21 @@ package xyz.kvantum.server.api.util;
     }
 
     /**
+     * Will only pass if the object isn't null
+     *
+     * @param object Array to test
+     * @param message Object name
+     * @return input object
+     * @throws AssertionError If not passing the test
+     */
+    public static <T> T notNull(final T object, final String message) {
+        if (object == null) {
+            throw new AssertionError(null, String.format("%s cannot be null", message));
+        }
+        return object;
+    }
+
+    /**
      * Assertion that will pass if, and only if, the given array is neither null nor empty
      *
      * @param array Array to be tested

@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.util;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 
@@ -33,11 +32,7 @@ public abstract class ApplicationStructure {
 
     protected final String applicationName;
 
-    @Getter protected IAccountManager accountManager;
-
     @Getter protected ISessionDatabase sessionDatabase;
-
-    public abstract IAccountManager createNewAccountManager();
 
     @Override public String toString() {
         return this.applicationName;

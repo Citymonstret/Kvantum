@@ -25,6 +25,7 @@ import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import com.intellectualsites.commands.parser.impl.StringParser;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.verification.AccountVerifier;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -40,7 +41,6 @@ import java.util.Optional;
 @CommandDeclaration(command = "account", usage = "/account [subcommand]", description = "Manage accounts")
 public class AccountCommand extends Command {
 
-    private final ApplicationStructure structure;
 
     public AccountCommand(final ApplicationStructure applicationStructure) {
         Assert.notNull(applicationStructure);
@@ -50,8 +50,6 @@ public class AccountCommand extends Command {
         this.createCommand(new CreateAccount());
         this.createCommand(new SetData());
         this.createCommand(new DeleteData());
-
-        this.structure = applicationStructure;
     }
 
     public boolean onCommand(CommandInstance instance) {
@@ -77,7 +75,7 @@ public class AccountCommand extends Command {
         @Override public boolean onCommand(final CommandInstance instance) {
             String key = instance.getString("key");
             String username = instance.getValue("username", String.class);
-            Optional<IAccount> account = structure.getAccountManager().getAccount(username);
+            Optional<IAccount> account = AccountService.getInstance().getGlobalAccountManager().getAccount(username);
             if (!account.isPresent()) {
                 send("There is no such account!");
             } else {
@@ -102,7 +100,7 @@ public class AccountCommand extends Command {
             String key = instance.getString("key");
             String value = instance.getString("value");
             String username = instance.getValue("username", String.class);
-            Optional<IAccount> account = structure.getAccountManager().getAccount(username);
+            Optional<IAccount> account = AccountService.getInstance().getGlobalAccountManager().getAccount(username);
             if (!account.isPresent()) {
                 send("There is no such account!");
             } else {
@@ -126,7 +124,7 @@ public class AccountCommand extends Command {
                 send("Syntax: account dumpdata [username]");
             } else {
                 String username = instance.getValue("username", String.class);
-                Optional<IAccount> account = structure.getAccountManager().getAccount(username);
+                Optional<IAccount> account = AccountService.getInstance().getGlobalAccountManager().getAccount(username);
                 if (!account.isPresent()) {
                     send("There is no such account!");
                 } else {
@@ -149,7 +147,7 @@ public class AccountCommand extends Command {
         @Override public boolean onCommand(final CommandInstance instance) {
             String username = instance.getValue("username", String.class);
             String password = instance.getValue("password", String.class);
-            if (structure.getAccountManager().getAccount(username).isPresent()) {
+            if (AccountService.getInstance().getGlobalAccountManager().getAccount(username).isPresent()) {
                 send("There is already an account with that username!");
             } else {
                 final IAccount temporaryAccount = new Account(-1, username, password);
@@ -163,7 +161,7 @@ public class AccountCommand extends Command {
                 }
                 try {
                     send("Account created (Username: " + username + ")");
-                    structure.getAccountManager().createAccount(username, password);
+                    AccountService.getInstance().getGlobalAccountManager().createAccount(username, password);
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
@@ -184,7 +182,8 @@ public class AccountCommand extends Command {
             String username = instance.getValue("username", String.class);
             String password = instance.getValue("password", String.class);
 
-            Optional<IAccount> accountOptional = structure.getAccountManager().getAccount(username);
+            Optional<IAccount> accountOptional = AccountService.getInstance().getGlobalAccountManager()
+                .getAccount(username);
             if (!accountOptional.isPresent()) {
                 send("There is no such account!");
             } else {

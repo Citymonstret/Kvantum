@@ -32,8 +32,9 @@ import org.mongodb.morphia.Morphia;
 import org.slf4j.LoggerFactory;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.util.ApplicationStructure;
+import xyz.kvantum.server.implementation.mongo.MongoAccountManager;
 
-public abstract class MongoApplicationStructure extends ApplicationStructure {
+public final class MongoApplicationStructure extends ApplicationStructure {
 
     @Getter private final MongoClient mongoClient;
     @Getter private final Morphia morphia;
@@ -50,7 +51,6 @@ public abstract class MongoApplicationStructure extends ApplicationStructure {
         }
 
         this.mongoClient = new MongoClient(new MongoClientURI(CoreConfig.MongoDB.uri));
-        this.accountManager = createNewAccountManager();
         xyz.kvantum.server.api.logging.Logger
             .info("Initialized MongoApplicationStructure: {}", this.applicationName);
 
@@ -58,6 +58,8 @@ public abstract class MongoApplicationStructure extends ApplicationStructure {
         this.morphia.mapPackage("com.github.intellectualsites.kvantum.implementation");
         this.morphiaDatastore =
             morphia.createDatastore(this.mongoClient, CoreConfig.MongoDB.dbMorphia);
+
+        new MongoAccountManager(this); // Initialize
     }
 
 }

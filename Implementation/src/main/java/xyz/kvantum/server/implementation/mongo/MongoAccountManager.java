@@ -21,36 +21,65 @@
  */
 package xyz.kvantum.server.implementation.mongo;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.AccountDecorator;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
+import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.implementation.Account;
 import xyz.kvantum.server.implementation.MongoApplicationStructure;
+import xyz.kvantum.server.implementation.commands.AccountCommand;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
-@RequiredArgsConstructor final public class MongoAccountManager implements IAccountManager {
+public final class MongoAccountManager implements IAccountManager {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType") private static final Optional<IAccount>
         EMPTY_OPTIONAL = Optional.empty();
     @Getter private final MongoApplicationStructure applicationStructure;
     private final Collection<AccountDecorator> decorators = new ArrayList<>();
-
+    private final Cache<Integer, IAccount> cachedAccounts;
+    private final Cache<String, Integer> cachedAccountIds;
     private DBCollection counters;
+
+    public MongoAccountManager(final MongoApplicationStructure applicationStructure) {
+        AccountService.getInstance().setGlobalAccountManager(this);
+        this.applicationStructure = applicationStructure;
+        this.cachedAccounts = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedAccountsExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedAccountsMaxItems)
+            .removalListener(
+                (RemovalListener<Integer, IAccount>) (key, value, cause) -> value.saveState()).<Integer, IAccount>build();
+        this.cachedAccountIds = Caffeine.newBuilder()
+            .expireAfterWrite(CoreConfig.Cache.cachedAccountIdsExpiry, TimeUnit.SECONDS)
+            .maximumSize(CoreConfig.Cache.cachedAccountIdsMaxItems).build();
+        try {
+            this.setup();
+            if (ServerImplementation.getImplementation().getCommandManager() != null) {
+                ServerImplementation.getImplementation().getCommandManager()
+                    .createCommand(new AccountCommand(applicationStructure));
+            }
+        } catch (final Exception e) {
+            Logger.error("Failed to create account command");
+        }
+    }
 
     private static String getNewSalt() {
         return BCrypt.gensalt();
@@ -106,12 +135,10 @@ import java.util.Optional;
     @Override public Optional<IAccount> getAccount(final String username) {
         Assert.notEmpty(username);
 
-        Optional<Integer> accountId =
-            ServerImplementation.getImplementation().getCacheManager().getCachedId(username);
+        Optional<Integer> accountId = getCachedId(username);
         Optional<IAccount> ret = EMPTY_OPTIONAL;
         if (accountId.isPresent()) {
-            ret = ServerImplementation.getImplementation().getCacheManager()
-                .getCachedAccount(accountId.get());
+            ret = getCachedAccount(accountId.get());
         }
         if (ret.isPresent()) {
             return ret;
@@ -119,8 +146,7 @@ import java.util.Optional;
         ret = Optional.ofNullable(
             applicationStructure.getMorphiaDatastore().createQuery(Account.class).field("username")
                 .equal(username).get());
-        ret.ifPresent(account -> ServerImplementation.getImplementation().getCacheManager()
-            .setCachedAccount(account));
+        ret.ifPresent(this::setCachedAccount);
         ret.ifPresent(account -> account.setManager(this));
         ret.ifPresent(
             account -> decorators.forEach(decorator -> decorator.decorateAccount(account)));
@@ -128,8 +154,7 @@ import java.util.Optional;
     }
 
     @Override public Optional<IAccount> getAccount(final int accountId) {
-        Optional<IAccount> ret =
-            ServerImplementation.getImplementation().getCacheManager().getCachedAccount(accountId);
+        Optional<IAccount> ret = getCachedAccount(accountId);
         if (ret.isPresent()) {
             return ret;
         }
@@ -137,8 +162,7 @@ import java.util.Optional;
         ret = Optional.ofNullable(
             applicationStructure.getMorphiaDatastore().createQuery(Account.class).field("userId")
                 .equal(accountId).get());
-        ret.ifPresent(account -> ServerImplementation.getImplementation().getCacheManager()
-            .setCachedAccount(account));
+        ret.ifPresent(this::setCachedAccount);
         ret.ifPresent(account -> account.setManager(this));
         ret.ifPresent(
             account -> decorators.forEach(decorator -> decorator.decorateAccount(account)));
@@ -175,7 +199,21 @@ import java.util.Optional;
 
     @Override public void deleteAccount(@NonNull final IAccount account) {
         this.applicationStructure.getMorphiaDatastore().delete(account);
-        ServerImplementation.getImplementation().getCacheManager().deleteAccount(account);
+        this.cachedAccounts.invalidate(account.getId());
+        this.cachedAccountIds.invalidate(account.getUsername());
+    }
+
+    private void setCachedAccount(@NonNull final IAccount account) {
+        this.cachedAccounts.put(account.getId(), account);
+        this.cachedAccountIds.put(account.getUsername(), account.getId());
+    }
+
+    private Optional<IAccount> getCachedAccount(final int id) {
+        return Optional.ofNullable(cachedAccounts.getIfPresent(id));
+    }
+
+    private Optional<Integer> getCachedId(@NonNull final String username) {
+        return Optional.ofNullable(cachedAccountIds.getIfPresent(username));
     }
 
 }

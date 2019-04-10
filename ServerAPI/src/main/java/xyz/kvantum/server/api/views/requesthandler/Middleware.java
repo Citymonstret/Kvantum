@@ -91,7 +91,6 @@ import xyz.kvantum.server.api.views.annotatedviews.ViewMatcher;
  * </pre>
  * </p>
  *
- * @see AuthenticationRequiredMiddleware
  * @see DebugMiddleware
  */
 public abstract class Middleware {

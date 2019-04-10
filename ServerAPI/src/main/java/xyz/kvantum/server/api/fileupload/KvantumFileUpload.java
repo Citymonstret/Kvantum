@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * Wrapper for {@link FileUpload Commons FileUpload}
+ * {@inheritDoc}
  */
 @SuppressWarnings("ALL") public class KvantumFileUpload extends FileUpload {
 

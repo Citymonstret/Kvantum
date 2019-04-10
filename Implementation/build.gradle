@@ -64,5 +64,6 @@ dependencies {
     //
     // Modules
     //
-    compile project(":ServerAPI")
+    compile project(':ServerAPI')
+    compile project(':Accounts')
 }

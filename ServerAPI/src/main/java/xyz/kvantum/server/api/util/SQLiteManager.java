@@ -34,13 +34,14 @@ import java.sql.*;
 /**
  * Utility class for dealing with common SQLite operations
  */
-@SuppressWarnings({"unused", "WeakerAccess"}) @EqualsAndHashCode(of = "name", callSuper = false)
+@SuppressWarnings("unused") @EqualsAndHashCode(of = "name", callSuper = false)
 public class SQLiteManager extends AutoCloseable {
 
     private final Connection connection;
     private final String name;
 
-    public SQLiteManager(@NonNull final String name) throws IOException, SQLException {
+    public SQLiteManager(@NonNull final String name) throws IOException, SQLException, ClassNotFoundException {
+        Class.forName("org.sqlite.JDBC");
         this.name = name + ".db";
         final File file =
             new File(new File(ServerImplementation.getImplementation().getCoreFolder(), "storage"),

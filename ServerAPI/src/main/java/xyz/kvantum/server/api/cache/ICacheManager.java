@@ -23,11 +23,9 @@ package xyz.kvantum.server.api.cache;
 
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
-import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.response.ResponseBody;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -42,37 +40,6 @@ public interface ICacheManager {
      * @return null if the file is not stored in the cache, otherwise the file content
      */
     String getCachedInclude(String file);
-
-    /**
-     * Get a cached account based on the account ID, if it is stored in the cache
-     *
-     * @param id Account id
-     * @return Account if it is stored
-     * @see #getCachedId(String) to get the account ID from the account username
-     */
-    Optional<IAccount> getCachedAccount(int id);
-
-    /**
-     * Get a cached account ID, if it is stored in the cache
-     *
-     * @param username Account username
-     * @return Account ID if it is stored
-     */
-    Optional<Integer> getCachedId(String username);
-
-    /**
-     * Save an account to the cache
-     *
-     * @param account Account to save
-     */
-    void setCachedAccount(IAccount account);
-
-    /**
-     * Remove an account from the cache
-     *
-     * @param account Account to be removed
-     */
-    void deleteAccount(IAccount account);
 
     /**
      * Get a cached file from the cache, if is stored
@@ -104,13 +71,6 @@ public interface ICacheManager {
      * @param path File to remove
      */
     void removeFileCache(Path path);
-
-    /**
-     * Get all stored accounts
-     *
-     * @return all stored accounts as an immutable collection
-     */
-    Collection<IAccount> getAllStoredAccounts();
 
     /**
      * Check if there is a ResponseBody cached for the view

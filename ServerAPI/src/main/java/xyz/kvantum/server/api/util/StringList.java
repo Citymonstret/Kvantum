@@ -62,7 +62,7 @@ import java.util.StringTokenizer;
         return this.content.remove(string);
     }
 
-    @SuppressWarnings("WeakerAccess") public boolean addAll(@Nullable final String string) {
+    public boolean addAll(@Nullable final String string) {
         if (string != null && !string.isEmpty()) {
             final StringTokenizer tokenizer = new StringTokenizer(string, ",");
             while (tokenizer.hasMoreTokens()) {
@@ -92,23 +92,19 @@ import java.util.StringTokenizer;
         return o instanceof String && this.remove((String) o);
     }
 
-    @Override @SuppressWarnings("ALL")
-    public boolean containsAll(@NonNull final Collection<?> collection) {
+    @Override @SuppressWarnings("ALL") public boolean containsAll(@NonNull final Collection<?> collection) {
         return this.content.containsAll(collection);
     }
 
-    @Override @SuppressWarnings("ALL")
-    public boolean addAll(@NonNull final Collection<? extends String> collection) {
+    @Override @SuppressWarnings("ALL") public boolean addAll(@NonNull final Collection<? extends String> collection) {
         return this.content.addAll(collection);
     }
 
-    @Override @SuppressWarnings("ALL")
-    public boolean removeAll(@NonNull final Collection<?> collection) {
+    @Override @SuppressWarnings("ALL") public boolean removeAll(@NonNull final Collection<?> collection) {
         return this.content.removeAll(collection);
     }
 
-    @Override @SuppressWarnings("ALL")
-    public boolean retainAll(@NonNull final Collection<?> collection) {
+    @Override @SuppressWarnings("ALL") public boolean retainAll(@NonNull final Collection<?> collection) {
         return this.content.retainAll(collection);
     }
 
@@ -164,8 +160,7 @@ import java.util.StringTokenizer;
         return this.content.toArray();
     }
 
-    @Nonnull @Override @SuppressWarnings("ALL")
-    public <T> T[] toArray(@Nonnull @NonNull final T[] ts) {
+    @Nonnull @Override @SuppressWarnings("ALL") public <T> T[] toArray(@Nonnull @NonNull final T[] ts) {
         return this.content.toArray(ts);
     }
 

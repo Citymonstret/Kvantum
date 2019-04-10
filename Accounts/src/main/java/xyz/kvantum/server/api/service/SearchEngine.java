@@ -19,7 +19,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Mock implementations for testing and error prevention
- */
-package xyz.kvantum.server.api.mocking;
+package xyz.kvantum.server.api.service;
+
+import xyz.kvantum.server.api.views.RequestHandler;
+
+@FunctionalInterface interface SearchEngine {
+
+    @SuppressWarnings("ALL") RequestHandler createService();
+
+}
