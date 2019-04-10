@@ -21,13 +21,13 @@
  */
 package xyz.kvantum.example;
 
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.AccountMatcherFactory;
 import xyz.kvantum.server.api.account.IAccount;
-import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.service.KvantumSearchService;
+import xyz.kvantum.server.api.service.RSQLSearchService;
 import xyz.kvantum.server.api.util.ParameterScope;
-import service.KvantumSearchService;
-import service.RSQLSearchService;
 import xyz.kvantum.server.implementation.Account;
 
 class ExampleSearch {
@@ -52,8 +52,7 @@ class ExampleSearch {
         //      ]
         // }
         KvantumSearchService.<Account, IAccount>builder().filter("search")
-            .queryObjectType(Account.class).resultProvider(
-            ServerImplementation.getImplementation().getApplicationStructure().getAccountManager())
+            .queryObjectType(Account.class).resultProvider(AccountService.getInstance().getGlobalAccountManager())
             .matcher(new AccountMatcherFactory<>()).parameterScope(ParameterScope.GET).build()
             .createService();
 
@@ -70,8 +69,7 @@ class ExampleSearch {
         //      ]
         // }
         RSQLSearchService.<IAccount>builder().filter("rsqlsearch")
-            .parameterScope(ParameterScope.GET).resultProvider(
-            ServerImplementation.getImplementation().getApplicationStructure().getAccountManager())
+            .parameterScope(ParameterScope.GET).resultProvider(AccountService.getInstance().getGlobalAccountManager())
             .queryKey("query").build().createService();
 
         Logger.info("ACCESS THE EXAMPLE AT: /search?username=<username>&id=<id>");

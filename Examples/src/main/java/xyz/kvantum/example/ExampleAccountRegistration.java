@@ -23,6 +23,7 @@ package xyz.kvantum.example;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.AccountMatcherFactory;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
@@ -127,9 +128,7 @@ public class ExampleAccountRegistration {
                     // Here we make sure that the submitted account details are not
                     // already associated with an account
                     //
-                    final IAccountManager accountManager =
-                        ServerImplementation.getImplementation().getApplicationStructure()
-                            .getAccountManager();
+                    final IAccountManager accountManager = AccountService.getInstance().getGlobalAccountManager();
                     final AccountMatcherFactory<Account, IAccount> factory =
                         new AccountMatcherFactory<>();
                     final FieldComparator<? extends Account, ? super IAccount> comparator =

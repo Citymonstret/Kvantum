@@ -27,6 +27,7 @@ import com.google.gson.JsonPrimitive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.val;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.account.roles.AccountRole;
@@ -67,11 +68,6 @@ import java.util.Optional;
     private final MatcherFactory<QueryType, ObjectType> matcher;
 
     /**
-     * Account manager
-     */
-    private final IAccountManager accountManager;
-
-    /**
      * Whether GET or POST parameters will be used to read the object
      */
     @Builder.Default private ParameterScope parameterScope = ParameterScope.GET;
@@ -92,7 +88,7 @@ import java.util.Optional;
                         hasPermission = false;
                     } else {
                         final Optional<IAccount> accountOptional =
-                            this.accountManager.getAccount(request.getSession());
+                            AccountService.getInstance().getGlobalAccountManager().getAccount(request.getSession());
                         hasPermission = accountOptional
                             .map(iAccount -> iAccount.isPermitted(getPermissionRequirement()))
                             .orElse(false);

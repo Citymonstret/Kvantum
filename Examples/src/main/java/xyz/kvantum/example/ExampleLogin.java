@@ -22,6 +22,7 @@
 package xyz.kvantum.example;
 
 import xyz.kvantum.example.object.LoginAttempt;
+import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -59,8 +60,7 @@ import java.util.Optional;
         // Get the account manager implementation. This is also an account repository, and is
         // responsible for account retrieving, creation and alike.
         //
-        final IAccountManager accountManager =
-            ServerImplementation.getImplementation().getApplicationStructure().getAccountManager();
+        final IAccountManager accountManager = AccountService.getInstance().getGlobalAccountManager();
         if (accountManager.getAccount(request.getSession()).isPresent()) {
             response.setResponse("You are already logged in...");
             return;
