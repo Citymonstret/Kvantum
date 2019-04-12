@@ -24,15 +24,13 @@ package xyz.kvantum.server.api.views.errors;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.response.Header;
 
-import javax.annotation.Nonnull;
-
 public class View404 extends xyz.kvantum.server.api.views.errors.Error {
 
     private View404(final String url) {
         super(Header.STATUS_NOT_FOUND, "Not Found: " + url);
     }
 
-    @Nonnull public static View404 construct(final String url) {
+    public static View404 construct(final String url) {
         final String webAddress = CoreConfig.webAddress.endsWith("/") ?
             CoreConfig.webAddress.substring(0, CoreConfig.webAddress.length() - 1) :
             CoreConfig.webAddress;

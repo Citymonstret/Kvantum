@@ -21,12 +21,11 @@
  */
 package xyz.kvantum.server.api.verification;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import lombok.Singular;
 import xyz.kvantum.server.api.verification.rules.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -34,11 +33,11 @@ public class Verifier<T> {
 
     private final Collection<Rule<T>> rules;
 
-    private boolean nullable = false;
+    private boolean nullable;
 
     @Builder private Verifier(@Singular("withRule") final Collection<Rule<T>> rules,
         final boolean nullable) {
-        this.rules = ImmutableList.copyOf(rules);
+        this.rules = Collections.unmodifiableCollection(rules);
         this.nullable = nullable;
     }
 
@@ -52,14 +51,14 @@ public class Verifier<T> {
         if (!this.nullable && object == null) {
             return Collections.singletonList(new NotNull<T>());
         }
-        final ImmutableCollection.Builder<Rule<T>> ruleBuilder = ImmutableList.builder();
+        final Collection<Rule<T>> failedRules = new ArrayList<>();
         for (final Rule<T> rule : this.rules) {
             if (rule.test(object)) {
                 continue;
             }
-            ruleBuilder.add(rule);
+            failedRules.add(rule);
         }
-        return ruleBuilder.build();
+        return Collections.unmodifiableCollection(failedRules);
     }
 
 }

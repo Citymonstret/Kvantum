@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation.config;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.config.YamlConfiguration;
@@ -60,11 +59,11 @@ final public class TranslationFile extends YamlConfiguration implements ITransla
         this.saveFile();
     }
 
-    @Override public boolean containsTranslation(@NonNull final String translation) {
+    @Override public boolean containsTranslation(final String translation) {
         return this.contains(translation);
     }
 
-    @Override public String getTranslation(@NonNull final String translation) {
+    @Override public String getTranslation(final String translation) {
         return this.get(translation);
     }
 }

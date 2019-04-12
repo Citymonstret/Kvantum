@@ -21,10 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -42,14 +40,14 @@ import java.util.Map;
      * @param in String to be replaced
      * @return Colored formatted string
      */
-    @Nonnull public static String getReplaced(@Nonnull @NonNull String in) {
+    public static String getReplaced(String in) {
         for (final Map.Entry<Character, Integer> entry : coloredMapping.entrySet()) {
             in = in.replace("&" + entry.getKey(), "\u001B[" + entry.getValue() + ";1m");
         }
         return in;
     }
 
-    @Nonnull public static String getStripped(@Nonnull @NonNull String in) {
+    public static String getStripped(String in) {
         for (final char key : coloredMapping.keySet()) {
             in = in.replace("&" + key, "");
         }

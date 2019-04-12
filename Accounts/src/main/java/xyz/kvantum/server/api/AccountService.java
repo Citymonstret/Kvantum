@@ -4,7 +4,6 @@ import lombok.Getter;
 import xyz.kvantum.server.api.account.IAccountManager;
 import xyz.kvantum.server.api.util.Assert;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,15 +21,15 @@ public final class AccountService {
         return this.getAccountManager(INTERNAL_CONTEXT);
     }
 
-    public IAccountManager getAccountManager(@Nonnull final String context) {
+    public IAccountManager getAccountManager(final String context) {
         return this.accountManagerMap.get(Assert.notNull(context));
     }
 
-    public void setAccountManager(@Nonnull final String context, @Nonnull final IAccountManager accountManager) {
+    public void setAccountManager(final String context, final IAccountManager accountManager) {
         this.accountManagerMap.put(Assert.notNull(context), Assert.notNull(accountManager));
     }
 
-    public void setGlobalAccountManager(@Nonnull final IAccountManager manager) {
+    public void setGlobalAccountManager(final IAccountManager manager) {
         this.setAccountManager(INTERNAL_CONTEXT, manager);
     }
 

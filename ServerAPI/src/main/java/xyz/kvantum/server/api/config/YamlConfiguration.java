@@ -26,9 +26,12 @@ import org.yaml.snakeyaml.Yaml;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.Assert;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,7 +144,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         return this.get(key);
     }
 
-    @Nullable @SuppressWarnings("ALL") @Override public final <T> T get(final String key) {
+    @SuppressWarnings("ALL") @Override public final <T> T get(final String key) {
         Assert.notNull(key);
 
         if (this.map.containsKey(key)) {
@@ -165,7 +168,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         return null; // Nullable
     }
 
-    @Nonnull @Override public final Map<String, Object> getAll() {
+    @Override public final Map<String, Object> getAll() {
         return new HashMap<>(this.map);
     }
 

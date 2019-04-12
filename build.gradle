@@ -40,7 +40,6 @@ allprojects {
         testImplementation 'junit:junit:4.12'
     }
 
-
     dependencies {
         testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.2'
         testCompile(
@@ -148,7 +147,7 @@ subprojects {
         exclude group: 'tomcat', module: 'servlet-api'
         exclude group: 'net.sf.cglib', module: 'cglib-nodep'
         exclude group: 'jcuda', module: 'jcuda'
-
+        exclude group: 'com.moandjiezana.toml', module: 'toml'
     }
 }
 

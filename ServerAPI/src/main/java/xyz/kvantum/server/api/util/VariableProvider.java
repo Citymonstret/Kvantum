@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -51,7 +50,7 @@ public interface VariableProvider {
      * @return The object (or null)
      * @see #contains(String) Use this to check if it exists
      */
-    @Nullable Object get(String variable);
+    Object get(String variable);
 
     /**
      * Get all variables stored in the provider

@@ -1,8 +1,0 @@
-repositories {
-    maven { url "https://jitpack.io" }
-    maven { url "http://repo.maven.apache.org/maven2" }
-}
-
-dependencies {
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
-}

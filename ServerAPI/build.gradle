@@ -1,16 +1,18 @@
 dependencies {
-    // CSV
-    // compile 'org.apache.commons:commons-csv:1.6'
+    // Cache manager
+    compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
+
+    compileOnly 'org.projectlombok:lombok:1.18.6'
+    annotationProcessor 'org.projectlombok:lombok:1.18.6'
     // Performance monitoring
     compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
     // Logback (used for configuration purposes only)
     compile 'ch.qos.logback:logback-classic:1.2.3'
     // Mostly used for its awesome map implementations
-    compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
+    // compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // rest query engine
     compile('com.github.rutledgepaulv:rest-query-engine:0.7.1') {
-        // TODO: Re-introduce this exclusion
-        // exclude group: 'org.springframework', module: '*'
+        exclude group: 'org.springframework', module: '*'
     }
     // Makes input handling better and more fluent
     compile group: 'org.jline', name: 'jline', version: '3.5.1'
@@ -34,9 +36,4 @@ dependencies {
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
     compile 'com.github.Hervian:lambda-factory:91bc62f8c2'
-    //
-    // Modules
-    //
-    compile project(":FileSystem")
-    compile project(":Assert")
 }

@@ -1,0 +1,46 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+
+// Disable ZIP artifacts
+tasks.distZip.enabled = false
+tasks.shadowDistZip.enabled = false
+configurations.archives.artifacts.removeAll { it.type == 'zip' }
+
+// Disabke TAR artifacts
+tasks.distTar.enabled = false
+tasks.shadowDistTar.enabled = false
+configurations.archives.artifacts.removeAll { it.type == 'tar' }
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Kvantum',
+                'Implementation-Version': rootProject.version,
+                'Main-Class': 'xyz.kvantum.server.implementation.KvantumMain'
+    }
+}
+
+mainClassName = 'xyz.kvantum.server.implementation.KvantumMain'
+
+artifacts {
+    jar
+    shadowJar
+    sourcesJar
+    javadocJar
+}
+
+// build.dependsOn(shadowJar)
+
+dependencies {
+    // Program argument parser
+    compile group: 'com.beust', name: 'jcommander', version: '1.72'
+    compile project(':Implementation')
+}

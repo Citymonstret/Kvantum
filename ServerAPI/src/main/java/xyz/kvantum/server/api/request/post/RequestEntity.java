@@ -28,7 +28,6 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestChild;
 import xyz.kvantum.server.api.util.Assert;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,7 +72,7 @@ import java.util.Map;
      * @param key Parameter key
      * @return Parameter value if found, else null
      */
-    @Nullable public String get(final String key) {
+    public String get(final String key) {
         Assert.notNull(key);
 
         this.load();

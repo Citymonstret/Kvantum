@@ -21,13 +21,10 @@
  */
 package xyz.kvantum.server.api.util;
 
-import com.google.common.collect.Multimap;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.Singular;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,11 +34,11 @@ import java.util.Map;
 
     private static final String NEW_LINE = System.lineSeparator();
 
-    @NonNull private final String name;
+    private final String name;
 
     @Singular("entry") private final Map<String, Object> entries;
 
-    @Nonnull public String toString() {
+    public String toString() {
         final StringBuilder builder = new StringBuilder("# ").append(name).append(NEW_LINE);
         for (final Map.Entry<String, Object> entry : entries.entrySet()) {
             if (entry.getValue() instanceof Map) {
@@ -58,9 +55,9 @@ import java.util.Map;
                     builder.append(e.getKey()).append(", Value: ").append(e.getValue())
                         .append(NEW_LINE);
                 }
-            } else if (entry.getValue() instanceof Multimap) {
+            } else if (entry.getValue() instanceof ListMultiMap) {
                 builder.append("├── ").append(entry.getKey()).append(NEW_LINE);
-                Multimap<?, ?> map = (Multimap<?, ?>) entry.getValue();
+                ListMultiMap<?, ?> map = (ListMultiMap<?, ?>) entry.getValue();
                 final Iterator<? extends Map.Entry<?, ?>> iterator = map.entries().iterator();
                 while (iterator.hasNext()) {
                     final Map.Entry e = iterator.next();

@@ -21,10 +21,7 @@
  */
 package xyz.kvantum.server.api.core;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.exceptions.KvantumException;
-
-import javax.annotation.Nonnull;
 
 /**
  * Use this class to manage the {@link Kvantum} instances
@@ -40,8 +37,7 @@ public final class ServerImplementation {
      * @param intellectualServer Server instance
      * @throws KvantumException if the instance is already set
      */
-    public static void registerServerImplementation(
-        @Nonnull @NonNull final Kvantum intellectualServer) {
+    public static void registerServerImplementation(final Kvantum intellectualServer) {
         if (ServerImplementation.intellectualServer != null) {
             throw new KvantumException("Trying to replace server implementation");
         }

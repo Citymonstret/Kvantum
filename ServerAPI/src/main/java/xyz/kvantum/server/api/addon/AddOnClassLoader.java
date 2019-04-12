@@ -23,10 +23,8 @@ package xyz.kvantum.server.api.addon;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,8 +43,7 @@ final class AddOnClassLoader extends URLClassLoader {
 
     @Getter @Setter(AccessLevel.PROTECTED) private boolean disabling;
 
-    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager,
-        @Nonnull @NonNull final File file, @NonNull final String name)
+    AddOnClassLoader(final AddOnManager addOnManager, final File file, final String name)
         throws AddOnLoaderException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, addOnManager.getClass().getClassLoader());
 
@@ -60,9 +57,8 @@ final class AddOnClassLoader extends URLClassLoader {
         }
     }
 
-    AddOnClassLoader(@Nonnull @NonNull final AddOnManager addOnManager,
-        @Nonnull @NonNull final File file, @NonNull final String mainFile,
-        @NonNull final String name) throws AddOnLoaderException, MalformedURLException {
+    AddOnClassLoader(final AddOnManager addOnManager, final File file, final String mainFile,
+        final String name) throws AddOnLoaderException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, addOnManager.getClass().getClassLoader());
 
         this.addOnManager = addOnManager;

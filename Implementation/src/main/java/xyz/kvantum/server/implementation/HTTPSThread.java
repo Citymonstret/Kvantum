@@ -28,7 +28,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.ssl.SslHandler;
-import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -40,7 +39,11 @@ import javax.net.ssl.SSLEngine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
 /**
@@ -57,7 +60,7 @@ final class HTTPSThread extends Thread {
 
     private ChannelFuture future;
 
-    HTTPSThread(@NonNull final NioClassResolver classResolver)
+    HTTPSThread(final NioClassResolver classResolver)
         throws KvantumInitializationException {
         super("https");
         this.setPriority(Thread.MAX_PRIORITY);

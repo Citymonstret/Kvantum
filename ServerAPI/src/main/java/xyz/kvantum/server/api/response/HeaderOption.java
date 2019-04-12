@@ -21,13 +21,15 @@
  */
 package xyz.kvantum.server.api.response;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AsciiStringable;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ import java.util.Map;
 
     private static Map<AsciiString, HeaderOption> headerOptionMap = new HashMap<>();
 
-    @NonNull @Getter private final AsciiString text;
+    @Getter private final AsciiString text;
     @Getter private boolean cacheApplicable = true;
 
     public static HeaderOption create(final String string) {
@@ -48,13 +50,13 @@ import java.util.Map;
         return create(text, true);
     }
 
-    public static HeaderOption create(@NonNull final AsciiString text, boolean cacheApplicable) {
+    public static HeaderOption create(final AsciiString text, boolean cacheApplicable) {
         final HeaderOption headerOption = new HeaderOption(text).cacheApplicable(cacheApplicable);
         headerOptionMap.put(text.toLowerCase(), headerOption);
         return headerOption;
     }
 
-    public static HeaderOption getOrCreate(@Nonnull @NonNull final AsciiString text) {
+    public static HeaderOption getOrCreate(final AsciiString text) {
         if (headerOptionMap.containsKey(text.toLowerCase())) {
             return headerOptionMap.get(text.toLowerCase());
         }
@@ -69,7 +71,7 @@ import java.util.Map;
         return this;
     }
 
-    @Nonnull @Override public final String toString() {
+    @Override public final String toString() {
         return this.text.toString();
     }
 

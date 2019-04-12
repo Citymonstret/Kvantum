@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.event;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.util.ReflectionUtils.AnnotatedMethod;
@@ -64,7 +63,7 @@ import java.util.concurrent.Future;
      *
      * @param listenerInstance Instance to scan
      */
-    public void registerListeners(@NonNull final Object listenerInstance) {
+    public void registerListeners(final Object listenerInstance) {
         final Class<?> clazz = listenerInstance.getClass();
         try {
             //
@@ -100,11 +99,11 @@ import java.util.concurrent.Future;
     }
 
     protected abstract void registerListenersInternally(
-        @NonNull final Collection<ListenerMethod> listenerMethods);
+        final Collection<ListenerMethod> listenerMethods);
 
-    protected abstract <T> Future<T> throwAsync(@NonNull final T event);
+    protected abstract <T> Future<T> throwAsync(final T event);
 
-    protected abstract <T> T throwSync(@NonNull final T event);
+    protected abstract <T> T throwSync(final T event);
 
     /**
      * Submit an event for distribution
@@ -114,7 +113,7 @@ import java.util.concurrent.Future;
      * @return Future containing the distributed event, or an exception if the event
      * could not be handled properly
      */
-    public final <T> Future<T> throwEvent(@NonNull final T event, final boolean async) {
+    public final <T> Future<T> throwEvent(final T event, final boolean async) {
         if (async && !this.supportsAsync()) {
             throw new IllegalStateException("This event bus does not support asynchronous events");
         }

@@ -21,14 +21,13 @@
  */
 package xyz.kvantum.server.api.matching;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import xyz.kvantum.server.api.exceptions.KvantumException;
+import xyz.kvantum.server.api.util.MapBuilder;
 import xyz.kvantum.server.api.util.VariableHolder;
 
-import javax.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,16 +40,16 @@ import java.util.regex.Pattern;
     private final String pattern;
     private final Map<String, String> variableMap;
 
-    @Nonnull public static FilePattern compile(@NonNull final String in) {
+    public static FilePattern compile(final String in) {
         final Matcher matcher = PATTERN_VARIABLE.matcher(in);
-        final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
+        final MapBuilder<String, String> mapBuilder = MapBuilder.newUnmodifableMap(HashMap::new);
         while (matcher.find()) {
             mapBuilder.put(matcher.group(), matcher.group("variable"));
         }
-        return new FilePattern(in, mapBuilder.build());
+        return new FilePattern(in, mapBuilder.get());
     }
 
-    @Nonnull public FileMatcher matcher(final VariableHolder holder) {
+    public FileMatcher matcher(final VariableHolder holder) {
         return new FileMatcher(holder);
     }
 
@@ -68,9 +67,9 @@ import java.util.regex.Pattern;
         private final Map<String, String> variableMapping;
         private String compiledName = null;
 
-        private FileMatcher(@Nonnull @NonNull final VariableHolder variableHolder) {
-            final ImmutableMap.Builder<String, String> variableMappingBuilder =
-                ImmutableMap.builder();
+        private FileMatcher(final VariableHolder variableHolder) {
+            final MapBuilder<String, String> variableMappingBuilder =
+                MapBuilder.newUnmodifableMap(HashMap::new);
             final Map<String, String> requestVariables = variableHolder.getVariables();
             for (final Map.Entry<String, String> entry : variableMap.entrySet()) {
                 if (!requestVariables.containsKey(entry.getValue())) {
@@ -79,7 +78,7 @@ import java.util.regex.Pattern;
                 variableMappingBuilder
                     .put(entry.getValue(), requestVariables.get(entry.getValue()));
             }
-            this.variableMapping = variableMappingBuilder.build();
+            this.variableMapping = variableMappingBuilder.get();
         }
 
         public boolean matches() {

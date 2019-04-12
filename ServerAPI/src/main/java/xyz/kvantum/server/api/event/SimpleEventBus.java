@@ -21,18 +21,17 @@
  */
 package xyz.kvantum.server.api.event;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.NonNull;
 import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.api.util.ListMultiMap;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Simple {@link EventBus} implementation using a cached thread pool to handle
@@ -44,21 +43,29 @@ public final class SimpleEventBus extends EventBus {
     private final Object lock = new Object();
 
     private final ExecutorService executorService;
-    private final Multimap<String, ListenerMethod> listenerMethodMultimap =
-        MultimapBuilder.hashKeys().hashSetValues().build();
+    private final ListMultiMap<String, ListenerMethod> listenerMethodMultimap =
+        new ListMultiMap<>();
 
     public SimpleEventBus() {
         super(true);
-        this.executorService = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setDaemon(false).setNameFormat("kvantum-events-%s").build());
+        this.executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+            private AtomicInteger number = new AtomicInteger(1);
+
+            @Override public Thread newThread(Runnable runnable) {
+                final Thread thread = new Thread(runnable,
+                    String.format("kvantum-events-%s", number.getAndIncrement()));
+                thread.setDaemon(true);
+                return thread;
+            }
+        });
     }
 
     @Override protected void registerListenersInternally(
-        @Nonnull @NonNull Collection<ListenerMethod> listenerMethods) {
+        Collection<ListenerMethod> listenerMethods) {
         synchronized (this.lock) {
             for (final ListenerMethod listenerMethod : listenerMethods) {
                 if (listenerMethodMultimap
-                    .containsEntry(listenerMethod.getEventType(), listenerMethod)) {
+                    .containsEntry(getClassName(listenerMethod.getEventType()), listenerMethod)) {
                     Logger.error(
                         "Listener method with name {} has already been registered in event bus. Skipping.",
                         listenerMethod.toString());
@@ -70,8 +77,7 @@ public final class SimpleEventBus extends EventBus {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public final Collection<ListenerMethod> getMethods(@NonNull final String eventType) {
+    public final Collection<ListenerMethod> getMethods(final String eventType) {
         final Collection<ListenerMethod> methods;
         synchronized (this.lock) {
             methods = this.listenerMethodMultimap.get(eventType);
@@ -79,9 +85,9 @@ public final class SimpleEventBus extends EventBus {
         return methods;
     }
 
-    @Nonnull
+
     private <T> Callable<T> createRunnable(@NonNull final Collection<ListenerMethod> methods,
-        @NonNull final T event) {
+        final T event) {
         return () -> {
             for (final ListenerMethod method : methods) {
                 method.invoke(event);
@@ -90,16 +96,16 @@ public final class SimpleEventBus extends EventBus {
         };
     }
 
-    private String getClassName(@Nonnull @NonNull final Class clazz) {
+    private String getClassName(final Class clazz) {
         return clazz.getName();
     }
 
-    @Nonnull @Override protected <T> Future<T> throwAsync(@Nonnull @NonNull T event) {
+    @Override protected <T> Future<T> throwAsync(T event) {
         final Collection<ListenerMethod> methods = getMethods(getClassName(event.getClass()));
         return this.executorService.submit(createRunnable(methods, event));
     }
 
-    @Override protected <T> T throwSync(@NonNull T event) {
+    @Override protected <T> T throwSync(T event) {
         try {
             final Collection<ListenerMethod> methods = getMethods(getClassName(event.getClass()));
             return this.createRunnable(methods, event).call();

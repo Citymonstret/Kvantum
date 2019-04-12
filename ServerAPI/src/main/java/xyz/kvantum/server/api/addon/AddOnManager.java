@@ -22,16 +22,20 @@
 package xyz.kvantum.server.api.addon;
 
 import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.api.util.CollectionUtil;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -47,7 +51,7 @@ import java.util.stream.Collectors;
     private Map<String, Class> globalClassMap = new ConcurrentHashMap<>();
     private Map<String, AddOnClassLoader> classLoaders = new ConcurrentHashMap<>();
 
-    public AddOnManager(@NonNull final File addOnFolder, final Collection<String> disabledAddons) {
+    public AddOnManager(final File addOnFolder, final Collection<String> disabledAddons) {
         this.addOnFolder = addOnFolder;
         this.disabledAddons = new HashSet<>(disabledAddons);
     }
@@ -78,7 +82,7 @@ import java.util.stream.Collectors;
         fileList.stream().filter(file -> !this.isLibrary(file)).forEach(this::loadAddon);
     }
 
-    @Nullable private Properties getAddOnProperties(@NonNull final File file)
+    private Properties getAddOnProperties(final File file)
         throws AddOnManagerException {
         final JarFile jar;
         try {
@@ -101,11 +105,11 @@ import java.util.stream.Collectors;
         return properties;
     }
 
-    void setClass(@NonNull final String name, @NonNull Class<?> clazz) {
+    void setClass(final String name, Class<?> clazz) {
         this.globalClassMap.put(name, clazz);
     }
 
-    @Nullable Class<?> findClass(@NonNull final String name) {
+    Class<?> findClass(final String name) {
         if (this.globalClassMap.containsKey(name)) {
             return this.globalClassMap.get(name);
         }
@@ -127,7 +131,7 @@ import java.util.stream.Collectors;
      *
      * @return All loaded libraries
      */
-    @Nonnull public Collection<String> getLibraries() {
+    public Collection<String> getLibraries() {
         return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() == null)
             .map(AddOnClassLoader::getName).collect(Collectors.toUnmodifiableList());
     }
@@ -137,7 +141,7 @@ import java.util.stream.Collectors;
      *
      * @return All loaded addons
      */
-    @Nonnull public Collection<AddOn> getAddOns() {
+    public Collection<AddOn> getAddOns() {
         return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null)
             .map(AddOnClassLoader::getAddOn).collect(Collectors.toUnmodifiableList());
     }
@@ -148,14 +152,14 @@ import java.util.stream.Collectors;
      * @param clazz Addon class
      * @return Instance, if it can be found
      */
-    @Nonnull @SuppressWarnings("WeakerAccess")
-    public <T extends AddOn> Optional<T> getAddOnInstance(@Nonnull @NonNull final Class<T> clazz) {
+    @SuppressWarnings("WeakerAccess") public <T extends AddOn> Optional<T> getAddOnInstance(
+        final Class<T> clazz) {
         return this.classLoaders.values().stream().filter(loader -> loader.getAddOn() != null).
             map(AddOnClassLoader::getAddOn).filter(addOn -> addOn.getClass().equals(clazz))
             .map(clazz::cast).findAny();
     }
 
-    public Optional<AddOn> getAddOnInstance(@NonNull final String addOnName) {
+    public Optional<AddOn> getAddOnInstance(final String addOnName) {
         if (this.classLoaders.containsKey(addOnName)) {
             return Optional.of(this.classLoaders.get(addOnName).getAddOn());
         }
@@ -167,7 +171,7 @@ import java.util.stream.Collectors;
      *
      * @param clazz Addon class
      */
-    public <T extends AddOn> void unloadAddon(@NonNull final Class<T> clazz) {
+    public <T extends AddOn> void unloadAddon(final Class<T> clazz) {
         getAddOnInstance(clazz).ifPresent(this::unloadAddon);
     }
 
@@ -177,12 +181,12 @@ import java.util.stream.Collectors;
      * @param addOn Addon instance
      * @throws AddOnManagerException If anything happens during the unloading of the addon
      */
-    @SuppressWarnings("WeakerAccess") public <T extends AddOn> void unloadAddon(
-        @Nonnull @NonNull final T addOn) throws AddOnManagerException {
+    @SuppressWarnings("WeakerAccess") public <T extends AddOn> void unloadAddon(final T addOn)
+        throws AddOnManagerException {
         if (addOn.isEnabled()) {
             addOn.disable();
         }
-        @NonNull final AddOnClassLoader classLoader = addOn.getClassLoader();
+        final AddOnClassLoader classLoader = addOn.getClassLoader();
         classLoader.setDisabling(true);
         classLoader.removeClasses();
         final String name = addOn.getName();
@@ -200,7 +204,7 @@ import java.util.stream.Collectors;
      * @return New AddOn instance
      * @throws AddOnManagerException If anything goes wrong
      */
-    public <T extends AddOn> AddOn reloadAddon(@Nonnull @NonNull final T addOn)
+    public <T extends AddOn> AddOn reloadAddon(final T addOn)
         throws AddOnManagerException {
         if (addOn.isEnabled()) {
             addOn.disable();
@@ -216,7 +220,7 @@ import java.util.stream.Collectors;
         return classLoader.getAddOn();
     }
 
-    private boolean isLibrary(@NonNull final File file) {
+    private boolean isLibrary(final File file) {
         Properties properties = null;
         try {
             properties = getAddOnProperties(file);
@@ -232,8 +236,8 @@ import java.util.stream.Collectors;
      * @param file AddOn jar file
      * @throws AddOnManagerException If anything goes wrong during the loading
      */
-    @Nullable @SuppressWarnings("WeakerAccess") public AddOnClassLoader loadAddon(
-        @NonNull final File file) throws AddOnManagerException {
+    @SuppressWarnings("WeakerAccess") public AddOnClassLoader loadAddon(final File file)
+        throws AddOnManagerException {
         final Properties properties;
         try {
             properties = getAddOnProperties(file);
@@ -256,7 +260,7 @@ import java.util.stream.Collectors;
                     .printStackTrace();
                 return null; // Nullable
             }
-            @NonNull final String addOnName = properties.get("name").toString();
+            final String addOnName = properties.get("name").toString();
             if (this.classLoaders.containsKey(addOnName)) {
                 throw new AddOnManagerException(
                     "AddOn of name \"" + addOnName + "\" has already been loaded...");
@@ -264,7 +268,7 @@ import java.util.stream.Collectors;
             if (CollectionUtil.containsIgnoreCase(this.disabledAddons, addOnName)) {
                 return null; // Nullable
             }
-            @NonNull final String main = properties.get("main").toString();
+            final String main = properties.get("main").toString();
             if (this.globalClassMap.containsKey(main)) {
                 throw new AddOnManagerException(
                     "AddOn main class has already been loaded: " + main);
@@ -281,7 +285,7 @@ import java.util.stream.Collectors;
         }
     }
 
-    @Nullable private AddOnClassLoader loadLibrary(@NonNull final File file) {
+    private AddOnClassLoader loadLibrary(final File file) {
         final AddOnClassLoader loader;
         try {
             loader = new AddOnClassLoader(this, file, file.toPath().getFileName().toString());
@@ -310,7 +314,7 @@ import java.util.stream.Collectors;
             .map(AddOnClassLoader::getAddOn).filter(AddOn::isEnabled).forEach(AddOn::disable);
     }
 
-    void removeAll(@Nonnull final Map<String, Class<?>> clear) {
+    void removeAll(final Map<String, Class<?>> clear) {
         clear.keySet().forEach(key -> this.globalClassMap.remove(key));
         for (final Class<?> clazz : clear.values()) {
             if (this.globalClassMap.containsValue(clazz)) {
@@ -325,11 +329,11 @@ import java.util.stream.Collectors;
 
     private static final class AddOnManagerException extends RuntimeException {
 
-        private AddOnManagerException(@NonNull final String error) {
+        private AddOnManagerException(final String error) {
             super(error);
         }
 
-        private AddOnManagerException(@NonNull final String error, @NonNull final Throwable cause) {
+        private AddOnManagerException(final String error, final Throwable cause) {
             super(error, cause);
         }
 

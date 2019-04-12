@@ -22,10 +22,9 @@
 package xyz.kvantum.server.api.util;
 
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +49,7 @@ final public class MapBuilder<K, V> {
      * @param <V> Value type
      * @return {@link HashMap} builder
      */
-    @Nonnull public static <K, V> MapBuilder<K, V> newHashMap() {
+    public static <K, V> MapBuilder<K, V> newHashMap() {
         return create(map -> new HashMap<>(map), HashMap::new);
     }
 
@@ -61,8 +60,20 @@ final public class MapBuilder<K, V> {
      * @param <V> Value type
      * @return {@link LinkedHashMap} builder
      */
-    @Nonnull public static <K, V> MapBuilder<K, V> newLinkedHashMap() {
+    public static <K, V> MapBuilder<K, V> newLinkedHashMap() {
         return create(map -> new LinkedHashMap<>(map), LinkedHashMap::new);
+    }
+
+    /**
+     * Create an unmodifiable map
+     *
+     * @param provider Map provider
+     * @param <K>      Key type
+     * @param <V>      Value type
+     * @return unmodifable map builder
+     */
+    public static <K, V> MapBuilder<K, V> newUnmodifableMap(final Provider<Map<K, V>> provider) {
+        return create(map -> Collections.unmodifiableMap(map), provider);
     }
 
     /**
@@ -72,13 +83,12 @@ final public class MapBuilder<K, V> {
      * @param <V> Value type
      * @return {@link TreeMap} builder
      */
-    @Nonnull public static <K, V> MapBuilder<K, V> newTreeMap() {
+    public static <K, V> MapBuilder<K, V> newTreeMap() {
         return create(map -> new TreeMap<>(map), TreeMap::new);
     }
 
-    @Nonnull private static <K, V> MapBuilder<K, V> create(
-        @Nonnull @NonNull final Generator<Map<K, V>, Map<K, V>> generator,
-        @Nonnull @NonNull final Provider<Map<K, V>> provider) {
+    private static <K, V> MapBuilder<K, V> create(final Generator<Map<K, V>, Map<K, V>> generator,
+        final Provider<Map<K, V>> provider) {
         return new MapBuilder<>(provider.provide(), generator);
     }
 
@@ -89,8 +99,7 @@ final public class MapBuilder<K, V> {
      * @param value Value
      * @return {@code this} builder
      */
-    @Nonnull public MapBuilder<K, V> put(@Nonnull @NonNull final K key,
-        @Nonnull @NonNull final V value) {
+    public MapBuilder<K, V> put(final K key, final V value) {
         this.internalMap.put(key, value);
         return this;
     }
@@ -101,7 +110,7 @@ final public class MapBuilder<K, V> {
      * @param map Other map
      * @return {@code this} builder
      */
-    @Nonnull public MapBuilder<K, V> putAll(@Nonnull @NonNull final Map<K, V> map) {
+    public MapBuilder<K, V> putAll(final Map<K, V> map) {
         this.internalMap.putAll(map);
         return this;
     }
@@ -112,7 +121,7 @@ final public class MapBuilder<K, V> {
      * @param key Key
      * @return {@code this} builder
      */
-    @Nonnull public MapBuilder<K, V> remove(@Nonnull @NonNull final K key) {
+    public MapBuilder<K, V> remove(final K key) {
         this.internalMap.remove(key);
         return this;
     }
@@ -123,7 +132,7 @@ final public class MapBuilder<K, V> {
      * @param k Key
      * @return true if the object exists in the map; else false
      */
-    @Nonnull public boolean containsKey(@Nonnull @NonNull final K k) {
+    public boolean containsKey(final K k) {
         return this.internalMap.containsKey(k);
     }
 

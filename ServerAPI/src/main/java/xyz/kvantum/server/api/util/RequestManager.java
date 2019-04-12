@@ -21,10 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
-import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -37,9 +35,14 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.View404;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Router} implementation
@@ -73,7 +76,7 @@ import java.util.*;
     /**
      * Instance 404 generator, defaults to {@link #DEFAULT_404_GENERATOR}
      */
-    @Setter @Getter @NonNull @Builder.Default private Generator<AbstractRequest, RequestHandler>
+    @Setter @Getter @Builder.Default private Generator<AbstractRequest, RequestHandler>
         error404Generator = DEFAULT_404_GENERATOR;
 
     /**
@@ -114,7 +117,7 @@ import java.util.*;
 
 	/* TODO: Revisit this
 	@Listener
-	public void onShutdown(@NonNull final ServerShutdownEvent event)
+	public void onShutdown(final ServerShutdownEvent event)
 	{
 		Logger.info( "Saving requestHandlerOrder.cvs!" );
 		final File file = new File( new File( ServerImplementation.getImplementation().getCoreFolder(), "config" ), "requestHandlerOrder.csv" );
@@ -166,8 +169,7 @@ import java.util.*;
      * @param view The view to register
      * @return The request handler if it was created, null otherwise
      */
-    @Nullable @Override @SuppressWarnings("all") public RequestHandler add(
-        @Nonnull @NonNull final RequestHandler view) {
+    @Override @SuppressWarnings("all") public RequestHandler add(final RequestHandler view) {
         //
         // make sure the view pattern isn't registered yet
         //
@@ -241,16 +243,16 @@ import java.util.*;
         return error404Generator.generate(request);
     }
 
-    @Override public void dump(@NonNull final Kvantum server) {
+    @Override public void dump(final Kvantum server) {
         ((IConsumer<RequestHandler>) view -> Message.REQUEST_HANDLER_DUMP
             .log(view.getClass().getSimpleName(), view.toString())).foreach(views);
     }
 
     @Override public Collection<RequestHandler> getAll() {
-        return ImmutableList.copyOf(this.views);
+        return Collections.unmodifiableList(this.views);
     }
 
-    @Override public void remove(@NonNull final RequestHandler view) {
+    @Override public void remove(final RequestHandler view) {
         if (this.views.contains(view)) {
             this.views.remove(view);
         } else {

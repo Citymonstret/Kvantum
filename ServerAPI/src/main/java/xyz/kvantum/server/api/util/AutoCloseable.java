@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +56,7 @@ public abstract class AutoCloseable implements java.lang.AutoCloseable {
         closeable.stream().filter(AutoCloseable::exists).forEach(close);
     }
 
-    private static <T> boolean exists(@Nullable final WeakReference<T> reference) {
+    private static <T> boolean exists(final WeakReference<T> reference) {
         return reference != null && reference.get() != null;
     }
 

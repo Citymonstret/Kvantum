@@ -21,13 +21,11 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -35,13 +33,12 @@ import java.util.Map;
  */
 public class ImgView extends StaticFileView implements CacheApplicable, IgnoreSyntax {
 
-    public ImgView(@Nonnull @NonNull final String filter,
-        @Nonnull @NonNull final Map<String, Object> options) {
+    public ImgView(final String filter, final Map<String, Object> options) {
         super(filter, options, "img", FileExtension.IMAGE);
         super.relatedFolderPath = "/assets/img";
     }
 
-    @Override public boolean isApplicable(@Nonnull @NonNull final AbstractRequest r) {
+    @Override public boolean isApplicable(final AbstractRequest r) {
         return false;
     }
 

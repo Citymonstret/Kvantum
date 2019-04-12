@@ -21,12 +21,11 @@
  */
 package xyz.kvantum.server.api.views.decorators;
 
-import com.google.common.collect.ImmutableMap;
-import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.HeaderOption;
 import xyz.kvantum.server.api.views.HeaderDecorator;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -37,12 +36,11 @@ public final class Headers extends HeaderDecorator {
 
     private final Map<HeaderOption, String> headers;
 
-    @SuppressWarnings("WeakerAccess")
-    public Headers(@NonNull final Map<HeaderOption, String> headers) {
-        this.headers = ImmutableMap.copyOf(headers);
+    @SuppressWarnings("WeakerAccess") public Headers(final Map<HeaderOption, String> headers) {
+        this.headers = Collections.unmodifiableMap(headers);
     }
 
-    @Override public void decorate(@NonNull final Header header) {
+    @Override public void decorate(final Header header) {
         //
         // Only set the header if it isn't already set
         //

@@ -21,16 +21,22 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.logging.Logger;
 
-import javax.annotation.Nonnull;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,8 +52,7 @@ import java.util.Map;
      * @param path         Path where the resource should be pasted
      * @throws Exception All exceptions are thrown
      */
-    public static void copyResource(@NonNull final String resourcePath,
-        @Nonnull @NonNull final Path path) throws Exception {
+    public static void copyResource(final String resourcePath, final Path path) throws Exception {
         if (!Files.exists(path.getParent())) {
             Files.createDirectory(path.getParent());
         }
@@ -73,7 +78,7 @@ import java.util.Map;
      * @param files   Files to add to the zip
      * @throws Exception If anything goes wrong
      */
-    public static void addToZip(@NonNull final File zipFile, @NonNull final File[] files)
+    public static void addToZip(final File zipFile, final File[] files)
         throws Exception {
         Assert.notNull(zipFile, files);
 
@@ -98,7 +103,7 @@ import java.util.Map;
      * @param folder Folder to create
      * @return Input (regardless if created or not)
      */
-    @Nonnull public static File attemptFolderCreation(@Nonnull @NonNull final File folder) {
+    public static File attemptFolderCreation(final File folder) {
         if (!folder.exists() && !folder.mkdirs()) {
             Message.COULD_NOT_CREATE_FOLDER.log(folder);
         }
@@ -112,7 +117,7 @@ import java.util.Map;
      * @param out  Outgoing File
      * @param size Byte Buffer Size (in bytes)
      */
-    public static void copyFile(@NonNull final InputStream in, @NonNull final OutputStream out,
+    public static void copyFile(final InputStream in, final OutputStream out,
         final int size) {
         Assert.isPositive(size); // Make sure that the buffer size is always a positive number
         try {

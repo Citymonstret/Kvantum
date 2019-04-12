@@ -21,10 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -44,8 +42,8 @@ import java.util.function.Predicate;
      * @param <T>        Object type
      * @return Either the found object, or null
      */
-    @Nonnull public static <T> Optional<T> getFirst(
-        @Nonnull @NonNull final Collection<T> collection, @NonNull final Predicate<T> predicate) {
+    public static <T> Optional<T> getFirst(final Collection<T> collection,
+        final Predicate<T> predicate) {
         return collection.stream().filter(predicate).findFirst();
     }
 
@@ -57,8 +55,7 @@ import java.util.function.Predicate;
      * @param <T>       Object type
      * @return Either the found object, or null
      */
-    @Nonnull public static <T> Optional<T> getFirst(@Nonnull @NonNull final T[] array,
-        @Nonnull @NonNull final Predicate<T> predicate) {
+    public static <T> Optional<T> getFirst(final T[] array, final Predicate<T> predicate) {
         return Arrays.stream(array).filter(predicate).findFirst();
     }
 
@@ -72,8 +69,8 @@ import java.util.function.Predicate;
      * @return assigned collection
      */
     public static <T> Collection<T> collectionAssign(
-        @Nonnull @NonNull final Provider<Collection<T>> collectionProvider,
-        @Nonnull @NonNull final Provider<T> valueProvider, int number) {
+        final Provider<Collection<T>> collectionProvider, final Provider<T> valueProvider,
+        int number) {
         number = Assert.isPositive(number);
 
         final Collection<T> list = collectionProvider.provide();
@@ -91,8 +88,7 @@ import java.util.function.Predicate;
      * @param <T>      Type
      * @return assigned array
      */
-    @Nonnull public static <T> T[] arrayAssign(@Nonnull @NonNull final T[] array,
-        @Nonnull @NonNull final Provider<T> provider) {
+    public static <T> T[] arrayAssign(final T[] array, final Provider<T> provider) {
         for (int i = 0; i < array.length; i++) {
             array[i] = provider.provide();
         }
@@ -106,8 +102,7 @@ import java.util.function.Predicate;
      * @param consumer Action
      * @param <T>      Type
      */
-    public static <T> void arrayForeach(@Nonnull @NonNull final T[] array,
-        @Nonnull @NonNull final Consumer<T> consumer) {
+    public static <T> void arrayForeach(final T[] array, final Consumer<T> consumer) {
         Arrays.stream(array).forEach(consumer);
 
     }
@@ -119,7 +114,7 @@ import java.util.function.Predicate;
      * @param array    Array
      * @param <T>      Type
      */
-    @SafeVarargs public static <T> void arrayForeach(@Nonnull @NonNull final Consumer<T> consumer,
+    @SafeVarargs public static <T> void arrayForeach(final Consumer<T> consumer,
         final T... array) {
         Arrays.stream(array).forEach(consumer);
     }
@@ -132,8 +127,8 @@ import java.util.function.Predicate;
      * @param consumer Consumer
      * @param <T>      Type
      */
-    public static <T> void arrayForeach(@Nonnull @NonNull final T[] array,
-        @Nonnull @NonNull final Predicate<T> filter, @Nonnull @NonNull final Consumer<T> consumer) {
+    public static <T> void arrayForeach(final T[] array, final Predicate<T> filter,
+        final Consumer<T> consumer) {
         Assert.notNull(array, filter, consumer);
         Arrays.stream(array).filter(filter).forEach(consumer);
     }

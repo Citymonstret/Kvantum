@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.FileCacheManager;
 import xyz.kvantum.files.Path;
@@ -32,12 +31,11 @@ import java.util.Optional;
 
 final class FileCacheImplementation implements FileCacheManager {
 
-    @Override public Optional<CachedFile> readCachedFile(@NonNull final Path path) {
+    @Override public Optional<CachedFile> readCachedFile(final Path path) {
         return ServerImplementation.getImplementation().getCacheManager().getCachedFile(path);
     }
 
-    @Override
-    public void writeCachedFile(@NonNull final Path path, @NonNull final CachedFile content) {
+    @Override public void writeCachedFile(final Path path, final CachedFile content) {
         if (content.getLength() > Cache.cachedFilesMaxSize) {
             return;
         }

@@ -25,7 +25,6 @@ import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -37,10 +36,13 @@ import xyz.kvantum.server.api.validation.ValidationManager;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueue;
 import xyz.kvantum.server.api.views.requesthandler.MiddlewareQueuePopulator;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The lowest-level class in the request handling chain. Allows for responses to be generated from incoming requests.
@@ -78,8 +80,8 @@ public abstract class RequestHandler {
      * @param methodName Name of the method ( in the class, or any parent super classes )
      * @throws Exception If anything goes wrong
      */
-    public void registerAlternateOutcome(@Nonnull @NonNull final String identifier,
-        @Nonnull @NonNull final String methodName) throws Throwable {
+    public void registerAlternateOutcome(final String identifier, final String methodName)
+        throws Throwable {
         Assert.notEmpty(identifier);
         Assert.notEmpty(methodName);
 
@@ -107,7 +109,7 @@ public abstract class RequestHandler {
      *
      * @param decorator Decorator
      */
-    public void addResponseDecorator(@Nonnull @NonNull final Decorator decorator) {
+    public void addResponseDecorator(final Decorator decorator) {
         this.decorators.add(decorator);
     }
 
@@ -118,7 +120,7 @@ public abstract class RequestHandler {
      * @param identifier Method identifier
      * @return Alternate outcome method, if present
      */
-    public Optional<Lambda> getAlternateOutcomeMethod(@Nonnull @NonNull final String identifier) {
+    public Optional<Lambda> getAlternateOutcomeMethod(final String identifier) {
         if (alternateOutcomes.containsKey(identifier)) {
             return Optional.of(alternateOutcomes.get(identifier));
         }
@@ -146,7 +148,7 @@ public abstract class RequestHandler {
      * @param request Requested to serve
      * @return Generated response
      */
-    @Nullable public final Response handle(@Nonnull @NonNull final AbstractRequest request) {
+    public final Response handle(final AbstractRequest request) {
         Assert.isValid(request);
 
         //
@@ -214,7 +216,7 @@ public abstract class RequestHandler {
      * @param request The incoming request
      * @return The generated response
      */
-    @Nullable abstract public Response generate(final AbstractRequest request);
+    abstract public Response generate(final AbstractRequest request);
 
     /**
      * Get the view specific factory (if it exists)
@@ -222,7 +224,7 @@ public abstract class RequestHandler {
      * @param r Request IN
      * @return Null by default, or the ProviderFactory (if set by the view)
      */
-    @Nullable public ProviderFactory<? extends VariableProvider> getFactory(
+    public ProviderFactory<? extends VariableProvider> getFactory(
         final AbstractRequest r) {
         return null; // Nullable
     }

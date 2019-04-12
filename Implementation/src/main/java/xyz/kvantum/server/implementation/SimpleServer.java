@@ -21,14 +21,13 @@
  */
 package xyz.kvantum.server.implementation;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.configurable.ConfigurationFactory;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import xyz.kvantum.files.FileSystem;
@@ -98,7 +97,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Main {@link Kvantum} implementation. Extended by {@link StandaloneServer}
+ * Main {@link Kvantum} implementation.
  */
 public class SimpleServer implements Kvantum {
 
@@ -118,6 +117,7 @@ public class SimpleServer implements Kvantum {
     private final ServerContext serverContext;
     @Getter protected ICacheManager cacheManager;
     PrintStream logStream;
+    AccessLogStream accessLogStream;
     @Getter private InputThread inputThread;
     @Getter private boolean silent = false;
     @Getter private ExecutorService executorService;
@@ -125,6 +125,7 @@ public class SimpleServer implements Kvantum {
     @Getter private boolean paused = false;
     @Getter private boolean stopping;
     @Getter private boolean started;
+    @Getter private boolean stopped;
     private HTTPThread httpThread;
     private HTTPSThread httpsThread;
     @Getter private FileSystem fileSystem;
@@ -138,8 +139,7 @@ public class SimpleServer implements Kvantum {
     /**
      * @param serverContext ServerContext that will be used to initialize the server
      */
-    @SneakyThrows @SuppressWarnings("WeakerAccess") public SimpleServer(
-        @NonNull final ServerContext serverContext) {
+    @SneakyThrows public SimpleServer(final ServerContext serverContext) {
         this.serverContext = serverContext;
 
         //
@@ -159,7 +159,7 @@ public class SimpleServer implements Kvantum {
         // Initialize the executor service
         //
         this.executorService = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setDaemon(false).setNameFormat("kvantum-%d").build());
+            new DefaultThreadFactory("kvantum-pool"));
 
         //
         // Watches for file updates and invalidates cache
@@ -242,9 +242,8 @@ public class SimpleServer implements Kvantum {
         if (serverContext.isStandalone()) {
             // Makes the application closable in the terminal
             // Removed post Java 8: Signal.handle( new Signal( "INT" ), new ExitSignalHandler() );
-            final Thread exitThread = new Thread(() -> {
-                ServerImplementation.getImplementation().stopServer();
-            });
+            final Thread exitThread =
+                new Thread(() -> ServerImplementation.getImplementation().stopServer());
             exitThread.setName("Shutdown Handler");
             exitThread.setDaemon(true);
             Runtime.getRuntime().addShutdownHook(exitThread);
@@ -331,7 +330,7 @@ public class SimpleServer implements Kvantum {
         // Initialize access.log logger
         //
         Logger.info("Creating access.log handler...");
-        this.eventBus.registerListeners(new AccessLogStream(logFolder));
+        this.eventBus.registerListeners((this.accessLogStream = new AccessLogStream(logFolder)));
 
         //
         // Register connection denier
@@ -455,9 +454,6 @@ public class SimpleServer implements Kvantum {
             case LogModes.MODE_DEBUG:
                 prefix = "Debug";
                 break;
-            case LogModes.MODE_INFO:
-                prefix = "Info";
-                break;
             case LogModes.MODE_ERROR:
                 prefix = "Error";
                 break;
@@ -484,7 +480,7 @@ public class SimpleServer implements Kvantum {
      * @param message String to be replaced. Cannot be null.
      * @param args    Replacements
      */
-    @Synchronized private void log(@NonNull final String prefix, @NonNull final String message,
+    @Synchronized private void log(final String prefix, final String message,
         final Object... args) {
         String msg = message;
 
@@ -533,6 +529,10 @@ public class SimpleServer implements Kvantum {
     }
 
     @Synchronized @Override public void stopServer() {
+        if (isStopped()) {
+            return;
+        }
+
         Message.SHUTTING_DOWN.log();
 
         //
@@ -569,6 +569,7 @@ public class SimpleServer implements Kvantum {
         //
         try {
             this.logStream.close();
+            this.accessLogStream.close();
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -588,24 +589,31 @@ public class SimpleServer implements Kvantum {
                 if (thread.getName().equalsIgnoreCase("DestroyJavaVM")) {
                     destroyThreadExists = true;
                 }
+                if (!thread.isDaemon()) {
+                    for (final StackTraceElement stackTraceElement : thread.getStackTrace()) {
+                        Logger.info("- {}", stackTraceElement.toString());
+                    }
+                }
             }
 
             if (!destroyThreadExists) {
-                System.exit(0);
+                // System.exit(0);
             }
         } else {
             Logger.info("Not set to shutdown on exit. Waiting for parent application to close.");
         }
+
+        this.stopped = true;
     }
 
-    @Override public final RequestHandler createSimpleRequestHandler(@NonNull final String filter,
-        @NonNull final BiConsumer<AbstractRequest, Response> generator) {
+    @Override public final RequestHandler createSimpleRequestHandler(final String filter,
+        final BiConsumer<AbstractRequest, Response> generator) {
         return SimpleRequestHandler.builder().pattern(filter).generator(generator).build()
             .addToRouter(getRouter());
     }
 
     @Listener @SuppressWarnings("unused")
-    private void listenForConnections(@NonNull final ConnectionEstablishedEvent establishedEvent) {
+    private void listenForConnections(final ConnectionEstablishedEvent establishedEvent) {
         Logger.debug("Checking for external connection {}", establishedEvent.getIp());
         boolean shouldCancel = true;
         final InetAddress address;

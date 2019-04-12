@@ -21,7 +21,10 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Synchronized;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 import xyz.kvantum.server.api.session.ISession;
@@ -70,7 +73,7 @@ import java.util.function.Function;
         return new HashMap<>(sessionStorage);
     }
 
-    @Override @Synchronized public ISession set(@NonNull final String s, @NonNull final Object o) {
+    @Override @Synchronized public ISession set(final String s, final Object o) {
         if (o == null) {
             sessionStorage.remove(s);
         } else {
@@ -83,8 +86,8 @@ import java.util.function.Function;
         return kvantumPojoFactory.of(this);
     }
 
-    @Override @SuppressWarnings("ALL") public <T> T getOrCompute(@NonNull final String key,
-        @NonNull final Function<String, ? extends T> function) {
+    @Override @SuppressWarnings("ALL")
+    public <T> T getOrCompute(final String key, final Function<String, ? extends T> function) {
         final T object;
         if (!this.contains(key)) {
             object = function.apply(key);

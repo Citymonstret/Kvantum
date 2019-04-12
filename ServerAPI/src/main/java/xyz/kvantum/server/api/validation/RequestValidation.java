@@ -21,11 +21,8 @@
  */
 package xyz.kvantum.server.api.validation;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.RequestChild;
-
-import javax.annotation.Nonnull;
 
 @SuppressWarnings({"WeakerAccess", "unused"}) public abstract class RequestValidation<T> {
 
@@ -52,13 +49,13 @@ import javax.annotation.Nonnull;
         private final boolean success;
         private final String message;
 
-        public ValidationResult(@Nonnull @NonNull final RequestChild request) {
+        public ValidationResult(final RequestChild request) {
             this.request = request.getParent();
             this.success = true;
             this.message = null;
         }
 
-        public ValidationResult(@Nonnull @NonNull final RequestChild request,
+        public ValidationResult(final RequestChild request,
             final String message) {
             this.request = request.getParent();
             this.success = false;

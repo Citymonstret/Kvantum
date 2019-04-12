@@ -22,11 +22,8 @@
 package xyz.kvantum.server.implementation;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.util.AsciiString;
-
-import javax.annotation.Nullable;
 
 final class ReturnStatus extends Throwable {
 
@@ -36,15 +33,14 @@ final class ReturnStatus extends Throwable {
 
     @Setter @Getter private WorkerContext applicableContext;
 
-    ReturnStatus(@NonNull final AsciiString status,
-        @Nullable final WorkerContext applicableContext) {
+    ReturnStatus(final AsciiString status, final WorkerContext applicableContext) {
         super(String.format(MESSAGE_FORMAT, status));
         this.status = status;
         this.applicableContext = applicableContext;
     }
 
-    ReturnStatus(@NonNull final AsciiString status, @Nullable final WorkerContext applicableContext,
-        @NonNull final Throwable cause) {
+    ReturnStatus(final AsciiString status, final WorkerContext applicableContext,
+        final Throwable cause) {
         super(String.format(MESSAGE_FORMAT, status), cause);
         this.status = status;
         this.applicableContext = applicableContext;

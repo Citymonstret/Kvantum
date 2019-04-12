@@ -23,7 +23,6 @@ package xyz.kvantum.server.implementation;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.logging.LogWrapper;
@@ -42,10 +41,10 @@ import java.util.function.Function;
 @Setter @Getter @Builder @SuppressWarnings("WeakerAccess") public final class ServerContext {
 
     @Builder.Default private boolean standalone = true;
-    @NonNull private File coreFolder;
-    @NonNull private LogWrapper logWrapper;
-    @NonNull private Router router;
-    @NonNull private Function<ServerContext, SimpleServer> serverSupplier;
+    private File coreFolder;
+    private LogWrapper logWrapper;
+    private Router router;
+    private Function<ServerContext, SimpleServer> serverSupplier;
 
     /**
      * Creates a server instance using this context. Will print any exceptions, but if the server cannot be initialized

@@ -4,7 +4,6 @@ import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.util.Assert;
 
-import javax.annotation.Nonnull;
 import java.io.InputStream;
 
 /**
@@ -32,7 +31,7 @@ import java.io.InputStream;
      * @param maxSize             Size of the data that is to be read. The stream will never
      *                            read beyond this point. Has to be positive.
      */
-    public KvantumInputStream(@Nonnull final KvantumOutputStream kvantumOutputStream,
+    public KvantumInputStream(final KvantumOutputStream kvantumOutputStream,
         final int maxSize) {
         this(kvantumOutputStream, CoreConfig.Buffer.in, maxSize);
     }
@@ -45,7 +44,7 @@ import java.io.InputStream;
      * @param maxSize             Size of the data that is to be read. The stream will never
      *                            read beyond this point. Has to be positive.
      */
-    public KvantumInputStream(@Nonnull final KvantumOutputStream kvantumOutputStream,
+    public KvantumInputStream(final KvantumOutputStream kvantumOutputStream,
         final int bufferSize, final int maxSize) {
         this.kvantumOutputStream = Assert.notNull(kvantumOutputStream, "output stream");
         this.maxSize = Assert.isPositive(maxSize);

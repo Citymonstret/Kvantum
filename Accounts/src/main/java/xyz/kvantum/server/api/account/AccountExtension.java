@@ -21,8 +21,6 @@
  */
 package xyz.kvantum.server.api.account;
 
-import lombok.NonNull;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -40,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
     private IAccount account;
 
-    public static <T extends AccountExtension> T createInstance(@NonNull final Class<T> clazz) {
+    public static <T extends AccountExtension> T createInstance(final Class<T> clazz) {
         Constructor<T> constructor;
         try {
             constructor = getConstructor(clazz);
@@ -64,8 +62,8 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     @SuppressWarnings("ALL")
-    private static <T extends AccountExtension> Constructor<T> getConstructor(
-        @NonNull final Class<T> clazz) throws NoSuchMethodException {
+    private static <T extends AccountExtension> Constructor<T> getConstructor(final Class<T> clazz)
+        throws NoSuchMethodException {
         final Constructor constructor = CONSTRUCTOR_CACHE.get(clazz);
         if (constructor == null) {
             final Constructor<T> foundConstructor = clazz.getConstructor();
@@ -75,7 +73,7 @@ import java.util.concurrent.ConcurrentHashMap;
         return (Constructor<T>) constructor;
     }
 
-    public void attach(@NonNull final IAccount account) {
+    public void attach(final IAccount account) {
         if (this.account != null) {
             throw new IllegalStateException("Cannot attach an extension twice");
         }

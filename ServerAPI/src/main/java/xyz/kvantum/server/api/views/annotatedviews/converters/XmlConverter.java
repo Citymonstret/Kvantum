@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews.converters;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
@@ -29,7 +28,7 @@ import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
 public class XmlConverter extends OutputConverter {
 
-    XmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager) {
+    XmlConverter(final AnnotatedViewManager annotatedViewManager) {
         super("xml", String.class);
         annotatedViewManager.registerConverter(this);
     }

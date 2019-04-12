@@ -30,10 +30,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Optional;
 
-@SuppressWarnings({"unused", "WeakerAccess"}) @UtilityClass public final class QuickStart {
+@SuppressWarnings("unused") @UtilityClass public final class QuickStart {
 
     /**
-     * Utility method that creates a new standalone server instance. It will register any request handlers passed as
+     * Utility method that creates a new simple server instance. It will register any request handlers passed as
      * arguments, and scan for annotations in the case that non request handler objects are passed
      *
      * @param classes Request handlers to register in the router
@@ -44,7 +44,7 @@ import java.util.Optional;
         final ServerContext kvantumContext =
             ServerContext.builder().coreFolder(new File("./kvantum"))
                 .logWrapper(new DefaultLogWrapper()).router(RequestManager.builder().build())
-                .standalone(true).serverSupplier(StandaloneServer::new).build();
+                .standalone(true).serverSupplier(SimpleServer::new).build();
         final Optional<Kvantum> kvantumOptional = kvantumContext.create();
         if (!kvantumOptional.isPresent()) {
             throw new ServerStartFailureException(

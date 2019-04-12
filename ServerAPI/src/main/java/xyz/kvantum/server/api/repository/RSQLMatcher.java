@@ -23,10 +23,7 @@ package xyz.kvantum.server.api.repository;
 
 import com.github.rutledgepaulv.qbuilders.visitors.PredicateVisitor;
 import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import lombok.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 /**
@@ -40,12 +37,11 @@ public final class RSQLMatcher<V> extends Matcher<String, V> {
 
     private Predicate<V> predicate;
 
-    RSQLMatcher(@NonNull final String queryObject) {
+    RSQLMatcher(final String queryObject) {
         super(queryObject);
     }
 
-    @Override
-    protected boolean matches(@Nullable final String queryObject, @NonNull final V value) {
+    @Override protected boolean matches(final String queryObject, final V value) {
         if (this.predicate == null) {
             this.predicate =
                 pipeline.apply(queryObject, getClass(value)).query(new PredicateVisitor<>());
@@ -53,7 +49,7 @@ public final class RSQLMatcher<V> extends Matcher<String, V> {
         return this.predicate.test(value);
     }
 
-    @SuppressWarnings("ALL") private Class<V> getClass(@Nonnull @NonNull final V instance) {
+    @SuppressWarnings("ALL") private Class<V> getClass(final V instance) {
         return (Class<V>) instance.getClass();
     }
 

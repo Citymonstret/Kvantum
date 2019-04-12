@@ -21,11 +21,8 @@
  */
 package xyz.kvantum.server.api.account;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.repository.FieldComparator;
 import xyz.kvantum.server.api.repository.MatcherFactory;
-
-import javax.annotation.Nonnull;
 
 /**
  * Factory class for {@link FieldComparator}
@@ -33,8 +30,7 @@ import javax.annotation.Nonnull;
 public final class AccountMatcherFactory<A extends IAccount, B extends IAccount>
     implements MatcherFactory<A, B> {
 
-    @Nonnull @Override
-    public FieldComparator<? extends A, ? super B> createMatcher(@NonNull final A queryObject) {
+    @Override public FieldComparator<? extends A, ? super B> createMatcher(final A queryObject) {
         return new FieldComparator<>(queryObject, true, true);
     }
 

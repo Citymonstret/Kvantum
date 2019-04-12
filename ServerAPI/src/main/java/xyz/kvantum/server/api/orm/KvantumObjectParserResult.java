@@ -22,7 +22,11 @@
 package xyz.kvantum.server.api.orm;
 
 import com.intellectualsites.commands.parser.ParserResult;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.sf.oval.ConstraintViolation;
 import xyz.kvantum.server.api.orm.annotations.KvantumField;
 import xyz.kvantum.server.api.util.CollectionUtil;

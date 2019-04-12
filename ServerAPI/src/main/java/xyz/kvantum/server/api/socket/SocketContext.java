@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.socket;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.ITempFileManager;
@@ -46,9 +45,9 @@ import static xyz.kvantum.server.api.util.ProtocolType.HTTPS;
 
     @Getter final long socketId = socketIdPoll.getAndIncrement();
 
-    @NonNull final ProtocolType protocolType;
-    @NonNull final SocketAddress socketAddress;
-    @NonNull final Supplier<Boolean> activeCheck;
+    final ProtocolType protocolType;
+    final SocketAddress socketAddress;
+    final Supplier<Boolean> activeCheck;
 
     private ITempFileManager tempFileManager;
 

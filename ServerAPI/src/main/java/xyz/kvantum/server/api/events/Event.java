@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.events;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.core.Kvantum;
 
@@ -36,6 +35,6 @@ import xyz.kvantum.server.api.core.Kvantum;
     /**
      * The name of the event
      */
-    @NonNull @Getter private final String name;
+    @Getter private final String name;
 
 }

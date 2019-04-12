@@ -25,18 +25,16 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 
-import javax.annotation.Nonnull;
-
 @SuppressWarnings("WeakerAccess") @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PojoJsonFactory<Pojo> {
 
     private final KvantumPojoFactory<Pojo> kvantumPojoFactory;
 
-    @Nonnull JSONObject toJson(@Nonnull final KvantumPojo<Pojo> kvantumPojo) {
+    JSONObject toJson(final KvantumPojo<Pojo> kvantumPojo) {
         return new JSONObject(kvantumPojo.getAll());
     }
 
-    @Nonnull @SuppressWarnings("unused") JSONObject toJson(final Pojo pojo) {
+    @SuppressWarnings("unused") JSONObject toJson(final Pojo pojo) {
         return this.toJson(kvantumPojoFactory.of(pojo));
     }
 

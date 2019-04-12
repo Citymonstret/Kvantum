@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation.sqlite;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
@@ -44,7 +43,7 @@ import java.sql.ResultSet;
                 + " session_key VARCHAR (64) NOT NULL )");
     }
 
-    @Override public SessionLoad getSessionLoad(@NonNull final AsciiString sessionID) {
+    @Override public SessionLoad getSessionLoad(final AsciiString sessionID) {
         SessionLoad sessionLoad = null;
         try (final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
             .prepareStatement("SELECT * FROM sessions WHERE id = ?")) {
@@ -78,7 +77,7 @@ import java.sql.ResultSet;
         }
     }
 
-    @Override public void deleteSession(@NonNull final AsciiString session) {
+    @Override public void deleteSession(final AsciiString session) {
         try (final PreparedStatement statement = this.applicationStructure.getDatabaseManager()
             .prepareStatement("DELETE FROM sessions WHERE id = ?")) {
             statement.setString(1, session.toString());

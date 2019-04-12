@@ -21,13 +21,13 @@
  */
 package xyz.kvantum.server.api.util;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.HashBiMap;
-import lombok.NonNull;
-
-import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused") public final class AsciiString
     implements CharSequence, AsciiStringable, Comparable<CharSequence> {
 
-    private static final Map<String, AsciiString> map = HashBiMap.create();
+    private static final Map<String, AsciiString> map = new HashMap<>();
     public static final AsciiString empty = of("");
     private final byte[] value;
     private final String string;
@@ -45,15 +45,15 @@ import java.util.stream.Collectors;
     private final boolean uppercase;
     private final int hashCode;
 
-    private AsciiString(@NonNull final String value) {
-        this(value, value.getBytes(Charsets.US_ASCII));
+    private AsciiString(final String value) {
+        this(value, value.getBytes(StandardCharsets.US_ASCII));
     }
 
-    private AsciiString(@NonNull final byte[] value) {
+    private AsciiString(final byte[] value) {
         this(new String(value, StandardCharsets.US_ASCII), value);
     }
 
-    private AsciiString(@NonNull final String string, @NonNull final byte[] bytes) {
+    private AsciiString(final String string, final byte[] bytes) {
         this.value = bytes;
         this.string = string;
         this.hashCode = this.string.hashCode();
@@ -93,11 +93,11 @@ import java.util.stream.Collectors;
         return of(string, true);
     }
 
-    public static AsciiString of(@Nonnull @NonNull final Number number) {
+    public static AsciiString of(final Number number) {
         return of(number.toString(), false);
     }
 
-    public static AsciiString of(@NonNull final String string, final boolean cache) {
+    public static AsciiString of(final String string, final boolean cache) {
         if (map.containsKey(string)) {
             return map.get(string);
         }
@@ -108,7 +108,7 @@ import java.util.stream.Collectors;
         return asciiString;
     }
 
-    @Nonnull public static AsciiString of(@NonNull final byte[] string) {
+    public static AsciiString of(final byte[] string) {
         return new AsciiString(string);
     }
 
@@ -133,7 +133,7 @@ import java.util.stream.Collectors;
         return this.string.charAt(i);
     }
 
-    @Nonnull @Override public CharSequence subSequence(final int i, final int i1) {
+    @Override public CharSequence subSequence(final int i, final int i1) {
         return this.string.subSequence(i, i1);
     }
 
@@ -160,7 +160,7 @@ import java.util.stream.Collectors;
         return false;
     }
 
-    private boolean compareBytes(@Nonnull @NonNull final byte[] other) {
+    private boolean compareBytes(final byte[] other) {
         if (this.value.length != other.length) {
             return false;
         }
@@ -175,11 +175,11 @@ import java.util.stream.Collectors;
     /**
      * Delegate for {@link String#contains(CharSequence)}
      */
-    public boolean contains(@NonNull final CharSequence other) {
+    public boolean contains(final CharSequence other) {
         return this.string.contains(other);
     }
 
-    @SuppressWarnings("ALL") public boolean containsIgnoreCase(@NonNull final CharSequence other) {
+    @SuppressWarnings("ALL") public boolean containsIgnoreCase(final CharSequence other) {
         final String localString;
         final String otherString;
         if (lowercase) {
@@ -195,15 +195,15 @@ import java.util.stream.Collectors;
         return localString.contains(otherString);
     }
 
-    public boolean equals(@NonNull final CharSequence other) {
+    public boolean equals(final CharSequence other) {
         return this.string.equals(other.toString());
     }
 
-    public boolean equals(@Nonnull @NonNull final AsciiString other) {
+    public boolean equals(final AsciiString other) {
         return Arrays.equals(this.value, other.value);
     }
 
-    @SuppressWarnings("ALL") public boolean equalsIgnoreCase(@NonNull final CharSequence other) {
+    @SuppressWarnings("ALL") public boolean equalsIgnoreCase(final CharSequence other) {
         if (this == other) {
             return true;
         }
@@ -225,7 +225,7 @@ import java.util.stream.Collectors;
     /**
      * Delegate for {@link String#endsWith(String)}
      */
-    @SuppressWarnings("WeakerAccess") public boolean endsWith(@NonNull final String string) {
+    @SuppressWarnings("WeakerAccess") public boolean endsWith(final String string) {
         return this.string.endsWith(string);
     }
 
@@ -332,19 +332,19 @@ import java.util.stream.Collectors;
         return value;
     }
 
-    @Override @SuppressWarnings("ALL") public int compareTo(@NonNull final CharSequence sequence) {
+    @Override @SuppressWarnings("ALL") public int compareTo(final CharSequence sequence) {
         if (this == sequence || this.equals(sequence)) {
             return 0;
         }
         return this.string.compareTo(sequence.toString());
     }
 
-    public List<AsciiString> split(@NonNull final String delimiter) {
+    public List<AsciiString> split(final String delimiter) {
         return Arrays.stream(this.string.split(delimiter))
             .map(string -> AsciiString.of(string, false)).collect(Collectors.toList());
     }
 
-    public boolean startsWith(@Nonnull @NonNull final AsciiString part) {
+    public boolean startsWith(final AsciiString part) {
         final byte[] other = part.value;
         if (this.value.length < other.length) {
             return false;
@@ -357,7 +357,7 @@ import java.util.stream.Collectors;
         return true;
     }
 
-    public boolean startsWith(@NonNull final String part) {
+    public boolean startsWith(final String part) {
         return this.string.startsWith(part);
     }
 

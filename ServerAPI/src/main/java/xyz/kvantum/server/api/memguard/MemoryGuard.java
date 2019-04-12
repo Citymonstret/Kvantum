@@ -25,30 +25,34 @@ import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.AutoCloseable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-public final class MemoryGuard implements Runnable {
+public final class MemoryGuard extends AutoCloseable implements Runnable {
 
     @Getter private static final MemoryGuard instance = new MemoryGuard();
 
     private final Collection<LeakageProne> leakagePrones;
-
     private boolean started = false;
+
+    private final Thread thread;
 
     private MemoryGuard() {
         this.leakagePrones = new ArrayList<>();
+        thread = new Thread(this, "memory-guard");
+    }
+
+    @Override protected void handleClose() {
+        this.thread.stop();
     }
 
     public void start() {
         Assert.equals(started, false);
         started = true;
-        Executors.newScheduledThreadPool(1)
-            .scheduleAtFixedRate(this, CoreConfig.MemoryGuard.runEveryMillis,
-                CoreConfig.MemoryGuard.runEveryMillis, TimeUnit.MILLISECONDS);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public void register(final LeakageProne leakageProne) {
@@ -56,7 +60,13 @@ public final class MemoryGuard implements Runnable {
     }
 
     @Override public void run() {
+        try {
+            Thread.sleep(CoreConfig.MemoryGuard.runEveryMillis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Logger.info("Running memory guard!");
         this.leakagePrones.forEach(LeakageProne::cleanUp);
     }
+
 }

@@ -21,11 +21,8 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
-
-import javax.annotation.Nonnull;
 
 /**
  * {@link Decorator} implementation that specifically decorates {@link Header headers}. <p> Extended by {@link
@@ -35,7 +32,7 @@ import javax.annotation.Nonnull;
  */
 public abstract class HeaderDecorator implements Decorator {
 
-    @Override public final void decorate(@Nonnull @NonNull final Response response) {
+    @Override public final void decorate(final Response response) {
         this.decorate(response.getHeader());
     }
 

@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.api.account;
 
-import lombok.NonNull;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,14 +35,14 @@ public class AccountDecorator {
 
     private final Collection<Consumer<IAccount>> consumers;
 
-    private AccountDecorator(@NonNull final Collection<Consumer<IAccount>> consumers) {
+    private AccountDecorator(final Collection<Consumer<IAccount>> consumers) {
         this.consumers = Collections.unmodifiableCollection(consumers);
     }
 
     /**
      * @see #with(Object...)
      */
-    @Nonnull @SafeVarargs public static AccountDecorator with(
+    @SafeVarargs public static AccountDecorator with(
         final Consumer<IAccount>... consumers) {
         return new AccountDecorator(Arrays.asList(consumers));
     }
@@ -57,8 +54,7 @@ public class AccountDecorator {
      *                or any class extending {@link AccountExtension}
      * @return Created account decorator
      */
-    @Nonnull @SuppressWarnings("ALL") public static AccountDecorator with(
-        @Nonnull final Object... objects) {
+    @SuppressWarnings("ALL") public static AccountDecorator with(final Object... objects) {
         final Collection<Consumer<IAccount>> consumers = new ArrayList<>();
         for (final Object object : objects) {
             if (object instanceof Consumer) {
@@ -79,7 +75,7 @@ public class AccountDecorator {
      *
      * @param account {@link IAccount} to decorate
      */
-    public void decorateAccount(@NonNull final IAccount account) {
+    public void decorateAccount(final IAccount account) {
         this.consumers.forEach(consumer -> consumer.accept(account));
     }
 

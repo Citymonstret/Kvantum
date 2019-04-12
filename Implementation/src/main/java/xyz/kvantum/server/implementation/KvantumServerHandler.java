@@ -27,7 +27,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.ReadTimeoutException;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
@@ -72,9 +71,6 @@ import java.util.function.Supplier;
     static final Timer TIMER_SEND_RESPONSE =
         ServerImplementation.getImplementation().getMetrics().getRegistry()
             .timer(MetricRegistry.name(KvantumServerHandler.class, "sendResponse"));
-    static final Timer TIMER_READ_REQUEST =
-        ServerImplementation.getImplementation().getMetrics().getRegistry()
-            .timer(MetricRegistry.name(KvantumServerHandler.class, "readRequest"));
     static final Timer TIMER_TOTAL_SEND =
         ServerImplementation.getImplementation().getMetrics().getRegistry()
             .timer(MetricRegistry.name(KvantumServerHandler.class, "totalSend"));
@@ -112,7 +108,7 @@ import java.util.function.Supplier;
         Message.CONNECTION_ACCEPTED.log(workerContext.getSocketContext().getAddress());
     }
 
-    void createNew(@NonNull final SocketContext socketContext) {
+    void createNew(final SocketContext socketContext) {
         this.workerContext = new WorkerContext(ServerImplementation.getImplementation(),
             ServerImplementation.getImplementation().getProcedure().getInstance(), this);
         this.workerContext.setSocketContext(socketContext);

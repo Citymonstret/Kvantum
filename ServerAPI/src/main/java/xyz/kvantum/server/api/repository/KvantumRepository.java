@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.api.repository;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -52,7 +49,7 @@ import java.util.Optional;
      *
      * @return All objects without sorting
      */
-    ImmutableList<? extends T> findAll();
+    Collection<? extends T> findAll();
 
     /**
      * Find all objects registered in the repository and sort using a specified sorter
@@ -60,7 +57,7 @@ import java.util.Optional;
      * @param sorter Sorter to sort the objects with
      * @return Sorted collection
      */
-    default ImmutableList<? extends T> findAllSorted(Sorter<T> sorter) {
+    default Collection<? extends T> findAllSorted(Sorter<T> sorter) {
         return sorter.sort(findAll());
     }
 
@@ -70,7 +67,7 @@ import java.util.Optional;
      * @param collection Identifiers
      * @return Immutable collection of matching items
      */
-    ImmutableList<? extends T> findAllById(Collection<ID> collection);
+    Collection<? extends T> findAllById(Collection<ID> collection);
 
     /**
      * Find all objects that correspond to a list of given identifiers and sort using a specified sorter
@@ -79,7 +76,7 @@ import java.util.Optional;
      * @param sorter     Sorter
      * @return Immutable collection of matching items
      */
-    default ImmutableList<? extends T> findAllByIdSorted(Collection<ID> collection,
+    default Collection<? extends T> findAllByIdSorted(Collection<ID> collection,
         Sorter<T> sorter) {
         return sorter.sort(findAllById(collection));
     }
@@ -90,7 +87,7 @@ import java.util.Optional;
      * @param matcher Predicate
      * @return Immutable collection of matching items
      */
-    ImmutableList<? extends T> findAllByQuery(Matcher<?, ? super T> matcher);
+    Collection<? extends T> findAllByQuery(Matcher<?, ? super T> matcher);
 
     /**
      * Find all objects that correspond to a predicate and sort using a specified sorter
@@ -99,7 +96,7 @@ import java.util.Optional;
      * @param sorter  Sorter
      * @return Immutable collection of matching items
      */
-    default <Q> ImmutableList<? extends T> findAllByQuerySorted(Matcher<?, ? super T> matcher,
+    default <Q> Collection<? extends T> findAllByQuerySorted(Matcher<?, ? super T> matcher,
         Sorter<T> sorter) {
         return sorter.sort(findAllByQuery(matcher));
     }
@@ -110,7 +107,7 @@ import java.util.Optional;
      * @param collection Collection of items to save
      * @return A collection of the items that were successfully saved
      */
-    ImmutableCollection<? extends T> save(final Collection<? extends T> collection);
+    Collection<? extends T> save(final Collection<? extends T> collection);
 
     /**
      * Delete all items in a given collection
@@ -142,6 +139,6 @@ import java.util.Optional;
      * @param identifier Identifier
      * @return Items
      */
-    ImmutableCollection<? extends T> findAll(ID identifier);
+    Collection<? extends T> findAll(ID identifier);
 
 }

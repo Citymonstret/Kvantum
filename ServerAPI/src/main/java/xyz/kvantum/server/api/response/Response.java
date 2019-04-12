@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.response;
 
 import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.io.ImmutableKvantumOutputStream;
 import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.io.SimpleOutputStream;
@@ -80,7 +79,7 @@ import java.nio.charset.StandardCharsets;
         return this.setResponse(new SimpleOutputStream(bytes));
     }
 
-    public Response setResponse(@NonNull final KvantumOutputStream stream) {
+    public Response setResponse(final KvantumOutputStream stream) {
         this.responseStream = stream;
         return this;
     }

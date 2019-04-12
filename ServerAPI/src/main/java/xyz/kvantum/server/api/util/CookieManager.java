@@ -21,15 +21,10 @@
  */
 package xyz.kvantum.server.api.util;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.Cookie;
 
-import javax.annotation.Nonnull;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,8 +38,7 @@ import java.util.regex.Pattern;
 
     private static final Pattern PATTERN_COOKIE =
         Pattern.compile("(?<key>[A-Za-z0-9_\\-]*)=" + "(?<value>.*)?");
-    private static final ListMultimap<AsciiString, Cookie> EMPTY_COOKIES =
-        ArrayListMultimap.create(0, 0);
+    private static final ListMultiMap<AsciiString, Cookie> EMPTY_COOKIES = ListMultiMap.empty();
     private static final String CONST_COOKIE = "Cookie";
     private static final String CONST_SLASH_S = "\\s";
     private static final String CONST_EMPTY = "";
@@ -52,18 +46,13 @@ import java.util.regex.Pattern;
     private static final String CONST_KEY = "key";
     private static final String CONST_VALUE = "value";
 
-    private static ListMultimap<AsciiString, Cookie> createNewMap() {
-        return MultimapBuilder.hashKeys().arrayListValues().build();
-    }
-
     /**
      * Get all cookies from a HTTP Request
      *
      * @param request HTTP Request
      * @return an array containing the cookies
      */
-    @Nonnull public static ListMultimap<AsciiString, Cookie> getCookies(
-        @Nonnull @NonNull final AbstractRequest request) {
+    public static ListMultiMap<AsciiString, Cookie> getCookies(final AbstractRequest request) {
         // Assert that the request is still valid
         Assert.isValid(request);
         // Extract the cookie header
@@ -74,7 +63,7 @@ import java.util.regex.Pattern;
             return EMPTY_COOKIES;
         }
         // Create a new multimap
-        final ListMultimap<AsciiString, Cookie> cookies = createNewMap();
+        final ListMultiMap<AsciiString, Cookie> cookies = new ListMultiMap<>();
         // Create a new tokenizer to extract the individual cookies
         final StringTokenizer cookieTokenizer = new StringTokenizer(raw, CONST_SEMI_COLON);
         // Loop through all the tokens

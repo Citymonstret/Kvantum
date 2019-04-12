@@ -23,14 +23,11 @@ package xyz.kvantum.server.api.views.annotatedviews;
 
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.views.ViewReturn;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
@@ -42,8 +39,8 @@ final public class ResponseMethod<T, C>
     private final boolean passResponse;
     private final OutputConverter outputConverter;
 
-    ResponseMethod(@NonNull final Method method, @NonNull final C instance,
-        @Nullable final OutputConverter outputConverter) throws Throwable {
+    ResponseMethod(final Method method, final C instance, final OutputConverter outputConverter)
+        throws Throwable {
         Assert.notNull(method, instance);
 
         this.lambda = LambdaFactory.create(method);
@@ -67,8 +64,7 @@ final public class ResponseMethod<T, C>
         return (Response) output;
     }
 
-    @Override
-    public void accept(final AbstractRequest request, @Nonnull @NonNull final Response response) {
+    @Override public void accept(final AbstractRequest request, final Response response) {
         response.copyFrom(handle(request));
     }
 

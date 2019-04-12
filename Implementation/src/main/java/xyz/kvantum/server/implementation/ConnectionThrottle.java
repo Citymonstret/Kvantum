@@ -22,7 +22,6 @@
 package xyz.kvantum.server.implementation;
 
 import lombok.Data;
-import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.event.Listener;
@@ -69,7 +68,7 @@ final class ConnectionThrottle implements LeakageProne {
         setInstance(new ConnectionThrottle());
     }
 
-    private static void setInstance(@NonNull final ConnectionThrottle instance) {
+    private static void setInstance(final ConnectionThrottle instance) {
         ConnectionThrottle.instance = instance;
     }
 
@@ -116,7 +115,7 @@ final class ConnectionThrottle implements LeakageProne {
         establishedEvent.setCancelled(shouldThrottle(establishedEvent.getIp()));
     }
 
-    private boolean shouldReset(@NonNull final AttemptMapping attemptMapping) {
+    private boolean shouldReset(final AttemptMapping attemptMapping) {
         final long timeDifference =
             System.currentTimeMillis() - attemptMapping.getFirstAttempt().get();
         return getTimeLimit() <= timeDifference;

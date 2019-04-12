@@ -26,8 +26,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import xyz.kvantum.server.api.util.AsciiString;
 
-import javax.annotation.Nonnull;
-
 /**
  * A very simple representation of a cookie
  */
@@ -41,7 +39,7 @@ import javax.annotation.Nonnull;
      *
      * @return name=value
      */
-    @Nonnull public String toString() {
+    public String toString() {
         return name + "=" + value;
     }
 }

@@ -27,7 +27,6 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -38,8 +37,17 @@ import xyz.kvantum.server.api.core.WorkerProcedure;
 import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
-import xyz.kvantum.server.api.response.*;
-import xyz.kvantum.server.api.util.*;
+import xyz.kvantum.server.api.response.FinalizedResponse;
+import xyz.kvantum.server.api.response.Header;
+import xyz.kvantum.server.api.response.HeaderOption;
+import xyz.kvantum.server.api.response.KnownLengthStream;
+import xyz.kvantum.server.api.response.Response;
+import xyz.kvantum.server.api.response.ResponseBody;
+import xyz.kvantum.server.api.util.AsciiString;
+import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.DebugTree;
+import xyz.kvantum.server.api.util.ProtocolType;
+import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.ViewException;
 import xyz.kvantum.server.api.views.requesthandler.HTTPSRedirectHandler;
@@ -51,14 +59,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
-import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
+import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
 @RequiredArgsConstructor final class ResponseTask implements Runnable {
 
     private static final String HIDDEN_IP = "127.0.0.1";
 
-    @NonNull final ChannelHandlerContext context;
-    @NonNull final WorkerContext workerContext;
+    final ChannelHandlerContext context;
+    final WorkerContext workerContext;
 
     @Override public void run() {
         try (Timer.Context ignored = KvantumServerHandler.TIMER_TOTAL_SEND.time()) {
@@ -106,8 +116,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.*;
         }
     }
 
-    void handleThrowable(@NonNull final Throwable throwable,
-        @NonNull final ChannelHandlerContext context) {
+    void handleThrowable(final Throwable throwable, final ChannelHandlerContext context) {
         if (throwable instanceof ReturnStatus) {
             try {
                 final ReturnStatus returnStatus = (ReturnStatus) throwable;

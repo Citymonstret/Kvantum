@@ -21,15 +21,11 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.views.requesthandler.SimpleRequestHandler;
-
-import javax.annotation.Nonnull;
 
 final class AnnotatedView<C> extends SimpleRequestHandler {
 
-    AnnotatedView(@Nonnull @NonNull final ViewDeclaration declaration,
-        @Nonnull @NonNull final ResponseMethod<?, C> method) {
+    AnnotatedView(final ViewDeclaration declaration, final ResponseMethod<?, C> method) {
         super(declaration.getFilter(), method, declaration.isForceHttps(),
             declaration.getHttpMethod());
     }

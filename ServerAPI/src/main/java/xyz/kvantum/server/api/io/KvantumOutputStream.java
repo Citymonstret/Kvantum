@@ -22,11 +22,8 @@
 package xyz.kvantum.server.api.io;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 /**
@@ -74,8 +71,8 @@ import java.util.function.Consumer;
      * @throws IllegalArgumentException If the specified amount is less than or equal to 0.
      * @throws IllegalStateException    If the method is called after the stream has been marked as finished.
      */
-    public void offer(final int amount, @NonNull final Consumer<Integer> acceptedAction,
-        @Nullable final Consumer<Integer> finalizedAction) {
+    public void offer(final int amount, final Consumer<Integer> acceptedAction,
+        final Consumer<Integer> finalizedAction) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be bigger than 0");
         }
@@ -93,7 +90,7 @@ import java.util.function.Consumer;
      * @param bytes Data. Length should not be larger than the offer. Cannot be null.
      * @throws IllegalArgumentException If the length of the pushed data exceeds the last offer.
      */
-    public void push(@Nonnull final byte[] bytes) {
+    public void push(final byte[] bytes) {
         if (bytes.length > this.offer) {
             throw new IllegalArgumentException("Pushed data size cannot be larger than offer");
         }
@@ -109,7 +106,7 @@ import java.util.function.Consumer;
      * @throws IllegalArgumentException If amount is less than or equal to 0.
      * @throws IllegalStateException    If content isn't written to the stream within 500ms of the method call.
      */
-    public int read(@Nonnull byte[] buffer) {
+    public int read(byte[] buffer) {
         if (buffer.length <= 0) {
             throw new IllegalArgumentException("Amount must be bigger than 0");
         }

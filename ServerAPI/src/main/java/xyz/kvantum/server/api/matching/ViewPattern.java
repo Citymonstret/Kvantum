@@ -28,9 +28,13 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,7 +150,7 @@ import java.util.regex.Pattern;
      * @param in String to test for
      * @return A map containing the variables extracted from the string. If there was no match, the map will be null
      */
-    @Nullable public Map<String, String> matches(final String in) {
+    public Map<String, String> matches(final String in) {
         Assert.notNull(in);
 
         String url;
@@ -236,11 +240,11 @@ import java.util.regex.Pattern;
 
     private static final class Dot extends Part {
 
-        @Nonnull @Override public String toString() {
+        @Override public String toString() {
             return ".";
         }
 
-        @Nonnull @Override public String toRegexBlock(final boolean nextOptional) {
+        @Override public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[.§]*";
             } else {
@@ -252,11 +256,11 @@ import java.util.regex.Pattern;
 
     private static final class Split extends Part {
 
-        @Nonnull @Override public String toString() {
+        @Override public String toString() {
             return "/";
         }
 
-        @Nonnull @Override public String toRegexBlock(final boolean nextOptional) {
+        @Override public String toRegexBlock(final boolean nextOptional) {
             if (nextOptional) {
                 return "[\\/]*";
             } else {

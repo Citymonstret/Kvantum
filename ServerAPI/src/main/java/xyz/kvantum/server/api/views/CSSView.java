@@ -21,12 +21,10 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -37,15 +35,14 @@ import java.util.Optional;
  */
 public final class CSSView extends StaticFileView implements CacheApplicable {
 
-    public CSSView(@Nonnull @NonNull final String filter,
-        @Nonnull @NonNull final Map<String, Object> options) {
+    public CSSView(final String filter, final Map<String, Object> options) {
         super(filter, options, "css", Collections.singletonList(FileExtension.CSS));
         super.relatedFolderPath = "/assets/css";
         super.setOption("extension", "css");
         super.defaultFilePattern = "${file}.css";
     }
 
-    @Override public boolean isApplicable(@Nonnull @NonNull final AbstractRequest r) {
+    @Override public boolean isApplicable(final AbstractRequest r) {
         final Optional<Boolean> cacheApplicableBoolean = getOptionSafe("cacheApplicable");
         return cacheApplicableBoolean.orElse(true);
     }

@@ -21,10 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import javax.annotation.Nonnull;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -51,7 +49,7 @@ import java.util.Locale;
      *
      * @return log formatted timestamp
      */
-    @Nonnull public static String getTimeStamp() {
+    public static String getTimeStamp() {
         return getTimeStamp(logFormat, new Date());
     }
 
@@ -61,11 +59,11 @@ import java.util.Locale;
      * @param date Date from which the timestamp is generated
      * @return RFC 7231 formatted timestamp
      */
-    @Nonnull public static String getHTTPTimeStamp(final Date date) {
+    public static String getHTTPTimeStamp(final Date date) {
         return getTimeStamp(httpFormat, date);
     }
 
-    @Nonnull public static String getAccessLogTimeStamp(final long time) {
+    public static String getAccessLogTimeStamp(final long time) {
         return getTimeStamp(accessLogFormat, new Date(time));
     }
 
@@ -74,12 +72,11 @@ import java.util.Locale;
      *
      * @return RFC 7231 formatted timestamp
      */
-    @Nonnull public static String getHTTPTimeStamp() {
+    public static String getHTTPTimeStamp() {
         return getTimeStamp(httpFormat, new Date());
     }
 
-    @Nonnull public static String getTimeStamp(@Nonnull @NonNull final SimpleDateFormat format,
-        @Nonnull @NonNull final Date date) {
+    public static String getTimeStamp(final SimpleDateFormat format, final Date date) {
         return format.format(date);
     }
 }

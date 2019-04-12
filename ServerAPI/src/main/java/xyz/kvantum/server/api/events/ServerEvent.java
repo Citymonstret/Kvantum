@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.events;
 
 import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.core.Kvantum;
 
 /**
@@ -32,7 +31,7 @@ import xyz.kvantum.server.api.core.Kvantum;
 
     @Getter private final Kvantum serverInstance;
 
-    ServerEvent(@NonNull final Kvantum instance, final String name) {
+    ServerEvent(final Kvantum instance, final String name) {
         super(name);
         this.serverInstance = instance;
     }

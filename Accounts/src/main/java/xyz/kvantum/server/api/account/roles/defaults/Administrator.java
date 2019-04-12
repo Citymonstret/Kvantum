@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.account.roles.defaults;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.account.roles.SimpleAccountRole;
 
 /**
@@ -37,16 +36,16 @@ import xyz.kvantum.server.api.account.roles.SimpleAccountRole;
         super(ADMIN_IDENTIFIER);
     }
 
-    @Override public boolean hasPermission(@NonNull final String permissionKey) {
+    @Override public boolean hasPermission(final String permissionKey) {
         return true;
     }
 
-    @Override public boolean addPermission(@NonNull final String permissionKey) {
+    @Override public boolean addPermission(final String permissionKey) {
         // Cannot add administrator permission
         return false;
     }
 
-    @Override public boolean removePermission(@NonNull final String permissionKey) {
+    @Override public boolean removePermission(final String permissionKey) {
         // Cannot remove administrator permission
         return false;
     }

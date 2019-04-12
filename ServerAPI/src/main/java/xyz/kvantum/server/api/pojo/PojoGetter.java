@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.pojo;
 
 import com.hervian.lambda.Lambda;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.logging.Logger;
 
@@ -32,7 +31,7 @@ import xyz.kvantum.server.api.logging.Logger;
     private final Lambda lambda;
     private final Class<?> returnType;
 
-    public Object get(@NonNull final Pojo instance) {
+    public Object get(final Pojo instance) {
         try {
             if (returnType.isPrimitive()) {
                 if (returnType.equals(int.class)) {

@@ -21,17 +21,16 @@
  */
 package xyz.kvantum.server.api.pojo;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
+import xyz.kvantum.server.api.util.MapBuilder;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,10 +41,10 @@ import java.util.Map;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) @SuppressWarnings({"unused", "WeakerAccess"})
 public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
 
-    @NonNull private final KvantumPojoFactory<Pojo> factory;
-    @NonNull private final Pojo instance;
-    @NonNull private final Map<String, PojoGetter<Pojo>> fieldValues;
-    @NonNull private final Map<String, PojoSetter<Pojo>> fieldSetters;
+    private final KvantumPojoFactory<Pojo> factory;
+    private final Pojo instance;
+    private final Map<String, PojoGetter<Pojo>> fieldValues;
+    private final Map<String, PojoSetter<Pojo>> fieldSetters;
 
     @Override public boolean contains(final String variable) {
         return this.containsGetter(variable);
@@ -58,7 +57,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @return Object
      * @see #containsGetter(String) To check if a key is stored
      */
-    @SneakyThrows(NoSuchMethodException.class) public Object get(@NonNull final String key) {
+    @SneakyThrows(NoSuchMethodException.class) public Object get(final String key) {
         if (!this.containsGetter(key)) {
             throw new NoSuchMethodException("No such getter: " + key);
         }
@@ -70,7 +69,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return Collection of field names
      */
-    @Nonnull public Collection<String> getSetterNames() {
+    public Collection<String> getSetterNames() {
         return this.fieldSetters.keySet();
     }
 
@@ -79,7 +78,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return Collection of field names
      */
-    @Nonnull public Collection<String> getGetterNames() {
+    public Collection<String> getGetterNames() {
         return this.fieldValues.keySet();
     }
 
@@ -89,7 +88,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @param key Key to check for
      * @return True if the key exists
      */
-    public boolean containsGetter(@NonNull final String key) {
+    public boolean containsGetter(final String key) {
         return fieldValues.containsKey(key);
     }
 
@@ -99,7 +98,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @param key Key to check for
      * @return True if the key exists
      */
-    public boolean containsSetter(@NonNull final String key) {
+    public boolean containsSetter(final String key) {
         return fieldSetters.containsKey(key);
     }
 
@@ -109,11 +108,11 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @return Immutable map with all values
      */
     public Map<String, Object> getAll() {
-        final ImmutableMap.Builder<String, Object> mapBuilder = ImmutableMap.builder();
+        final MapBuilder<String, Object> mapBuilder = MapBuilder.newUnmodifableMap(HashMap::new);
         for (final Map.Entry<String, PojoGetter<Pojo>> getterEntry : this.fieldValues.entrySet()) {
             mapBuilder.put(getterEntry.getKey(), getterEntry.getValue().get(instance));
         }
-        return mapBuilder.build();
+        return mapBuilder.get();
     }
 
     /**
@@ -121,7 +120,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      *
      * @return JSON object
      */
-    @Nonnull public JSONObject toJson() {
+    public JSONObject toJson() {
         return this.factory.getJsonFactory().toJson(this);
     }
 
@@ -132,7 +131,7 @@ public final class KvantumPojo<Pojo> implements VariableProvider, JSONAware {
      * @param value Object value
      */
     @SneakyThrows({IllegalArgumentException.class, NoSuchMethodException.class}) public void set(
-        @NonNull final String field, @NonNull final Object value) {
+        final String field, final Object value) {
         if (this.fieldSetters.containsKey(field)) {
             final PojoSetter<Pojo> setter = this.fieldSetters.get(field);
             if (!value.getClass().isAssignableFrom(setter.getParameterType())) {

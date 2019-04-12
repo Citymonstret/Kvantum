@@ -23,7 +23,6 @@ package xyz.kvantum.server.implementation;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import lombok.NonNull;
 import xyz.kvantum.files.CachedFile;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.cache.CachedResponse;
@@ -56,38 +55,35 @@ import java.util.concurrent.TimeUnit;
             .maximumSize(CoreConfig.Cache.cachedBodiesMaxItems).build();
     }
 
-    @Override public String getCachedInclude(@NonNull final String group) {
+    @Override public String getCachedInclude(final String group) {
         return this.cachedIncludes.getIfPresent(group);
     }
 
-    @Override public Optional<CachedFile> getCachedFile(@NonNull final Path file) {
+    @Override public Optional<CachedFile> getCachedFile(final Path file) {
         return Optional.ofNullable(cachedFiles.getIfPresent(file.toString()));
     }
 
-    @Override
-    public void setCachedFile(@NonNull final Path file, @NonNull final CachedFile content) {
+    @Override public void setCachedFile(final Path file, final CachedFile content) {
         cachedFiles.put(file.toString(), content);
     }
 
-    @Override
-    public void setCachedInclude(@NonNull final String group, @NonNull final String document) {
+    @Override public void setCachedInclude(final String group, final String document) {
         this.cachedIncludes.put(group, document);
     }
 
-    @Override public void removeFileCache(@NonNull final Path path) {
+    @Override public void removeFileCache(final Path path) {
         this.cachedFiles.invalidate(path.toString());
     }
 
-    @Override public boolean hasCache(@NonNull final RequestHandler view) {
+    @Override public boolean hasCache(final RequestHandler view) {
         return this.cachedBodies.getIfPresent(view.toString()) != null;
     }
 
-    @Override public void setCache(@NonNull final RequestHandler view,
-        @NonNull final ResponseBody responseBody) {
+    @Override public void setCache(final RequestHandler view, final ResponseBody responseBody) {
         this.cachedBodies.put(view.toString(), new CachedResponse(responseBody));
     }
 
-    @Override public CachedResponse getCache(@NonNull final RequestHandler view) {
+    @Override public CachedResponse getCache(final RequestHandler view) {
         return this.cachedBodies.getIfPresent(view.toString());
     }
 

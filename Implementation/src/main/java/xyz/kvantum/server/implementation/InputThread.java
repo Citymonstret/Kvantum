@@ -29,7 +29,11 @@ import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.InternalJlineManager;
 import xyz.kvantum.server.api.util.AutoCloseable;
-import xyz.kvantum.server.implementation.commands.*;
+import xyz.kvantum.server.implementation.commands.Dump;
+import xyz.kvantum.server.implementation.commands.Generate;
+import xyz.kvantum.server.implementation.commands.Help;
+import xyz.kvantum.server.implementation.commands.Show;
+import xyz.kvantum.server.implementation.commands.Stop;
 
 /**
  * The thread which handles command inputs, when ran as a standalone applications.
@@ -43,6 +47,8 @@ public final class InputThread extends Thread {
     private volatile boolean shouldStop = false;
 
     InputThread() {
+        this.setDaemon(true);
+
         ServerImplementation.getImplementation().getCommandManager().createCommand(new Stop());
         ServerImplementation.getImplementation().getCommandManager().createCommand(new Dump());
         ServerImplementation.getImplementation().getCommandManager().createCommand(new Show());

@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -31,7 +30,6 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.views.Decorator;
 import xyz.kvantum.server.api.views.View;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,10 +48,9 @@ import java.util.function.Supplier;
     private Map<String, Map<String, Object>> views = new HashMap<>();
     private Map<String, Class<? extends View>> viewBindings;
 
-    ViewLoader(@NonNull final ConfigurationFile viewConfiguration,
-        @NonNull final Supplier<FileSystem> fileSystemSupplier,
-        @NonNull final Collection<Decorator> decorators,
-        @NonNull final Map<String, Class<? extends View>> viewBindings) {
+    ViewLoader(final ConfigurationFile viewConfiguration,
+        final Supplier<FileSystem> fileSystemSupplier, final Collection<Decorator> decorators,
+        final Map<String, Class<? extends View>> viewBindings) {
         this.fileSystemSupplier = fileSystemSupplier;
         this.viewBindings = viewBindings;
         this.decorators = decorators;
@@ -61,10 +58,9 @@ import java.util.function.Supplier;
         this.views.entrySet().forEach(this::loadView);
     }
 
-    ViewLoader(@NonNull final Supplier<FileSystem> fileSystemSupplier,
-        @NonNull final Collection<Decorator> decorators,
-        @NonNull final Map<String, Map<String, Object>> views,
-        @NonNull final Map<String, Class<? extends View>> viewBindings) {
+    ViewLoader(final Supplier<FileSystem> fileSystemSupplier,
+        final Collection<Decorator> decorators, final Map<String, Map<String, Object>> views,
+        final Map<String, Class<? extends View>> viewBindings) {
         this.fileSystemSupplier = fileSystemSupplier;
         this.decorators = decorators;
         this.viewBindings = viewBindings;
@@ -72,7 +68,7 @@ import java.util.function.Supplier;
         this.views.entrySet().forEach(this::loadView);
     }
 
-    private void visitMembers(@Nullable final Map<String, Object> views) {
+    private void visitMembers(final Map<String, Object> views) {
         if (views == null || views.isEmpty()) {
             return;
         }
@@ -112,7 +108,7 @@ import java.util.function.Supplier;
         }
     }
 
-    private void loadView(@Nullable final Map.Entry<String, Map<String, Object>> viewEntry) {
+    private void loadView(final Map.Entry<String, Map<String, Object>> viewEntry) {
         if (viewEntry == null || viewEntry.getValue() == null) {
             return;
         }
@@ -155,11 +151,11 @@ import java.util.function.Supplier;
         }
     }
 
-    private boolean validateView(@NonNull final Map<String, Object> viewBody) {
+    private boolean validateView(final Map<String, Object> viewBody) {
         return viewBody.containsKey("type") && viewBody.containsKey("filter");
     }
 
-    private void addViews(@Nullable final ConfigurationFile file) {
+    private void addViews(final ConfigurationFile file) {
         if (file == null || file.getAll().isEmpty()) {
             return;
         }

@@ -30,8 +30,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -66,12 +64,12 @@ import java.util.Objects;
         return new JSONObject();
     }
 
-    @SuppressWarnings("unused") @Nonnull
+    @SuppressWarnings("unused")
     public <T> JSONObject toJSONObject(final Map<String, T> map) {
         return new JSONObject(MapUtil.convertMap(map, Object::toString));
     }
 
-    public JSONArray toJsonArray(@Nonnull final Collection<?> collection) {
+    public JSONArray toJsonArray(final Collection<?> collection) {
         final JSONArray array = new JSONArray();
         for (final Object o : collection) {
             if (o instanceof KvantumPojo) {
@@ -90,7 +88,7 @@ import java.util.Objects;
      * @param in String
      * @return Parsed primitive
      */
-    @Nonnull public static JsonPrimitive stringToPrimitive(@Nullable final String in) {
+    public static JsonPrimitive stringToPrimitive(final String in) {
         return new JsonPrimitive(Objects.requireNonNullElse(in, ""));
     }
 

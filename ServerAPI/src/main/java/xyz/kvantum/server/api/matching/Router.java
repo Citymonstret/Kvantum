@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.matching;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.core.Kvantum;
 import xyz.kvantum.server.api.exceptions.NotImplementedException;
@@ -30,8 +29,6 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -57,7 +54,7 @@ import java.util.Collections;
      * @param handler RequestHandler that is to be registered
      * @return The added {@link RequestHandler}
      */
-    @Nullable public abstract <T extends RequestHandler> T add(T handler);
+    public abstract <T extends RequestHandler> T add(T handler);
 
     /**
      * Add a collection containing {@link RequestHandler RequestHandlers} to the router
@@ -65,7 +62,7 @@ import java.util.Collections;
      * @param handlers RequestHandlers that are to be registered
      */
     public final Collection<? extends RequestHandler> addAll(
-        @Nonnull @NonNull final Collection<? extends RequestHandler> handlers) {
+        final Collection<? extends RequestHandler> handlers) {
         handlers.forEach(this::add);
         return handlers;
     }
@@ -76,7 +73,7 @@ import java.util.Collections;
      *
      * @param instance Instance to be scanned
      */
-    public final <T> Collection<? extends RequestHandler> scanAndAdd(@NonNull final T instance) {
+    public final <T> Collection<? extends RequestHandler> scanAndAdd(final T instance) {
         return this.addAll(this.scan(instance));
     }
 
@@ -87,7 +84,7 @@ import java.util.Collections;
      * @param instance Instance to be scanned
      * @return Constructed views
      */
-    public final <T> Collection<? extends RequestHandler> scan(@NonNull final T instance) {
+    public final <T> Collection<? extends RequestHandler> scan(final T instance) {
         try {
             return this.annotatedViewManager.generate(instance);
         } catch (final Exception e) {
@@ -115,7 +112,7 @@ import java.util.Collections;
      *
      * @param server Server instance
      */
-    @SneakyThrows public void dump(@NonNull final Kvantum server) {
+    @SneakyThrows public void dump(final Kvantum server) {
         throw new NotImplementedException(
             "Dump has not been overridden by the Router implementation");
     }

@@ -21,11 +21,16 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.util.MapBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Can be used to detect file structures that could be served by the standard library of {@link View views}
@@ -38,8 +43,8 @@ import java.util.*;
     private final Set<Path> paths = new HashSet<>();
     private final Map<String, Map<String, Object>> viewEntries = new HashMap<>();
 
-    public ViewDetector(@NonNull final String basePath, @NonNull final Path basePathObject,
-        @NonNull final Collection<String> ignore) {
+    public ViewDetector(final String basePath, final Path basePathObject,
+        final Collection<String> ignore) {
         this.basePath = basePath;
         this.ignore = ignore;
         this.basePathObject = basePathObject;

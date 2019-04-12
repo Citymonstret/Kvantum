@@ -22,11 +22,9 @@
 package xyz.kvantum.server.api.views.annotatedviews;
 
 import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.CollectionUtil;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -35,8 +33,7 @@ public abstract class OutputConverter {
     @Getter private final String key;
     @Getter private final Collection<Class> classes;
 
-    protected OutputConverter(@Nonnull @NonNull final String key,
-        @Nonnull @NonNull final Class<?>... classes) {
+    protected OutputConverter(final String key, final Class<?>... classes) {
         this.key = key;
         this.classes = CollectionUtil.arrayToCollection(HashSet::new, classes);
     }

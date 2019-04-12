@@ -42,7 +42,6 @@ import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AutoCloseable;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -362,7 +361,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
             }
         }
 
-        @Override public int read(@Nonnull byte[] buffer) {
+        @Override public int read(byte[] buffer) {
             synchronized (this.lock) {
                 if (this.isFinished()) {
                     return -1;

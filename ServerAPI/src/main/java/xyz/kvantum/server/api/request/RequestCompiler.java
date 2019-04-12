@@ -24,7 +24,6 @@ package xyz.kvantum.server.api.request;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -61,7 +60,7 @@ import java.util.regex.Pattern;
         }
     }
 
-    public static Optional<HeaderPair> compileHeader(@NonNull final String line) {
+    public static Optional<HeaderPair> compileHeader(final String line) {
         final Matcher matcher = PATTERN_HEADER.matcher(line);
         if (!matcher.matches()) {
             return Optional.empty();
@@ -71,8 +70,8 @@ import java.util.regex.Pattern;
         return Optional.of(new HeaderPair(key, value));
     }
 
-    public static void compileQuery(@NonNull final AbstractRequest request,
-        @NonNull final String line) throws IllegalArgumentException, RequestException {
+    public static void compileQuery(final AbstractRequest request, final String line)
+        throws IllegalArgumentException, RequestException {
         final Timer.Context timer = TIMER_COMPILE_QUERY.time();
         final Matcher matcher = PATTERN_QUERY.matcher(line);
         if (!matcher.matches()) {
@@ -97,8 +96,8 @@ import java.util.regex.Pattern;
 
     @Getter @RequiredArgsConstructor public static final class HeaderPair {
 
-        @NonNull private final AsciiString key;
-        @NonNull private final AsciiString value;
+        private final AsciiString key;
+        private final AsciiString value;
     }
 
 }

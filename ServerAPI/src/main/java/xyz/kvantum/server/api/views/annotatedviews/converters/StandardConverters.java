@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews.converters;
 
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
 
@@ -31,8 +30,7 @@ import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
     public static final String JSON = "json";
     public static final String XML = "xml";
 
-    public static void registerStandardConverters(
-        @NonNull final AnnotatedViewManager staticViewManager) {
+    public static void registerStandardConverters(final AnnotatedViewManager staticViewManager) {
         new HtmlConverter(staticViewManager);
         new JsonConverter(staticViewManager);
         new XmlConverter(staticViewManager);

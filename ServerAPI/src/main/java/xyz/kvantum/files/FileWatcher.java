@@ -22,7 +22,11 @@
 package xyz.kvantum.files;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -68,8 +72,8 @@ import java.util.function.BiConsumer;
      * @throws IllegalArgumentException If the specified path isn't a folder
      * @throws IOException              IOException thrown when registering the path.
      */
-    public FileWatchingContext registerPath(final Path path,
-        final BiConsumer<Path, WatchEvent.Kind<?>> reaction)
+    public FileWatchingContext registerPath(final xyz.kvantum.files.Path path,
+        final BiConsumer<xyz.kvantum.files.Path, WatchEvent.Kind<?>> reaction)
         throws IllegalArgumentException, IOException {
         if (path == null || !path.isFolder()) {
             throw new IllegalArgumentException("Supplied path is not a directory");
@@ -97,7 +101,8 @@ import java.util.function.BiConsumer;
                     final WatchEvent<java.nio.file.Path> pathEvent = cast(event);
                     final java.nio.file.Path javaPath = pathEvent.context();
                     try {
-                        final Path path = context.path.getPath(javaPath.getFileName().toString());
+                        final xyz.kvantum.files.Path path =
+                            context.path.getPath(javaPath.getFileName().toString());
                         if (path == null) {
                             new RuntimeException(
                                 "Path could not be resolved: '" + javaPath.getFileName().toString()
@@ -126,12 +131,13 @@ import java.util.function.BiConsumer;
 
     public static final class FileWatchingContext {
 
-        private final Path path;
+        private final xyz.kvantum.files.Path path;
         private final WatchService watchService;
-        private BiConsumer<Path, WatchEvent.Kind<?>> reaction;
+        private BiConsumer<xyz.kvantum.files.Path, WatchEvent.Kind<?>> reaction;
 
-        private FileWatchingContext(final Path path, final WatchService service,
-            final BiConsumer<Path, WatchEvent.Kind<?>> reaction) throws IllegalArgumentException {
+        private FileWatchingContext(final xyz.kvantum.files.Path path, final WatchService service,
+            final BiConsumer<xyz.kvantum.files.Path, WatchEvent.Kind<?>> reaction)
+            throws IllegalArgumentException {
             if (path == null) {
                 throw new IllegalArgumentException("Supplied path was null");
             }
@@ -161,7 +167,8 @@ import java.util.function.BiConsumer;
                 .equals(this.path);
         }
 
-        public void setReaction(final BiConsumer<Path, WatchEvent.Kind<?>> reaction) {
+        public void setReaction(
+            final BiConsumer<xyz.kvantum.files.Path, WatchEvent.Kind<?>> reaction) {
             if (reaction == null) {
                 this.reaction = (file, kind) -> {
                 };

@@ -21,10 +21,15 @@
  */
 package xyz.kvantum.server.api.request;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.ToString;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.CoreConfig.Cache;
@@ -36,15 +41,30 @@ import xyz.kvantum.server.api.request.post.RequestEntity;
 import xyz.kvantum.server.api.response.ResponseCookie;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.socket.SocketContext;
-import xyz.kvantum.server.api.util.*;
+import xyz.kvantum.server.api.util.AsciiString;
+import xyz.kvantum.server.api.util.Assert;
+import xyz.kvantum.server.api.util.ITempFileManager;
+import xyz.kvantum.server.api.util.ListMultiMap;
+import xyz.kvantum.server.api.util.MapUtil;
+import xyz.kvantum.server.api.util.ProtocolType;
+import xyz.kvantum.server.api.util.ProviderFactory;
+import xyz.kvantum.server.api.util.Validatable;
+import xyz.kvantum.server.api.util.VariableHolder;
+import xyz.kvantum.server.api.util.VariableProvider;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,8 +87,8 @@ public abstract class AbstractRequest
     @Setter(AccessLevel.PROTECTED) @Getter private ProtocolType protocolType;
     @Getter(AccessLevel.PROTECTED) private Map<String, Object> meta = new HashMap<>();
     @Getter private Map<AsciiString, AsciiString> headers = new HashMap<>();
-    @Setter(AccessLevel.PROTECTED) @Getter private ListMultimap<AsciiString, Cookie> cookies =
-        ArrayListMultimap.create();
+    @Setter(AccessLevel.PROTECTED) @Getter private ListMultiMap<AsciiString, Cookie> cookies =
+        new ListMultiMap<>();
     @Setter(AccessLevel.PROTECTED) @Getter private Query query;
     @Setter private RequestEntity postRequest;
     @Setter(AccessLevel.PROTECTED) @Getter private SocketContext socket;
@@ -116,9 +136,9 @@ public abstract class AbstractRequest
         this.addMeta(ALTERNATE_OUTCOME, Assert.notNull(identifier));
     }
 
-    public void addModel(@NonNull final String name, @NonNull final VariableProvider provider) {
+    public void addModel(final String name, final VariableProvider provider) {
         final ProviderFactory<VariableProvider> providerFactory = new ProviderFactory<>() {
-            @Nonnull @Override public Optional<VariableProvider> get(AbstractRequest r) {
+            @Override public Optional<VariableProvider> get(AbstractRequest r) {
                 return Optional.of(provider);
             }
 
@@ -148,7 +168,7 @@ public abstract class AbstractRequest
      * @param name Header Name
      * @return The header value, if the header exists. Otherwise an empty string will be returned.
      */
-    public AsciiString getHeader(@NonNull final AsciiString name) {
+    public AsciiString getHeader(final AsciiString name) {
         if (this.headers.containsKey(name.toLowerCase())) {
             return this.headers.get(name.toLowerCase());
         }
@@ -156,7 +176,7 @@ public abstract class AbstractRequest
         return AsciiString.empty;
     }
 
-    public AsciiString getHeader(@NonNull final String name) {
+    public AsciiString getHeader(final String name) {
         return getHeader(AsciiString.of(name));
     }
 
@@ -187,7 +207,7 @@ public abstract class AbstractRequest
         meta.put(name, var);
     }
 
-    public void internalRedirect(@NonNull final String url) {
+    public void internalRedirect(final String url) {
         this.addMeta(INTERNAL_REDIRECT, newRequest(url));
         Message.INTERNAL_REDIRECT.log(url);
     }
@@ -199,7 +219,7 @@ public abstract class AbstractRequest
      * @return Meta value if exists, else null
      * @see #addMeta(String, Object) To set a meta value
      */
-    @Nullable public Object getMeta(@NonNull final String name) {
+    public Object getMeta(final String name) {
         if (!meta.containsKey(name)) {
             return null; // Nullable
         }
@@ -258,7 +278,7 @@ public abstract class AbstractRequest
             Logger.info("Cleaned up {} stored queries!", toRemove.size());
         }
 
-        public Query getQuery(@NonNull final QueryParameters parameters) {
+        public Query getQuery(final QueryParameters parameters) {
             final Query query;
             if (this.cachedQueries.containsKey(parameters)) {
                 if (CoreConfig.debug) {
@@ -278,9 +298,9 @@ public abstract class AbstractRequest
     @EqualsAndHashCode @RequiredArgsConstructor @Getter @ToString
     public static final class QueryParameters {
 
-        @NonNull final HttpMethod method;
-        @NonNull final ProtocolType protocolType;
-        @NonNull final String resource;
+        final HttpMethod method;
+        final ProtocolType protocolType;
+        final String resource;
 
     }
 
@@ -298,7 +318,7 @@ public abstract class AbstractRequest
         /**
          * The query constructor
          */
-        private Query(@Nonnull @NonNull final QueryParameters parameters) {
+        private Query(final QueryParameters parameters) {
             String resourceName = parameters.resource;
 
             final String illegalBeginning = parameters.protocolType.getString();
@@ -345,7 +365,7 @@ public abstract class AbstractRequest
          *
          * @return compiled string
          */
-        @Nonnull String buildLog() {
+        String buildLog() {
             return "Query: [Method: " + method.toString() + " | Resource: " + resource + "]";
         }
 
@@ -365,7 +385,7 @@ public abstract class AbstractRequest
         @Getter private final AsciiString username;
         @Getter private final AsciiString password;
 
-        Authorization(@Nonnull @NonNull final AsciiString input) {
+        Authorization(final AsciiString input) {
             final List<AsciiString> parts = input.split("\\s");
             this.mechanism = parts.get(1);
             final val auth =

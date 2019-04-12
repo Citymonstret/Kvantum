@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.config;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -60,7 +59,7 @@ import java.util.Map;
      * @param <T> Value type (wont cast - make sure this is correct)
      * @return value|null
      */
-    @Nullable <T> T get(String key);
+    <T> T get(String key);
 
     /**
      * Get all stored entries

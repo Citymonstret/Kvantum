@@ -22,14 +22,17 @@
 package xyz.kvantum.server.api.util;
 
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Utility class for dealing with common SQLite operations
@@ -40,7 +43,8 @@ public class SQLiteManager extends AutoCloseable {
     private final Connection connection;
     private final String name;
 
-    public SQLiteManager(@NonNull final String name) throws IOException, SQLException, ClassNotFoundException {
+    public SQLiteManager(final String name)
+        throws IOException, SQLException, ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
         this.name = name + ".db";
         final File file =
@@ -53,17 +57,17 @@ public class SQLiteManager extends AutoCloseable {
         this.connection = DriverManager.getConnection("jdbc:sqlite:" + file.getAbsolutePath());
     }
 
-    public void executeUpdate(@NonNull final String sql) throws SQLException {
+    public void executeUpdate(final String sql) throws SQLException {
         try (final Statement statement = this.connection.createStatement()) {
             statement.executeUpdate(sql);
         }
     }
 
-    public PreparedStatement prepareStatement(@NonNull final String statement) throws SQLException {
+    public PreparedStatement prepareStatement(final String statement) throws SQLException {
         return connection.prepareStatement(statement);
     }
 
-    @Nullable public Blob createBlob() {
+    public Blob createBlob() {
         try {
             return connection.createBlob();
         } catch (SQLException e) {

@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.account.verification;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.account.IAccount;
 import xyz.kvantum.server.api.verification.PredicatedRule;
@@ -68,10 +67,10 @@ import java.util.regex.Pattern;
             //
             return email.map(s -> PATTERN_EMAIL.matcher(s).matches()).orElse(true);
         });
-    @NonNull @Setter @Getter private static AccountVerifier globalAccountVerifier =
+    @Setter @Getter private static AccountVerifier globalAccountVerifier =
         new AccountVerifier();
 
-    @Setter @Getter @NonNull private Verifier<IAccount> internalVerifier;
+    @Setter @Getter private Verifier<IAccount> internalVerifier;
 
     public AccountVerifier() {
         final Verifier.VerifierBuilder<IAccount> builder = Verifier.builder();
@@ -87,7 +86,7 @@ import java.util.regex.Pattern;
      * @param account Account to verify
      * @return True if the account passes all checks, false if not
      */
-    public final boolean isValid(@NonNull final IAccount account) {
+    public final boolean isValid(final IAccount account) {
         return this.verifyAccount(account).isEmpty();
     }
 
@@ -97,7 +96,7 @@ import java.util.regex.Pattern;
      * @param account Account to verify
      * @return Collection containing all violations, An empty collection if the account is valid
      */
-    public final Collection<Rule<IAccount>> verifyAccount(@NonNull final IAccount account) {
+    public final Collection<Rule<IAccount>> verifyAccount(final IAccount account) {
         return this.internalVerifier.verify(account);
     }
 

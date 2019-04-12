@@ -24,12 +24,10 @@ package xyz.kvantum.server.implementation.mongo;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import lombok.Getter;
-import lombok.NonNull;
 import org.mindrot.jbcrypt.BCrypt;
 import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.AccountDecorator;
@@ -45,6 +43,7 @@ import xyz.kvantum.server.implementation.commands.AccountCommand;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -104,7 +103,7 @@ public final class MongoAccountManager implements IAccountManager {
             new BasicDBObject("$inc", new BasicDBObject("seq", 1))).get("seq");
     }
 
-    @Override public void addAccountDecorator(@NonNull final AccountDecorator decorator) {
+    @Override public void addAccountDecorator(final AccountDecorator decorator) {
         this.decorators.add(decorator);
     }
 
@@ -189,21 +188,19 @@ public final class MongoAccountManager implements IAccountManager {
         // Done automatically
     }
 
-    @Override public ImmutableList<? extends IAccount> findAll() {
+    @Override public List<? extends IAccount> findAll() {
         final List<? extends IAccount> list =
             applicationStructure.getMorphiaDatastore().find(Account.class).asList();
-        final ImmutableList.Builder<IAccount> builder =
-            ImmutableList.builderWithExpectedSize(list.size());
-        return builder.addAll(list).build();
+        return Collections.unmodifiableList(list);
     }
 
-    @Override public void deleteAccount(@NonNull final IAccount account) {
+    @Override public void deleteAccount(final IAccount account) {
         this.applicationStructure.getMorphiaDatastore().delete(account);
         this.cachedAccounts.invalidate(account.getId());
         this.cachedAccountIds.invalidate(account.getUsername());
     }
 
-    private void setCachedAccount(@NonNull final IAccount account) {
+    private void setCachedAccount(final IAccount account) {
         this.cachedAccounts.put(account.getId(), account);
         this.cachedAccountIds.put(account.getUsername(), account.getId());
     }
@@ -212,7 +209,7 @@ public final class MongoAccountManager implements IAccountManager {
         return Optional.ofNullable(cachedAccounts.getIfPresent(id));
     }
 
-    private Optional<Integer> getCachedId(@NonNull final String username) {
+    private Optional<Integer> getCachedId(final String username) {
         return Optional.ofNullable(cachedAccountIds.getIfPresent(username));
     }
 

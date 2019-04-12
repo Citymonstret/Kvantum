@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.views.rest;
 
-import lombok.NonNull;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -30,8 +29,6 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 import xyz.kvantum.server.api.views.RequestHandler;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,11 +46,11 @@ import java.util.List;
         this.responseHandlers = new ArrayList<>();
     }
 
-    public void registerHandler(@Nonnull @NonNull final RestResponse restResponse) {
+    public void registerHandler(final RestResponse restResponse) {
         this.responseHandlers.add(restResponse);
     }
 
-    @Override public boolean matches(@Nonnull @NonNull final AbstractRequest request) {
+    @Override public boolean matches(final AbstractRequest request) {
         Assert.isValid(request);
 
         for (final RestResponse restResponse : responseHandlers) {
@@ -66,7 +63,7 @@ import java.util.List;
         return false;
     }
 
-    @Nullable @Override public Response generate(@Nonnull @NonNull final AbstractRequest request) {
+    @Override public Response generate(final AbstractRequest request) {
         final RestResponse restResponse = (RestResponse) request.getMeta("restResponse");
         if (restResponse == null) {
             return null; // Nullable

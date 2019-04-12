@@ -21,10 +21,7 @@
  */
 package xyz.kvantum.server.api.response;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.io.KvantumOutputStream;
-
-import javax.annotation.Nonnull;
 
 /**
  * A stream (such as {@link KvantumOutputStream}) with a known length.
@@ -41,13 +38,13 @@ public interface KnownLengthStream {
      *
      * @return byte array with length {@link #getLength()}
      */
-    @Nonnull byte[] getAll();
+    byte[] getAll();
 
     /**
      * Replace the content provided by the stream
      *
      * @param bytes byte array. Cannot be null
      */
-    void replaceBytes(@NonNull final byte[] bytes);
+    void replaceBytes(final byte[] bytes);
 
 }

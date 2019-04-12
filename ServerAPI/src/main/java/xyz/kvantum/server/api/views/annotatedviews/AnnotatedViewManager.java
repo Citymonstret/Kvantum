@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.CollectionUtil;
@@ -33,9 +30,15 @@ import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.annotatedviews.converters.StandardConverters;
 import xyz.kvantum.server.api.views.requesthandler.Middleware;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public final class AnnotatedViewManager {
 
@@ -48,12 +51,12 @@ public final class AnnotatedViewManager {
         StandardConverters.registerStandardConverters(this);
     }
 
-    public <T> Collection<? extends RequestHandler> generate(
-        @Nonnull @NonNull final T viewDeclaration) throws Exception {
+    public <T> Collection<? extends RequestHandler> generate(final T viewDeclaration)
+        throws Exception {
         final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
             ReflectionUtils.getAnnotatedMethods(ViewMatcher.class, clazz);
-        final ImmutableCollection.Builder<RequestHandler> builder = ImmutableList.builder();
+        final Collection<RequestHandler> builder = new ArrayList<>();
         ((IConsumer<ReflectionUtils.AnnotatedMethod<ViewMatcher>>) annotatedMethod -> {
             final Method m = annotatedMethod.getMethod();
             final boolean usesAlternate =
@@ -125,11 +128,11 @@ public final class AnnotatedViewManager {
                 }
             }
         }).foreach(annotatedMethods);
-        return builder.build();
+        return Collections.unmodifiableCollection(builder);
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void registerConverter(@NonNull final OutputConverter converter) {
+    public void registerConverter(final OutputConverter converter) {
         converters.put(converter.getKey().toLowerCase(Locale.ENGLISH), converter);
     }
 }

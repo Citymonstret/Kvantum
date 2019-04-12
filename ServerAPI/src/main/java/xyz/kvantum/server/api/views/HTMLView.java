@@ -21,14 +21,12 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +56,7 @@ public class HTMLView extends StaticFileView implements CacheApplicable {
 
         private final Map<String, String> storage = new HashMap<>();
 
-        HTMLProvider(@Nonnull @NonNull final AbstractRequest r) {
+        HTMLProvider(final AbstractRequest r) {
             storage.put("name", r.getMeta("html_file") + ".html");
         }
 

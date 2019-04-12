@@ -21,15 +21,14 @@
  */
 package xyz.kvantum.server.api.templates;
 
-import com.google.common.collect.ImmutableList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE) final public class TemplateManager {
 
@@ -44,8 +43,7 @@ import java.util.Collection;
         return instance;
     }
 
-    public void addProviderFactory(
-        @NonNull final ProviderFactory<? extends VariableProvider> factory) {
+    public void addProviderFactory(final ProviderFactory<? extends VariableProvider> factory) {
         for (final ProviderFactory<?> registeredFactory : this.providers) {
             if (registeredFactory.providerName().equals(factory.providerName())) {
                 throw new IllegalArgumentException("Cannot register a provider factory twice");
@@ -55,7 +53,6 @@ import java.util.Collection;
     }
 
     public Collection<ProviderFactory<? extends VariableProvider>> getProviders() {
-        return ImmutableList.<ProviderFactory<? extends VariableProvider>>builder()
-            .addAll(this.providers).build();
+        return Collections.unmodifiableCollection(this.providers);
     }
 }

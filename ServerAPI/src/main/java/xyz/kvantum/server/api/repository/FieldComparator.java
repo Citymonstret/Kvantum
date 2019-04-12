@@ -21,11 +21,9 @@
  */
 package xyz.kvantum.server.api.repository;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -47,7 +45,7 @@ import java.util.Map;
      * @param ignoreUnassigned If null values should be ignored
      * @param returnFirstMatch If any matching fields should count as a match
      */
-    public FieldComparator(@NonNull final Q queryObject, final boolean ignoreUnassigned,
+    public FieldComparator(final Q queryObject, final boolean ignoreUnassigned,
         final boolean returnFirstMatch) {
         super(queryObject);
         this.ignoreUnassigned = ignoreUnassigned;
@@ -60,11 +58,11 @@ import java.util.Map;
         this.queryPojo = queryFactory.of(queryObject);
     }
 
-    @SuppressWarnings("all") private static <T> Class<T> getClass(@Nonnull final T instance) {
+    @SuppressWarnings("all") private static <T> Class<T> getClass(final T instance) {
         return (Class<T>) instance.getClass();
     }
 
-    @Override protected boolean matches(@NonNull final Q query, @NonNull final V value) {
+    @Override protected boolean matches(final Q query, final V value) {
         if (valueFactory == null) {
             valueFactory = KvantumPojoFactory.forClass(getClass(value));
         }

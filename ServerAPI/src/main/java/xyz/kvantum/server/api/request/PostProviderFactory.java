@@ -28,7 +28,6 @@ import xyz.kvantum.server.api.util.MapUtil;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ import java.util.Optional;
         return Optional.of(new PostProviderFactory(r.getPostRequest()));
     }
 
-    @Nonnull @Override public String providerName() {
+    @Override public String providerName() {
         return "post";
     }
 

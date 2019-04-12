@@ -21,11 +21,9 @@
  */
 package xyz.kvantum.server.api.views.requesthandler;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.Assert;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -35,7 +33,7 @@ public final class MiddlewareQueue {
 
     private boolean finished = false;
 
-    public void add(@Nonnull @NonNull final Middleware middleware) {
+    public void add(final Middleware middleware) {
         this.queue.add(middleware);
     }
 

@@ -21,17 +21,13 @@
  */
 package xyz.kvantum.server.api.repository;
 
-import lombok.NonNull;
-
-import javax.annotation.Nonnull;
-
 /**
  * {@link MatcherFactory} generating instances of {@link RSQLMatcher}
  * {@inheritDoc}
  */
 public final class RSQLMatcherFactory<V> implements MatcherFactory<String, V> {
 
-    @Nonnull @Override public RSQLMatcher<V> createMatcher(@NonNull final String queryObject) {
+    @Override public RSQLMatcher<V> createMatcher(final String queryObject) {
         return new RSQLMatcher<>(queryObject);
     }
 

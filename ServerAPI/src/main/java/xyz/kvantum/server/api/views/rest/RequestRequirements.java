@@ -24,11 +24,9 @@ package xyz.kvantum.server.api.views.rest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import xyz.kvantum.server.api.orm.KvantumObjectFactory;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Map;
@@ -53,7 +51,7 @@ import java.util.Optional;
 
     private final Collection<RequestRequirement> requirements = new ArrayDeque<>();
 
-    private static <K, V> Optional<V> mapOptional(@Nonnull @NonNull final Map<K, V> map,
+    private static <K, V> Optional<V> mapOptional(final Map<K, V> map,
         K instance) {
         if (map.containsKey(instance)) {
             return Optional.of(map.get(instance));
@@ -62,13 +60,12 @@ import java.util.Optional;
         }
     }
 
-    @NonNull public RequestRequirements addRequirement(
-        @Nonnull @NonNull final RequestRequirement requirement) {
+    public RequestRequirements addRequirement(final RequestRequirement requirement) {
         this.requirements.add(requirement);
         return this;
     }
 
-    public RequirementStatus testRequirements(@Nonnull @NonNull final AbstractRequest request) {
+    public RequirementStatus testRequirements(final AbstractRequest request) {
         RequirementStatus status;
         for (final RequestRequirement requirement : this.requirements) {
             if (!(status = requirement.test(request)).passed) {
@@ -84,9 +81,8 @@ import java.util.Optional;
             super(key);
         }
 
-        @Nonnull @Override
-        protected Optional<String> getVariable(@Nonnull @NonNull final AbstractRequest request,
-            @Nonnull @NonNull final String key) {
+        @Override
+        protected Optional<String> getVariable(final AbstractRequest request, final String key) {
             return mapOptional(request.getQuery().getParameters(), key);
         }
     }
@@ -98,9 +94,8 @@ import java.util.Optional;
             super(key);
         }
 
-        @Nonnull @Override
-        protected Optional<String> getVariable(@Nonnull @NonNull final AbstractRequest request,
-            @Nonnull @NonNull final String key) {
+        @Override
+        protected Optional<String> getVariable(final AbstractRequest request, final String key) {
             return mapOptional(request.getPostRequest().get(), key);
         }
     }
@@ -110,12 +105,11 @@ import java.util.Optional;
 
         private final String key;
 
-        public VariableRequirement(@Nonnull @NonNull final String key) {
+        public VariableRequirement(final String key) {
             this.key = key;
         }
 
-        @Nonnull protected abstract Optional<String> getVariable(@Nonnull AbstractRequest request,
-            @Nonnull String key);
+        protected abstract Optional<String> getVariable(AbstractRequest request, String key);
 
         @Override final RequirementStatus test(final AbstractRequest request) {
             Optional<String> optional = getVariable(request, key);
@@ -143,7 +137,7 @@ import java.util.Optional;
         @Getter private String internalMessage;
         private boolean passed = true;
 
-        @Nonnull public static Builder builder() {
+        public static Builder builder() {
             return new Builder();
         }
 

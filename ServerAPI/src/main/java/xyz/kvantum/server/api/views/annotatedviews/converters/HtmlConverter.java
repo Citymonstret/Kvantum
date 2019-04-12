@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews.converters;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.views.annotatedviews.AnnotatedViewManager;
@@ -29,7 +28,7 @@ import xyz.kvantum.server.api.views.annotatedviews.OutputConverter;
 
 final class HtmlConverter extends OutputConverter {
 
-    HtmlConverter(@NonNull final AnnotatedViewManager annotatedViewManager) {
+    HtmlConverter(final AnnotatedViewManager annotatedViewManager) {
         super("html", String.class);
         annotatedViewManager.registerConverter(this);
     }

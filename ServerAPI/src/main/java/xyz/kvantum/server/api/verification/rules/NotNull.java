@@ -23,15 +23,13 @@ package xyz.kvantum.server.api.verification.rules;
 
 import xyz.kvantum.server.api.verification.Rule;
 
-import javax.annotation.Nonnull;
-
 /**
  * Rule that forces the test object to be non-null
  * {@inheritDoc}
  */
 public final class NotNull<T> implements Rule<T> {
 
-    @Nonnull @Override public String getRuleDescription() {
+    @Override public String getRuleDescription() {
         return "Supplied object cannot be null";
     }
 

@@ -22,7 +22,6 @@
 package xyz.kvantum.server.api.events;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import xyz.kvantum.server.api.event.Cancellable;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -35,7 +34,7 @@ public final class RequestHandlerAddedEvent extends Event implements Cancellable
     @Getter private final RequestHandler context;
     @Getter @Setter private boolean cancelled = false;
 
-    public RequestHandlerAddedEvent(@NonNull final RequestHandler context) {
+    public RequestHandlerAddedEvent(final RequestHandler context) {
         super("requestHandlerAddedEvent");
         this.context = context;
     }

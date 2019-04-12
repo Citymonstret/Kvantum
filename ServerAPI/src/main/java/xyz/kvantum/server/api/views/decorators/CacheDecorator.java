@@ -28,7 +28,6 @@ import xyz.kvantum.server.api.util.MapBuilder;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.Decorator;
 
-import javax.annotation.Nonnull;
 import java.util.Date;
 
 @Builder public final class CacheDecorator {
@@ -43,7 +42,7 @@ import java.util.Date;
 
     @Builder.Default private String expires = "";
 
-    @Nonnull public Decorator getDecorator() {
+    public Decorator getDecorator() {
         final MapBuilder<HeaderOption, String> builder = MapBuilder.newHashMap();
         final StringBuilder cacheBuilder = new StringBuilder();
         cacheBuilder.append(cachePublic ? "public" : "private");

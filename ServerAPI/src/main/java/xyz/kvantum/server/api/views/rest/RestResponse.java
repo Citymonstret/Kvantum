@@ -23,14 +23,12 @@ package xyz.kvantum.server.api.views.rest;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import org.json.simple.JSONObject;
 import xyz.kvantum.server.api.matching.ViewPattern;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.util.AsciiString;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 
@@ -41,31 +39,28 @@ import java.util.Map;
     @Getter private final String contentType;
     @Getter(AccessLevel.PROTECTED) private final RequestRequirements requestRequirements;
 
-    public RestResponse(@Nonnull @NonNull final HttpMethod httpMethod,
-        @Nonnull @NonNull final ViewPattern viewPattern) {
+    public RestResponse(final HttpMethod httpMethod, final ViewPattern viewPattern) {
         this(httpMethod, viewPattern, "application/json");
     }
 
-    public RestResponse(@Nonnull @NonNull final HttpMethod httpMethod,
-        @Nonnull @NonNull final ViewPattern viewPattern,
-        @Nonnull @NonNull final String contentType) {
+    public RestResponse(final HttpMethod httpMethod, final ViewPattern viewPattern,
+        final String contentType) {
         this(httpMethod, viewPattern, contentType, new RequestRequirements());
     }
 
-    public RestResponse(@Nonnull @NonNull final HttpMethod httpMethod,
-        @Nonnull @NonNull final ViewPattern viewPattern, @Nonnull @NonNull final String contentType,
-        @Nonnull @NonNull final RequestRequirements requestRequirements) {
+    public RestResponse(final HttpMethod httpMethod, final ViewPattern viewPattern,
+        final String contentType, final RequestRequirements requestRequirements) {
         this.httpMethod = httpMethod;
         this.viewPattern = viewPattern;
         this.contentType = contentType;
         this.requestRequirements = requestRequirements;
     }
 
-    public boolean methodMatches(@Nonnull @NonNull final AbstractRequest request) {
+    public boolean methodMatches(final AbstractRequest request) {
         return request.getQuery().getMethod().equals(this.httpMethod);
     }
 
-    public boolean contentTypeMatches(@Nonnull @NonNull final AbstractRequest request) {
+    public boolean contentTypeMatches(final AbstractRequest request) {
         if (this.contentType.isEmpty()) {
             // We simply don't care.
             return true;
@@ -84,7 +79,7 @@ import java.util.Map;
         return false;
     }
 
-    protected final boolean matches(@Nonnull @NonNull final AbstractRequest request) {
+    protected final boolean matches(final AbstractRequest request) {
         final Map<String, String> map = viewPattern.matches(request.getQuery().getFullRequest());
         if (map != null) {
             request.addMeta("variables", map);
@@ -92,6 +87,6 @@ import java.util.Map;
         return map != null;
     }
 
-    public abstract JSONObject generate(@Nonnull final AbstractRequest request);
+    public abstract JSONObject generate(final AbstractRequest request);
 
 }

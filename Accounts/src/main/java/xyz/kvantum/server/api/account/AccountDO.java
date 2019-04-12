@@ -21,7 +21,10 @@
  */
 package xyz.kvantum.server.api.account;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import net.sf.oval.ConstraintViolation;
 import net.sf.oval.Validator;
 import net.sf.oval.constraint.NotEmpty;
@@ -31,7 +34,6 @@ import xyz.kvantum.server.api.account.roles.AccountRole;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 import xyz.kvantum.server.api.pojo.KvantumPojoFactory;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,11 +47,11 @@ import java.util.List;
 
     @NotNegative private final int id;
 
-    @NotEmpty @NotNull @NonNull private final String username;
+    @NotEmpty @NotNull private final String username;
 
-    @NonNull @NotNull private final Collection<AccountRole> accountRoles;
+    @NotNull private final Collection<AccountRole> accountRoles;
 
-    public AccountDO(@Nonnull @NotNull final IAccount account) {
+    public AccountDO(@NotNull final IAccount account) {
         this.id = account.getId();
         this.username = account.getUsername();
         this.accountRoles = new ArrayList<>(account.getAccountRoles());

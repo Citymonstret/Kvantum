@@ -21,11 +21,9 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.util.LambdaUtil;
 import xyz.kvantum.server.api.util.Provider;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -43,7 +41,7 @@ final class ObjectPool<T> {
      * @param objects  Number of  instances (must be positive)
      * @param supplier Supplier of objects
      */
-    ObjectPool(final int objects, @NonNull final Provider<T> supplier) {
+    ObjectPool(final int objects, final Provider<T> supplier) {
         this.availableObjects = new LinkedBlockingDeque<>(objects);
         LambdaUtil.collectionAssign(() -> availableObjects, supplier, objects);
     }
@@ -64,7 +62,7 @@ final class ObjectPool<T> {
      *
      * @return next object | null
      */
-    @Nullable final T getNullable() {
+    final T getNullable() {
         try {
             return getAvailable();
         } catch (final InterruptedException e) {
@@ -77,7 +75,7 @@ final class ObjectPool<T> {
      *
      * @param t object
      */
-    final void add(@NonNull final T t) {
+    final void add(final T t) {
         this.availableObjects.add(t);
     }
 }

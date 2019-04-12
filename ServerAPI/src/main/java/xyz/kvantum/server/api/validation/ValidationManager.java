@@ -21,13 +21,16 @@
  */
 package xyz.kvantum.server.api.validation;
 
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.request.HttpMethod;
 import xyz.kvantum.server.api.request.post.RequestEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manager that handles validation of {@link AbstractRequest requests} using
@@ -90,7 +93,7 @@ import java.util.*;
      *
      * @param validator validator to register, cannot be null
      */
-    public void addValidator(@NonNull final RequestValidation validator) {
+    public void addValidator(final RequestValidation validator) {
         this.empty = false;
         this.validators.get(validator.getStage()).add(validator);
     }
@@ -103,7 +106,7 @@ import java.util.*;
      * @param request request to validate, cannot be null
      * @throws ValidationException on failure, containing result about the failure
      */
-    public void validate(@NonNull final AbstractRequest request) throws ValidationException {
+    public void validate(final AbstractRequest request) throws ValidationException {
         if (request.getQuery().getMethod() == HttpMethod.POST) {
             for (final RequestValidation<?> validator : this
                 .getValidators(RequestValidation.ValidationStage.POST_PARAMETERS)) {

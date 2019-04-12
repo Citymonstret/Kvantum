@@ -21,11 +21,10 @@
  */
 package xyz.kvantum.server.api.session;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalNotification;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.Synchronized;
 import lombok.val;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -39,7 +38,6 @@ import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.ProviderFactory;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -56,11 +54,11 @@ import java.util.concurrent.TimeUnit;
     private final ISessionCreator sessionCreator;
     private final ISessionDatabase sessionDatabase;
     private final Cache<AsciiString, ISession> sessions =
-        CacheBuilder.newBuilder().maximumSize(CoreConfig.Cache.cachedSessionsMaxItems)
+        Caffeine.newBuilder().maximumSize(CoreConfig.Cache.cachedSessionsMaxItems)
             .removalListener(this::saveSession)
             .expireAfterAccess(CoreConfig.Sessions.sessionTimeout, TimeUnit.SECONDS).build();
 
-    private ISession createSession(@NonNull final AbstractRequest r) {
+    private ISession createSession(final AbstractRequest r) {
         Assert.isValid(r);
 
         final AsciiString sessionID = AsciiString.randomUUIDAsciiString();
@@ -72,36 +70,35 @@ import java.util.concurrent.TimeUnit;
         return session;
     }
 
-    private void saveSession(
-        @Nonnull @NonNull final RemovalNotification<AsciiString, ISession> notification) {
-        if (!notification.getValue().isDeleted()) {
-            this.sessionDatabase.updateSession(notification.getKey());
+    private void saveSession(final AsciiString key, final ISession value,
+        final RemovalCause cause) {
+        if (cause != RemovalCause.EXPLICIT) {
+            this.sessionDatabase.updateSession(key);
         }
     }
 
-    private void saveCookies(@Nonnull @NonNull final AbstractRequest r,
-        @Nonnull @NonNull final ISession session, @NonNull final AsciiString sessionID) {
+    private void saveCookies(final AbstractRequest r, final ISession session,
+        final AsciiString sessionID) {
         r.postponedCookies.add(
             ResponseCookie.builder().cookie(SESSION_KEY).value(sessionID).httpOnly(true).build());
         r.postponedCookies.add(
             ResponseCookie.builder().cookie(SESSION_PASS).value(session.getSessionKey())
                 .httpOnly(true).build());
         // Make sure that the cookies aren't duplicated
-        r.getCookies().removeAll(SESSION_KEY);
-        r.getCookies().removeAll(SESSION_PASS);
+        r.getCookies().remove(SESSION_KEY);
+        r.getCookies().remove(SESSION_PASS);
         r.getCookies().put(SESSION_KEY, new Cookie(SESSION_KEY, sessionID));
         r.getCookies().put(SESSION_PASS, new Cookie(SESSION_PASS, session.getSessionKey()));
     }
 
-    @Synchronized private ISession createSession(@NonNull final AsciiString sessionID) {
+    @Synchronized private ISession createSession(final AsciiString sessionID) {
         final ISession session = sessionCreator.createSession().set("id", sessionID);
         this.sessions.put(sessionID, session);
         this.sessionDatabase.storeSession(session);
         return session;
     }
 
-    public void deleteSession(@NonNull final AbstractRequest r,
-        @Nonnull @NonNull final HeaderProvider re) {
+    public void deleteSession(final AbstractRequest r, final HeaderProvider re) {
         re.getHeader().removeCookie(SESSION_KEY);
     }
 
@@ -111,7 +108,7 @@ import java.util.concurrent.TimeUnit;
      * @param r Request to query from
      * @return (Optional) session
      */
-    @Synchronized public Optional<ISession> getSession(@NonNull final AbstractRequest r) {
+    @Synchronized public Optional<ISession> getSession(final AbstractRequest r) {
         Assert.isValid(r);
 
         ISession session = null;

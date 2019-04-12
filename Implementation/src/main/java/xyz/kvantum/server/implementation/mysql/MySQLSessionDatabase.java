@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation.mysql;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
@@ -47,7 +46,7 @@ import java.sql.ResultSet;
                 + "CONSTRAINT sessions_UN UNIQUE KEY (id)" + ")");
     }
 
-    @Override public SessionLoad getSessionLoad(@NonNull final AsciiString sessionID) {
+    @Override public SessionLoad getSessionLoad(final AsciiString sessionID) {
         SessionLoad sessionLoad = null;
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
@@ -91,7 +90,7 @@ import java.sql.ResultSet;
         }
     }
 
-    @Override public void deleteSession(@NonNull final AsciiString session) {
+    @Override public void deleteSession(final AsciiString session) {
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
             try (final PreparedStatement statement = connection

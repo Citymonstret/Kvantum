@@ -21,28 +21,23 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.View;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 final class CachedAnnotatedView<C> extends View implements CacheApplicable {
 
-    CachedAnnotatedView(@Nonnull @NonNull final ViewDeclaration viewDeclaration,
-        @Nonnull @NonNull final ResponseMethod<?, C> method) {
+    CachedAnnotatedView(final ViewDeclaration viewDeclaration, final ResponseMethod<?, C> method) {
         super(viewDeclaration.getFilter(), viewDeclaration.getName(), null, method,
             viewDeclaration.getHttpMethod());
         this.forceHTTPS = viewDeclaration.isForceHttps();
     }
 
-    @Override public boolean passes(@Nullable final AbstractRequest request) {
+    @Override public boolean passes(final AbstractRequest request) {
         return true;
     }
 
-    @Override public boolean isApplicable(@Nullable final AbstractRequest r) {
+    @Override public boolean isApplicable(final AbstractRequest r) {
         return true;
     }
 

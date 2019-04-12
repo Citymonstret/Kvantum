@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.logging.LogWrapper;
 
@@ -35,7 +34,7 @@ import java.nio.charset.StandardCharsets;
  */
 @RequiredArgsConstructor public final class ErrorOutputStream extends ByteArrayOutputStream {
 
-    @NonNull private final LogWrapper logWrapper;
+    private final LogWrapper logWrapper;
 
     @Override public void flush() {
         String message = new String(toByteArray(), StandardCharsets.UTF_8);

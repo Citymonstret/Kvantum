@@ -24,9 +24,7 @@ package xyz.kvantum.server.implementation.mysql;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import xyz.kvantum.server.api.AccountService;
@@ -47,6 +45,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +86,7 @@ import java.util.concurrent.TimeUnit;
         return BCrypt.gensalt();
     }
 
-    private static String hashPassword(@NonNull final String password, @NonNull final String salt) {
+    private static String hashPassword(final String password, final String salt) {
         return BCrypt.hashpw(password, salt);
     }
 
@@ -103,12 +103,12 @@ import java.util.concurrent.TimeUnit;
         this.checkAdmin();
     }
 
-    @Override public Optional<IAccount> createAccount(@NonNull final String username,
-        @NonNull final String password) {
+    @Override
+    public Optional<IAccount> createAccount(final String username, final String password) {
         return this.createAccount(new Account(-1, username, password));
     }
 
-    @Override public Optional<IAccount> createAccount(@NonNull final IAccount temporary) {
+    @Override public Optional<IAccount> createAccount(final IAccount temporary) {
         final String username = temporary.getUsername();
         final String password = temporary.getSuppliedPassword();
 
@@ -137,11 +137,11 @@ import java.util.concurrent.TimeUnit;
         return ret;
     }
 
-    @Override public void addAccountDecorator(@NonNull final AccountDecorator decorator) {
+    @Override public void addAccountDecorator(final AccountDecorator decorator) {
         this.decorators.add(decorator);
     }
 
-    @Override public Optional<IAccount> getAccount(@NonNull final String username) {
+    @Override public Optional<IAccount> getAccount(final String username) {
         Assert.notEmpty(username);
 
         Optional<Integer> accountId = getCachedId(username);
@@ -203,7 +203,7 @@ import java.util.concurrent.TimeUnit;
         return ret;
     }
 
-    private IAccount getAccount(@NonNull final ResultSet resultSet) throws Exception {
+    private IAccount getAccount(final ResultSet resultSet) throws Exception {
         final int id = resultSet.getInt("id");
         final String username = resultSet.getString("username");
         final String password = resultSet.getString("password");
@@ -212,7 +212,7 @@ import java.util.concurrent.TimeUnit;
         return account;
     }
 
-    @Override public void loadData(@NonNull final IAccount account) {
+    @Override public void loadData(final IAccount account) {
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
             try (final PreparedStatement statement = connection
@@ -231,7 +231,7 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-    @Override public void deleteAccount(@NonNull final IAccount account) {
+    @Override public void deleteAccount(final IAccount account) {
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
             try (final PreparedStatement statement = connection
@@ -248,7 +248,7 @@ import java.util.concurrent.TimeUnit;
         this.cachedAccountIds.invalidate(account.getUsername());
     }
 
-    @Override public void removeData(@NonNull final IAccount account, @NonNull final String key) {
+    @Override public void removeData(final IAccount account, final String key) {
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
             try (final PreparedStatement statement = connection
@@ -264,8 +264,7 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-    @Override public void setData(@NonNull final IAccount account, @NonNull final String key,
-        @NonNull final String value) {
+    @Override public void setData(final IAccount account, final String key, final String value) {
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
             try (final PreparedStatement statement = connection.prepareStatement(
@@ -291,8 +290,8 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-    @Override public ImmutableList<? extends IAccount> findAll() {
-        final ImmutableList.Builder<IAccount> builder = ImmutableList.builder();
+    @Override public List<? extends IAccount> findAll() {
+        final List<IAccount> builder = new ArrayList<>();
         try (final Connection connection = applicationStructure.getDatabaseManager()
             .getConnection()) {
             try (final PreparedStatement statement = connection
@@ -308,10 +307,10 @@ import java.util.concurrent.TimeUnit;
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        return builder.build();
+        return Collections.unmodifiableList(builder);
     }
 
-    private void setCachedAccount(@NonNull final IAccount account) {
+    private void setCachedAccount(final IAccount account) {
         this.cachedAccounts.put(account.getId(), account);
         this.cachedAccountIds.put(account.getUsername(), account.getId());
     }
@@ -320,7 +319,7 @@ import java.util.concurrent.TimeUnit;
         return Optional.ofNullable(cachedAccounts.getIfPresent(id));
     }
 
-    private Optional<Integer> getCachedId(@NonNull final String username) {
+    private Optional<Integer> getCachedId(final String username) {
         return Optional.ofNullable(cachedAccountIds.getIfPresent(username));
     }
 

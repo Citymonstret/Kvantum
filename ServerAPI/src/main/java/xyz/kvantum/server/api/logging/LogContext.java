@@ -21,10 +21,13 @@
  */
 package xyz.kvantum.server.api.logging;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import xyz.kvantum.server.api.util.MapBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter @Builder @EqualsAndHashCode public class LogContext {
 
@@ -38,9 +41,10 @@ import lombok.Getter;
 
     private String message;
 
-    public final ImmutableMap<String, String> toMap() {
-        return ImmutableMap.<String, String>builder().put("applicationPrefix", applicationPrefix)
+    public final Map<String, String> toMap() {
+        return MapBuilder.<String, String>newUnmodifableMap(HashMap::new)
+            .put("applicationPrefix", applicationPrefix)
             .put("logPrefix", logPrefix).put("thread", thread).put("timeStamp", timeStamp)
-            .put("message", message).build();
+            .put("message", message).get();
     }
 }

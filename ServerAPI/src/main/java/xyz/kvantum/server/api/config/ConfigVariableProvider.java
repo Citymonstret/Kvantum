@@ -21,13 +21,10 @@
  */
 package xyz.kvantum.server.api.config;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
 import xyz.kvantum.server.api.util.VariableProvider;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +56,7 @@ public class ConfigVariableProvider
      *
      * @param provider Provider to add
      */
-    public void add(@Nonnull @NonNull final ConfigProvider provider) {
+    public void add(final ConfigProvider provider) {
         configurations.put(provider.toString(), new WeakReference<>(provider));
     }
 
@@ -85,7 +82,7 @@ public class ConfigVariableProvider
         return false;
     }
 
-    @Nullable @Override public Object get(final String variable) {
+    @Override public Object get(final String variable) {
         String[] parts = variable.split("@");
         final WeakReference<ConfigProvider> reference = configurations.get(parts[0]);
         final ConfigProvider provider = reference.get();

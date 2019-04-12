@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.files.Path;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
@@ -29,7 +28,6 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.FileExtension;
 import xyz.kvantum.server.api.util.IgnoreSyntax;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -38,13 +36,12 @@ import java.util.Map;
  */
 public final class DownloadView extends StaticFileView implements IgnoreSyntax {
 
-    public DownloadView(@NonNull final String filter, @NonNull final Map<String, Object> options) {
+    public DownloadView(final String filter, final Map<String, Object> options) {
         super(filter, options, "download", FileExtension.DOWNLOADABLE);
         super.relatedFolderPath = "/assets/downloads";
     }
 
-    @Override public void handle(@Nonnull @NonNull final AbstractRequest r,
-        @Nonnull @NonNull final Response response) {
+    @Override public void handle(final AbstractRequest r, final Response response) {
         final Path path = r.getMetaUnsafe("path");
         final String fileName = path.getEntityName();
         final FileExtension extension = r.getMetaUnsafe("extension");

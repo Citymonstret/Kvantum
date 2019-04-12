@@ -21,17 +21,20 @@
  */
 package xyz.kvantum.server.api.pojo;
 
-import com.google.common.collect.ImmutableMap;
 import com.hervian.lambda.LambdaFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import xyz.kvantum.server.api.util.MapBuilder;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,12 +59,11 @@ public final class KvantumPojoFactory<Object> {
      * @param <Object>  Class Type
      * @return Constructed Factory
      */
-    @Nonnull public static <Object> KvantumPojoFactory<Object> forClass(
-        @NonNull final Class<Object> pojoClass) {
-        final ImmutableMap.Builder<String, PojoGetter<Object>> getterBuilder =
-            ImmutableMap.builder();
-        final ImmutableMap.Builder<String, PojoSetter<Object>> setterBuilder =
-            ImmutableMap.builder();
+    public static <Object> KvantumPojoFactory<Object> forClass(final Class<Object> pojoClass) {
+        final MapBuilder<String, PojoGetter<Object>> getterBuilder =
+            MapBuilder.newUnmodifableMap(HashMap::new);
+        final MapBuilder<String, PojoSetter<Object>> setterBuilder =
+            MapBuilder.newUnmodifableMap(HashMap::new);
 
         for (final Method method : pojoClass.getDeclaredMethods()) {
             final String prefix;
@@ -121,7 +123,7 @@ public final class KvantumPojoFactory<Object> {
                 }
             }
         }
-        return new KvantumPojoFactory<>(getterBuilder.build(), setterBuilder.build());
+        return new KvantumPojoFactory<>(getterBuilder.get(), setterBuilder.get());
     }
 
     /**
@@ -130,7 +132,7 @@ public final class KvantumPojoFactory<Object> {
      * @param instance POJO Instance
      * @return Instance
      */
-    @Nonnull public KvantumPojo<Object> of(@NonNull final Object instance) {
+    public KvantumPojo<Object> of(final Object instance) {
         return new KvantumPojo<>(this, instance, getters, setters);
     }
 
@@ -140,8 +142,7 @@ public final class KvantumPojoFactory<Object> {
      * @param collection Collection
      * @return Stream of {@link KvantumPojo} objects
      */
-    public Collection<KvantumPojo> getPojoCollection(
-        @Nonnull @NonNull final Collection<Object> collection) {
+    public Collection<KvantumPojo> getPojoCollection(final Collection<Object> collection) {
         if (collection.isEmpty()) {
             return Collections.emptyList();
         }

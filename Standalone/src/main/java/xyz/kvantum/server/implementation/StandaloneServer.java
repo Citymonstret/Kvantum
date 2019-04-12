@@ -22,7 +22,6 @@
 package xyz.kvantum.server.implementation;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import xyz.kvantum.files.Extension;
@@ -41,7 +40,14 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.util.LambdaUtil;
 import xyz.kvantum.server.api.util.MapBuilder;
-import xyz.kvantum.server.api.views.*;
+import xyz.kvantum.server.api.views.CSSView;
+import xyz.kvantum.server.api.views.DownloadView;
+import xyz.kvantum.server.api.views.HTMLView;
+import xyz.kvantum.server.api.views.ImgView;
+import xyz.kvantum.server.api.views.JSView;
+import xyz.kvantum.server.api.views.StandardView;
+import xyz.kvantum.server.api.views.View;
+import xyz.kvantum.server.api.views.ViewDetector;
 import xyz.kvantum.server.api.views.decorators.CacheDecorator;
 import xyz.kvantum.server.implementation.error.KvantumException;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
@@ -55,7 +61,13 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public final class StandaloneServer extends SimpleServer {
@@ -206,7 +218,7 @@ public final class StandaloneServer extends SimpleServer {
         //
         {
             try {
-                @NonNull final URL url = StandaloneServer.class.getResource("/addons");
+                final URL url = StandaloneServer.class.getResource("/addons");
                 if (CoreConfig.debug) {
                     Logger.debug("Trying to load addons from {}", url);
                 }
@@ -223,7 +235,7 @@ public final class StandaloneServer extends SimpleServer {
                         addonFolderPath = fileSystem.getPath("/addons");
                     } else {
                         // loading from IDE
-                        @NonNull final File file = new File(url.getFile());
+                        final File file = new File(url.getFile());
                         addonFolderPath = file.toPath();
                     }
                 } else {
@@ -276,7 +288,7 @@ public final class StandaloneServer extends SimpleServer {
         loadWebJars:
         if (CoreConfig.loadWebJars) {
             try {
-                @NonNull final URL url =
+                final URL url =
                     StandaloneServer.class.getResource("/META-INF/resources/webjars");
                 final java.nio.file.Path webjarsFolderPath;
                 if (url != null && url.getFile() != null) {
@@ -291,7 +303,7 @@ public final class StandaloneServer extends SimpleServer {
                         webjarsFolderPath = fileSystem.getPath("/META-INF/resources/webjars");
                     } else {
                         // loading from IDE
-                        @NonNull final File file = new File(url.getFile());
+                        final File file = new File(url.getFile());
                         webjarsFolderPath = file.toPath();
                     }
                 } else {

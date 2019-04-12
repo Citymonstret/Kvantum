@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.request;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.QueryException;
@@ -46,7 +45,7 @@ import java.util.Optional;
     private static final AsciiString HEADER_AUTHORIZATION = AsciiString.of("Authorization");
     private boolean hasBeenRequested = false;
 
-    public Request(@NonNull final SocketContext socket) {
+    public Request(final SocketContext socket) {
         this.setSocket(socket);
         if (socket.isSSL()) {
             this.setProtocolType(ProtocolType.HTTPS);
@@ -68,7 +67,7 @@ import java.util.Optional;
         }
     }
 
-    @Override protected AbstractRequest newRequest(@NonNull final String query) {
+    @Override protected AbstractRequest newRequest(final String query) {
         final AbstractRequest request = new Request();
         request.setPostRequest(this.getPostRequest());
         request.getHeaders().putAll(this.getHeaders());

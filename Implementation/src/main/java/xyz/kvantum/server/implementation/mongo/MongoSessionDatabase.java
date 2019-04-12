@@ -21,7 +21,11 @@
  */
 package xyz.kvantum.server.implementation.mongo;
 
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.config.CoreConfig;
@@ -30,8 +34,6 @@ import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.implementation.MongoApplicationStructure;
-
-import javax.annotation.Nullable;
 
 @RequiredArgsConstructor final public class MongoSessionDatabase implements ISessionDatabase {
 
@@ -47,7 +49,7 @@ import javax.annotation.Nullable;
         this.collection = database.getCollection(CoreConfig.MongoDB.collectionSessions);
     }
 
-    @Nullable @Override public SessionLoad getSessionLoad(final AsciiString sessionID) {
+    @Override public SessionLoad getSessionLoad(final AsciiString sessionID) {
         final DBObject object = new BasicDBObject(FIELD_SESSION_ID, sessionID);
         final DBCursor cursor = collection.find(object);
 

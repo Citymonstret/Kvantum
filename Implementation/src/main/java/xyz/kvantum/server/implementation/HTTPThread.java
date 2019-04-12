@@ -28,7 +28,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
-import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
@@ -48,8 +47,8 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
     private final int port;
     private ChannelFuture future;
 
-    HTTPThread(@NonNull final ServerSocketFactory serverSocketFactory,
-        @NonNull final NioClassResolver classResolver) throws KvantumInitializationException {
+    HTTPThread(final ServerSocketFactory serverSocketFactory, final NioClassResolver classResolver)
+        throws KvantumInitializationException {
         super("http");
         this.setPriority(Thread.MAX_PRIORITY);
 

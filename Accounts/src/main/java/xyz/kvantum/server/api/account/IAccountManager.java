@@ -21,9 +21,6 @@
  */
 package xyz.kvantum.server.api.account;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
 import org.mindrot.jbcrypt.BCrypt;
 import xyz.kvantum.server.api.AccountService;
 import xyz.kvantum.server.api.account.roles.AccountRole;
@@ -35,7 +32,10 @@ import xyz.kvantum.server.api.repository.Matcher;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -213,7 +213,7 @@ import java.util.concurrent.ConcurrentHashMap;
      *
      * @param role Role instance
      */
-    default void registerAccountRole(@NonNull final AccountRole role) {
+    default void registerAccountRole(final AccountRole role) {
         this.ROLE_MAP.put(role.getRoleIdentifier(), role);
     }
 
@@ -223,7 +223,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @return registered account roles
      */
     default Collection<AccountRole> getRegisteredAccountRoles() {
-        return ImmutableList.copyOf(this.ROLE_MAP.values());
+        return Collections.unmodifiableCollection(this.ROLE_MAP.values());
     }
 
     /**
@@ -232,49 +232,49 @@ import java.util.concurrent.ConcurrentHashMap;
      * @param roleIdentifier Role identifier ({@link AccountRole#getRoleIdentifier()})
      * @return Optional
      */
-    default Optional<AccountRole> getAccountRole(@NonNull final String roleIdentifier) {
+    default Optional<AccountRole> getAccountRole(final String roleIdentifier) {
         if (this.ROLE_MAP.containsKey(roleIdentifier)) {
             return Optional.of(this.ROLE_MAP.get(roleIdentifier));
         }
         return Optional.empty();
     }
 
-    @Override default ImmutableList<? extends IAccount> findAllById(
-        @NonNull final Collection<Integer> collection) {
-        final ImmutableList.Builder<IAccount> builder = ImmutableList.builder();
+    @Override default List<? extends IAccount> findAllById(final Collection<Integer> collection) {
+        final List<IAccount> builder = new ArrayList<>();
         collection.stream().map(this::getAccount).filter(Optional::isPresent).map(Optional::get)
             .forEach(builder::add);
-        return builder.build();
-    }
-
-    @Override default ImmutableList<? extends IAccount> findAllByQuery(
-        @NonNull final Matcher<?, ? super IAccount> matcher) {
-        final ImmutableList.Builder<IAccount> builder = ImmutableList.builder();
-        findAll().stream().filter(matcher::matches).forEach(builder::add);
-        return builder.build();
-    }
-
-    @Override default ImmutableCollection<? extends IAccount> save(
-        @NonNull final Collection<? extends IAccount> collection) {
-        final ImmutableList.Builder<IAccount> builder =
-            ImmutableList.builderWithExpectedSize(collection.size());
-        collection.stream().map(this::createAccount).filter(Optional::isPresent).map(Optional::get)
-            .forEach(builder::add);
-        return builder.build();
-    }
-
-    @Override default void delete(@NonNull final Collection<IAccount> collection) {
-        collection.forEach(this::deleteAccount);
-    }
-
-    @Override default Optional<? extends IAccount> findSingle(@NonNull final Integer identifier) {
-        return this.getAccount(identifier);
+        return Collections.unmodifiableList(builder);
     }
 
     @Override
-    default ImmutableCollection<? extends IAccount> findAll(@NonNull final Integer identifier) {
+    default List<? extends IAccount> findAllByQuery(final Matcher<?, ? super IAccount> matcher) {
+        final List<IAccount> builder = new ArrayList<>();
+        findAll().stream().filter(matcher::matches).forEach(builder::add);
+        return Collections.unmodifiableList(builder);
+
+    }
+
+    @Override
+    default Collection<? extends IAccount> save(final Collection<? extends IAccount> collection) {
+        final Collection<IAccount> builder = new ArrayList<>(collection.size());
+        collection.stream().map(this::createAccount).filter(Optional::isPresent).map(Optional::get)
+            .forEach(builder::add);
+        return Collections.unmodifiableCollection(builder);
+    }
+
+    @Override default void delete(final Collection<IAccount> collection) {
+        collection.forEach(this::deleteAccount);
+    }
+
+    @Override default Optional<? extends IAccount> findSingle(final Integer identifier) {
+        return this.getAccount(identifier);
+    }
+
+    @Override default Collection<? extends IAccount> findAll(final Integer identifier) {
         final Optional<? extends IAccount> optional = findSingle(identifier);
-        return optional.<ImmutableCollection<? extends IAccount>>map(ImmutableList::of)
-            .orElseGet(ImmutableList::of);
+        if (optional.isPresent()) {
+            return optional.map(Collections::singleton).get();
+        }
+        return Collections.emptySet();
     }
 }

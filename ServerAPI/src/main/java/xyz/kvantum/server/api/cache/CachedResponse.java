@@ -21,13 +21,14 @@
  */
 package xyz.kvantum.server.api.cache;
 
-import lombok.NonNull;
 import lombok.ToString;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.io.KvantumOutputStream;
 import xyz.kvantum.server.api.io.SimpleOutputStream;
 import xyz.kvantum.server.api.logging.Logger;
-import xyz.kvantum.server.api.response.*;
+import xyz.kvantum.server.api.response.Header;
+import xyz.kvantum.server.api.response.KnownLengthStream;
+import xyz.kvantum.server.api.response.ResponseBody;
 
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ import java.util.UUID;
     private final boolean isText;
     private boolean supportsGzip;
 
-    public CachedResponse(@NonNull final ResponseBody parent) {
+    public CachedResponse(final ResponseBody parent) {
         this.header = parent.getHeader();
         this.isText = parent.isText();
         this.supportsGzip = parent.supportsGzip();

@@ -23,8 +23,12 @@ package xyz.kvantum.server.api.util;
 
 import xyz.kvantum.server.api.response.Header;
 
-import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Basic file and MIME info associated with file extensions / types
@@ -72,7 +76,7 @@ import java.util.*;
         this.comment = comment;
     }
 
-    @Nonnull public static Optional<FileExtension> getExtension(@Nonnull final String string) {
+    public static Optional<FileExtension> getExtension(final String string) {
         String workingString = string;
         if (string.startsWith(".")) {
             workingString = string.substring(1);
@@ -85,7 +89,7 @@ import java.util.*;
         return Optional.empty();
     }
 
-    @Nonnull public String getComment(final String comment) {
+    public String getComment(final String comment) {
         return this.comment.replace("{cmt}", comment);
     }
 

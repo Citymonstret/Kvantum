@@ -21,7 +21,11 @@
  */
 package xyz.kvantum.server.api.addon;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import net.sf.oval.constraint.NotNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogProvider;

@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
 import lombok.val;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
@@ -36,7 +35,7 @@ import java.io.PrintStream;
  */
 @SuppressWarnings("WeakerAccess") public class DefaultLogWrapper implements LogWrapper {
 
-    @Override public void log(@NonNull final LogContext logContext) {
+    @Override public void log(final LogContext logContext) {
         final val map = logContext.toMap();
         final String replacedMessage = CoreConfig.Logging.logFormat
             .replace("${applicationPrefix}", map.get("applicationPrefix"))
@@ -54,7 +53,7 @@ import java.io.PrintStream;
         System.out.println(ColorUtil.getReplaced(replacedMessage));
     }
 
-    @Override public void log(@NonNull final String s) {
+    @Override public void log(final String s) {
         System.out.println(s);
         ((SimpleServer) ServerImplementation.getImplementation()).logStream.println(s);
     }

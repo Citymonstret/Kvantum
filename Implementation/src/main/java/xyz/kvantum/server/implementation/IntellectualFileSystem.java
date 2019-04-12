@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.NonNull;
 import xyz.kvantum.files.FileSystem;
 import xyz.kvantum.files.FileWatcher;
 import xyz.kvantum.files.Path;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
 
 final class IntellectualFileSystem extends FileSystem {
 
-    IntellectualFileSystem(@NonNull final java.nio.file.Path coreFolder) {
+    IntellectualFileSystem(final java.nio.file.Path coreFolder) {
         super(coreFolder, new FileCacheImplementation());
     }
 
@@ -46,7 +45,7 @@ final class IntellectualFileSystem extends FileSystem {
         this.actOnSubPaths(this.getPath(""));
     }
 
-    private void actOnSubPaths(@NonNull final Path path) {
+    private void actOnSubPaths(final Path path) {
         final Collection<Path> subPaths = path.getSubPaths().stream().filter(Path::isFolder)
             .filter(p -> !Arrays.asList("log", "config", "storage").contains(p.getEntityName()))
             .collect(Collectors.toList());
@@ -54,7 +53,7 @@ final class IntellectualFileSystem extends FileSystem {
         subPaths.forEach(this::actOnSubPaths);
     }
 
-    private void registerCacheWatcher(@NonNull final Path path) {
+    private void registerCacheWatcher(final Path path) {
         if (CoreConfig.debug) {
             Logger.debug("Registering cache invalidation watcher for: {}", path.getEntityName());
         }
@@ -66,8 +65,8 @@ final class IntellectualFileSystem extends FileSystem {
         }
     }
 
-    @SuppressWarnings("unused") private void eventListener(@NonNull final Path path,
-        @NonNull final WatchEvent.Kind<?> eventKind) {
+    @SuppressWarnings("unused")
+    private void eventListener(final Path path, final WatchEvent.Kind<?> eventKind) {
         //
         // Ignore file creation and temporary job files
         //

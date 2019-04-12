@@ -25,8 +25,6 @@ import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.util.AsciiString;
 
-import javax.annotation.Nullable;
-
 /**
  * Database handling for {@link ISession sessions}
  */
@@ -40,7 +38,7 @@ public interface ISessionDatabase {
      * @param sessionID Session ID
      * @return session load if found, else null
      */
-    @Nullable SessionLoad getSessionLoad(AsciiString sessionID);
+    SessionLoad getSessionLoad(AsciiString sessionID);
 
     /**
      * Check if a session is valid
@@ -48,7 +46,7 @@ public interface ISessionDatabase {
      * @param session Session ID
      * @return the session load for the given session if valid, else null
      */
-    @Nullable default SessionLoad isValid(final AsciiString session) {
+    default SessionLoad isValid(final AsciiString session) {
         final SessionLoad sessionLoad = getSessionLoad(session);
         if (sessionLoad == null) {
             return null; // Nullable

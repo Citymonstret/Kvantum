@@ -24,9 +24,7 @@ package xyz.kvantum.server.api.event;
 import com.hervian.lambda.Lambda;
 import com.hervian.lambda.LambdaFactory;
 import lombok.Getter;
-import lombok.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 
 @Getter @SuppressWarnings({"WeakerAccess"}) public final class ListenerMethod {
@@ -35,14 +33,14 @@ import java.lang.reflect.Method;
     private final Class eventType;
     private final Object instance;
 
-    public ListenerMethod(@NonNull final Method method, @NonNull final Object instance,
-        @NonNull final Class eventType) throws Throwable {
+    public ListenerMethod(final Method method, final Object instance, final Class eventType)
+        throws Throwable {
         this.eventType = eventType;
         this.instance = instance;
         this.lambda = LambdaFactory.create(method);
     }
 
-    public void invoke(@Nonnull @NonNull final Object instance) {
+    public void invoke(final Object instance) {
         if (!instance.getClass().equals(eventType)) {
             throw new IllegalArgumentException(String.
                 format("Mis-matched event types. Requires '%s', but was given '%s'",

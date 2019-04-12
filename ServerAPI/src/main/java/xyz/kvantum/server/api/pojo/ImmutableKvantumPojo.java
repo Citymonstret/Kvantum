@@ -21,15 +21,14 @@
  */
 package xyz.kvantum.server.api.pojo;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
+import xyz.kvantum.server.api.util.MapBuilder;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,8 +37,8 @@ import java.util.Map;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) @SuppressWarnings({"unused", "WeakerAccess"})
 public final class ImmutableKvantumPojo<Pojo> {
 
-    @NonNull private final Pojo instance;
-    @NonNull private final Map<String, PojoGetter<Pojo>> fieldValues;
+    private final Pojo instance;
+    private final Map<String, PojoGetter<Pojo>> fieldValues;
 
     /**
      * Get a specified value. Will throw exceptions if no such key is stored.
@@ -48,7 +47,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      * @return Object
      * @see #containsGetter(String) To check if a key is stored
      */
-    @SneakyThrows(NoSuchMethodException.class) public Object get(@NonNull final String key) {
+    @SneakyThrows(NoSuchMethodException.class) public Object get(final String key) {
         if (!this.containsGetter(key)) {
             throw new NoSuchMethodException("No such getter: " + key);
         }
@@ -60,7 +59,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return Collection of field names
      */
-    @Nonnull public Collection<String> getGetterNames() {
+    public Collection<String> getGetterNames() {
         return this.fieldValues.keySet();
     }
 
@@ -70,7 +69,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      * @param key Key to check for
      * @return True if the key exists
      */
-    public boolean containsGetter(@NonNull final String key) {
+    public boolean containsGetter(final String key) {
         return fieldValues.containsKey(key);
     }
 
@@ -80,11 +79,11 @@ public final class ImmutableKvantumPojo<Pojo> {
      * @return Immutable map with all values
      */
     public Map<String, Object> getAll() {
-        final ImmutableMap.Builder<String, Object> mapBuilder = ImmutableMap.builder();
+        final MapBuilder<String, Object> mapBuilder = MapBuilder.newUnmodifableMap(HashMap::new);
         for (final Map.Entry<String, PojoGetter<Pojo>> getterEntry : this.fieldValues.entrySet()) {
             mapBuilder.put(getterEntry.getKey(), getterEntry.getValue().get(instance));
         }
-        return mapBuilder.build();
+        return mapBuilder.get();
     }
 
     /**
@@ -92,7 +91,7 @@ public final class ImmutableKvantumPojo<Pojo> {
      *
      * @return JSON object
      */
-    @Nonnull public JSONObject toJson() {
+    public JSONObject toJson() {
         return new JSONObject(this.getAll());
     }
 

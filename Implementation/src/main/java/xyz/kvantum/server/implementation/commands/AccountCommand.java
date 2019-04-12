@@ -41,10 +41,8 @@ import java.util.Optional;
 @CommandDeclaration(command = "account", usage = "/account [subcommand]", description = "Manage accounts")
 public class AccountCommand extends Command {
 
-
     public AccountCommand(final ApplicationStructure applicationStructure) {
         Assert.notNull(applicationStructure);
-
         this.createCommand(new DumpData());
         this.createCommand(new TestPass());
         this.createCommand(new CreateAccount());

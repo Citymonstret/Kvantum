@@ -21,7 +21,12 @@
  */
 package xyz.kvantum.server.api.fileupload;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileCleaningTracker;
 

@@ -21,12 +21,13 @@
  */
 package xyz.kvantum.server.api.util;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
      * @param collection Collection to be cleared
      * @return Size of collection before clearing
      */
-    public static int clear(@Nonnull @NonNull final Collection collection) {
+    public static int clear(final Collection collection) {
         final int size = collection.size();
         collection.clear();
         return size;
@@ -54,7 +55,7 @@ import java.util.stream.Collectors;
      * @param <T>        Type
      * @return list of strings
      */
-    public static <T> List<String> toStringList(@Nonnull @NonNull final Collection<T> collection) {
+    public static <T> List<String> toStringList(final Collection<T> collection) {
         final List<String> returnList = new ArrayList<>(collection.size());
         collection.forEach(o -> returnList.add(o.toString()));
         return returnList;
@@ -70,8 +71,8 @@ import java.util.stream.Collectors;
      * @return Joined string
      * @see #join(Collection, String) for an {@link Object#toString()} implementation
      */
-    public static <T> String smartJoin(@NonNull final Collection<T> collection,
-        @NonNull final Generator<T, String> stringGenerator, @NonNull final String joiner) {
+    public static <T> String smartJoin(final Collection<T> collection,
+        final Generator<T, String> stringGenerator, final String joiner) {
         if (collection.isEmpty()) {
             return "";
         }
@@ -103,8 +104,7 @@ import java.util.stream.Collectors;
      *
      * @deprecated Use {@link StringList}
      */
-    @Deprecated public static Collection<String> toStringCollection(
-        @Nullable final String stringList) {
+    @Deprecated public static Collection<String> toStringCollection(final String stringList) {
         return new StringList(stringList);
     }
 
@@ -118,7 +118,7 @@ import java.util.stream.Collectors;
      * @return Joined string
      * @see #smartJoin(Collection, Generator, String) to customize the string generation behavior
      */
-    public static <T> String join(@NonNull final Collection<T> collection, @NonNull String joiner) {
+    public static <T> String join(final Collection<T> collection, String joiner) {
         return smartJoin(collection, Object::toString, joiner);
     }
 
@@ -129,8 +129,8 @@ import java.util.stream.Collectors;
      * @param string     String
      * @return true if the collection contains the string, regardless of casing
      */
-    public static boolean containsIgnoreCase(@NonNull final Collection<? extends String> collection,
-        @NonNull final String string) {
+    public static boolean containsIgnoreCase(final Collection<? extends String> collection,
+        final String string) {
         if (collection.isEmpty()) {
             return false;
         }

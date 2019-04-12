@@ -21,7 +21,14 @@
  */
 package xyz.kvantum.crush;
 
-import xyz.kvantum.crush.syntax.*;
+import xyz.kvantum.crush.syntax.Comment;
+import xyz.kvantum.crush.syntax.ForEachBlock;
+import xyz.kvantum.crush.syntax.IfStatement;
+import xyz.kvantum.crush.syntax.Include;
+import xyz.kvantum.crush.syntax.Macro;
+import xyz.kvantum.crush.syntax.MetaBlock;
+import xyz.kvantum.crush.syntax.Syntax;
+import xyz.kvantum.crush.syntax.Variable;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.template.TemplateHandler;

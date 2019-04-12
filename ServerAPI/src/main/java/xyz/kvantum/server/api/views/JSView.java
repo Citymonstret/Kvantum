@@ -21,12 +21,10 @@
  */
 package xyz.kvantum.server.api.views;
 
-import lombok.NonNull;
 import xyz.kvantum.server.api.cache.CacheApplicable;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.FileExtension;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -36,15 +34,14 @@ import java.util.Optional;
  */
 public class JSView extends StaticFileView implements CacheApplicable {
 
-    public JSView(@Nonnull @NonNull final String filter,
-        @Nonnull @NonNull final Map<String, Object> options) {
+    public JSView(final String filter, final Map<String, Object> options) {
         super(filter, options, "javascript", Collections.singletonList(FileExtension.JAVASCRIPT));
         super.relatedFolderPath = "/assets/js";
         super.setOption("extension", "js");
         super.defaultFilePattern = "${file}.js";
     }
 
-    @Override public boolean isApplicable(@Nonnull @NonNull AbstractRequest r) {
+    @Override public boolean isApplicable(AbstractRequest r) {
         final Optional<Boolean> cacheApplicableBoolean = getOptionSafe("cacheApplicable");
         return cacheApplicableBoolean.orElse(true);
     }

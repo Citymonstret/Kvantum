@@ -21,17 +21,13 @@
  */
 package xyz.kvantum.server.api.response;
 
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import lombok.Getter;
-import lombok.NonNull;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.AsciiString;
+import xyz.kvantum.server.api.util.ListMultiMap;
 import xyz.kvantum.server.api.util.TimeUtil;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -374,8 +370,7 @@ import java.util.Optional;
      */
     public static final HeaderOption HEADER_RETRY_AFTER = HeaderOption.create("Retry-After");
     private static final AsciiString DEFAULT_FORMAT = AsciiString.of("HTTP/1.1");
-    @SuppressWarnings("UnstableApiUsage") private final ListMultimap<HeaderOption, AsciiString>
-        headers = MultimapBuilder.hashKeys().arrayListValues().build();
+    private final ListMultiMap<HeaderOption, AsciiString> headers = new ListMultiMap<>();
     @Getter private AsciiString status;
     @Getter private AsciiString format;
 
@@ -385,7 +380,7 @@ import java.util.Optional;
      * @param status HTTP status
      * @param format HTTP version
      */
-    public Header(@NonNull final AsciiString status, @NonNull final AsciiString format) {
+    public Header(final AsciiString status, final AsciiString format) {
         this.status = status;
         this.format = format;
     }
@@ -405,7 +400,7 @@ import java.util.Optional;
      * @param status Response status
      * @return Instance
      */
-    public Header setStatus(@NonNull final AsciiString status) {
+    public Header setStatus(final AsciiString status) {
         this.status = status;
         this.set(HEADER_STATUS, status);
         return this;
@@ -441,7 +436,7 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    public Header set(@NonNull final HeaderOption key, @Nullable final String value,
+    public Header set(final HeaderOption key, final String value,
         final boolean allowDuplicates) {
         return this.set(key, AsciiString.of(value, false), allowDuplicates);
     }
@@ -454,10 +449,10 @@ import java.util.Optional;
      * @param allowDuplicates If this is set to false, then previous entries will be overwritten
      * @return Instance
      */
-    public Header set(@NonNull final HeaderOption key, @Nullable final AsciiString value,
+    public Header set(final HeaderOption key, final AsciiString value,
         final boolean allowDuplicates) {
         if (value == null || !allowDuplicates) {
-            this.headers.removeAll(key);
+            this.headers.remove(key);
         }
         if (value != null) {
             this.headers.put(key, value);
@@ -471,7 +466,7 @@ import java.util.Optional;
      * @param key Header eky
      * @return Collection with all stored values
      */
-    public Collection<AsciiString> getMultiple(@NonNull final HeaderOption key) {
+    public Collection<AsciiString> getMultiple(final HeaderOption key) {
         final Collection<AsciiString> values = new ArrayList<>();
         if (this.headers.containsKey(key)) {
             values.addAll(this.headers.get(key));
@@ -485,7 +480,7 @@ import java.util.Optional;
      * @param key Header key
      * @return Optional
      */
-    public Optional<AsciiString> get(@NonNull final HeaderOption key) {
+    public Optional<AsciiString> get(final HeaderOption key) {
         if (this.headers.containsKey(key)) {
             return Optional.of(this.headers.get(key).get(0));
         }
@@ -507,7 +502,7 @@ import java.util.Optional;
      * @param newURL         New URL
      * @param redirectHeader Status code
      */
-    public void redirect(@NonNull final String newURL, @NonNull final AsciiString redirectHeader) {
+    public void redirect(final String newURL, final AsciiString redirectHeader) {
         set(Header.HEADER_LOCATION, newURL);
         set(Header.HEADER_STATUS, redirectHeader);
         setStatus(redirectHeader);
@@ -519,13 +514,13 @@ import java.util.Optional;
      * @param cookie Cookie
      * @return Instance
      */
-    public Header setCookie(@NonNull final ResponseCookie cookie) {
+    public Header setCookie(final ResponseCookie cookie) {
         if (CoreConfig.debug) {
             Logger.debug("Cookie set! Key: {}, Value: {}, Full: {}", cookie.getCookie(),
                 cookie.getValue(), cookie.toString());
         }
-        if (this.headers.containsEntry(HEADER_SET_COOKIE, cookie.toString())) {
-            this.headers.remove(HEADER_SET_COOKIE, cookie.toString());
+        if (this.headers.containsEntry(HEADER_SET_COOKIE, cookie.toAsciiString())) {
+            this.headers.remove(HEADER_SET_COOKIE, cookie.toAsciiString());
         }
         this.headers.put(HEADER_SET_COOKIE, cookie.toAsciiString());
         return this;
@@ -536,7 +531,7 @@ import java.util.Optional;
      *
      * @param cookie Cookie key
      */
-    public void removeCookie(@NonNull final AsciiString cookie) {
+    public void removeCookie(final AsciiString cookie) {
         final ResponseCookie responseCookie =
             ResponseCookie.builder().cookie(cookie).value(AsciiString.of("deleted"))
                 .expires(new Date(0)).build();
@@ -556,7 +551,7 @@ import java.util.Optional;
      * @param headerOption Key
      * @return True if it is stored
      */
-    public boolean hasHeader(@NonNull final HeaderOption headerOption) {
+    public boolean hasHeader(final HeaderOption headerOption) {
         return this.headers.containsKey(headerOption);
     }
 
@@ -565,9 +560,8 @@ import java.util.Optional;
      *
      * @return Copy of the internal map
      */
-    @SuppressWarnings("UnstableApiUsage") public Multimap<HeaderOption, AsciiString> getHeaders() {
-        return MultimapBuilder.ListMultimapBuilder.hashKeys(headers.size()).arrayListValues()
-            .build(headers);
+    public ListMultiMap<HeaderOption, AsciiString> getHeaders() {
+        return this.headers.getCopy();
     }
 
 }

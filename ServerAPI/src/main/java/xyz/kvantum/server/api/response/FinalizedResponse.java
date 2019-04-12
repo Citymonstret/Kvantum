@@ -23,26 +23,22 @@ package xyz.kvantum.server.api.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.TimeUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @Getter @RequiredArgsConstructor @Builder public final class FinalizedResponse {
 
     private static final String LOG_FORMAT = "%h %l %u [%t] \"%r\" %>s %b";
 
-    @NonNull private final String address;
-    @Nullable private final AbstractRequest.Authorization authorization;
+    private final String address;
+    private final AbstractRequest.Authorization authorization;
     private final long timeFinished;
-    @NonNull private final AbstractRequest.Query query;
-    @NonNull private final String status;
+    private final AbstractRequest.Query query;
+    private final String status;
     private final int length;
 
-    @Nonnull public String toLogString() {
+    public String toLogString() {
         return LOG_FORMAT.replace("%h", this.address).replace("%l", "-")
             .replace("%u", authorization != null ? authorization.getUsername() : "-")
             .replace("%t", TimeUtil.getAccessLogTimeStamp(this.timeFinished))

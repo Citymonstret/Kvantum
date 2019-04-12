@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.util;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,11 +41,11 @@ public final class MetaProvider implements ProviderFactory<MetaProvider>, Variab
         this.r = r;
     }
 
-    @Nonnull @Override public Optional<MetaProvider> get(final AbstractRequest r) {
+    @Override public Optional<MetaProvider> get(final AbstractRequest r) {
         return Optional.of(new MetaProvider(r));
     }
 
-    @Nonnull @Override public String providerName() {
+    @Override public String providerName() {
         return "meta";
     }
 

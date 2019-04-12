@@ -23,7 +23,6 @@ package xyz.kvantum.server.api.util;
 
 import xyz.kvantum.server.api.request.AbstractRequest;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
@@ -46,6 +45,6 @@ public interface ProviderFactory<T extends VariableProvider> {
      *
      * @return unique provider name
      */
-    @Nullable String providerName();
+    String providerName();
 
 }

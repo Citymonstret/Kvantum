@@ -21,7 +21,10 @@
  */
 package xyz.kvantum.server.implementation;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.sf.oval.constraint.Min;
 import net.sf.oval.constraint.NotEmpty;
 import org.mongodb.morphia.annotations.Entity;
@@ -44,7 +47,11 @@ import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.api.util.StringList;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -67,9 +74,9 @@ import java.util.concurrent.ConcurrentHashMap;
     private final Map<Class<? extends AccountExtension>, AccountExtension> extensions =
         new ConcurrentHashMap<>();
     @Min(-1) @KvantumField @Id @Getter private int id;
-    @NotEmpty @KvantumField @Getter @NonNull private String username;
-    @KvantumField @NonNull private String password;
-    @NonNull private Map<String, String> data;
+    @NotEmpty @KvantumField @Getter private String username;
+    @KvantumField private String password;
+    private Map<String, String> data;
     @Setter @Transient private transient IAccountManager manager;
     private StringList rawRoleList;
     private Collection<AccountRole> roleList;
@@ -152,7 +159,7 @@ import java.util.concurrent.ConcurrentHashMap;
         return this.roleList;
     }
 
-    @Override public void addRole(@NonNull final AccountRole role) {
+    @Override public void addRole(final AccountRole role) {
         if (this.roleList == null) {
             this.getAccountRoles();
         }
@@ -164,7 +171,7 @@ import java.util.concurrent.ConcurrentHashMap;
         this.setData(KEY_ROLE_LIST, rawRoleList.toString());
     }
 
-    @Override public void removeRole(@NonNull final AccountRole role) {
+    @Override public void removeRole(final AccountRole role) {
         if (this.roleList == null) {
             this.getAccountRoles();
         }
@@ -175,8 +182,7 @@ import java.util.concurrent.ConcurrentHashMap;
         }
     }
 
-    @Override
-    public <T extends AccountExtension> T attachExtension(@NonNull final Class<T> extension) {
+    @Override public <T extends AccountExtension> T attachExtension(final Class<T> extension) {
         if (this.getExtension(extension).isPresent()) {
             throw new IllegalArgumentException("Cannot attach an extension twice");
         }
@@ -191,7 +197,7 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     @SuppressWarnings("ALL") @Override public <T extends AccountExtension> Optional<T> getExtension(
-        @NonNull final Class<T> extension) {
+        final Class<T> extension) {
         final Object extensionInstance = this.extensions.get(extension);
         if (extensionInstance == null) {
             return Optional.empty();
@@ -209,7 +215,7 @@ import java.util.concurrent.ConcurrentHashMap;
         }
     }
 
-    @Override public boolean isPermitted(@NonNull final String permissionKey) {
+    @Override public boolean isPermitted(final String permissionKey) {
         if (this.roleList == null) {
             this.getAccountRoles();
         }
