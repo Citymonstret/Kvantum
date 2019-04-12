@@ -12,7 +12,7 @@ dependencies {
     // SQLite Driver
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.25.2'
     // MySQL Driver
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
     // Netty
     compile group: 'io.netty', name: 'netty-all', version: '4.1.31.Final'
     // Netty native transports
