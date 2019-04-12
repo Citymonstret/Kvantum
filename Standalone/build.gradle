@@ -41,6 +41,6 @@ artifacts {
 
 dependencies {
     // Program argument parser
-    compile group: 'com.beust', name: 'jcommander', version: '1.72'
+    compile group: 'com.beust', name: 'jcommander', version: '1.75'
     compile project(':Implementation')
 }
