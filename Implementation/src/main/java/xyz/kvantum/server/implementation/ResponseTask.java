@@ -459,44 +459,31 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                 Logger.debug("Using direct write from memory: {}", hasKnownLength);
             }
 
-            int toRead;
-            if (hasKnownLength) {
-                toRead = CoreConfig.Buffer.out;
-            } else {
-                toRead = CoreConfig.Buffer.out - KvantumServerHandler.MAX_LENGTH;
-            }
-
-            if (toRead <= 0) {
-                Logger.warn("buffer.out is less than {}, configured value will be ignored",
-                    KvantumServerHandler.MAX_LENGTH);
-                toRead = MAX_LENGTH + 1;
-            }
-
             //
             // Write the response
             //
-            final byte[] buffer = new byte[toRead];
+            final byte[] buffer = ThreadCache.CHUNK_BUFFER.get();
             while (!responseStream.isFinished()) {
                 //
                 // Read as much data as possible from the respone stream
                 //
                 final int read = responseStream.read(buffer);
                 if (read != -1) {
-                    // We need to copy the data over to a known length array
-                    byte[] data;
-                    if (read != buffer.length) {
-                        data = new byte[read];
-                        System.arraycopy(buffer, 0, data, 0, data.length);
-                    } else {
-                        data = buffer;
-                    }
+//                    // We need to copy the data over to a known length array
+//                    byte[] data = buffer;
+//                    if (read != buffer.length) {
+//                        data = new byte[read];
+//                        System.arraycopy(buffer, 0, data, 0, data.length);
+//                    } else {
+//                        data = buffer;
+//                    }
 
                     //
                     // If the length is known, write data directly
                     //
                     if (hasKnownLength) {
-                        context.write(data);
-                        actualLength = data.length;
+                        context.write(buffer); // TODO does this work if the buffer length is > data.length?
+                        actualLength = read;
                     } else {
                         //
                         // If the length isn't known, we first compress (if applicable) and then write using
@@ -504,7 +491,9 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                         //
                         if (workerContext.isGzip()) {
                             try {
-                                data = gzipHandler.compress(data);
+                                compressBuffer = ThreadCache.COMPRESS_BUFFER.get();
+                                read = gzipHandler.compress(buffer, compressBuffer, read);
+                                buffer = compressBuffer;
                             } catch (final IOException e) {
                                 new KvantumException("( GZIP ) Failed to compress the bytes")
                                     .printStackTrace();
@@ -512,11 +501,11 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                             }
                         }
 
-                        actualLength += data.length;
+                        actualLength += read;
 
-                        context.write(AsciiString.of(Integer.toHexString(data.length)).getValue());
+                        context.write(AsciiString.of(Integer.toHexString(read)).getValue());
                         context.write(KvantumServerHandler.CRLF);
-                        context.write(data);
+                        context.write(buffer, read);
                         context.write(KvantumServerHandler.CRLF);
                         //
                         // When using this mode we need to make sure that everything is written, so the
