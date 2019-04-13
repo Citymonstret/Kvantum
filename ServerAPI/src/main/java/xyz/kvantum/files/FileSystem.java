@@ -24,7 +24,7 @@ package xyz.kvantum.files;
 /**
  * A very simple (and restrictive) file system
  */
-@SuppressWarnings({"unused", "WeakerAccess"}) public class FileSystem {
+@SuppressWarnings("unused") public class FileSystem {
 
     final java.nio.file.Path coreFolder;
     private final Path corePath;

@@ -33,7 +33,7 @@ import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
 
-@SuppressWarnings({"WeakerAccess", "unused"}) final class HTTPThread extends Thread {
+@SuppressWarnings("unused") final class HTTPThread extends Thread {
 
     //
     // Netty
@@ -68,7 +68,7 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
         serverBootstrap.group(bossGroup, workerGroup)
             .channel(classResolver.getClassProvider().getServerSocketChannelClass())
             .childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override protected void initChannel(final SocketChannel ch) throws Exception {
+                @Override protected void initChannel(final SocketChannel ch) {
                     ch.pipeline().addLast(new KvantumReadTimeoutHandler())
                         .addLast(new ByteArrayEncoder())
                         .addLast(new KvantumServerHandler(ProtocolType.HTTP));

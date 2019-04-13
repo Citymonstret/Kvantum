@@ -72,7 +72,7 @@ import static org.junit.Assert.assertTrue;
         final ServerContext serverContext =
             serverContextBuilder.standalone(true).coreFolder(temporaryFolder)
                 .logWrapper(new DefaultLogWrapper()).router(requestManager)
-                .serverSupplier(StandaloneServer::new).build();
+                .serverSupplier(SimpleServer::new).build();
         assertNotNull(serverContext);
 
         final Optional<Kvantum> serverOptional = serverContext.create();

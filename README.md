@@ -18,7 +18,7 @@ You can see the current progress [here](https://github.com/IntellectualSites/Kva
 [![Project Stats](https://www.openhub.net/p/Kvantum/widgets/project_thin_badge.gif)](https://www.openhub.net/p/Kvantum)
 
 Travis CI:
-[![Build Status](https://travis-ci.org/IntellectualSites/Kvantum.svg?branch=master)](https://travis-ci.org/IntellectualSites/Kvantum)
+[![Build Status](https://travis-ci.org/Sauilitired/Kvantum.svg?branch=master)](https://travis-ci.org/Sauilitired/Kvantum)
 
 ## Description
 Kvantum is a lightweight, portable and (if you so desire) embeddable (HTTP/HTTPS) web server, written entirely in java. It is meant to be easy to use, yet offer a wide variety of tools and utilities to simplify the development of your website. It comes shipped with tools such as account management, database connectors and template engine support. All to remove the need for repeated boilerplate. 

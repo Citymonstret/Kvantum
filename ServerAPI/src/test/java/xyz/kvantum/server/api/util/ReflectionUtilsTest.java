@@ -21,7 +21,6 @@
  */
 package xyz.kvantum.server.api.util;
 
-import com.google.common.annotations.Beta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,7 @@ class ReflectionUtilsTest {
         Assertions.assertEquals("Hello Schweeden!", annotation.content());
     }
 
-    @Beta @SampleAnnotation(content = "Hello Schweeden!") void sampleMethod() {
+    @SampleAnnotation(content = "Hello Schweeden!") void sampleMethod() {
     }
 
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.METHOD)

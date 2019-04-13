@@ -87,10 +87,7 @@ import java.util.function.BiConsumer;
     }
 
     @Override public void run() {
-        for (; ; ) {
-            if (shouldStop) {
-                break;
-            }
+        while (!shouldStop) {
             final Collection<FileWatchingContext> invalid = new ArrayList<>();
             for (final FileWatchingContext context : contexts) {
                 final WatchKey key = context.watchService.poll();
@@ -101,8 +98,7 @@ import java.util.function.BiConsumer;
                     final WatchEvent<java.nio.file.Path> pathEvent = cast(event);
                     final java.nio.file.Path javaPath = pathEvent.context();
                     try {
-                        final xyz.kvantum.files.Path path =
-                            context.path.getPath(javaPath.getFileName().toString());
+                        final Path path = context.path.getPath(javaPath.getFileName().toString());
                         if (path == null) {
                             new RuntimeException(
                                 "Path could not be resolved: '" + javaPath.getFileName().toString()
