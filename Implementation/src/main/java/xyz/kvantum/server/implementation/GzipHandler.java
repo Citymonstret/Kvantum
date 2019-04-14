@@ -48,6 +48,8 @@ final class GzipHandler extends AutoCloseable {
     /**
      * Compress bytes using gzip
      *
+     * TODO optimize (though not super important since it's only used for fixed size)
+     *
      * @param data Bytes to compress
      * @return GZIP compressed data
      * @throws IOException If compression fails
@@ -65,5 +67,16 @@ final class GzipHandler extends AutoCloseable {
         Assert.equals(compressed != null && compressed.length > 0, true, "Failed to compress data");
 
         return compressed;
+    }
+
+    /**
+     * Compresses the input bytes into the buffer and returns the new length
+     * @param input
+     * @param buffer
+     * @param inputLength length of input to compress
+     * @return compressed length (in buffer)
+     */
+    int compress(byte[] input, byte[] buffer, int inputLength) {
+        // TODO compress using buffer
     }
 }
