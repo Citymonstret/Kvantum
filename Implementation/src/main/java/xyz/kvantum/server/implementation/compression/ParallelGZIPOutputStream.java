@@ -34,7 +34,7 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
 
     @NonNull
     private static Deflater newDeflater() {
-        return new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+        return new Deflater(Deflater.BEST_SPEED, true);
     }
 
     @NonNull
