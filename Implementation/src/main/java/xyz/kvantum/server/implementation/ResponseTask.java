@@ -24,6 +24,7 @@ package xyz.kvantum.server.implementation;
 import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,6 +52,8 @@ import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.ViewException;
 import xyz.kvantum.server.api.views.requesthandler.HTTPSRedirectHandler;
+import xyz.kvantum.server.implementation.cache.ThreadCache;
+import xyz.kvantum.server.implementation.compression.ReusableByteArrayOutputStream;
 import xyz.kvantum.server.implementation.error.KvantumException;
 
 import javax.net.ssl.SSLException;
@@ -462,12 +465,12 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
             //
             // Write the response
             //
-            final byte[] buffer = ThreadCache.CHUNK_BUFFER.get();
+            byte[] buffer = ThreadCache.CHUNK_BUFFER.get();
             while (!responseStream.isFinished()) {
                 //
                 // Read as much data as possible from the respone stream
                 //
-                final int read = responseStream.read(buffer);
+                int read = responseStream.read(buffer);
                 if (read != -1) {
 //                    // We need to copy the data over to a known length array
 //                    byte[] data = buffer;
@@ -491,9 +494,9 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                         //
                         if (workerContext.isGzip()) {
                             try {
-                                compressBuffer = ThreadCache.COMPRESS_BUFFER.get();
-                                read = gzipHandler.compress(buffer, compressBuffer, read);
-                                buffer = compressBuffer;
+                                ReusableByteArrayOutputStream result = gzipHandler.compress(buffer, read);
+                                read = result.size();
+                                buffer = result.getBuffer();
                             } catch (final IOException e) {
                                 new KvantumException("( GZIP ) Failed to compress the bytes")
                                     .printStackTrace();
@@ -505,7 +508,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
                         context.write(AsciiString.of(Integer.toHexString(read)).getValue());
                         context.write(KvantumServerHandler.CRLF);
-                        context.write(buffer, read);
+                        context.write(Unpooled.wrappedBuffer(buffer, 0, read));
                         context.write(KvantumServerHandler.CRLF);
                         //
                         // When using this mode we need to make sure that everything is written, so the

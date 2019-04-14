@@ -1,5 +1,9 @@
 package xyz.kvantum.server.implementation.cache;
 
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.logging.Logger;
+import xyz.kvantum.server.implementation.KvantumServerHandler;
+
 public class ThreadCache {
     public static void clear() {
         CHUNK_BUFFER.clean();
@@ -23,15 +27,22 @@ public class ThreadCache {
 
     public static final IterableThreadLocal<byte[]> CHUNK_BUFFER = new IterableThreadLocal<byte[]>() {
         @Override
-        public int[] init() {
+        public byte[] init() {
             return new byte[getMaxLen()];
         }
     };
 
     public static final IterableThreadLocal<byte[]> COMPRESS_BUFFER = new IterableThreadLocal<byte[]>() {
         @Override
-        public int[] init() {
-            return new byte[getMaxLen()];
+        public byte[] init() {
+            return new byte[getMaxLen() + 1024]; // TODO is 1024 large enough to handle data that can't be compressed?
+        }
+    };
+
+    public static final IterableThreadLocal<byte[]> BUFFER_8192 = new IterableThreadLocal<byte[]>() {
+        @Override
+        public byte[] init() {
+            return new byte[8192];
         }
     };
 

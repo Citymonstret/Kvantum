@@ -23,6 +23,9 @@ package xyz.kvantum.server.implementation;
 
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
+import xyz.kvantum.server.implementation.cache.ThreadCache;
+import xyz.kvantum.server.implementation.compression.ParallelGZIPOutputStream;
+import xyz.kvantum.server.implementation.compression.ReusableByteArrayOutputStream;
 
 import java.io.IOException;
 
@@ -31,10 +34,12 @@ import java.io.IOException;
  */
 final class GzipHandler extends AutoCloseable {
 
-    private final ReusableGzipOutputStream reusableGzipOutputStream;
+    private final ParallelGZIPOutputStream reusableGzipOutputStream;
+    private final ReusableByteArrayOutputStream buffer;
 
-    GzipHandler() {
-        this.reusableGzipOutputStream = new ReusableGzipOutputStream();
+    GzipHandler() throws IOException {
+        this.buffer = new ReusableByteArrayOutputStream(ThreadCache.COMPRESS_BUFFER.get());
+        this.reusableGzipOutputStream = new ParallelGZIPOutputStream(buffer);
     }
 
     @Override protected void handleClose() {
@@ -57,12 +62,12 @@ final class GzipHandler extends AutoCloseable {
     byte[] compress(final byte[] data) throws IOException {
         Assert.notNull(data);
 
+        buffer.reset();
         reusableGzipOutputStream.reset();
         reusableGzipOutputStream.write(data);
-        reusableGzipOutputStream.finish();
-        reusableGzipOutputStream.flush();
+        reusableGzipOutputStream.close();
 
-        final byte[] compressed = reusableGzipOutputStream.getData();
+        final byte[] compressed = buffer.toByteArray();
 
         Assert.equals(compressed != null && compressed.length > 0, true, "Failed to compress data");
 
@@ -72,11 +77,17 @@ final class GzipHandler extends AutoCloseable {
     /**
      * Compresses the input bytes into the buffer and returns the new length
      * @param input
-     * @param buffer
      * @param inputLength length of input to compress
      * @return compressed length (in buffer)
      */
-    int compress(byte[] input, byte[] buffer, int inputLength) {
-        // TODO compress using buffer
+    ReusableByteArrayOutputStream compress(byte[] input, int inputLength) throws IOException {
+        Assert.notNull(input);
+
+        buffer.reset();
+        reusableGzipOutputStream.reset();
+        reusableGzipOutputStream.write(input, 0, inputLength);
+        reusableGzipOutputStream.close();
+
+        return buffer;
     }
 }
