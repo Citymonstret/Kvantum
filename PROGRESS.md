@@ -32,7 +32,7 @@ You are highly encouraged to aid the development of Kvantum. This document provi
 * Connection Throttling
 * Keep-Alive Support
 * Non-blocking implementation using Netty
-* GZIP compression support
+* GZIP compression support (parallel and non-parallel)
 
 ## 2 View/Request Handling
 #### 2.1 All views
