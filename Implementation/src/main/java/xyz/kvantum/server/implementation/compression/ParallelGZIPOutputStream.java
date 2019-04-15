@@ -253,10 +253,11 @@ import java.util.zip.GZIPOutputStream;
         emitUntil(emitQueueSize - 1);
         emitQueue.add(executor.submit(block));
         Block b = freeBlock;
-        if (b != null)
+        if (b != null) {
             freeBlock = null;
-        else
+        } else {
             b = new Block();
+        }
         block = b;
     }
 

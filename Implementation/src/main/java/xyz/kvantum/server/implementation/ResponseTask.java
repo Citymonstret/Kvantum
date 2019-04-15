@@ -471,15 +471,6 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
                 //
                 int read = responseStream.read(buffer);
                 if (read != -1) {
-//                    // We need to copy the data over to a known length array
-//                    byte[] data = buffer;
-//                    if (read != buffer.length) {
-//                        data = new byte[read];
-//                        System.arraycopy(buffer, 0, data, 0, data.length);
-//                    } else {
-//                        data = buffer;
-//                    }
-
                     //
                     // If the length is known, write data directly
                     //
