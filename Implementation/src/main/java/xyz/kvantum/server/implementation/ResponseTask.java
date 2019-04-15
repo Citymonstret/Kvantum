@@ -64,7 +64,6 @@ import java.util.Optional;
 
 import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
 import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
-import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
 @RequiredArgsConstructor final class ResponseTask implements Runnable {
 
@@ -495,7 +494,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                         if (workerContext.isGzip()) {
                             try {
                                 ReusableByteArrayOutputStream result = gzipHandler.compress(buffer, read);
-                                read = result.size();
+                                read = result.getCount();
                                 buffer = result.getBuffer();
                             } catch (final IOException e) {
                                 new KvantumException("( GZIP ) Failed to compress the bytes")

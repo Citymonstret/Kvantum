@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.implementation;
 
+import lombok.SneakyThrows;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.implementation.cache.ThreadCache;
@@ -37,7 +38,7 @@ final class GzipHandler extends AutoCloseable {
     private final ParallelGZIPOutputStream reusableGzipOutputStream;
     private final ReusableByteArrayOutputStream buffer;
 
-    GzipHandler() throws IOException {
+    @SneakyThrows GzipHandler() {
         this.buffer = new ReusableByteArrayOutputStream(ThreadCache.COMPRESS_BUFFER.get());
         this.reusableGzipOutputStream = new ParallelGZIPOutputStream(buffer);
     }
@@ -53,7 +54,7 @@ final class GzipHandler extends AutoCloseable {
     /**
      * Compress bytes using gzip
      *
-     * TODO optimize (though not super important since it's only used for fixed size)
+     * TODO optimize (though not super important since it's only used for fixed getCount)
      *
      * @param data Bytes to compress
      * @return GZIP compressed data
