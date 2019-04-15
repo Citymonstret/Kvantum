@@ -51,6 +51,7 @@ final class GzipHandler extends AutoCloseable {
     @Override protected void handleClose() {
         try {
             this.reusablePGzipOutputStream.close();
+            this.reusableGzipOutputStream.close();
         } catch (final Exception e) {
             e.printStackTrace();
         }
