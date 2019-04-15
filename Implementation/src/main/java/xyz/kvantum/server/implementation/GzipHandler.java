@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.implementation;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
@@ -81,7 +83,7 @@ final class GzipHandler extends AutoCloseable {
      * @param inputLength length of input to compress
      * @return compressed length (in buffer)
      */
-    ReusableByteArrayOutputStream compress(byte[] input, int inputLength) throws IOException {
+    ByteBuf compress(final byte[] input, final int inputLength) throws IOException {
         Assert.notNull(input);
 
         buffer.reset();
@@ -89,6 +91,6 @@ final class GzipHandler extends AutoCloseable {
         reusableGzipOutputStream.write(input, 0, inputLength);
         reusableGzipOutputStream.close();
 
-        return buffer;
+        return Unpooled.wrappedBuffer(buffer.getBuffer(), 0, buffer.getCount());
     }
 }
