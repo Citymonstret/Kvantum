@@ -10,7 +10,7 @@ dependencies {
     // HikariCP, SQL connection pooling
     compile 'com.zaxxer:HikariCP:3.3.1'
     // SQLite Driver
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.25.2'
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.27.2.1'
     // MySQL Driver
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
     // Netty
