@@ -1,7 +1,6 @@
 package xyz.kvantum.server.implementation.compression;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import lombok.NonNull;
+import xyz.kvantum.server.implementation.compression.ParallelGZIPEnvironment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
@@ -10,6 +9,7 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayDeque;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -75,10 +75,6 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
         private byte[] buf = new byte[SIZE + (SIZE >> 3)];
         private int buf_length = 0;
 
-        public void reset() {
-            buf_length = 0;
-        }
-
         /*
          public Block( int index) {
          this.index = index;
@@ -99,8 +95,9 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
 
             // int in_length = buf_length;
             int out_length = state.buf.size();
-            if (out_length > buf.length)
+            if (out_length > buf.length) {
                 this.buf = new byte[out_length];
+            }
             // System.out.println("Compressed " + in_length + " to " + out_length + " bytes.");
             this.buf_length = out_length;
             state.buf.writeTo(buf);
@@ -129,8 +126,7 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
     private final BlockingQueue<Future<Block>> emitQueue;
     @NonNull
     private Block block = new Block();
-    @CheckForNull
-    private Block freeBlock = null;
+    private ArrayDeque<Block> freeBlocks = new ArrayDeque<>();
     /** Used as a sentinel for 'closed'. */
     private long bytesWritten = 0;
 
@@ -147,10 +143,7 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
 
     public void reset() throws IOException {
         crc.reset();
-        freeBlock = null;
-        block.reset();
         bytesWritten = 0;
-        emitQueue.clear();
         writeHeader();
     }
 
@@ -240,11 +233,10 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
     private void submit() throws IOException {
         emitUntil(emitQueueSize - 1);
         emitQueue.add(executor.submit(block));
-        Block b = freeBlock;
-        if (b != null)
-            freeBlock = null;
-        else
+        Block b = freeBlocks.poll();
+        if (b == null) {
             b = new Block();
+        }
         block = b;
     }
 
@@ -265,7 +257,7 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
             // System.out.println("Chance-emitting block " + b);
             out.write(b.buf, 0, b.buf_length);
             b.buf_length = 0;
-            freeBlock = b;
+            freeBlocks.add(b);
         }
     }
 
@@ -279,7 +271,7 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
                 // System.out.println("Force-emitting block " + b);
                 out.write(b.buf, 0, b.buf_length);  // Blocks until this task is done.
                 b.buf_length = 0;
-                freeBlock = b;
+                freeBlocks.add(b);
             }
             // We may have achieved more opportunistically available blocks
             // while waiting for a block above. Let's emit them here.
@@ -301,6 +293,8 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
         super.flush();
     }
 
+    private final ByteBuffer footer = ByteBuffer.allocate(8);
+
     // Master thread only
     @Override
     public void close() throws IOException {
@@ -308,14 +302,16 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
         if (bytesWritten >= 0) {
             flush();
 
-            newDeflaterOutputStream(out, newDeflater()).finish();
+            out.write(3);
+            out.write(0);
 
-            ByteBuffer buf = ByteBuffer.allocate(8);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
+            footer.mark();
+            footer.order(ByteOrder.LITTLE_ENDIAN);
             // LOG.info("CRC is " + crc.getValue());
-            buf.putInt((int) crc.getValue());
-            buf.putInt((int) (bytesWritten % 4294967296L));
-            out.write(buf.array()); // allocate() guarantees a backing array.
+            footer.putInt((int) crc.getValue());
+            footer.putInt((int) (bytesWritten % 4294967296L));
+            out.write(footer.array()); // allocate() guarantees a backing array.
+            footer.reset();
             // LOG.info("trailer is " + Arrays.toString(buf.array()));
 
             out.flush();
@@ -324,8 +320,6 @@ public class ParallelGZIPOutputStream extends FilterOutputStream {
             bytesWritten = Integer.MIN_VALUE;
             // } else {
             // LOG.warn("Already closed.");
-
-            freeBlock = null;
         }
     }
 }
