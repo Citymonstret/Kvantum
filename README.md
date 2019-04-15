@@ -21,9 +21,21 @@ Travis CI:
 [![Build Status](https://travis-ci.org/Sauilitired/Kvantum.svg?branch=master)](https://travis-ci.org/Sauilitired/Kvantum)
 
 ## Description
-Kvantum is a lightweight, portable and (if you so desire) embeddable (HTTP/HTTPS) web server, written entirely in java. It is meant to be easy to use, yet offer a wide variety of tools and utilities to simplify the development of your website. It comes shipped with tools such as account management, database connectors and template engine support. All to remove the need for repeated boilerplate. 
 
-Kvantum can be used both as a standalone web server for static content, natively serving:
+Kvantum is a web server and framework written in Java, on top of the Netty application framework.
+Kvantum is written with two main goals in mind: a) to be able to run as a standalone web server, with
+no extra programming needed, and b) to offer an extensive API, allowing developers to extend Kvantum
+to fit their needs exactly. The user can choose to either run Kvantum on its own, 
+to create Kvantum extensions (addons) or to ship their application with Kvantum embedded in it. 
+
+Kvantum is written for HTTP/HTTPS 1.1 and aims to implement the entire protocol. The web server is 
+written to be non-blocking, and to greatly favour caching over I/O operations.
+
+The Kvantum framework includes many specially written components, that will drastically reduce
+end user boilerplate code. This includes (but is not limited to): account management, database connections 
+(MySQL, SQLite, MongoDB), template engines (Apache Velocity, JTwig, Crush), REST utilities, search service utilities, etc.
+
+Kvantum can be used as a standalone server for static content, natively serving:
 * HTML
 * CSS 
 * JavaScript
@@ -32,13 +44,11 @@ Kvantum can be used both as a standalone web server for static content, natively
 * Webjars resources as static files
 * ... and the system can also be extended programmatically, both by extending the application itself, by scripts and by plugins. 
 
-and as a web framework with a powerful API. Everything served by Kvantum, regardless if it's dynamic or static, can be managed by templates. Kvantum supports Crush, JTwig and Apache Velocity out of the box!
-
 ### Examples
 Code examples can be found at [this](https://github.com/IntellectualSites/Kvantum/tree/master/Examples) link. There are also some sample projects (may not be up to date): [Forum](https://github.com/Sauilitired/Forum), [KvantumBlog](https://github.com/IntellectualSites/KvantumBlog), [Foton](https://github.com/IntellectualSites/Foton) and [KvantumBukkit](https://github.com/Sauilitired/KvantumBukkit).
 
 ### Prerequisites
-Kvantum only requires Java 8 (or later versions) to be installed on your system.
+Kvantum only requires Java 10 (or later versions) to be installed on your system.
 
 ### How to run
 
@@ -48,12 +58,19 @@ If you instead want to use the framework, please refer to the [wiki](https://git
 The easiest way to run Kvantum as a standalone web server is to use a pre-compiled Implementation jar file. These
 can be found in [releases](https://github.com/IntellectualSites/Kvantum/releases). Simply download the jar file into
 a directory, and then run it using:
+
+(older versions):
 ```bash
 java -jar /path/to/Implementation-all.jar
 ```
 
+(newer versions):
+```bash
+java -jar /path/to/Standalone-all.jar
+```
+
 However, if you'd rather call the main method directly, then it is
-located in [KvantumMain](https://github.com/IntellectualSites/Kvantum/blob/master/Implementation/src/main/java/xyz/kvantum/server/implementation/KvantumMain.java)
+located in [KvantumMain](https://github.com/IntellectualSites/Kvantum/blob/master/Standalone/src/main/java/xyz/kvantum/server/implementation/KvantumMain.java)
 
 ## Wiki/Information
 More information can be found in our [wiki](https://github.com/IntellectualSites/Kvantum/wiki)
@@ -78,6 +95,8 @@ Press `Import` and select `...path/to/project/code_style.xml`
 ### Maven
 
 ```xml
+<!-- CURRENTLY DOWN! NEW REPOSITORY COMING SOON -->
+
 <repositories>
     <repository>
         <id>Incendo</id>

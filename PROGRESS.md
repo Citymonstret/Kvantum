@@ -74,9 +74,9 @@ Kvantum allows views/request handlers to be defined through:
 
 ##### 2.3.1 REST API
 Kvantum comes with some utilities and rest based views to allow the creation of REST based APIs
-* Utility to autogenerate response for invalid requests (missing parameters)
+* Utility to auto generate response for invalid requests (missing parameters)
 * Auto-serving of JSON content through REST Handlers
-* Utilities for REST services & microservices using the Kvantum ORM and POJO systems
+* Utilities for REST services & micro services using the Kvantum ORM and POJO systems
 * Repository search system (Springlike)
 * Support for RSQL (Rest-Query-Engine)
 
@@ -89,7 +89,7 @@ Kvantum provides support for the following templating engines:
 
 #### 2.5 Sessions
 Kvantum provides a session system. Sessions can either be loaded automatically and stored in client cookies, or be loaded on requests.
-* SQLite and MongoDB Session database support (for persistent and inter-application sessions)
+* MySQL, SQLite and MongoDB Session database support (for persistent and inter-application sessions)
 
 ## 3 Commands
 Kvantum has a built in console command system that can be extended programmatically.

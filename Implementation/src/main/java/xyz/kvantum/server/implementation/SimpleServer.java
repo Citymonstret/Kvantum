@@ -597,7 +597,7 @@ public class SimpleServer implements Kvantum {
             }
 
             if (!destroyThreadExists) {
-                // System.exit(0);
+                System.exit(0);
             }
         } else {
             Logger.info("Not set to shutdown on exit. Waiting for parent application to close.");
