@@ -1,7 +1,6 @@
 rootProject.name = 'Kvantum'
 include 'ServerAPI'
 include 'Crush'
-include 'Assert'
 include 'Implementation'
 include 'Velocity'
 include 'JTwig'
