@@ -142,7 +142,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
                 }
                 if (this.contentLength >= CoreConfig.Limits.limitPostBasicSize) {
                     if (CoreConfig.debug) {
-                        Logger.debug("Supplied post body size too large ({0} > {1})", contentLength,
+                        Logger.debug("Supplied post body getCount too large ({0} > {1})",
+                            contentLength,
                             CoreConfig.Limits.limitPostBasicSize);
                     }
                     throw new ReturnStatus(Header.STATUS_ENTITY_TOO_LARGE, null);

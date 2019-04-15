@@ -21,6 +21,9 @@
  */
 package xyz.kvantum.server.implementation;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import lombok.SneakyThrows;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.implementation.cache.ThreadCache;
@@ -37,7 +40,7 @@ final class GzipHandler extends AutoCloseable {
     private final ParallelGZIPOutputStream reusableGzipOutputStream;
     private final ReusableByteArrayOutputStream buffer;
 
-    GzipHandler() throws IOException {
+    @SneakyThrows GzipHandler() {
         this.buffer = new ReusableByteArrayOutputStream(ThreadCache.COMPRESS_BUFFER.get());
         this.reusableGzipOutputStream = new ParallelGZIPOutputStream(buffer);
     }
@@ -52,8 +55,8 @@ final class GzipHandler extends AutoCloseable {
 
     /**
      * Compress bytes using gzip
-     *
-     * TODO optimize (though not super important since it's only used for fixed size)
+     * <p>
+     * TODO optimize (though not super important since it's only used for fixed getCount)
      *
      * @param data Bytes to compress
      * @return GZIP compressed data
@@ -68,19 +71,19 @@ final class GzipHandler extends AutoCloseable {
         reusableGzipOutputStream.close();
 
         final byte[] compressed = buffer.toByteArray();
-
-        Assert.equals(compressed != null && compressed.length > 0, true, "Failed to compress data");
+        Assert.equals(compressed.length > 0, true, "Failed to compress data");
 
         return compressed;
     }
 
     /**
      * Compresses the input bytes into the buffer and returns the new length
-     * @param input
+     *
+     * @param input       Input data
      * @param inputLength length of input to compress
      * @return compressed length (in buffer)
      */
-    ReusableByteArrayOutputStream compress(byte[] input, int inputLength) throws IOException {
+    ByteBuf compress(final byte[] input, final int inputLength) throws IOException {
         Assert.notNull(input);
 
         buffer.reset();
@@ -88,6 +91,6 @@ final class GzipHandler extends AutoCloseable {
         reusableGzipOutputStream.write(input, 0, inputLength);
         reusableGzipOutputStream.close();
 
-        return buffer;
+        return Unpooled.wrappedBuffer(buffer.getBuffer(), 0, buffer.getCount());
     }
 }

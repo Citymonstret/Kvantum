@@ -53,7 +53,6 @@ import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.ViewException;
 import xyz.kvantum.server.api.views.requesthandler.HTTPSRedirectHandler;
 import xyz.kvantum.server.implementation.cache.ThreadCache;
-import xyz.kvantum.server.implementation.compression.ReusableByteArrayOutputStream;
 import xyz.kvantum.server.implementation.error.KvantumException;
 
 import javax.net.ssl.SSLException;
@@ -64,7 +63,6 @@ import java.util.Optional;
 
 import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
 import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
-import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
 @RequiredArgsConstructor final class ResponseTask implements Runnable {
 
@@ -472,43 +470,37 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                 //
                 int read = responseStream.read(buffer);
                 if (read != -1) {
-//                    // We need to copy the data over to a known length array
-//                    byte[] data = buffer;
-//                    if (read != buffer.length) {
-//                        data = new byte[read];
-//                        System.arraycopy(buffer, 0, data, 0, data.length);
-//                    } else {
-//                        data = buffer;
-//                    }
-
                     //
                     // If the length is known, write data directly
                     //
                     if (hasKnownLength) {
-                        context.write(buffer); // TODO does this work if the buffer length is > data.length?
-                        actualLength = read;
+                        context.write(Unpooled.wrappedBuffer(buffer, 0, read));
+                        context.flush().newSucceededFuture().awaitUninterruptibly();
+                        actualLength += read;
                     } else {
                         //
                         // If the length isn't known, we first compress (if applicable) and then write using
                         // the chunked transfer encoding format
                         //
+                        final ByteBuf result;
+
                         if (workerContext.isGzip()) {
                             try {
-                                ReusableByteArrayOutputStream result = gzipHandler.compress(buffer, read);
-                                read = result.size();
-                                buffer = result.getBuffer();
+                                result = gzipHandler.compress(buffer, read);
+                                actualLength += result.readableBytes();
                             } catch (final IOException e) {
-                                new KvantumException("( GZIP ) Failed to compress the bytes")
-                                    .printStackTrace();
+                                new KvantumException("( GZIP ) Failed to compress the bytes").printStackTrace();
                                 continue;
                             }
+                        } else {
+                            result = Unpooled.wrappedBuffer(buffer, 0, read);
                         }
 
                         actualLength += read;
 
                         context.write(AsciiString.of(Integer.toHexString(read)).getValue());
                         context.write(KvantumServerHandler.CRLF);
-                        context.write(Unpooled.wrappedBuffer(buffer, 0, read));
+                        context.write(result);
                         context.write(KvantumServerHandler.CRLF);
                         //
                         // When using this mode we need to make sure that everything is written, so the

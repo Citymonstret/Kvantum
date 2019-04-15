@@ -40,6 +40,7 @@ import java.util.function.Consumer;
     private Consumer<Integer> offerAction, finalizedAction;
 
     private byte[] buffer; // internal buffer
+    private int bufferLength; // length of written buffer
 
     /**
      * Get the last pushed offer (available data length)
@@ -87,14 +88,27 @@ import java.util.function.Consumer;
     /**
      * Push data to the stream
      *
+     * @param bytes        Cannot be null.
+     * @param bufferLength The length of the readable part of the buffer. Should not be larger
+     *                     than the offer.
+     * @throws IllegalArgumentException If the length of the pushed data exceeds the last offer.
+     */
+    public void push(final byte[] bytes, final int bufferLength) {
+        if (bufferLength > this.offer) {
+            throw new IllegalArgumentException("Pushed data size cannot be larger than offer");
+        }
+        this.buffer = bytes;
+        this.bufferLength = bufferLength;
+    }
+
+    /**
+     * Push data to the stream
+     *
      * @param bytes Data. Length should not be larger than the offer. Cannot be null.
      * @throws IllegalArgumentException If the length of the pushed data exceeds the last offer.
      */
     public void push(final byte[] bytes) {
-        if (bytes.length > this.offer) {
-            throw new IllegalArgumentException("Pushed data size cannot be larger than offer");
-        }
-        this.buffer = bytes;
+        this.push(bytes, bytes.length);
     }
 
     /**
@@ -129,7 +143,10 @@ import java.util.function.Consumer;
             }
         }
 
-        read += this.buffer.length;
+        // now we need to make sure that we actually use the data pushed
+        final int actualLength = Math.min(amount, this.bufferLength);
+
+        read += actualLength;
 
         this.offer = 0;
         this.offerAction = null;
@@ -138,7 +155,7 @@ import java.util.function.Consumer;
             this.finalizedAction.accept(read);
         }
 
-        System.arraycopy(this.buffer, 0, buffer, 0, amount);
+        System.arraycopy(this.buffer, 0, buffer, 0, actualLength);
         return amount;
     }
 
