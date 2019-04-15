@@ -24,6 +24,7 @@ package xyz.kvantum.server.implementation;
 import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,6 +52,7 @@ import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.api.views.RequestHandler;
 import xyz.kvantum.server.api.views.errors.ViewException;
 import xyz.kvantum.server.api.views.requesthandler.HTTPSRedirectHandler;
+import xyz.kvantum.server.implementation.cache.ThreadCache;
 import xyz.kvantum.server.implementation.error.KvantumException;
 
 import javax.net.ssl.SSLException;
@@ -61,7 +63,6 @@ import java.util.Optional;
 
 import static xyz.kvantum.server.implementation.KvantumServerHandler.CLOSE;
 import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
-import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
 
 @RequiredArgsConstructor final class ResponseTask implements Runnable {
 
@@ -459,64 +460,47 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.MAX_LENGTH;
                 Logger.debug("Using direct write from memory: {}", hasKnownLength);
             }
 
-            int toRead;
-            if (hasKnownLength) {
-                toRead = CoreConfig.Buffer.out;
-            } else {
-                toRead = CoreConfig.Buffer.out - KvantumServerHandler.MAX_LENGTH;
-            }
-
-            if (toRead <= 0) {
-                Logger.warn("buffer.out is less than {}, configured value will be ignored",
-                    KvantumServerHandler.MAX_LENGTH);
-                toRead = MAX_LENGTH + 1;
-            }
-
             //
             // Write the response
             //
-            final byte[] buffer = new byte[toRead];
+            byte[] buffer = ThreadCache.CHUNK_BUFFER.get();
             while (!responseStream.isFinished()) {
                 //
                 // Read as much data as possible from the respone stream
                 //
-                final int read = responseStream.read(buffer);
+                int read = responseStream.read(buffer);
                 if (read != -1) {
-                    // We need to copy the data over to a known length array
-                    byte[] data;
-                    if (read != buffer.length) {
-                        data = new byte[read];
-                        System.arraycopy(buffer, 0, data, 0, data.length);
-                    } else {
-                        data = buffer;
-                    }
-
                     //
                     // If the length is known, write data directly
                     //
                     if (hasKnownLength) {
-                        context.write(data);
-                        actualLength = data.length;
+                        context.write(Unpooled.wrappedBuffer(buffer, 0, read));
+                        context.flush().newSucceededFuture().awaitUninterruptibly();
+                        actualLength += read;
                     } else {
                         //
                         // If the length isn't known, we first compress (if applicable) and then write using
                         // the chunked transfer encoding format
                         //
+                        final ByteBuf result;
+
                         if (workerContext.isGzip()) {
                             try {
-                                data = gzipHandler.compress(data);
+                                result = gzipHandler.compress(buffer, read);
+                                actualLength += result.readableBytes();
                             } catch (final IOException e) {
-                                new KvantumException("( GZIP ) Failed to compress the bytes")
-                                    .printStackTrace();
+                                new KvantumException("( GZIP ) Failed to compress the bytes").printStackTrace();
                                 continue;
                             }
+                        } else {
+                            result = Unpooled.wrappedBuffer(buffer, 0, read);
                         }
 
-                        actualLength += data.length;
+                        actualLength += read;
 
-                        context.write(AsciiString.of(Integer.toHexString(data.length)).getValue());
+                        context.write(AsciiString.of(Integer.toHexString(read)).getValue());
                         context.write(KvantumServerHandler.CRLF);
-                        context.write(data);
+                        context.write(result);
                         context.write(KvantumServerHandler.CRLF);
                         //
                         // When using this mode we need to make sure that everything is written, so the

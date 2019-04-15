@@ -125,18 +125,19 @@ import java.util.function.Consumer;
                 return;
             }
             response.setResponse(responseStream);
+            final byte[] outerBuffer = new byte[Buffer.files];
             final Consumer<Integer> writer = accepted -> {
-                byte[] bytes = new byte[accepted];
+                final int toRead = Math.min(outerBuffer.length, accepted);
                 try {
-                    final int read = inputStream.read(bytes, responseStream.getRead(), accepted);
-                    if (CoreConfig.debug && read != bytes.length) {
-                        Logger.debug("StaticFileView: accepted was {0} but {1} was read", accepted,
+                    final int read = inputStream.read(outerBuffer, 0, toRead);
+                    if (CoreConfig.debug && read != toRead) {
+                        Logger.debug("StaticFileView: accepted was {0} but {1} was read", read,
                             read);
                     }
+                    responseStream.push(outerBuffer, read);
                 } catch (final IOException e) {
                     e.printStackTrace();
                 }
-                responseStream.push(bytes);
             };
 
             final Consumer<Integer> finalizedAction = totalRead -> {
