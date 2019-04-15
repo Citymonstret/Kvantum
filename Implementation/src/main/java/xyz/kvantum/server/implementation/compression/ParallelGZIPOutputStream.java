@@ -1,3 +1,44 @@
+/*
+ *    _  __                     _
+ *    | |/ /__   __ __ _  _ __  | |_  _   _  _ __ ___
+ *    | ' / \ \ / // _` || '_ \ | __|| | | || '_ ` _ \
+ *    | . \  \ V /| (_| || | | || |_ | |_| || | | | | |
+ *    |_|\_\  \_/  \__,_||_| |_| \__| \__,_||_| |_| |_|
+ *
+ *    Copyright (C) 2019 Alexander Söderberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * Originally published at https://github.com/shevek/parallelgzip, under the Apache 2.0 license
+ * by author shevek.
+ *
+ * ORIGINAL LICENSE:
+ *
+ * Copyright 2012-2014 Shevek
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package xyz.kvantum.server.implementation.compression;
 
 import lombok.NonNull;
@@ -31,8 +72,7 @@ import java.util.zip.GZIPOutputStream;
  *
  * @author shevek, boy0001
  */
-@SuppressWarnings("NullableProblems") public class ParallelGZIPOutputStream
-    extends FilterOutputStream {
+@SuppressWarnings("NullableProblems") public class ParallelGZIPOutputStream extends FilterOutputStream {
 
     private static final int GZIP_MAGIC = 0x8b1f;
     private static final int SIZE = 64 * 1024;
@@ -137,8 +177,7 @@ import java.util.zip.GZIPOutputStream;
         while (len > 0) {
             final byte[] blockBuf = block.buf;
             // assert block.in_length < block.in.length
-            int capacity =
-                SIZE - block.buf_length; // Make sure we don't grow the block buf repeatedly.
+            int capacity = SIZE - block.buf_length; // Make sure we don't grow the block buf repeatedly.
             if (len >= capacity) {
                 System.arraycopy(b, off, blockBuf, block.buf_length, capacity);
                 block.buf_length += capacity;   // == block.in.length
@@ -266,8 +305,7 @@ import java.util.zip.GZIPOutputStream;
     private static class State {
 
         private final Deflater def = newDeflater();
-        private final ByteArrayOutputStreamExposed buf =
-            new ByteArrayOutputStreamExposed(SIZE + (SIZE >> 3));
+        private final ByteArrayOutputStreamExposed buf = new ByteArrayOutputStreamExposed(SIZE + (SIZE >> 3));
         private final DeflaterOutputStream str = newDeflaterOutputStream(buf, def);
 
     }
