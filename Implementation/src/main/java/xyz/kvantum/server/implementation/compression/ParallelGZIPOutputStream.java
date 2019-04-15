@@ -1,6 +1,8 @@
 package xyz.kvantum.server.implementation.compression;
 
 import lombok.NonNull;
+import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
@@ -16,7 +18,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -66,18 +67,17 @@ import java.util.zip.GZIPOutputStream;
 
     private ParallelGZIPOutputStream(@NonNull OutputStream out, @NonNull ExecutorService executor)
         throws IOException {
-        this(out, executor, getThreadCount(executor));
+        this(out, executor, getThreadCount());
     }
 
     /**
      * Creates a ParallelGZIPOutputStream
-     * using {@link ParallelGZIPEnvironment#getSharedThreadPool()}.
      *
      * @param out the eventual output stream for the compressed data.
      * @throws IOException if it all goes wrong.
      */
     public ParallelGZIPOutputStream(@NonNull OutputStream out) throws IOException {
-        this(out, ParallelGZIPEnvironment.getSharedThreadPool());
+        this(out, ServerImplementation.getImplementation().getExecutorService());
     }
 
     private static Deflater newDeflater() {
@@ -89,10 +89,12 @@ import java.util.zip.GZIPOutputStream;
         return ParallelGZIPEnvironment.newDeflaterOutputStream(out, deflater);
     }
 
-    private static int getThreadCount(@NonNull ExecutorService executor) {
-        if (executor instanceof ThreadPoolExecutor)
-            return ((ThreadPoolExecutor) executor).getMaximumPoolSize();
-        return Runtime.getRuntime().availableProcessors();
+    private static int getThreadCount() {
+        final int maximum = CoreConfig.Pools.gzipParallelThreads;
+        if (maximum <= 0) {
+            return Runtime.getRuntime().availableProcessors();
+        }
+        return maximum;
     }
 
     public void reset() throws IOException {
@@ -267,6 +269,7 @@ import java.util.zip.GZIPOutputStream;
         private final ByteArrayOutputStreamExposed buf =
             new ByteArrayOutputStreamExposed(SIZE + (SIZE >> 3));
         private final DeflaterOutputStream str = newDeflaterOutputStream(buf, def);
+
     }
 
 

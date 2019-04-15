@@ -24,20 +24,20 @@ package xyz.kvantum.server.implementation.compression;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-@SuppressWarnings("NullableProblems") @RequiredArgsConstructor
-public final class ReusableByteArrayOutputStream extends OutputStream {
+@RequiredArgsConstructor public final class ReusableByteArrayOutputStream
+    extends ByteArrayOutputStream {
 
     @Getter private final byte[] buffer;
     @Getter private int count;
 
-    public void write(int b) {
+    public void write(final int b) {
         this.buffer[this.count++] = (byte) b;
     }
 
-    public void write(byte[] b, int off, int len) {
+    public void write(final byte[] b, final int off, final int len) {
         System.arraycopy(b, off, this.buffer, this.count, len);
         this.count += len;
     }

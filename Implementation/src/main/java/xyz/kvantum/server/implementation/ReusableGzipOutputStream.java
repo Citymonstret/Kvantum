@@ -23,6 +23,7 @@ package xyz.kvantum.server.implementation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -64,8 +65,8 @@ class ReusableGzipOutputStream extends DeflaterOutputStream {
     private long writtenSize;
     private boolean written = false;
 
-    ReusableGzipOutputStream() {
-        super(new ByteArrayOutputStream(), new Deflater(Deflater.BEST_SPEED, true));
+    ReusableGzipOutputStream(final OutputStream out) {
+        super(out, new Deflater(Deflater.BEST_SPEED, true));
         this.crc32 = new CRC32();
         this.bufferStream = (ByteArrayOutputStream) out;
     }

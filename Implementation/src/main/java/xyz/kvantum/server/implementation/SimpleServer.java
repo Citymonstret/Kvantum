@@ -104,7 +104,7 @@ public class SimpleServer implements Kvantum {
     private static final Pattern LOG_ARG_PATTERN = Pattern.compile("\\{(?<num>([0-9])+)}");
 
     static ObjectPool<GzipHandler> gzipHandlerPool;
-    static ObjectPool<Md5Handler> md5HandlerPool;
+    // static ObjectPool<Md5Handler> md5HandlerPool;
 
     //region Instance fields
     @Getter private final WorkerProcedure procedure = new WorkerProcedure();
@@ -368,7 +368,7 @@ public class SimpleServer implements Kvantum {
         if (CoreConfig.gzip) {
             gzipHandlerPool = new ObjectPool<>(CoreConfig.Pools.gzipHandlers, GzipHandler::new);
         }
-        md5HandlerPool = new ObjectPool<>(CoreConfig.Pools.md5Handlers, Md5Handler::new);
+        // md5HandlerPool = new ObjectPool<>(CoreConfig.Pools.md5Handlers, Md5Handler::new);
 
         try {
             Assert.equals(this.started, false,

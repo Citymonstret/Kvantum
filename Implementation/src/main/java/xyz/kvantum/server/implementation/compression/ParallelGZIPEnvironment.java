@@ -27,13 +27,6 @@ import xyz.kvantum.server.implementation.cache.ThreadCache;
 
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -56,7 +49,7 @@ class ParallelGZIPEnvironment {
         }
     }
 
-    public static DeflaterOutputStream newDeflaterOutputStream(@NonNull final OutputStream out,
+    static DeflaterOutputStream newDeflaterOutputStream(@NonNull final OutputStream out,
         @NonNull final Deflater deflater) {
         try {
             DeflaterOutputStream dos = new DeflaterOutputStream(out, deflater, 1, true);
@@ -68,40 +61,5 @@ class ParallelGZIPEnvironment {
         }
     }
 
-    private static ThreadPoolExecutor newThreadPoolExecutor(final int nThreads) {
-        ThreadPoolExecutor executor =
-            new ThreadPoolExecutor(nThreads, nThreads, 1L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(nThreads * 20), ThreadFactoryHolder.THREAD_FACTORY,
-                new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.allowCoreThreadTimeOut(true);
-        return executor;
-    }
-
-    public static ExecutorService getSharedThreadPool() {
-        return ThreadPoolHolder.EXECUTOR;
-    }
-
-
-    private static class ThreadFactoryHolder {
-
-        private static final ThreadFactory THREAD_FACTORY = new ThreadFactory() {
-            private final ThreadFactory defaultThreadFactory = Executors.defaultThreadFactory();
-            private final AtomicLong counter = new AtomicLong(0);
-
-            @Override public Thread newThread(final Runnable r) {
-                Thread thread = defaultThreadFactory.newThread(r);
-                thread.setName("kvantum-pgzip-" + counter.getAndIncrement());
-                thread.setDaemon(true);
-                return thread;
-            }
-        };
-    }
-
-
-    private static class ThreadPoolHolder {
-
-        private static final ExecutorService EXECUTOR =
-            newThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
-    }
 
 }

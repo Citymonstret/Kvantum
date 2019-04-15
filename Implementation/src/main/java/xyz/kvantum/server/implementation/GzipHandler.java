@@ -37,17 +37,20 @@ import java.io.IOException;
  */
 final class GzipHandler extends AutoCloseable {
 
-    private final ParallelGZIPOutputStream reusableGzipOutputStream;
+    private final ParallelGZIPOutputStream reusablePGzipOutputStream; // parallel
+    private final ReusableGzipOutputStream reusableGzipOutputStream;
+
     private final ReusableByteArrayOutputStream buffer;
 
     @SneakyThrows GzipHandler() {
         this.buffer = new ReusableByteArrayOutputStream(ThreadCache.COMPRESS_BUFFER.get());
-        this.reusableGzipOutputStream = new ParallelGZIPOutputStream(buffer);
+        this.reusablePGzipOutputStream = new ParallelGZIPOutputStream(buffer);
+        this.reusableGzipOutputStream = new ReusableGzipOutputStream(buffer);
     }
 
     @Override protected void handleClose() {
         try {
-            this.reusableGzipOutputStream.close();
+            this.reusablePGzipOutputStream.close();
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -68,9 +71,11 @@ final class GzipHandler extends AutoCloseable {
         buffer.reset();
         reusableGzipOutputStream.reset();
         reusableGzipOutputStream.write(data);
-        reusableGzipOutputStream.close();
+        reusableGzipOutputStream.finish();
+        reusableGzipOutputStream.flush();
 
         final byte[] compressed = buffer.toByteArray();
+
         Assert.equals(compressed.length > 0, true, "Failed to compress data");
 
         return compressed;
@@ -87,9 +92,9 @@ final class GzipHandler extends AutoCloseable {
         Assert.notNull(input);
 
         buffer.reset();
-        reusableGzipOutputStream.reset();
-        reusableGzipOutputStream.write(input, 0, inputLength);
-        reusableGzipOutputStream.close();
+        reusablePGzipOutputStream.reset();
+        reusablePGzipOutputStream.write(input, 0, inputLength);
+        reusablePGzipOutputStream.close();
 
         return Unpooled.wrappedBuffer(buffer.getBuffer(), 0, buffer.getCount());
     }

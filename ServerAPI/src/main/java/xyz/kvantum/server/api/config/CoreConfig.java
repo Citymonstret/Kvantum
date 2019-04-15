@@ -111,6 +111,8 @@ public class CoreConfig {
         public static int httpsBossGroupThreads = 0;
         public static int httpsWorkerGroupThreads = 0;
 
+        public static int gzipParallelThreads = -1;
+
         public static int gzipHandlers = 2;
         public static int md5Handlers = 2;
     }
@@ -143,6 +145,7 @@ public class CoreConfig {
         public static int in = 100_000;
         public static int out = 100_000;
         public static int files = 100_000;
+
     }
 
 
