@@ -53,7 +53,7 @@ final class GzipHandler extends AutoCloseable {
 
     /**
      * Compress bytes using gzip
-     *
+     * <p>
      * TODO optimize (though not super important since it's only used for fixed getCount)
      *
      * @param data Bytes to compress
@@ -69,15 +69,15 @@ final class GzipHandler extends AutoCloseable {
         reusableGzipOutputStream.close();
 
         final byte[] compressed = buffer.toByteArray();
-
-        Assert.equals(compressed != null && compressed.length > 0, true, "Failed to compress data");
+        Assert.equals(compressed.length > 0, true, "Failed to compress data");
 
         return compressed;
     }
 
     /**
      * Compresses the input bytes into the buffer and returns the new length
-     * @param input
+     *
+     * @param input       Input data
      * @param inputLength length of input to compress
      * @return compressed length (in buffer)
      */
