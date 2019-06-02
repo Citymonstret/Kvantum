@@ -2,7 +2,7 @@ dependencies {
     // Cache manager
     compile 'com.github.ben-manes.caffeine:caffeine:2.7.0'
 
-    compileOnly 'org.projectlombok:lombok:1.18.6'
+    compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
     // Performance monitoring
     compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
