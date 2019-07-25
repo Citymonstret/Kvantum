@@ -14,7 +14,7 @@ dependencies {
     // MySQL Driver
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.16'
     // Netty
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.36.Final'
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.38.Final'
     // Netty native transports
     compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.36.Final',
             classifier: 'linux-x86_64'
