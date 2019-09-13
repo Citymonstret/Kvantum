@@ -16,7 +16,7 @@ dependencies {
     // Netty
     compile group: 'io.netty', name: 'netty-all', version: '4.1.36.Final'
     // Netty native transports
-    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.36.Final',
+    compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.41.Final',
             classifier: 'linux-x86_64'
     //
     // Modules
