@@ -25,6 +25,10 @@ allprojects {
     apply plugin: 'org.junit.platform.gradle.plugin'
     apply plugin: 'signing'
 
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
     license {
         header rootProject.file('HEADER')
         mapping 'java', 'SLASHSTAR_STYLE'
