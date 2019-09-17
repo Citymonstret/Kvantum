@@ -74,7 +74,7 @@ import java.util.Optional;
             if (!isPrivileged) {
                 System.out.println("\nWARNING\n"
                     + "The server is not privileged, and might therefore not be able to bind to port 80.\n"
-                    + "Not running as a previleged user may also cause complications with file creation. Beware.\n");
+                    + "Not running as a privileged user may also cause complications with file creation. Beware.\n");
             }
         }
 
