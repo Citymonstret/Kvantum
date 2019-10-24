@@ -21,10 +21,10 @@
  */
 package xyz.kvantum.server.implementation.config;
 
+import com.github.sauilitired.loggbok.LogLevels;
 import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.config.YamlConfiguration;
-import xyz.kvantum.server.api.logging.LogModes;
 
 import java.io.File;
 import java.util.Locale;
@@ -37,16 +37,16 @@ final public class TranslationFile extends YamlConfiguration implements ITransla
         for (final Message message : Message.values()) {
             final String nameSpace;
             switch (message.getMode()) {
-                case LogModes.MODE_DEBUG:
+                case LogLevels.LEVEL_DEBUG:
                     nameSpace = "debug";
                     break;
-                case LogModes.MODE_INFO:
+                case LogLevels.LEVEL_INFO:
                     nameSpace = "info";
                     break;
-                case LogModes.MODE_ERROR:
+                case LogLevels.LEVEL_ERROR:
                     nameSpace = "error";
                     break;
-                case LogModes.MODE_WARNING:
+                case LogLevels.LEVEL_WARNING:
                     nameSpace = "warning";
                     break;
                 default:

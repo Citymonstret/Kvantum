@@ -26,6 +26,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import xyz.kvantum.server.api.core.ServerImplementation;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,7 @@ public class InternalJlineManager {
             try {
                 instance = new InternalJlineManager();
             } catch (Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
         return instance;

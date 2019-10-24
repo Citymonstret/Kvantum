@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.addon;
 
 import lombok.Getter;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.api.util.CollectionUtil;
 
@@ -225,7 +226,7 @@ import java.util.stream.Collectors;
         try {
             properties = getAddOnProperties(file);
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return properties == null;
     }
@@ -242,22 +243,20 @@ import java.util.stream.Collectors;
         try {
             properties = getAddOnProperties(file);
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
             return null; // Nullable
         }
         if (properties == null) {
             return this.loadLibrary(file);
         } else {
             if (!properties.containsKey("main")) {
-                new AddOnManagerException(
-                    "\"addon.properties\" for " + file.getName() + " has no \"main\" key")
-                    .printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new AddOnManagerException("\"addon.properties\" for " + file.getName() + " has no \"main\" key"));
                 return null; // Nullable
             }
             if (!properties.containsKey("name")) {
-                new AddOnManagerException(
-                    "\"addon.properties\" for " + file.getName() + " has no \"name\" key")
-                    .printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new AddOnManagerException("\"addon.properties\" for " + file.getName() + " has no \"name\" key"));
                 return null; // Nullable
             }
             final String addOnName = properties.get("name").toString();
@@ -277,7 +276,8 @@ import java.util.stream.Collectors;
             try {
                 loader = new AddOnClassLoader(this, file, main, addOnName);
             } catch (final Exception e) {
-                new AddOnManagerException("Failed to load " + file.getName(), e).printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new AddOnManagerException("Failed to load " + file.getName(), e));
                 return null; // Nullable
             }
             this.classLoaders.put(addOnName, loader);
@@ -290,7 +290,8 @@ import java.util.stream.Collectors;
         try {
             loader = new AddOnClassLoader(this, file, file.toPath().getFileName().toString());
         } catch (final Exception e) {
-            new AddOnManagerException("Failed to load " + file.getName(), e).printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest()
+                .digest(new AddOnManagerException("Failed to load " + file.getName(), e));
             return null; // Nullable
         }
         this.classLoaders.put(loader.getName(), loader);

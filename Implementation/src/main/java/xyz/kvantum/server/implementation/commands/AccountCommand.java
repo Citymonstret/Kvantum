@@ -161,7 +161,7 @@ public class AccountCommand extends Command {
                     send("Account created (Username: " + username + ")");
                     AccountService.getInstance().getGlobalAccountManager().createAccount(username, password);
                 } catch (final Exception e) {
-                    e.printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest().digest(e);
                 }
             }
             return true;

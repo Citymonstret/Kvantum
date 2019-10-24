@@ -36,4 +36,6 @@ dependencies {
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Lambda-factory
     compile 'com.github.Hervian:lambda-factory:91bc62f8c2'
+    // Logging
+    implementation 'com.github.Sauilitired:LoggBok:1.1-Pre'
 }

@@ -71,7 +71,7 @@ public class SQLiteManager extends AutoCloseable {
         try {
             return connection.createBlob();
         } catch (SQLException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return null; // Nullable
     }
@@ -80,7 +80,7 @@ public class SQLiteManager extends AutoCloseable {
         try {
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 }

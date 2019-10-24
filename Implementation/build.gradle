@@ -18,6 +18,8 @@ dependencies {
     // Netty native transports
     compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.36.Final',
             classifier: 'linux-x86_64'
+    // Logging
+    implementation 'com.github.Sauilitired:LoggBok:1.1-Pre'
     //
     // Modules
     //

@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.memguard;
 
 import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
@@ -63,7 +64,7 @@ public final class MemoryGuard extends AutoCloseable implements Runnable {
         try {
             Thread.sleep(CoreConfig.MemoryGuard.runEveryMillis);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         Logger.info("Running memory guard!");
         this.leakagePrones.forEach(LeakageProne::cleanUp);

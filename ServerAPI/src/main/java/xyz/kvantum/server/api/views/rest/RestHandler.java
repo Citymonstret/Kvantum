@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.views.rest;
 
 import org.json.simple.JSONObject;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.response.Response;
@@ -81,7 +82,7 @@ import java.util.List;
         try {
             jsonObject = restResponse.generate(request);
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
             try {
                 jsonObject = new JSONObject();
                 jsonObject.put("status", "error");

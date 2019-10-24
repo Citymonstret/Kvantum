@@ -67,7 +67,7 @@ public class ViewException extends View {
             try {
                 FileUtils.copyResource(resourcePath, path.getJavaPath());
             } catch (Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
         template = path.readFile();
@@ -75,7 +75,7 @@ public class ViewException extends View {
 
     @Override public Response generate(AbstractRequest request) {
         StringWriter sw = new StringWriter();
-        in.printStackTrace(new PrintWriter(sw));
+        in.printStackTrace(new PrintWriter(sw)); // Should not use ErrorDigest
         return new Response().setResponse(
             template.replace("{{path}}", request.getQuery().getResource())
                 .replace("{{exception}}", in.toString()).replace("{{cause}}",

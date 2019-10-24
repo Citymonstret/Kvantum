@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.util;
 
 import lombok.experimental.UtilityClass;
+import xyz.kvantum.server.api.core.ServerImplementation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -48,7 +49,7 @@ import java.lang.reflect.Modifier;
 
             Assert.equals(field.get(null).equals(t), true);
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -79,7 +80,7 @@ import java.lang.reflect.Modifier;
                     }
                     field.set(null, t);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest().digest(e);
                 }
             }
         }

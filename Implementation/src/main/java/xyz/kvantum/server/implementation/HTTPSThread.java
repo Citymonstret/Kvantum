@@ -29,6 +29,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.ssl.SslHandler;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
@@ -108,7 +109,7 @@ final class HTTPSThread extends Thread {
                 Logger.info("Closed ssl!");
             }
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -116,7 +117,7 @@ final class HTTPSThread extends Thread {
         try {
             this.future = serverBootstrap.bind(CoreConfig.SSL.port).sync();
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 }

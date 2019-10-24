@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.matching;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import xyz.kvantum.server.api.core.Kvantum;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.NotImplementedException;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.views.RequestHandler;
@@ -88,7 +89,7 @@ import java.util.Collections;
         try {
             return this.annotatedViewManager.generate(instance);
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return Collections.emptyList();
     }

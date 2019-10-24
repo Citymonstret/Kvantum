@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.util;
 
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.config.Message;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 
 import java.io.BufferedReader;
@@ -127,13 +128,13 @@ import java.util.Map;
                 out.write(buffer, 0, length);
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         } finally {
             try {
                 in.close();
                 out.close();
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
     }

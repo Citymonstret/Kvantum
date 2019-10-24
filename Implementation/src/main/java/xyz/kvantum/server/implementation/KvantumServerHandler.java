@@ -191,7 +191,7 @@ import java.util.function.Supplier;
             }
         } else {
             Logger.error("Encountered error...");
-            cause.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(cause);
         }
         context.close();
     }

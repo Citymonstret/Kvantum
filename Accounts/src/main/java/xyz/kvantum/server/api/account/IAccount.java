@@ -21,8 +21,8 @@
  */
 package xyz.kvantum.server.api.account;
 
+import com.github.sauilitired.loggbok.LogFormatted;
 import xyz.kvantum.server.api.account.roles.AccountRole;
-import xyz.kvantum.server.api.logging.LogFormatted;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 
 import java.util.Collection;

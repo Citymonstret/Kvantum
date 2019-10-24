@@ -61,7 +61,7 @@ final class IntellectualFileSystem extends FileSystem {
         try {
             path.registerWatcher(fileWatcher, this::eventListener);
         } catch (final IOException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 

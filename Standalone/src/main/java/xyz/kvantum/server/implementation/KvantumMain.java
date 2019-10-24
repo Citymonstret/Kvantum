@@ -25,8 +25,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.Kvantum;
-import xyz.kvantum.server.api.logging.LogContext;
-import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.util.RequestManager;
 import xyz.kvantum.server.api.util.TimeUtil;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
@@ -87,13 +85,12 @@ import java.util.Optional;
         jCommander.setProgramName("Kvantum");
 
         if (options.help) {
-            final LogWrapper logWrapper = new DefaultLogWrapper();
             final StringBuilder message = new StringBuilder();
             jCommander.usage(message);
 
-            logWrapper.log(LogContext.builder().applicationPrefix("Help").logPrefix("Info")
-                .timeStamp(TimeUtil.getTimeStamp()).message(message.toString()).thread("main")
-                .build());
+            System.out.print("[Kvantum][Help]: ");
+            System.out.print(message);
+            System.out.println();
 
             System.exit(0);
         } else {
@@ -112,7 +109,7 @@ import java.util.Optional;
 
             final Optional<Kvantum> server =
                 ServerContext.builder().coreFolder(file).standalone(true)
-                    .logWrapper(new DefaultLogWrapper()).router(RequestManager.builder().build())
+                    .router(RequestManager.builder().build())
                     .serverSupplier(StandaloneServer::new).build().create();
             if (server.isPresent()) {
                 if (!options.debug.isEmpty()) {
@@ -139,7 +136,7 @@ import java.util.Optional;
 
     public static Optional<? extends Kvantum> start(final File coreFolder) {
         return start(ServerContext.builder().standalone(false).coreFolder(coreFolder)
-            .logWrapper(new DefaultLogWrapper()).router(RequestManager.builder().build()).build());
+            .router(RequestManager.builder().build()).build());
     }
 
     public static Optional<? extends Kvantum> start() {
@@ -164,7 +161,7 @@ import java.util.Optional;
                 }
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
         return server;
     }

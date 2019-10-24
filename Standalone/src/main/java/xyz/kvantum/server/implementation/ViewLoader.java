@@ -89,7 +89,8 @@ import java.util.function.Supplier;
                             continue;
                         }
                     } catch (Exception e) {
-                        new RuntimeException("Failed to include views file", e).printStackTrace();
+                        ServerImplementation.getImplementation().getErrorDigest()
+                            .digest(new RuntimeException("Failed to include views file", e));
                         continue;
                     }
                 } else {
@@ -142,8 +143,8 @@ import java.util.function.Supplier;
                 }
                 ServerImplementation.getImplementation().getRouter().add(vv);
             } catch (final Exception e) {
-                new RuntimeException("Failed to add view '" + viewEntry.getKey() + "' to router", e)
-                    .printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new RuntimeException("Failed to add view '" + viewEntry.getKey() + "' to router", e));
             }
         } else {
             Logger.warn("View declaration '{}' trying to declare unknown type: {}",

@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews;
 
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.CollectionUtil;
@@ -51,8 +52,7 @@ public final class AnnotatedViewManager {
         StandardConverters.registerStandardConverters(this);
     }
 
-    public <T> Collection<? extends RequestHandler> generate(final T viewDeclaration)
-        throws Exception {
+    public <T> Collection<? extends RequestHandler> generate(final T viewDeclaration) {
         final Class<?> clazz = viewDeclaration.getClass();
         final List<ReflectionUtils.AnnotatedMethod<ViewMatcher>> annotatedMethods =
             ReflectionUtils.getAnnotatedMethods(ViewMatcher.class, clazz);
@@ -66,11 +66,12 @@ public final class AnnotatedViewManager {
 
             if (!usesAlternate && !Response.class.equals(m.getReturnType()) && matcher.outputType()
                 .isEmpty()) {
-                new IllegalArgumentException(m.getName() + " doesn't return response")
-                    .printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new IllegalArgumentException(m.getName() + " doesn't return response"));
             } else {
                 if (!usesAlternate && !Arrays.equals(m.getParameterTypes(), parameters)) {
-                    new IllegalArgumentException("M has wrong parameter types").printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest()
+                        .digest(new IllegalArgumentException("M has wrong parameter types"));
                 } else {
                     declaration.setCache(matcher.cache());
                     declaration.setFilter(matcher.filter());
@@ -82,10 +83,9 @@ public final class AnnotatedViewManager {
                         final OutputConverter outputConverter =
                             converters.get(matcher.outputType().toLowerCase(Locale.ENGLISH));
                         if (!outputConverter.getClasses().contains(m.getReturnType())) {
-                            new IllegalArgumentException(
-                                m.getName() + " should return one of " + CollectionUtil
-                                    .smartJoin(outputConverter.getClasses(), Class::getSimpleName,
-                                        ", ")).printStackTrace();
+                            ServerImplementation.getImplementation().getErrorDigest().
+                                digest(new IllegalArgumentException(m.getName() + " should return one of " +
+                                    CollectionUtil.smartJoin(outputConverter.getClasses(), Class::getSimpleName, ", ")));
                         } else {
                             declaration.setOutputConverter(
                                 converters.get(matcher.outputType().toLowerCase(Locale.ENGLISH)));
@@ -104,7 +104,7 @@ public final class AnnotatedViewManager {
                                 new ResponseMethod<>(m, viewDeclaration,
                                     declaration.getOutputConverter()));
                         } catch (Throwable throwable) {
-                            throwable.printStackTrace();
+                            ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
                         }
                     } else {
                         try {
@@ -112,7 +112,7 @@ public final class AnnotatedViewManager {
                                 new ResponseMethod<>(m, viewDeclaration,
                                     declaration.getOutputConverter()));
                         } catch (Throwable throwable) {
-                            throwable.printStackTrace();
+                            ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
                         }
                     }
 

@@ -29,6 +29,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ProtocolType;
 import xyz.kvantum.server.implementation.error.KvantumInitializationException;
@@ -86,7 +87,7 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
                 Logger.info("Closed!");
             }
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -94,7 +95,7 @@ import xyz.kvantum.server.implementation.error.KvantumInitializationException;
         try {
             this.future = serverBootstrap.bind(this.port).sync();
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 

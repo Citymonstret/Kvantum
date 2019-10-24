@@ -26,6 +26,7 @@ import xyz.kvantum.crush.syntax.filter.List;
 import xyz.kvantum.crush.syntax.filter.Lowercase;
 import xyz.kvantum.crush.syntax.filter.Uppercase;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.util.ProviderFactory;
@@ -84,7 +85,7 @@ final public class Variable extends Syntax {
                         content = content.replace(matcher.group(), "");
                     }
                 } catch (final Throwable e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); // Can't use ErrorDigest
                     content = content.replace(matcher.group(), "");
                 }
             } else {

@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.core;
 
+import com.github.sauilitired.loggbok.ErrorDigest;
 import com.google.gson.Gson;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
@@ -33,9 +34,7 @@ import xyz.kvantum.server.api.config.ITranslationManager;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.event.EventBus;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
-import xyz.kvantum.server.api.logging.LogModes;
 import xyz.kvantum.server.api.logging.LogProvider;
-import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
@@ -165,7 +164,7 @@ import java.util.function.BiConsumer;
      * argument can also be passed as "{}" or "{}", in which case the number will be implied.
      *
      * @param message message to be logged
-     * @param mode    log mode ({@link LogModes})
+     * @param mode    log mode ({@link com.github.sauilitired.loggbok.LogLevels})
      * @param args    Replacements
      */
     void log(String message, int mode, Object... args);
@@ -183,13 +182,6 @@ import java.util.function.BiConsumer;
      * @return Cache manager instance
      */
     ICacheManager getCacheManager();
-
-    /**
-     * Get the currently used log wrapper instance
-     *
-     * @return Log wrapper
-     */
-    LogWrapper getLogWrapper();
 
     /**
      * Get the main folder (configured_folder/.kvantum/)
@@ -225,6 +217,13 @@ import java.util.function.BiConsumer;
      * @return Application structure
      */
     ApplicationStructure getApplicationStructure();
+
+    /**
+     * Get the error digest used by the Kvantum instance
+     *
+     * @return ErrorDigest instance
+     */
+    ErrorDigest getErrorDigest();
 
     /**
      * Log a message

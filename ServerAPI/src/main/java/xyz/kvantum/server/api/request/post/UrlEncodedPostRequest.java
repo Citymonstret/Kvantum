@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.request.post;
 
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.request.AbstractRequest;
 
 import java.net.URLDecoder;
@@ -39,7 +40,7 @@ public final class UrlEncodedPostRequest extends RequestEntity {
             fixedRequest = URLDecoder.decode(request, StandardCharsets.US_ASCII.toString());
         } catch (final Exception e) {
             if (CoreConfig.debug) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
             fixedRequest = request;
         }

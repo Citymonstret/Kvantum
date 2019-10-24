@@ -22,6 +22,7 @@
 package xyz.kvantum.server.implementation.sqlite;
 
 import lombok.RequiredArgsConstructor;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.session.ISession;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionLoad;
@@ -55,7 +56,7 @@ import java.sql.ResultSet;
                 }
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return sessionLoad;
     }
@@ -72,7 +73,7 @@ import java.sql.ResultSet;
                 statement.setString(3, session.getSessionKey().toString());
                 statement.executeUpdate();
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
     }
@@ -83,7 +84,7 @@ import java.sql.ResultSet;
             statement.setString(1, session.toString());
             statement.executeUpdate();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -94,7 +95,7 @@ import java.sql.ResultSet;
             statement.setString(2, session.toString());
             statement.executeUpdate();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 }

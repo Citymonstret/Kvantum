@@ -57,7 +57,7 @@ public class MySQLManager extends AutoCloseable {
         try (final FileReader reader = path.getReader()) {
             properties.load(reader);
         } catch (final IOException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         properties.putIfAbsent("jdbcUrl", "jdbc:mysql://localhost:3306/database");
         properties.putIfAbsent("username", "username");
@@ -65,7 +65,7 @@ public class MySQLManager extends AutoCloseable {
         try (final FileWriter writer = path.getWriter()) {
             properties.store(writer, null);
         } catch (final IOException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         final HikariConfig hikariConfig = new HikariConfig(properties);
         this.dataSource = new HikariDataSource(hikariConfig);

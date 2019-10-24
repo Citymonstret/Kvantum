@@ -1,3 +1,4 @@
 dependencies {
+    implementation 'com.github.Sauilitired:LoggBok:1.1-Pre'
     compile project(":ServerAPI")
 }

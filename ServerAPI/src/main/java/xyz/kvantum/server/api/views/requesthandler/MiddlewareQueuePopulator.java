@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.views.requesthandler;
 
+import xyz.kvantum.server.api.core.ServerImplementation;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -35,7 +37,7 @@ public final class MiddlewareQueuePopulator {
         try {
             middleware.getConstructor();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
             return;
         }
         this.middleware.add(middleware);
@@ -47,7 +49,7 @@ public final class MiddlewareQueuePopulator {
             try {
                 queue.add(clazz.newInstance());
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         });
         return queue;

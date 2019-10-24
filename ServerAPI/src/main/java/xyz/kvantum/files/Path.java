@@ -90,7 +90,7 @@ import java.util.stream.Stream;
         try {
             return Files.size(javaPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
         return -1L;
     }
@@ -124,7 +124,7 @@ import java.util.stream.Stream;
             this.loadAttributes();
             return this.basicFileAttributes.creationTime().toMillis();
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
         return -1;
     }
@@ -134,7 +134,7 @@ import java.util.stream.Stream;
             this.loadAttributes();
             return this.basicFileAttributes.lastModifiedTime().toMillis();
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
         return -1;
     }
@@ -165,7 +165,7 @@ import java.util.stream.Stream;
             try {
                 content = Files.readAllBytes(javaPath);
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // Can't use ErrorDigest
             }
         }
         fileSystem.getFileCacheManager().writeCachedFile(this, new CachedFile(content));
@@ -193,7 +193,7 @@ import java.util.stream.Stream;
                 Files.readAllLines(javaPath)
                     .forEach(line -> document.append(line).append(System.lineSeparator()));
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // Can't use ErrorDigest
             }
         }
         final String content = document.toString();
@@ -271,9 +271,9 @@ import java.util.stream.Stream;
     }
 
     /**
-     * Create the file/directory, if it doesn't exist <p> Invokes {@link Files#createFile(java.nio.file.Path, * FileAttribute[]) Files.createFile} if this path points to a file; Invokes {@link
-     * Files#createDirectories(java.nio.file.Path, FileAttribute[]) Files.createDirectories} if this path points to a
-     * directory </p>
+     * Create the file/directory, if it doesn't exist <p> Invokes {@link Files#createFile(java.nio.file.Path, FileAttribute[])}
+     * if this path points to a file; Invokes {@link Files#createDirectories(java.nio.file.Path, FileAttribute[]) Files.createDirectories}
+     * if this path points to a directory </p>
      *
      * @return true if the file/directory was created
      */
@@ -287,7 +287,7 @@ import java.util.stream.Stream;
             }
             exists = Files.exists(Files.createFile(javaPath));
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
         return exists;
     }
@@ -331,7 +331,7 @@ import java.util.stream.Stream;
                 this.subPaths.put(path.toString(), path);
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
     }
 
@@ -350,7 +350,7 @@ import java.util.stream.Stream;
                 Files
                     .copy(this.getJavaPath(), target.javaPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (final IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // Can't use ErrorDigest
                 return false;
             }
         }
@@ -413,7 +413,7 @@ import java.util.stream.Stream;
             try {
                 Files.delete(getJavaPath());
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // Can't use ErrorDigest
             }
         }
     }

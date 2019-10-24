@@ -299,7 +299,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
                     }
                 } catch (final IOException e) {
                     Logger.error("Failed to read request entity");
-                    e.printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest().digest(e);
                 }
                 if (isFormURLEncoded) {
                     requestEntity = new UrlEncodedPostRequest(abstractRequest, builder.toString());

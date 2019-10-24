@@ -21,6 +21,19 @@
  */
 package xyz.kvantum.server.implementation;
 
+import com.github.sauilitired.loggbok.ColorLogger;
+import com.github.sauilitired.loggbok.ColorStripper;
+import com.github.sauilitired.loggbok.ErrorDigest;
+import com.github.sauilitired.loggbok.FileLogger;
+import com.github.sauilitired.loggbok.LevelSplitLogger;
+import com.github.sauilitired.loggbok.LogFormatter;
+import com.github.sauilitired.loggbok.LogLevels;
+import com.github.sauilitired.loggbok.Logger;
+import com.github.sauilitired.loggbok.PositionFormatter;
+import com.github.sauilitired.loggbok.PrintStreamLogger;
+import com.github.sauilitired.loggbok.SimpleLogger;
+import com.github.sauilitired.loggbok.SplitLogger;
+import com.github.sauilitired.loggbok.ThreadedQueueLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellectualsites.commands.CommandManager;
@@ -47,12 +60,7 @@ import xyz.kvantum.server.api.events.ConnectionEstablishedEvent;
 import xyz.kvantum.server.api.events.ServerShutdownEvent;
 import xyz.kvantum.server.api.events.ServerStartedEvent;
 import xyz.kvantum.server.api.fileupload.KvantumFileUpload;
-import xyz.kvantum.server.api.logging.LogContext;
-import xyz.kvantum.server.api.logging.LogFormatted;
-import xyz.kvantum.server.api.logging.LogModes;
 import xyz.kvantum.server.api.logging.LogProvider;
-import xyz.kvantum.server.api.logging.LogWrapper;
-import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -64,7 +72,6 @@ import xyz.kvantum.server.api.templates.TemplateManager;
 import xyz.kvantum.server.api.util.ApplicationStructure;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
-import xyz.kvantum.server.api.util.ErrorOutputStream;
 import xyz.kvantum.server.api.util.FileUtils;
 import xyz.kvantum.server.api.util.ITempFileManagerFactory;
 import xyz.kvantum.server.api.util.MetaProvider;
@@ -83,25 +90,25 @@ import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
 import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Main {@link Kvantum} implementation.
  */
 public class SimpleServer implements Kvantum {
-
-    private static final Pattern LOG_ARG_PATTERN = Pattern.compile("\\{(?<num>([0-9])+)}");
 
     static ObjectPool<GzipHandler> gzipHandlerPool;
     // static ObjectPool<Md5Handler> md5HandlerPool;
@@ -116,7 +123,6 @@ public class SimpleServer implements Kvantum {
         new GsonBuilder().registerTypeAdapter(Account.class, new AccountSerializer()).create();
     private final ServerContext serverContext;
     @Getter protected ICacheManager cacheManager;
-    PrintStream logStream;
     AccessLogStream accessLogStream;
     @Getter private InputThread inputThread;
     @Getter private boolean silent = false;
@@ -134,6 +140,8 @@ public class SimpleServer implements Kvantum {
     @Getter private ApplicationStructure applicationStructure;
     @Getter private ITranslationManager translationManager;
     @Getter private EventBus eventBus;
+    @Getter private Logger logger;
+    @Getter private ErrorDigest errorDigest;
     //endregion
 
     /**
@@ -183,7 +191,7 @@ public class SimpleServer implements Kvantum {
             FileUtils.addToZip(new File(logFolder, "old.zip"), logFolder
                 .listFiles((dir, name) -> name.endsWith(".log") && !name.contains("access")));
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
 
         //
@@ -193,18 +201,50 @@ public class SimpleServer implements Kvantum {
             translationManager = new TranslationFile(new File(getCoreFolder(), "config"));
         } catch (final Exception e) {
             log(Message.CANNOT_LOAD_TRANSLATIONS);
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
+        }
+
+        //
+        // Load the configuration file
+        //
+        if (!CoreConfig.isPreConfigured()) {
+            ConfigurationFactory.load(CoreConfig.class, new File(getCoreFolder(), "config")).get();
         }
 
         //
         // Setup the log-to-file system and the error stream
         //
         try {
-            this.logStream = new LogStream(logFolder);
-            System.setErr(
-                new PrintStream(new ErrorOutputStream(serverContext.getLogWrapper()), true));
+            /*
+            new FileOutputStream(new File(logFolder,
+            TimeUtil.getTimeStamp(TimeUtil.logFileFormat, new Date()) + ".log")))
+             */
+            final Path path = new File(logFolder, TimeUtil
+                .getTimeStamp(TimeUtil.logFormat, new Date()) + ".log").toPath();
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+            final LogLevels logLevels = new LogLevels();
+            logLevels.addLevel("ACCESS"); // will have level value 0x10
+            final String format = CoreConfig.Logging.logFormat;
+            // We need to do two things:
+            // the first is to create a threaded queue logger
+            // we then need to split the logging into two different loggers:
+            // - file logging
+            // - standard output logging
+            final LogFormatter logFormatter = new PositionFormatter();
+            final SimpleLogger defaultLogger = new PrintStreamLogger(System.out, format, logLevels);
+            defaultLogger.setLogFormatter(logFormatter);
+            final SimpleLogger errorLogger = new PrintStreamLogger(System.err, format, logLevels);
+            errorLogger.setLogFormatter(logFormatter);
+            final Logger standardLogger = new LevelSplitLogger(new ColorLogger(defaultLogger), logLevels)
+                .split(LogLevels.LEVEL_ERROR, new ColorStripper(errorLogger));
+            final SimpleLogger fileLogger = new FileLogger(path, format, logLevels);
+            fileLogger.setLogFormatter(logFormatter);
+            this.logger = new ThreadedQueueLogger(new SplitLogger(standardLogger, new ColorStripper(fileLogger)));
+            this.errorDigest = new ErrorDigest(logger);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
 
         //
@@ -221,20 +261,13 @@ public class SimpleServer implements Kvantum {
         //
         // Setup memory guard
         //
-        Logger.info("Starting memory guard!");
+        log("Starting memory guard!");
         MemoryGuard.getInstance().start();
 
         //
         // Setup the cache manager
         //
         this.cacheManager = new CacheManager();
-
-        //
-        // Load the configuration file
-        //
-        if (!CoreConfig.isPreConfigured()) {
-            ConfigurationFactory.load(CoreConfig.class, new File(getCoreFolder(), "config")).get();
-        }
 
         //
         // Setup the internal application
@@ -276,10 +309,10 @@ public class SimpleServer implements Kvantum {
                 }
             } catch (ClassNotFoundException e) {
                 log(Message.APPLICATION_CANNOT_FIND, CoreConfig.Application.main);
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             } catch (InstantiationException | IllegalAccessException e) {
                 log(Message.APPLICATION_CANNOT_INITIATE, CoreConfig.Application.main);
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
 
@@ -310,7 +343,7 @@ public class SimpleServer implements Kvantum {
             try {
                 sessionDatabase.setup();
             } catch (Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         } else {
             sessionDatabase = new DumbSessionDatabase();
@@ -329,7 +362,7 @@ public class SimpleServer implements Kvantum {
         //
         // Initialize access.log logger
         //
-        Logger.info("Creating access.log handler...");
+        log("Creating access.log handler...");
         this.eventBus.registerListeners((this.accessLogStream = new AccessLogStream(logFolder)));
 
         //
@@ -347,10 +380,6 @@ public class SimpleServer implements Kvantum {
 
     @Override public final File getCoreFolder() {
         return this.serverContext.getCoreFolder();
-    }
-
-    @Override public final LogWrapper getLogWrapper() {
-        return this.serverContext.getLogWrapper();
     }
 
     @Override public final boolean isStandalone() {
@@ -375,7 +404,7 @@ public class SimpleServer implements Kvantum {
                 new KvantumStartException("Cannot start the server, it is already started",
                     new KvantumException("Cannot restart server singleton")));
         } catch (KvantumStartException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
             return false;
         }
 
@@ -417,7 +446,8 @@ public class SimpleServer implements Kvantum {
                 this.httpsThread = new HTTPSThread(classResolver);
                 this.httpsThread.start();
             } catch (final Exception e) {
-                new KvantumException("Failed to start HTTPS server", e).printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new KvantumException("Failed to start HTTPS server", e));
             }
         }
 
@@ -441,86 +471,12 @@ public class SimpleServer implements Kvantum {
         this.log(message.toString(), message.getMode(), args);
     }
 
-    @Override public final void log(final String message, final int mode, final Object... args) {
-        // This allows us to customize what messages are
-        // sent to the logging screen, and thus we're able
-        // to limit to only error messages or such
-        if ((mode == LogModes.MODE_DEBUG && !CoreConfig.debug) || mode < LogModes.lowestLevel
-            || mode > LogModes.highestLevel) {
-            return;
-        }
-        String prefix;
-        switch (mode) {
-            case LogModes.MODE_DEBUG:
-                prefix = "Debug";
-                break;
-            case LogModes.MODE_ERROR:
-                prefix = "Error";
-                break;
-            case LogModes.MODE_WARNING:
-                prefix = "Warning";
-                break;
-            case LogModes.MODE_ACCESS:
-                prefix = "Access";
-                break;
-            default:
-                prefix = "Info";
-                break;
-        }
-
-        this.log(prefix, message, args);
-    }
-
-    /**
-     * Replaces string arguments using the pattern {num} from an array of objects, starting from index 0, as such: 0
-     * &le; num &lt; args.length. If num &ge; args.length, then the pattern will be replaced by an empty string. An
-     * argument can also be passed as "{}", in which case the number will be implied.
-     *
-     * @param prefix  Log prefix
-     * @param message String to be replaced. Cannot be null.
-     * @param args    Replacements
-     */
-    @Synchronized private void log(final String prefix, final String message,
-        final Object... args) {
-        String msg = message;
-
-        final Matcher matcher = LOG_ARG_PATTERN.matcher(msg);
-
-        int index = 0;
-        boolean containsEmptyBrackets;
-        while ((containsEmptyBrackets = msg.contains("{}")) || matcher.find()) {
-            final int argumentNum;
-            final String toReplace;
-            if (containsEmptyBrackets) {
-                argumentNum = index++;
-                toReplace = "{}";
-            } else {
-                toReplace = matcher.group();
-                argumentNum = Integer.parseInt(matcher.group("num"));
-            }
-            if (argumentNum < args.length) {
-                final Object object = args[argumentNum];
-                String objectString;
-                if (object == null) {
-                    objectString = "null";
-                } else if (object instanceof LogFormatted) {
-                    objectString = ((LogFormatted) object).getLogFormatted();
-                } else {
-                    objectString = object.toString();
-                }
-                msg = msg.replace(toReplace, objectString);
-            } else {
-                msg = msg.replace(toReplace, "");
-            }
-        }
-        getLogWrapper().log(
-            LogContext.builder().applicationPrefix(CoreConfig.logPrefix).logPrefix(prefix)
-                .timeStamp(TimeUtil.getTimeStamp()).message(msg)
-                .thread(Thread.currentThread().getName()).build());
-    }
-
     @Override public final void log(final String message, final Object... args) {
-        this.log(message, LogModes.MODE_INFO, args);
+        this.log(message, LogLevels.LEVEL_INFO, args);
+    }
+
+    @Override public final void log(final String message, final int mode, final Object... args) {
+        this.logger.log(mode, message, args);
     }
 
     @Override
@@ -556,7 +512,7 @@ public class SimpleServer implements Kvantum {
                 httpsThread.close();
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
 
         //
@@ -568,14 +524,14 @@ public class SimpleServer implements Kvantum {
         // Close the log stream
         //
         try {
-            this.logStream.close();
+            this.logger.close();
             this.accessLogStream.close();
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
 
         if (isStandalone() && CoreConfig.exitOnStop) {
-            Logger.info("Shutting down the JVM.");
+            log("Shutting down the JVM.");
 
             //
             // Find all threads that are currently running
@@ -584,14 +540,14 @@ public class SimpleServer implements Kvantum {
 
             final Set<Thread> threads = Thread.getAllStackTraces().keySet();
             for (final Thread thread : threads) {
-                Logger.info("Running thread found: \"{0}\" daemon: {1}", thread.getName(),
+                log("Running thread found: \"{0}\" daemon: {1}", thread.getName(),
                     thread.isDaemon());
                 if (thread.getName().equalsIgnoreCase("DestroyJavaVM")) {
                     destroyThreadExists = true;
                 }
                 if (!thread.isDaemon()) {
                     for (final StackTraceElement stackTraceElement : thread.getStackTrace()) {
-                        Logger.info("- {}", stackTraceElement.toString());
+                        log("- {}", stackTraceElement.toString());
                     }
                 }
             }
@@ -600,7 +556,7 @@ public class SimpleServer implements Kvantum {
                 System.exit(0);
             }
         } else {
-            Logger.info("Not set to shutdown on exit. Waiting for parent application to close.");
+            log("Not set to shutdown on exit. Waiting for parent application to close.");
         }
 
         this.stopped = true;
@@ -614,14 +570,14 @@ public class SimpleServer implements Kvantum {
 
     @Listener @SuppressWarnings("unused")
     private void listenForConnections(final ConnectionEstablishedEvent establishedEvent) {
-        Logger.debug("Checking for external connection {}", establishedEvent.getIp());
+        log("Checking for external connection {}", establishedEvent.getIp());
         boolean shouldCancel = true;
         final InetAddress address;
         try {
             address = InetAddress.getByName(establishedEvent.getIp());
         } catch (final UnknownHostException e) {
-            Logger.error("Failed to get InetAddress... ");
-            e.printStackTrace();
+            log("Failed to get InetAddress... ");
+            getErrorDigest().digest(e);
             return;
         }
         if (address.isAnyLocalAddress() || address.isLoopbackAddress()) {
@@ -633,7 +589,7 @@ public class SimpleServer implements Kvantum {
             }
         }
         if (shouldCancel) {
-            Logger.debug("Cancelling connection because it isn't local...");
+            log("Cancelling connection because it isn't local...", LogLevels.LEVEL_DEBUG, new Object[0]);
             establishedEvent.setCancelled(true);
         }
     }

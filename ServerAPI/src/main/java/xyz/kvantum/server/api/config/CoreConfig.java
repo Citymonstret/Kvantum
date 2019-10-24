@@ -86,8 +86,7 @@ public class CoreConfig {
     @ConfigSection(name = "logging") public static class Logging {
 
         public static String logFormat =
-            "&0[&c${applicationPrefix}&0]" + "&0[&c${logPrefix}&0]" + "&0[&c${thread}&0]"
-                + "&0[&c${timeStamp}&0] " + "&r${message}";
+            "[Kvantum][%level%][%thread%][%time%]: %message%\n";
     }
 
 

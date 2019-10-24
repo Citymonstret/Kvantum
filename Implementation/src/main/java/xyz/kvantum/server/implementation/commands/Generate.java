@@ -75,7 +75,7 @@ public class Generate extends Command {
             configurationFile.loadFile();
         } catch (Exception e) {
             Logger.error("Failed to generate view declaration for {}", path);
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
             return true;
         }
         configurationFile.set("views", viewDetector.getViewEntries());

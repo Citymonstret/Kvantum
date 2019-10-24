@@ -63,7 +63,7 @@ final public class Include extends Syntax {
                     }
                     reader.close();
                 } catch (final Exception e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); // Can't use ErrorDigest
                 }
 
                 ServerImplementation.getImplementation().getCacheManager()

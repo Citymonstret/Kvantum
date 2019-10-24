@@ -32,8 +32,8 @@ import xyz.kvantum.server.api.config.ConfigurationFile;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
 import xyz.kvantum.server.api.config.YamlConfiguration;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.events.ServerInitializedEvent;
-import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.scripts.ScriptView;
 import xyz.kvantum.server.api.util.Assert;
@@ -94,17 +94,6 @@ public final class StandaloneServer extends SimpleServer {
         // File Watcher that will invalidate cache entries if files are updated
         //
         ((IntellectualFileSystem) getFileSystem()).registerFileWatcher();
-
-        //
-        // Enable the custom security manager
-        //
-        if (CoreConfig.enableSecurityManager) {
-            try {
-                System.setOut(ServerSecurityManager.SecurePrintStream.construct(System.out));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         //
         // Load view configuration
@@ -190,7 +179,7 @@ public final class StandaloneServer extends SimpleServer {
                             .copyFile(getClass().getResourceAsStream("/template/favicon.ico"), out,
                                 1024 * 16);
                     } catch (final Exception e) {
-                        e.printStackTrace();
+                        ServerImplementation.getImplementation().getErrorDigest().digest(e);
                     }
                 }
 
@@ -202,7 +191,7 @@ public final class StandaloneServer extends SimpleServer {
                             .copyFile(getClass().getResourceAsStream("/template/index.html"), out,
                                 1024 * 16);
                     } catch (final Exception e) {
-                        e.printStackTrace();
+                        ServerImplementation.getImplementation().getErrorDigest().digest(e);
                     }
                 }
             }
@@ -271,12 +260,12 @@ public final class StandaloneServer extends SimpleServer {
                                         file.getFileName().toString()).toPath(),
                                     StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                ServerImplementation.getImplementation().getErrorDigest().digest(e);
                             }
                         });
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
 
@@ -337,7 +326,7 @@ public final class StandaloneServer extends SimpleServer {
                         viewDetector.getViewEntries(), this.viewBindings);
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
         if (CoreConfig.autoDetectViews) {
@@ -400,17 +389,15 @@ public final class StandaloneServer extends SimpleServer {
     }
 
     private void printLicenseInfo() {
-        final LogWrapper.LogEntryFormatter prefix = msg -> "> " + msg;
-        getLogWrapper().log(
-            ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        LambdaUtil.arrayForeach(string -> getLogWrapper().log(prefix, string),
+        log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        LambdaUtil.arrayForeach(string -> log(string),
             "APACHE LICENSE VERSION 2.0:", "", "Kvantum, Copyright (C) 2017 IntellectualSites",
             "Kvantum comes with ABSOLUTELY NO WARRANTY; for details type `/show w`",
             "This is free software, and you are welcome to redistribute it",
             "under certain conditions; type `/show c` for details.", "");
-        getLogWrapper().log(
+       log(
             ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        getLogWrapper().log();
+       log("");
     }
 
 }

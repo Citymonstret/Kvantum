@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.scripts;
 
 import lombok.Getter;
 import xyz.kvantum.files.Path;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.FileUtils;
 
 import javax.script.Bindings;
@@ -45,7 +46,7 @@ final class ViewScriptEngine extends KvantumScriptEngine {
                 FileUtils.copyResource("scripts/folderStructure.js",
                     path.getPath("folderStructure.js").getJavaPath());
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
     }
@@ -60,7 +61,7 @@ final class ViewScriptEngine extends KvantumScriptEngine {
             this.getEngine().eval(content, bindings);
             return true;
         } catch (final ScriptException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return false;
     }

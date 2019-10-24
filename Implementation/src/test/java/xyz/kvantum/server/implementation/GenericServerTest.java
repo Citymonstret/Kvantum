@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.core.Kvantum;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.RequestManager;
 
 import java.io.File;
@@ -71,7 +72,7 @@ import static org.junit.Assert.assertTrue;
 
         final ServerContext serverContext =
             serverContextBuilder.standalone(true).coreFolder(temporaryFolder)
-                .logWrapper(new DefaultLogWrapper()).router(requestManager)
+                .router(requestManager)
                 .serverSupplier(SimpleServer::new).build();
         assertNotNull(serverContext);
 
@@ -83,10 +84,9 @@ import static org.junit.Assert.assertTrue;
 
     @AfterAll void tearDownAll() {
         try {
-
             FileUtils.deleteDirectory(temporaryFolder);
         } catch (IOException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 

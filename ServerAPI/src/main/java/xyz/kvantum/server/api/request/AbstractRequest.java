@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.CoreConfig.Cache;
 import xyz.kvantum.server.api.config.Message;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.memguard.LeakageProne;
 import xyz.kvantum.server.api.memguard.MemoryGuard;
@@ -341,9 +342,9 @@ public abstract class AbstractRequest
                     String params = parts[1];
                     try {
                         params = URLDecoder.decode(params, StandardCharsets.UTF_8.toString());
-                    } catch (final UnsupportedEncodingException ignore) {
+                    } catch (final UnsupportedEncodingException e) {
                         if (CoreConfig.debug) {
-                            ignore.printStackTrace();
+                            ServerImplementation.getImplementation().getErrorDigest().digest(e);
                         }
                     }
                     final String[] subParts = params.split("&");

@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.pojo;
 
 import com.hervian.lambda.Lambda;
 import lombok.RequiredArgsConstructor;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 
 @RequiredArgsConstructor final class PojoGetter<Pojo> {
@@ -51,9 +52,9 @@ import xyz.kvantum.server.api.logging.Logger;
                 }
             }
             return lambda.invoke_for_Object(instance);
-        } catch (final AbstractMethodError error) {
+        } catch (final AbstractMethodError e) {
             Logger.error("AbstractMethodError when getting field {}", name);
-            error.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         throw new NullPointerException("No value retrieved for " + name);
     }

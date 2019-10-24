@@ -103,7 +103,7 @@ import java.util.function.BiConsumer;
                             new RuntimeException(
                                 "Path could not be resolved: '" + javaPath.getFileName().toString()
                                     + "' in path '" + context.path.toString() + "'")
-                                .printStackTrace();
+                                .printStackTrace(); // Can't use ErrorDigest
                             continue;
                         }
                         context.reaction.accept(path, event.kind());

@@ -25,7 +25,6 @@ import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandDeclaration;
 import com.intellectualsites.commands.CommandInstance;
 import xyz.kvantum.server.api.core.ServerImplementation;
-import xyz.kvantum.server.api.logging.LogWrapper;
 
 import java.util.Locale;
 
@@ -202,9 +201,8 @@ public class Show extends Command {
                         .log("> Unknown Parameter `{}`", args[0].toLowerCase(Locale.ENGLISH));
                     break;
             }
-            LogWrapper wrapper = ServerImplementation.getImplementation().getLogWrapper();
             for (String line : lines) {
-                wrapper.log("  " + line);
+                ServerImplementation.getImplementation().log("  " + line);
             }
         }
         return true;

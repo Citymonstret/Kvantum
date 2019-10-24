@@ -22,6 +22,7 @@
 package xyz.kvantum.server.api.event;
 
 import lombok.NonNull;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ListMultiMap;
 
@@ -111,7 +112,7 @@ public final class SimpleEventBus extends EventBus {
             return this.createRunnable(methods, event).call();
         } catch (final Throwable throwable) {
             Logger.error("Failed to call event of type {}", event.getClass());
-            throwable.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
         }
         return event;
     }

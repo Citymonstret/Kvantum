@@ -24,6 +24,7 @@ package xyz.kvantum.server.implementation;
 import lombok.Getter;
 import xyz.kvantum.server.api.config.CoreConfig;
 import xyz.kvantum.server.api.config.Message;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ class ServerSocketFactory {
                     return false;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
                 return false;
             }
         }

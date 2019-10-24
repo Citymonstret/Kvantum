@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.logging;
 
+import com.github.sauilitired.loggbok.LogLevels;
 import lombok.experimental.UtilityClass;
 import xyz.kvantum.server.api.core.ServerImplementation;
 
@@ -28,6 +29,8 @@ import xyz.kvantum.server.api.core.ServerImplementation;
  * Static utility class for Logging purposes
  */
 @UtilityClass public final class Logger {
+
+    public static final int LEVEL_ACCESS = 0x10;
 
     /**
      * Log an informational message to the server implementation logger <p> Replaces string arguments using the pattern
@@ -39,7 +42,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
      * @param args    Replacements
      */
     public static void info(final String message, final Object... args) {
-        ServerImplementation.getImplementation().log(message, LogModes.MODE_INFO, args);
+        ServerImplementation.getImplementation().log(message, LogLevels.LEVEL_INFO, args);
     }
 
     /**
@@ -52,7 +55,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
      * @param args    Replacements
      */
     public static void warn(final String message, final Object... args) {
-        ServerImplementation.getImplementation().log(message, LogModes.MODE_WARNING, args);
+        ServerImplementation.getImplementation().log(message, LogLevels.LEVEL_WARNING, args);
     }
 
     /**
@@ -66,7 +69,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
      * @param args    Replacements
      */
     public static void error(final String message, final Object... args) {
-        ServerImplementation.getImplementation().log(message, LogModes.MODE_ERROR, args);
+        ServerImplementation.getImplementation().log(message, LogLevels.LEVEL_ERROR, args);
     }
 
     /**
@@ -80,7 +83,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
      * @param args    Replacements
      */
     public static void access(final String message, final Object... args) {
-        ServerImplementation.getImplementation().log(message, LogModes.MODE_ACCESS, args);
+        ServerImplementation.getImplementation().log(message, LEVEL_ACCESS, args);
     }
 
     /**
@@ -94,7 +97,7 @@ import xyz.kvantum.server.api.core.ServerImplementation;
      * @param args    Replacements
      */
     public static void debug(final String message, final Object... args) {
-        ServerImplementation.getImplementation().log(message, LogModes.MODE_DEBUG, args);
+        ServerImplementation.getImplementation().log(message, LogLevels.LEVEL_DEBUG, args);
     }
 
 }

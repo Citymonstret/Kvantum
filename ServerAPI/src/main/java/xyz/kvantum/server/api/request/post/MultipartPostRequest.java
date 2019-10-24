@@ -91,7 +91,7 @@ public class MultipartPostRequest extends RequestEntity {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         } else {
             Logger.warn("Failed to parse multipart request: {}", parsingResult.getStatus());

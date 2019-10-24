@@ -67,7 +67,7 @@ public class Error extends View {
             try {
                 FileUtils.copyResource(resourcePath, path.getJavaPath());
             } catch (Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
         template = path.readFile();

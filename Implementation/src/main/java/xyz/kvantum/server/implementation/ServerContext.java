@@ -25,7 +25,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.kvantum.server.api.core.Kvantum;
-import xyz.kvantum.server.api.logging.LogWrapper;
 import xyz.kvantum.server.api.matching.Router;
 import xyz.kvantum.server.api.util.Assert;
 
@@ -38,11 +37,10 @@ import java.util.function.Function;
  * created using {@link ServerContextBuilder}. A new {@link ServerContextBuilder} can be initialized using either {@link
  * ServerContext#builder()} or by using {@code new ServerContextBuilder()} </p>
  */
-@Setter @Getter @Builder @SuppressWarnings("WeakerAccess") public final class ServerContext {
+@Setter @Getter @Builder public final class ServerContext {
 
-    @Builder.Default private boolean standalone = true;
+    @Builder.Default private boolean standalone;
     private File coreFolder;
-    private LogWrapper logWrapper;
     private Router router;
     private Function<ServerContext, SimpleServer> serverSupplier;
 
@@ -57,7 +55,7 @@ import java.util.function.Function;
         try {
             simpleServer = serverSupplier.apply(this);
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Can't use ErrorDigest
         }
         return Optional.ofNullable(simpleServer);
     }

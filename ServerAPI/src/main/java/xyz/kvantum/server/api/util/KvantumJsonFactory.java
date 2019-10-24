@@ -28,6 +28,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.pojo.KvantumPojo;
 
 import java.util.Collection;
@@ -59,7 +60,7 @@ import java.util.Objects;
                 return (JSONObject) object;
             }
         } catch (final ParseException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return new JSONObject();
     }

@@ -71,7 +71,7 @@ public final class InputThread extends Thread {
         for (; ; ) {
             try {
                 line = InternalJlineManager.getInstance().getLineReader().readLine("> ");
-                ServerImplementation.getImplementation().getLogWrapper().breakLine();
+                System.out.println();
                 if (shouldStop || ServerImplementation.getImplementation().isStopping()) {
                     break;
                 }
@@ -92,7 +92,7 @@ public final class InputThread extends Thread {
                         case CommandHandlingOutput.ERROR:
                             ServerImplementation.getImplementation()
                                 .log("Something went wrong when executing the command!");
-                            result.getStacktrace().printStackTrace();
+                            ServerImplementation.getImplementation().getErrorDigest().digest(result.getStacktrace());
                             break;
                         case CommandHandlingOutput.NOT_FOUND:
                             if (result.getClosestMatch() != null) {

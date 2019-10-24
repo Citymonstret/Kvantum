@@ -122,7 +122,7 @@ import java.util.concurrent.TimeUnit;
             statement.setString(2, hashPassword(password, getNewSalt()));
             statement.executeUpdate();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         } finally {
             ret = getAccount(username);
         }
@@ -154,7 +154,7 @@ import java.util.concurrent.TimeUnit;
                 }
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         ret.ifPresent(this::setCachedAccount);
         ret.ifPresent(account -> account.setManager(this));
@@ -177,7 +177,7 @@ import java.util.concurrent.TimeUnit;
                 }
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         ret.ifPresent(this::setCachedAccount);
         ret.ifPresent(account -> account.setManager(this));
@@ -205,7 +205,7 @@ import java.util.concurrent.TimeUnit;
             }
             set.close();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -215,7 +215,7 @@ import java.util.concurrent.TimeUnit;
             statement.setInt(1, account.getId());
             statement.executeUpdate();
         } catch (final SQLException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         this.cachedAccounts.invalidate(account.getId());
         this.cachedAccountIds.invalidate(account.getUsername());
@@ -228,7 +228,7 @@ import java.util.concurrent.TimeUnit;
             statement.setString(2, key);
             statement.executeUpdate();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -241,7 +241,7 @@ import java.util.concurrent.TimeUnit;
             statement.setString(3, value);
             statement.executeUpdate();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         try (final PreparedStatement statement = applicationStructure.getDatabaseManager()
             .prepareStatement(
@@ -251,7 +251,7 @@ import java.util.concurrent.TimeUnit;
             statement.setString(1, value);
             statement.executeUpdate();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -265,7 +265,7 @@ import java.util.concurrent.TimeUnit;
                 }
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return Collections.unmodifiableList(builder);
     }

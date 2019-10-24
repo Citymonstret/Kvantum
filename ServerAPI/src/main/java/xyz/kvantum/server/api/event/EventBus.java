@@ -21,6 +21,7 @@
  */
 package xyz.kvantum.server.api.event;
 
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 import xyz.kvantum.server.api.util.ReflectionUtils;
 import xyz.kvantum.server.api.util.ReflectionUtils.AnnotatedMethod;
@@ -127,7 +128,7 @@ import java.util.concurrent.Future;
             final RuntimeException exception = new RuntimeException(String
                 .format("Failed to handle event of type %s", event.getClass().getSimpleName()),
                 throwable);
-            exception.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(exception);
             return CompletableFuture.failedFuture(exception);
         }
     }

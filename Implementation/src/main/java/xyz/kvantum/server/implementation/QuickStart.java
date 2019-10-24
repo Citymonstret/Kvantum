@@ -43,7 +43,7 @@ import java.util.Optional;
         throws ServerStartFailureException {
         final ServerContext kvantumContext =
             ServerContext.builder().coreFolder(new File("./kvantum"))
-                .logWrapper(new DefaultLogWrapper()).router(RequestManager.builder().build())
+                .router(RequestManager.builder().build())
                 .standalone(true).serverSupplier(SimpleServer::new).build();
         final Optional<Kvantum> kvantumOptional = kvantumContext.create();
         if (!kvantumOptional.isPresent()) {

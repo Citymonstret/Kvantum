@@ -23,6 +23,7 @@ package xyz.kvantum.server.api.config;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.util.Assert;
 
@@ -81,7 +82,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             this.getYaml().dump(map, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -92,7 +93,7 @@ public class YamlConfiguration extends ConfigProvider implements ConfigurationFi
                 this.map.putAll((HashMap<String, Object>) o);
             }
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 

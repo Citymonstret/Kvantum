@@ -24,6 +24,7 @@ package xyz.kvantum.server.implementation;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.implementation.cache.ThreadCache;
@@ -53,7 +54,7 @@ final class GzipHandler extends AutoCloseable {
             this.reusablePGzipOutputStream.close();
             this.reusableGzipOutputStream.close();
         } catch (final Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 

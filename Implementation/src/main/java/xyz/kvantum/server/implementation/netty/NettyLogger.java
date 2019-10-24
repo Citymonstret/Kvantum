@@ -23,6 +23,7 @@ package xyz.kvantum.server.implementation.netty;
 
 import io.netty.util.internal.logging.AbstractInternalLogger;
 import xyz.kvantum.server.api.config.CoreConfig;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.Logger;
 
 public final class NettyLogger extends AbstractInternalLogger {
@@ -64,7 +65,7 @@ public final class NettyLogger extends AbstractInternalLogger {
     @Override public void trace(final String msg, final Throwable t) {
         if (this.isTraceEnabled()) {
             Logger.info(msg);
-            t.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(t);
         }
     }
 
@@ -99,7 +100,7 @@ public final class NettyLogger extends AbstractInternalLogger {
     @Override public void debug(final String msg, final Throwable t) {
         if (this.isDebugEnabled()) {
             Logger.debug(msg);
-            t.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(t);
         }
     }
 
@@ -125,7 +126,7 @@ public final class NettyLogger extends AbstractInternalLogger {
 
     @Override public void info(final String msg, final Throwable t) {
         Logger.info(msg);
-        t.printStackTrace();
+        ServerImplementation.getImplementation().getErrorDigest().digest(t);
     }
 
     @Override public boolean isWarnEnabled() {
@@ -182,6 +183,6 @@ public final class NettyLogger extends AbstractInternalLogger {
 
     @Override public void error(final String msg, final Throwable t) {
         Logger.error(msg);
-        t.printStackTrace();
+        ServerImplementation.getImplementation().getErrorDigest().digest(t);
     }
 }

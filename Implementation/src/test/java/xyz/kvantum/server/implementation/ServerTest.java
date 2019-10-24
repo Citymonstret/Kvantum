@@ -51,11 +51,6 @@ class ServerTest extends GenericServerTest {
         assertEquals(serverInstance, ServerImplementation.getImplementation());
     }
 
-    @Test void getLogWrapper() {
-        assertNotNull(serverInstance.getLogWrapper());
-        assertTrue(serverInstance.getLogWrapper() instanceof DefaultLogWrapper);
-    }
-
     @Test void isStandalone() {
         assertTrue(serverInstance.isStandalone());
     }

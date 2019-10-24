@@ -86,7 +86,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
                     this.kvantumServerHandler.createNew(getSocketContext());
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
     }

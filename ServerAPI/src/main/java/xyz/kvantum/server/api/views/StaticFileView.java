@@ -121,7 +121,7 @@ import java.util.function.Consumer;
             try {
                 inputStream = new FileInputStream(javaPath.toFile());
             } catch (final FileNotFoundException e) {
-                e.printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);;
                 return;
             }
             response.setResponse(responseStream);
@@ -136,7 +136,7 @@ import java.util.function.Consumer;
                     }
                     responseStream.push(outerBuffer, read);
                 } catch (final IOException e) {
-                    e.printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest().digest(e);
                 }
             };
 

@@ -31,16 +31,27 @@ import xyz.kvantum.server.api.config.Message;
 
 public class Help extends PaginatedCommand<Command> {
 
+    private final CommandManager parent;
+    private PaginationFactory<Command> paginationFactory;
+
     public Help(final CommandManager parent) {
-        super(Command.class, parent::getCommands, 3, "help", "/help [page]",
+        super(Command.class, parent::getCommands, 7, "help", "/help [page]",
             "Show a list of commands", "", new String[] {"h"}, Object.class);
         withArgument("page", new IntegerParser(), "The page");
+        this.parent = parent;
     }
 
     @Override public boolean handleTooBigPage(CommandInstance commandInstance, int i, int i1) {
         commandInstance.getCaller()
             .message("The entered page number is too large (" + (i + 1) + ">" + i1 + ")");
         return true;
+    }
+
+    @Override protected PaginationFactory<Command> getPaginationFactory() {
+        if (paginationFactory == null) {
+            paginationFactory = new PaginationFactory<>(Command.class, parent.getCommands(), parent.getCommands().size());
+        }
+        return paginationFactory;
     }
 
     @Override public boolean onCommand(

@@ -25,6 +25,7 @@ import com.hervian.lambda.LambdaFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.util.MapBuilder;
 
 import java.lang.reflect.Method;
@@ -112,14 +113,14 @@ public final class KvantumPojoFactory<Object> {
                     getterBuilder.put(name, new PojoGetter<>(name, LambdaFactory.create(method),
                         method.getReturnType()));
                 } catch (final Throwable throwable) {
-                    throwable.printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
                 }
             } else {
                 try {
                     setterBuilder.put(name, new PojoSetter<>(LambdaFactory.create(method),
                         method.getParameters()[0].getType()));
                 } catch (final Throwable throwable) {
-                    throwable.printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
                 }
             }
         }

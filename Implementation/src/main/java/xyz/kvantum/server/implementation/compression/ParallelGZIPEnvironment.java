@@ -43,6 +43,7 @@ package xyz.kvantum.server.implementation.compression;
 
 
 import lombok.NonNull;
+import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.implementation.cache.ThreadCache;
 
 import java.io.OutputStream;
@@ -76,7 +77,7 @@ class ParallelGZIPEnvironment {
             fieldBuf.set(dos, ThreadCache.BUFFER_8192.get());
             return dos;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
             return new DeflaterOutputStream(out, deflater, 512, true);
         }
     }

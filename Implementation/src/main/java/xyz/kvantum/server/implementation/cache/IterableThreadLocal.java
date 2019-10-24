@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.implementation.cache;
 
+import xyz.kvantum.server.api.core.ServerImplementation;
+
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -78,7 +80,7 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 

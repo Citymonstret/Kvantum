@@ -132,7 +132,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
                     Message.WORKER_FAILED_HANDLING.log(throwable.getMessage());
 
                     if (CoreConfig.verbose) {
-                        throwable.printStackTrace();
+                        ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
                     }
 
                     response = new ViewException(throwable).generate(workerContext.getRequest());
@@ -151,11 +151,12 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
                 this.workerContext.setResponseStream(response.getResponseStream());
                 this.sendResponse(context);
             } catch (final Throwable innerThrowable) {
-                new KvantumException("Failed to handle return status", innerThrowable)
-                    .printStackTrace();
+                ServerImplementation.getImplementation().getErrorDigest()
+                    .digest(new KvantumException("Failed to handle return status", innerThrowable));
             }
         } else {
-            new KvantumException("Failed to handle incoming socket", throwable).printStackTrace();
+            ServerImplementation.getImplementation().getErrorDigest()
+                .digest(new KvantumException("Failed to handle incoming socket", throwable));
         }
     }
 
@@ -392,7 +393,8 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
                 try {
                     bytes = gzipHandler.compress(bytes);
                 } catch (final IOException e) {
-                    new KvantumException("( GZIP ) Failed to compress the bytes").printStackTrace();
+                    ServerImplementation.getImplementation().getErrorDigest()
+                        .digest(new KvantumException("( GZIP ) Failed to compress the bytes"));
                 }
                 ((KnownLengthStream) responseStream).replaceBytes(bytes);
             }
@@ -489,7 +491,8 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
                                 result = gzipHandler.compress(buffer, read);
                                 actualLength += result.readableBytes();
                             } catch (final IOException e) {
-                                new KvantumException("( GZIP ) Failed to compress the bytes").printStackTrace();
+                                ServerImplementation.getImplementation().getErrorDigest()
+                                    .digest(new KvantumException("( GZIP ) Failed to compress the bytes"));
                                 continue;
                             }
                         } else {
