@@ -220,7 +220,7 @@ public class SimpleServer implements Kvantum {
             TimeUtil.getTimeStamp(TimeUtil.logFileFormat, new Date()) + ".log")))
              */
             final Path path = new File(logFolder, TimeUtil
-                .getTimeStamp(TimeUtil.logFormat, new Date()) + ".log").toPath();
+                .getTimeStamp(TimeUtil.logFileFormat, new Date()) + ".log").toPath();
             if (!Files.exists(path)) {
                 Files.createFile(path);
             }

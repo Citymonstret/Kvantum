@@ -70,7 +70,7 @@ public final class InputThread extends Thread {
         String line;
         for (; ; ) {
             try {
-                line = InternalJlineManager.getInstance().getLineReader().readLine("> ");
+                line = InternalJlineManager.getInstance().getLineReader().readLine("");
                 System.out.println();
                 if (shouldStop || ServerImplementation.getImplementation().isStopping()) {
                     break;

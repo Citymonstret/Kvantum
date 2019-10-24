@@ -24,6 +24,7 @@ package xyz.kvantum.server.api.util;
 import lombok.experimental.UtilityClass;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -34,23 +35,12 @@ import java.util.Locale;
 
     public final static SimpleDateFormat logFileFormat;
     public final static SimpleDateFormat httpFormat;
-    public final static SimpleDateFormat logFormat;
     public static final SimpleDateFormat accessLogFormat;
 
     static {
         httpFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss 'GMT'", Locale.ENGLISH);
-        logFormat = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
         logFileFormat = new SimpleDateFormat("dd MMM yyyy kk-mm-ss", Locale.ENGLISH);
         accessLogFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
-    }
-
-    /**
-     * Get a log formatted timestamp
-     *
-     * @return log formatted timestamp
-     */
-    public static String getTimeStamp() {
-        return getTimeStamp(logFormat, new Date());
     }
 
     /**
