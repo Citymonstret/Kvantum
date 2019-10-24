@@ -226,6 +226,7 @@ public class SimpleServer implements Kvantum {
             }
             final LogLevels logLevels = new LogLevels();
             logLevels.addLevel("ACCESS"); // will have level value 0x10
+            logLevels.setEnabled(LogLevels.LEVEL_DEBUG, CoreConfig.debug);
             final String format = CoreConfig.Logging.logFormat;
             // We need to do two things:
             // the first is to create a threaded queue logger
