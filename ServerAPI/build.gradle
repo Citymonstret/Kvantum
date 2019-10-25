@@ -1,13 +1,13 @@
 dependencies {
     // Cache manager
     compile 'com.github.ben-manes.caffeine:caffeine:2.7.0'
-
+    // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
     // Performance monitoring
-    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0-rc2'
-    // Logback (used for configuration purposes only)
-    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile('io.dropwizard.metrics:metrics-core:4.1.0-rc2') {
+        exclude group: 'org.slf4j', module: '*'
+    }
     // Mostly used for its awesome map implementations
     // compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
     // rest query engine
@@ -18,10 +18,11 @@ dependencies {
     compile group: 'org.jline', name: 'jline', version: '3.11.0'
     // Command management system
     compile 'com.github.IntellectualSites:CommandAPI:-SNAPSHOT'
-    // Password encryption
-    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
     // Auto-generated configuration files
-    compile 'com.github.Sauilitired:Configurable:e5b88d349b'
+    compile('com.github.Sauilitired:Configurable:e5b88d349b') {
+        exclude group: 'com.moandjiezana.toml', module: '*'
+        exclude group: 'com.cedarsoftware', module: '*'
+    }
     // Great IO utilities (TODO: Look into this dependency)
     compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
     // JSON Implementation
@@ -35,7 +36,7 @@ dependencies {
     // Field verification (used in KvantumObject)
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
     // Logging
-    implementation 'com.github.Sauilitired:LoggBok:1.1-Pre'
+    compile 'com.github.Sauilitired:LoggBok:1.1-Pre'
     // Reflection
-    implementation 'com.esotericsoftware:reflectasm:1.11.9'
+    compile 'com.esotericsoftware:reflectasm:1.11.9'
 }

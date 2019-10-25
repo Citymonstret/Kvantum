@@ -24,9 +24,9 @@ package xyz.kvantum.server.api.addon;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import net.sf.oval.constraint.NotNull;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.logging.LogProvider;
 
@@ -85,7 +85,7 @@ import java.util.UUID;
      * @param message Message to be logged
      * @see xyz.kvantum.server.api.core.Kvantum#log(String, Object...)
      */
-    public void log(@NotNull final String message, final Object... args) {
+    public void log(@NonNull final String message, final Object... args) {
         ServerImplementation.getImplementation().log(this, message, args);
     }
 

@@ -18,8 +18,12 @@ dependencies {
     // Netty native transports
     compile group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.36.Final',
             classifier: 'linux-x86_64'
-    // Logging
-    implementation 'com.github.Sauilitired:LoggBok:1.1-Pre'
+    // Password encryption
+    implementation group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
+    // Logback (used for configuration purposes only)
+    compile('ch.qos.logback:logback-classic:1.2.3') {
+        exclude group: 'org.slf4j', module: '*'
+    }
     //
     // Modules
     //
