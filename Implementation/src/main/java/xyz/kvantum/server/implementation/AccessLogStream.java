@@ -43,7 +43,7 @@ final class AccessLogStream extends PrintStream {
     }
 
     @Listener @SuppressWarnings("unused")
-    private void onRequestFinish(final FinalizedResponse response) {
+    public void onRequestFinish(final FinalizedResponse response) {
         final String logString = response.toLogString();
         Assert.notNull(logString);
         Logger.access(logString);

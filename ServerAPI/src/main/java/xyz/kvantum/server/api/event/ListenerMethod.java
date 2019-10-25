@@ -21,23 +21,23 @@
  */
 package xyz.kvantum.server.api.event;
 
-import com.hervian.lambda.Lambda;
-import com.hervian.lambda.LambdaFactory;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
 
 @Getter @SuppressWarnings({"WeakerAccess"}) public final class ListenerMethod {
 
-    private final Lambda lambda;
+    private final MethodAccess methodAccess;
+    private final int nameIndex;
     private final Class eventType;
     private final Object instance;
 
-    public ListenerMethod(final Method method, final Object instance, final Class eventType)
-        throws Throwable {
+    public ListenerMethod(final Method method, final Object instance, final Class eventType) {
         this.eventType = eventType;
         this.instance = instance;
-        this.lambda = LambdaFactory.create(method);
+        this.methodAccess = MethodAccess.get(method.getDeclaringClass());
+        this.nameIndex = methodAccess.getIndex(method.getName());
     }
 
     public void invoke(final Object instance) {
@@ -46,7 +46,7 @@ import java.lang.reflect.Method;
                 format("Mis-matched event types. Requires '%s', but was given '%s'",
                     eventType.getSimpleName(), instance.getClass().getSimpleName()));
         }
-        this.lambda.invoke_for_void(this.instance, instance);
+        this.methodAccess.invoke(this.instance, nameIndex, instance);
     }
 
     @Override public boolean equals(final Object obj) {

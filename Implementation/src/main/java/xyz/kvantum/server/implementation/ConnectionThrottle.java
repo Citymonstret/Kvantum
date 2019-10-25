@@ -108,7 +108,7 @@ final class ConnectionThrottle implements LeakageProne {
     }
 
     @Listener @SuppressWarnings("unused")
-    private void listenForConnections(final ConnectionEstablishedEvent establishedEvent) {
+    public void listenForConnections(final ConnectionEstablishedEvent establishedEvent) {
         if (CoreConfig.debug) {
             Logger.debug("Checking for throttle for {}", establishedEvent.getIp());
         }

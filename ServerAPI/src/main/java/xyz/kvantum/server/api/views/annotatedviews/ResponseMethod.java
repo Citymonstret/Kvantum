@@ -21,8 +21,7 @@
  */
 package xyz.kvantum.server.api.views.annotatedviews;
 
-import com.hervian.lambda.Lambda;
-import com.hervian.lambda.LambdaFactory;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.util.Assert;
@@ -34,7 +33,8 @@ import java.util.function.BiConsumer;
 final public class ResponseMethod<T, C>
     implements BiConsumer<AbstractRequest, Response>, ViewReturn {
 
-    private final Lambda lambda;
+    private final MethodAccess methodAccess;
+    private final int nameIndex;
     private final C instance;
     private final boolean passResponse;
     private final OutputConverter outputConverter;
@@ -43,7 +43,8 @@ final public class ResponseMethod<T, C>
         throws Throwable {
         Assert.notNull(method, instance);
 
-        this.lambda = LambdaFactory.create(method);
+        this.methodAccess = MethodAccess.get(method.getDeclaringClass());
+        this.nameIndex = methodAccess.getIndex(method.getName());
         this.instance = instance;
         this.passResponse = method.getReturnType() == Void.TYPE;
         this.outputConverter = outputConverter;
@@ -54,10 +55,10 @@ final public class ResponseMethod<T, C>
 
         if (passResponse) {
             final Response response = new Response();
-            this.lambda.invoke_for_void(instance, r, response);
+            this.methodAccess.invoke(instance, nameIndex, r, response);
             return response;
         }
-        final Object output = this.lambda.invoke_for_Object(instance, r);
+        final Object output = this.methodAccess.invoke(instance, nameIndex, r);
         if (outputConverter != null) {
             return outputConverter.generateResponse(output);
         }

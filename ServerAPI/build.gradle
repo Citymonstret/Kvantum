@@ -34,8 +34,8 @@ dependencies {
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.0'
     // Field verification (used in KvantumObject)
     compile group: 'net.sf.oval', name: 'oval', version: '1.90'
-    // Lambda-factory
-    compile 'com.github.Hervian:lambda-factory:91bc62f8c2'
     // Logging
     implementation 'com.github.Sauilitired:LoggBok:1.1-Pre'
+    // Reflection
+    implementation 'com.esotericsoftware:reflectasm:1.11.9'
 }

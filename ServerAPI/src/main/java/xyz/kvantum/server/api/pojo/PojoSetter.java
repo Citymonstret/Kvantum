@@ -21,36 +21,19 @@
  */
 package xyz.kvantum.server.api.pojo;
 
-import com.hervian.lambda.Lambda;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor final class PojoSetter<Pojo> {
 
-    private final Lambda lambda;
+    private final MethodAccess methodAccess;
+    private final int nameIndex;
     @Getter(AccessLevel.PACKAGE) private final Class<?> parameterType;
 
     public void set(final Pojo instance, final Object object) {
-        if (parameterType.isPrimitive()) {
-            if (parameterType.equals(int.class)) {
-                lambda.invoke_for_void(instance, (int) object);
-            } else if (parameterType.equals(long.class)) {
-                lambda.invoke_for_void(instance, (long) object);
-            } else if (parameterType.equals(float.class)) {
-                lambda.invoke_for_void(instance, (float) object);
-            } else if (parameterType.equals(boolean.class)) {
-                lambda.invoke_for_void(instance, (boolean) object);
-            } else if (parameterType.equals(double.class)) {
-                lambda.invoke_for_void(instance, (double) object);
-            } else if (parameterType.equals(byte.class)) {
-                lambda.invoke_for_void(instance, (byte) object);
-            } else if (parameterType.equals(char.class)) {
-                lambda.invoke_for_void(instance, (char) object);
-            }
-        } else {
-            lambda.invoke_for_void(instance, object);
-        }
+        methodAccess.invoke(instance, nameIndex, object);
     }
 
 }

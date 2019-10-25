@@ -21,10 +21,11 @@
  */
 package xyz.kvantum.server.api.views;
 
-import com.hervian.lambda.Lambda;
-import com.hervian.lambda.LambdaFactory;
+import com.esotericsoftware.reflectasm.MethodAccess;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import xyz.kvantum.server.api.core.ServerImplementation;
 import xyz.kvantum.server.api.exceptions.KvantumException;
 import xyz.kvantum.server.api.request.AbstractRequest;
@@ -66,7 +67,7 @@ public abstract class RequestHandler {
      * Manages validators and allows them to terminate the request based on certain criteria being fulfilled or not
      */
     @Getter private final ValidationManager validationManager = new ValidationManager();
-    private final Map<String, Lambda> alternateOutcomes = new HashMap<>();
+    private final Map<String, MethodHandle> alternateOutcomes = new HashMap<>();
     private final String uniqueId = UUID.randomUUID().toString();
     private final Collection<Decorator> decorators = new ArrayList<>();
 
@@ -101,7 +102,11 @@ public abstract class RequestHandler {
         if (method == null) {
             throw new KvantumException("Could not find #" + methodName + "( Request, Response )");
         }
-        this.alternateOutcomes.put(identifier, LambdaFactory.create(method));
+
+        final MethodAccess methodAccess = MethodAccess.get(method.getDeclaringClass());
+        final int nameIndex = methodAccess.getIndex(method.getName());
+
+        this.alternateOutcomes.put(identifier, new MethodHandle(methodAccess, nameIndex));
     }
 
     /**
@@ -120,7 +125,7 @@ public abstract class RequestHandler {
      * @param identifier Method identifier
      * @return Alternate outcome method, if present
      */
-    public Optional<Lambda> getAlternateOutcomeMethod(final String identifier) {
+    public Optional<MethodHandle> getAlternateOutcomeMethod(final String identifier) {
         if (alternateOutcomes.containsKey(identifier)) {
             return Optional.of(alternateOutcomes.get(identifier));
         }
@@ -170,12 +175,12 @@ public abstract class RequestHandler {
         //
         if (request.hasMeta(AbstractRequest.ALTERNATE_OUTCOME)) {
             //noinspection ConstantConditions
-            final Optional<Lambda> method = getAlternateOutcomeMethod(
+            final Optional<MethodHandle> method = getAlternateOutcomeMethod(
                 request.getMeta(AbstractRequest.ALTERNATE_OUTCOME).toString());
             if (method.isPresent()) {
-                final Lambda lambda = method.get();
+                final MethodHandle methodHandle = method.get();
                 response = new Response(this);
-                lambda.invoke_for_void(this, request, response);
+                methodHandle.methodAccess.invoke(this, methodHandle.nameIndex, request, response);
             } else {
                 throw new KvantumException(
                     "Trying to access an internal redirect which isn't registered for type " + this
@@ -242,5 +247,12 @@ public abstract class RequestHandler {
      * @return boolean indicated whether or not the request must be served over HTTPS
      */
     public abstract boolean forceHTTPS();
+
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE) @Getter public final class MethodHandle {
+
+        private final MethodAccess methodAccess;
+        private final int nameIndex;
+
+    }
 
 }

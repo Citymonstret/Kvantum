@@ -570,7 +570,7 @@ public class SimpleServer implements Kvantum {
     }
 
     @Listener @SuppressWarnings("unused")
-    private void listenForConnections(final ConnectionEstablishedEvent establishedEvent) {
+    public void listenForConnections(final ConnectionEstablishedEvent establishedEvent) {
         log("Checking for external connection {}", establishedEvent.getIp());
         boolean shouldCancel = true;
         final InetAddress address;

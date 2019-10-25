@@ -21,7 +21,7 @@
  */
 package xyz.kvantum.server.api.pojo;
 
-import com.hervian.lambda.LambdaFactory;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -108,16 +108,18 @@ public final class KvantumPojoFactory<Object> {
             String firstChar = new String(new char[] {name.charAt(0)});
             name = firstChar.toLowerCase(Locale.ENGLISH) + name.substring(1);
 
+            final MethodAccess methodAccess = MethodAccess.get(pojoClass);
+            final int nameIndex = methodAccess.getIndex(method.getName());
+
             if (getter) {
                 try {
-                    getterBuilder.put(name, new PojoGetter<>(name, LambdaFactory.create(method),
-                        method.getReturnType()));
+                    getterBuilder.put(name, new PojoGetter<>(name, methodAccess, nameIndex));
                 } catch (final Throwable throwable) {
                     ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
                 }
             } else {
                 try {
-                    setterBuilder.put(name, new PojoSetter<>(LambdaFactory.create(method),
+                    setterBuilder.put(name, new PojoSetter<>(methodAccess, nameIndex,
                         method.getParameters()[0].getType()));
                 } catch (final Throwable throwable) {
                     ServerImplementation.getImplementation().getErrorDigest().digest(throwable);
