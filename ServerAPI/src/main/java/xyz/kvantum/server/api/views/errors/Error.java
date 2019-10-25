@@ -49,7 +49,7 @@ public class Error extends View {
     }
 
     private static void initTemplate() {
-        final String resourcePath = "template/";
+        final String resourcePath = "template/error.html";
         final Path folder =
             ServerImplementation.getImplementation().getFileSystem().getPath("templates");
         if (!folder.exists()) {
@@ -58,7 +58,7 @@ public class Error extends View {
                 return;
             }
         }
-        final Path path = folder.getPath("");
+        final Path path = folder.getPath("error.html");
         if (!path.exists()) {
             if (!path.create()) {
                 Logger.error("could not create file: '{}'", path);

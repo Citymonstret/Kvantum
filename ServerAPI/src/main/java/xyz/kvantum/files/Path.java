@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.files;
 
+import xyz.kvantum.server.api.core.ServerImplementation;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -90,7 +92,7 @@ import java.util.stream.Stream;
         try {
             return Files.size(javaPath);
         } catch (IOException e) {
-            e.printStackTrace(); // Can't use ErrorDigest
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return -1L;
     }
@@ -124,7 +126,7 @@ import java.util.stream.Stream;
             this.loadAttributes();
             return this.basicFileAttributes.creationTime().toMillis();
         } catch (final Exception e) {
-            e.printStackTrace(); // Can't use ErrorDigest
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return -1;
     }
@@ -134,7 +136,7 @@ import java.util.stream.Stream;
             this.loadAttributes();
             return this.basicFileAttributes.lastModifiedTime().toMillis();
         } catch (final Exception e) {
-            e.printStackTrace(); // Can't use ErrorDigest
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return -1;
     }
@@ -165,7 +167,7 @@ import java.util.stream.Stream;
             try {
                 content = Files.readAllBytes(javaPath);
             } catch (IOException e) {
-                e.printStackTrace(); // Can't use ErrorDigest
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
         fileSystem.getFileCacheManager().writeCachedFile(this, new CachedFile(content));
@@ -187,13 +189,18 @@ import java.util.stream.Stream;
         if (cacheEntry.isPresent()) {
             return cacheEntry.get().getAsString();
         }
+        if (isFolder()) {
+            ServerImplementation.getImplementation().getErrorDigest()
+                .digest(new UnsupportedOperationException("Cannot use readFile() on directory: " + this.toString()));
+            return "";
+        }
         final StringBuilder document = new StringBuilder();
         if (Files.isReadable(javaPath)) {
             try {
                 Files.readAllLines(javaPath)
                     .forEach(line -> document.append(line).append(System.lineSeparator()));
             } catch (IOException e) {
-                e.printStackTrace(); // Can't use ErrorDigest
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
         final String content = document.toString();
@@ -287,7 +294,7 @@ import java.util.stream.Stream;
             }
             exists = Files.exists(Files.createFile(javaPath));
         } catch (final Exception e) {
-            e.printStackTrace(); // Can't use ErrorDigest
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
         return exists;
     }
@@ -331,7 +338,7 @@ import java.util.stream.Stream;
                 this.subPaths.put(path.toString(), path);
             }
         } catch (final IOException e) {
-            e.printStackTrace(); // Can't use ErrorDigest
+            ServerImplementation.getImplementation().getErrorDigest().digest(e);
         }
     }
 
@@ -350,7 +357,7 @@ import java.util.stream.Stream;
                 Files
                     .copy(this.getJavaPath(), target.javaPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (final IOException e) {
-                e.printStackTrace(); // Can't use ErrorDigest
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
                 return false;
             }
         }
@@ -413,7 +420,7 @@ import java.util.stream.Stream;
             try {
                 Files.delete(getJavaPath());
             } catch (IOException e) {
-                e.printStackTrace(); // Can't use ErrorDigest
+                ServerImplementation.getImplementation().getErrorDigest().digest(e);
             }
         }
     }
