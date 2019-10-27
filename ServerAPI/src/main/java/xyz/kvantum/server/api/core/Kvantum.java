@@ -40,6 +40,7 @@ import xyz.kvantum.server.api.request.AbstractRequest;
 import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.session.SessionManager;
 import xyz.kvantum.server.api.util.ApplicationStructure;
+import xyz.kvantum.server.api.util.ApplicationStructureFactory;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.CollectionUtil;
 import xyz.kvantum.server.api.util.Generator;
@@ -295,4 +296,14 @@ import java.util.function.BiConsumer;
      * @return global file upload instance
      */
     KvantumFileUpload getGlobalFileUpload();
+
+    /**
+     * Attempt to retrieve an ApplicationStructureFactory
+     * from a given key
+     *
+     * @param key The key
+     * @return The factory, if it could be found, or null
+     */
+    ApplicationStructureFactory<?> getApplicationStructureFactory(String key);
+
 }

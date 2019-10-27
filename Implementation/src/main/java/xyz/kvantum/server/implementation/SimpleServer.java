@@ -41,6 +41,7 @@ import com.intellectualsites.configurable.ConfigurationFactory;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import xyz.kvantum.files.FileSystem;
@@ -69,7 +70,9 @@ import xyz.kvantum.server.api.response.Response;
 import xyz.kvantum.server.api.session.ISessionDatabase;
 import xyz.kvantum.server.api.session.SessionManager;
 import xyz.kvantum.server.api.templates.TemplateManager;
+import xyz.kvantum.server.api.util.ApplicationContext;
 import xyz.kvantum.server.api.util.ApplicationStructure;
+import xyz.kvantum.server.api.util.ApplicationStructureFactory;
 import xyz.kvantum.server.api.util.Assert;
 import xyz.kvantum.server.api.util.AutoCloseable;
 import xyz.kvantum.server.api.util.FileUtils;
@@ -91,6 +94,8 @@ import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -121,7 +126,7 @@ public class SimpleServer implements Kvantum {
         new GsonBuilder().registerTypeAdapter(Account.class, new AccountSerializer()).create();
     private final ServerContext serverContext;
     @Getter protected ICacheManager cacheManager;
-    AccessLogStream accessLogStream;
+    private AccessLogStream accessLogStream;
     @Getter private InputThread inputThread;
     @Getter private boolean silent = false;
     @Getter private ExecutorService executorService;
@@ -282,38 +287,12 @@ public class SimpleServer implements Kvantum {
             this.commandManager = new CommandManager('/');
             this.commandManager.getManagerOptions().getFindCloseMatches(false);
             this.commandManager.getManagerOptions().setRequirePrefix(false);
-
-            // TODO: Find a way to NOT hard code this, as it's silly.
-            switch (CoreConfig.Application.databaseImplementation) {
-                case "sqlite":
-                    applicationStructure = new SQLiteApplicationStructure("core");
-                    break;
-                case "mongo":
-                    applicationStructure = new MongoApplicationStructure("core");
-                    break;
-                case "mysql":
-                    applicationStructure = new MySQLApplicationStructure("core");
-                    break;
-                default:
-                    Message.DATABASE_UNKNOWN.log(CoreConfig.Application.databaseImplementation);
-                    throw new KvantumInitializationException(
-                        "Cannot load - Invalid session database " + "implementation provided");
-            }
+            this.applicationStructure =
+                getApplicationStructureFactory(CoreConfig.Application.databaseImplementation)
+                    .create(new ApplicationContext("core", true));
         } else if (!CoreConfig.Application.main.isEmpty()) {
-            try {
-                Class temp = Class.forName(CoreConfig.Application.main);
-                if (temp.getSuperclass().equals(ApplicationStructure.class)) {
-                    this.applicationStructure = (ApplicationStructure) temp.newInstance();
-                } else {
-                    log(Message.APPLICATION_DOES_NOT_EXTEND, CoreConfig.Application.main);
-                }
-            } catch (ClassNotFoundException e) {
-                log(Message.APPLICATION_CANNOT_FIND, CoreConfig.Application.main);
-                ServerImplementation.getImplementation().getErrorDigest().digest(e);
-            } catch (InstantiationException | IllegalAccessException e) {
-                log(Message.APPLICATION_CANNOT_INITIATE, CoreConfig.Application.main);
-                ServerImplementation.getImplementation().getErrorDigest().digest(e);
-            }
+            this.applicationStructure = getApplicationStructureFactory(CoreConfig.Application.main)
+                .create(new ApplicationContext(CoreConfig.Application.main, false));
         }
 
         //
@@ -388,6 +367,37 @@ public class SimpleServer implements Kvantum {
 
     @Override public final Router getRouter() {
         return this.serverContext.getRouter();
+    }
+
+    @Override public ApplicationStructureFactory<?> getApplicationStructureFactory(
+        @NonNull final String key) {
+        switch (key.toLowerCase()) {
+            case "mysql":
+                return context -> new MySQLApplicationStructure(context.getName());
+            case "mongo":
+                return context -> new MongoApplicationStructure(context.getName());
+            case "sqlite":
+                return context -> new SQLiteApplicationStructure(context.getName());
+            default:
+                return context -> {
+                    try {
+                        Class<?> temp = Class.forName(key);
+                        if (temp.getSuperclass().equals(ApplicationStructure.class)) {
+                            final Constructor constructor = temp.getConstructor();
+                            return (ApplicationStructure) constructor.newInstance();
+                        } else {
+                            log(Message.APPLICATION_DOES_NOT_EXTEND, key);
+                        }
+                    } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException e) {
+                        log(Message.APPLICATION_CANNOT_FIND, key);
+                        ServerImplementation.getImplementation().getErrorDigest().digest(e);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        log(Message.APPLICATION_CANNOT_INITIATE, key);
+                        ServerImplementation.getImplementation().getErrorDigest().digest(e);
+                    }
+                    return null;
+                };
+        }
     }
 
     protected void onStart() {
@@ -591,7 +601,8 @@ public class SimpleServer implements Kvantum {
             }
         }
         if (shouldCancel) {
-            log("Cancelling connection because it isn't local...", LogLevels.LEVEL_DEBUG);
+            xyz.kvantum.server.api.logging.Logger
+                .debug("Cancelling connection because it isn't local...");
             establishedEvent.setCancelled(true);
         }
     }
