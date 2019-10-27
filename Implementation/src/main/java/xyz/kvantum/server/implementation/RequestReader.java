@@ -42,7 +42,6 @@ import xyz.kvantum.server.api.response.Header;
 import xyz.kvantum.server.api.util.AsciiString;
 import xyz.kvantum.server.api.util.AutoCloseable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -236,19 +235,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
                     if (this.readByte(bytes[i])) {
                         read++;
                     } else if (this.getReadTarget() == ReadTarget.REQUEST_BODY) {
+                        // We use (i + 1) in the following section, because the last
+                        // read character was a new line, but the readByte method
+                        // returned false, as the byte could not be read into
+                        // any valid request section. Thus, we pretend that
+                        // we read it, as we would otherwise skip one byte worth
+                        // of data in the request
+
                         // We need to copy the remaining data over
-                        final int remaining = length - i;
+                        final int remaining = length - (i + 1);
                         if (CoreConfig.debug && CoreConfig.verbose) {
                             Logger.debug("Copying {0} bytes over to request entity (from {1})",
                                 remaining, this.abstractRequest);
                         }
                         final byte[] remainingData = new byte[remaining];
-                        System.arraycopy(bytes, i, remainingData, 0, remaining);
+                        System.arraycopy(bytes, i + 1, remainingData, 0, remaining);
                         this.overflowStream.setBuffer(remainingData);
 
-                        if (remainingData.length < (read + i)) {
-                            throw new IllegalStateException(String.format("%d < %d", remainingData.length,
-                                (read + i)));
+                        if (remainingData.length + (i + 1) < length) {
+                            throw new IllegalStateException(String
+                                .format("Missing data: %d < %d", remainingData.length + (i + 1),
+                                    length));
                         }
 
                         return read + remainingData.length;
@@ -288,14 +295,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
                 EntityType.JSON.getContentType().startsWith(contentType.toString())) {
                 // Read into memory and then parse the request
                 final StringBuilder builder = new StringBuilder(contentLength);
-                try (final BufferedReader bufferedReader =
-                    new BufferedReader(new InputStreamReader(this.kvantumInputStream))) {
+                try (final InputStreamReader inputStreamReader = new InputStreamReader(
+                    this.kvantumInputStream)) {
                     if (CoreConfig.debug && CoreConfig.verbose) {
                         Logger.debug("RequestEntityReader reading data into memory (from {})", abstractRequest);
                     }
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        builder.append(line).append("\n");
+                    final char[] buf = new char[CoreConfig.Buffer.in];
+                    int read;
+                    while ((read = inputStreamReader.read(buf)) != -1) {
+                        builder.append(buf, 0, read);
                     }
                 } catch (final IOException e) {
                     Logger.error("Failed to read request entity");
