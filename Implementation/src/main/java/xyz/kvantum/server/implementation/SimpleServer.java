@@ -90,9 +90,7 @@ import xyz.kvantum.server.implementation.sqlite.SQLiteSessionDatabase;
 import xyz.kvantum.server.implementation.tempfiles.TempFileManagerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -285,6 +283,7 @@ public class SimpleServer implements Kvantum {
             this.commandManager.getManagerOptions().getFindCloseMatches(false);
             this.commandManager.getManagerOptions().setRequirePrefix(false);
 
+            // TODO: Find a way to NOT hard code this, as it's silly.
             switch (CoreConfig.Application.databaseImplementation) {
                 case "sqlite":
                     applicationStructure = new SQLiteApplicationStructure("core");
@@ -356,7 +355,7 @@ public class SimpleServer implements Kvantum {
         this.sessionManager = new SessionManager(new SessionFactory(), sessionDatabase);
 
         //
-        // Setup causam (EventBus)
+        // Setup (EventBus)
         //
         this.eventBus = new SimpleEventBus();
 
@@ -453,7 +452,7 @@ public class SimpleServer implements Kvantum {
         }
 
         log(Message.ACCEPTING_CONNECTIONS_ON,
-            CoreConfig.webAddress + (CoreConfig.port == 80 ? "" : ":" + CoreConfig.port) + "/'");
+            CoreConfig.webAddress + (CoreConfig.port == 80 ? "" : ":" + CoreConfig.port));
         log(Message.OUTPUT_BUFFER_INFO, CoreConfig.Buffer.out / 1024, CoreConfig.Buffer.in / 1024);
 
         try {
@@ -508,8 +507,10 @@ public class SimpleServer implements Kvantum {
         // Shutdown the netty servers
         //
         try {
-            httpThread.close();
-            if (CoreConfig.SSL.enable) {
+            if (httpThread != null) {
+                httpThread.close();
+            }
+            if (CoreConfig.SSL.enable && httpsThread != null) {
                 httpsThread.close();
             }
         } catch (final Exception e) {
@@ -590,7 +591,7 @@ public class SimpleServer implements Kvantum {
             }
         }
         if (shouldCancel) {
-            log("Cancelling connection because it isn't local...", LogLevels.LEVEL_DEBUG, new Object[0]);
+            log("Cancelling connection because it isn't local...", LogLevels.LEVEL_DEBUG);
             establishedEvent.setCancelled(true);
         }
     }

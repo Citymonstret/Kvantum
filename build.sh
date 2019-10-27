@@ -1,1 +1,1 @@
-./gradlew :build --parallel
+./gradlew build --parallel

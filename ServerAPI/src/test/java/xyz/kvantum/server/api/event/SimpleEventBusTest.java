@@ -66,7 +66,6 @@ class SimpleEventBusTest {
 
     public static final class TestListenerClass {
         @Listener public void onString(final String string) {
-            new RuntimeException("Found a string: " + string).printStackTrace(); // Should not use ErrorDigest
             indicateSuccess = true;
         }
 
