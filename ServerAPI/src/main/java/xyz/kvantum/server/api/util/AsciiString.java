@@ -21,6 +21,8 @@
  */
 package xyz.kvantum.server.api.util;
 
+import lombok.RequiredArgsConstructor;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
         new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final char[] charactersLower =
         new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final CacheEntry[] cachedStrings = new CacheEntry[128];
+    private static final Object cachedStringsLock = new Object();
     private static final Map<String, AsciiString> map = new HashMap<>();
     private static final AsciiString HEX_ZERO_PREFIXED = of("0x0");
     private static final AsciiString HEX_ZERO = of("0");
@@ -97,12 +101,23 @@ import java.util.stream.Collectors;
         if (number <= 0) {
             return HEX_ZERO;
         }
+        synchronized (cachedStringsLock) {
+            final CacheEntry cacheEntry = cachedStrings[number & 0x7F];
+            if (cacheEntry != null && cacheEntry.tag == (number & 0x7FFFFF80)) {
+                return cacheEntry.cachedString;
+            }
+        }
         final int leadingZeros = Integer.numberOfLeadingZeros(number) >>> 2;
         final byte[] chars = new byte[8 - leadingZeros];
         for (int i = leadingZeros; i < 8; i++) {
             chars[7 - i] = (byte) charactersLower[(number >>> ((i - leadingZeros) << 2)) & 0xF];
         }
-        return of(chars);
+        final AsciiString asciiString = of(chars);
+        final CacheEntry cacheEntry = new CacheEntry(number & 0x7FFFFF80, asciiString);
+        synchronized (cachedStringsLock) {
+            cachedStrings[number & 0x7F] = cacheEntry;
+        }
+        return asciiString;
     }
 
     /**
@@ -398,6 +413,13 @@ import java.util.stream.Collectors;
             }
         }
         return true;
+    }
+
+    @RequiredArgsConstructor private static final class CacheEntry {
+
+        private final int tag;
+        private final AsciiString cachedString;
+
     }
 
 }

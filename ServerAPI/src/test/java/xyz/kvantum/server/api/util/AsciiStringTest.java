@@ -136,8 +136,20 @@ class AsciiStringTest {
             AsciiString.integerToHexStringWithoutPrefix(Integer.MAX_VALUE).toString());
         assertEquals(Integer.toHexString(0x0),
             AsciiString.integerToHexStringWithoutPrefix(0).toString());
-        assertEquals(Integer.toHexString(7863),
-            AsciiString.integerToHexStringWithoutPrefix(7863).toString());
+        for (int i = 0; i < 4; i++) {
+            assertEquals(Integer.toHexString(7863),
+                AsciiString.integerToHexStringWithoutPrefix(7863).toString());
+            assertEquals(Integer.toHexString(7863),
+                AsciiString.integerToHexStringWithoutPrefix(7863).toString());
+            assertEquals(Integer.toHexString(7863),
+                AsciiString.integerToHexStringWithoutPrefix(7863).toString());
+            assertEquals(Integer.toHexString(7863),
+                AsciiString.integerToHexStringWithoutPrefix(7863).toString());
+        }
+        assertEquals(Integer.toHexString(0x15),
+            AsciiString.integerToHexStringWithoutPrefix(0x15).toString());
+        assertEquals(Integer.toHexString(0x16),
+            AsciiString.integerToHexStringWithoutPrefix(0x16).toString());
     }
 
     @Test void toInteger() {
