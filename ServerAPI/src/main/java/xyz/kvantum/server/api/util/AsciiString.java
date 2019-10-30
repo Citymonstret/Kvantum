@@ -116,7 +116,7 @@ import java.util.stream.Collectors;
         return this.length() == 0;
     }
 
-    public boolean isUppercase() {
+    private boolean isUppercase() {
         if (this.uppercase == -1) {
             for (final byte b : this.value) {
                 if (b >= 97 && b <= 122) {
@@ -129,7 +129,7 @@ import java.util.stream.Collectors;
         return uppercase > 0;
     }
 
-    public boolean isLowercase() {
+    private boolean isLowercase() {
         if (this.lowercase == -1) {
             for (final byte b : this.value) {
                 if (b >= 65 && b <= 90) {
@@ -343,7 +343,7 @@ import java.util.stream.Collectors;
         return value;
     }
 
-    @Override @SuppressWarnings("ALL") public int compareTo(final CharSequence sequence) {
+    @Override public int compareTo(final CharSequence sequence) {
         if (this == sequence || this.equals(sequence)) {
             return 0;
         }
