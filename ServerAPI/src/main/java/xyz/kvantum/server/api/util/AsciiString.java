@@ -37,50 +37,50 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused") public final class AsciiString
     implements CharSequence, AsciiStringable, Comparable<CharSequence> {
 
+    private static final char[] characters =
+        new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final Map<String, AsciiString> map = new HashMap<>();
+    private static final AsciiString HEX_ZERO = of("0x0");
     public static final AsciiString empty = of("");
+
     private final byte[] value;
-    private final String string;
-    private final boolean lowercase;
-    private final boolean uppercase;
-    private final int hashCode;
+
+    private byte lowercase = -1;
+    private byte uppercase = -1;
+    private int hashCode;
+    private String cache;
 
     private AsciiString(final String value) {
-        this(value, value.getBytes(StandardCharsets.US_ASCII));
+        this(value.getBytes(StandardCharsets.US_ASCII));
     }
 
-    private AsciiString(final byte[] value) {
-        this(new String(value, StandardCharsets.US_ASCII), value);
-    }
-
-    private AsciiString(final String string, final byte[] bytes) {
+    private AsciiString(final byte[] bytes) {
         this.value = bytes;
-        this.string = string;
-        this.hashCode = this.string.hashCode();
-        boolean lowercase = true;
-        boolean uppercase = true;
-
-        //
-        // Pre-calculated values that determine
-        // how the string behaves in case dependent
-        // methods
-        //
-        for (final byte b : this.value) {
-            if (b >= 97 && b <= 122) // lowercase a-z
-            {
-                uppercase = false;
-            } else if (b >= 65 && b <= 90) // uppercase A-Z
-            {
-                lowercase = false;
-            }
-        }
-
-        this.uppercase = uppercase;
-        this.lowercase = lowercase;
     }
 
     public static AsciiString randomUUIDAsciiString() {
         return of(UUID.randomUUID().toString(), false);
+    }
+
+    /**
+     * Convert a positive integer to a String representation of the
+     * hexadecimal number
+     *
+     * @param number Positive integer
+     * @return Hex string
+     */
+    public static AsciiString integerToHexString(final int number) {
+        if (number <= 0) {
+            return HEX_ZERO;
+        }
+        final int leadingZeros = Integer.numberOfLeadingZeros(number) >>> 2;
+        final byte[] chars = new byte[10 - leadingZeros];
+        chars[0] = '0';
+        chars[1] = 'x';
+        for (int i = leadingZeros; i < 8; i++) {
+            chars[9 - i] = (byte) characters[(number >>> ((i - leadingZeros) << 2)) & 0xF];
+        }
+        return of(chars);
     }
 
     /**
@@ -116,6 +116,32 @@ import java.util.stream.Collectors;
         return this.length() == 0;
     }
 
+    public boolean isUppercase() {
+        if (this.uppercase == -1) {
+            for (final byte b : this.value) {
+                if (b >= 97 && b <= 122) {
+                    uppercase = 0;
+                    return false;
+                }
+            }
+            this.uppercase = 1;
+        }
+        return uppercase > 0;
+    }
+
+    public boolean isLowercase() {
+        if (this.lowercase == -1) {
+            for (final byte b : this.value) {
+                if (b >= 65 && b <= 90) {
+                    this.lowercase = 0;
+                    return false;
+                }
+            }
+            this.lowercase = 1;
+        }
+        return lowercase > 0;
+    }
+
     /**
      * Get the byte array backing the string
      *
@@ -126,22 +152,31 @@ import java.util.stream.Collectors;
     }
 
     @Override public int length() {
-        return this.string.length();
+        return this.value.length;
     }
 
     @Override public char charAt(final int i) {
-        return this.string.charAt(i);
+        return (char) this.value[i];
     }
 
     @Override public CharSequence subSequence(final int i, final int i1) {
-        return this.string.subSequence(i, i1);
+        final byte[] bytes = new byte[i1 - i];
+        System.arraycopy(this.value, i, bytes, 0, bytes.length);
+        return of(bytes);
     }
 
-    @Override @SuppressWarnings("ALL") public String toString() {
-        return this.string;
+    @Override public String toString() {
+        return this.cache == null ?
+            (this.cache = new String(this.value, StandardCharsets.US_ASCII)) :
+            this.cache;
     }
 
     @Override public int hashCode() {
+        if (this.hashCode == 0) {
+            for (byte b : value) {
+                this.hashCode = 31 * this.hashCode + b;
+            }
+        }
         return this.hashCode;
     }
 
@@ -152,8 +187,17 @@ import java.util.stream.Collectors;
         if (object instanceof AsciiString) {
             final AsciiString other = (AsciiString) object;
             return compareBytes(other.value);
-        } else if (object instanceof String) {
-            return this.string.equals(object);
+        } else if (object instanceof CharSequence) {
+            final CharSequence charSequence = (CharSequence) object;
+            if (charSequence.length() != this.length()) {
+                return false;
+            }
+            for (int i = 0; i < length(); i++) {
+                if (charAt(i) != charSequence.charAt(i)) {
+                    return false;
+                }
+            }
+            return true;
         } else if (object instanceof byte[]) {
             return compareBytes((byte[]) object);
         }
@@ -176,27 +220,7 @@ import java.util.stream.Collectors;
      * Delegate for {@link String#contains(CharSequence)}
      */
     public boolean contains(final CharSequence other) {
-        return this.string.contains(other);
-    }
-
-    @SuppressWarnings("ALL") public boolean containsIgnoreCase(final CharSequence other) {
-        final String localString;
-        final String otherString;
-        if (lowercase) {
-            localString = this.string;
-            otherString = other.toString().toLowerCase(Locale.ENGLISH);
-        } else if (uppercase) {
-            localString = this.string;
-            otherString = other.toString().toUpperCase(Locale.ENGLISH);
-        } else {
-            localString = this.string.toLowerCase(Locale.ENGLISH);
-            otherString = other.toString().toLowerCase(Locale.ENGLISH);
-        }
-        return localString.contains(otherString);
-    }
-
-    public boolean equals(final CharSequence other) {
-        return this.string.equals(other.toString());
+        return this.toString().contains(other);
     }
 
     public boolean equals(final AsciiString other) {
@@ -206,31 +230,30 @@ import java.util.stream.Collectors;
     @SuppressWarnings("ALL") public boolean equalsIgnoreCase(final CharSequence other) {
         if (this == other) {
             return true;
-        }
-        final String localString;
-        final String otherString;
-        if (lowercase) {
-            localString = this.string;
-            otherString = other.toString().toLowerCase(Locale.ENGLISH);
-        } else if (uppercase) {
-            localString = this.string;
-            otherString = other.toString().toUpperCase(Locale.ENGLISH);
+        } else if (isLowercase()) {
+            return equals(other.toString().toLowerCase(Locale.ENGLISH));
+        } else if (isUppercase()) {
+            return equals(other.toString().toUpperCase(Locale.ENGLISH));
         } else {
-            localString = this.string.toLowerCase(Locale.ENGLISH);
-            otherString = other.toString().toLowerCase(Locale.ENGLISH);
+            return toLowerCase().equals(other.toString().toLowerCase(Locale.ENGLISH));
         }
-        return localString.equals(otherString);
     }
 
     /**
      * Delegate for {@link String#endsWith(String)}
      */
-    @SuppressWarnings("WeakerAccess") public boolean endsWith(final String string) {
-        return this.string.endsWith(string);
+    public boolean endsWith(final String string) {
+        final char[] chars = string.toCharArray();
+        for (int i = chars.length - 1; i >= 0; i--) {
+            if (chars[i] != this.charAt(length() - chars.length + i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public AsciiString toLowerCase() {
-        if (this.lowercase || this.isEmpty()) {
+        if (this.isLowercase() || this.isEmpty()) {
             return this;
         }
 
@@ -248,8 +271,8 @@ import java.util.stream.Collectors;
         return of(lowercase);
     }
 
-    @SuppressWarnings("WeakerAccess") public AsciiString toUpperCase() {
-        if (this.uppercase) {
+    public AsciiString toUpperCase() {
+        if (this.isUppercase() || this.isEmpty()) {
             return this;
         }
 
@@ -278,19 +301,7 @@ import java.util.stream.Collectors;
      * @return Parsed integer
      */
     public int toInteger() {
-        int index = 0;
-        int value = 0;
-        boolean negative = this.value[0] == 45 /* - */;
-        if (negative) {
-            index = 1;
-        }
-        for (; index < this.value.length; index++) {
-            value = (value * 10) + (this.value[index] - 48 /* 0 */);
-        }
-        if (negative) {
-            return -value;
-        }
-        return value;
+        return (int) toLong();
     }
 
     public boolean isInteger() {
@@ -336,11 +347,11 @@ import java.util.stream.Collectors;
         if (this == sequence || this.equals(sequence)) {
             return 0;
         }
-        return this.string.compareTo(sequence.toString());
+        return this.toString().compareTo(sequence.toString());
     }
 
     public List<AsciiString> split(final String delimiter) {
-        return Arrays.stream(this.string.split(delimiter))
+        return Arrays.stream(this.toString().split(delimiter))
             .map(string -> AsciiString.of(string, false)).collect(Collectors.toList());
     }
 
@@ -358,7 +369,13 @@ import java.util.stream.Collectors;
     }
 
     public boolean startsWith(final String part) {
-        return this.string.startsWith(part);
+        final char[] characters = part.toCharArray();
+        for (int i = 0; i < characters.length; i++) {
+            if (characters[i] != this.value[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

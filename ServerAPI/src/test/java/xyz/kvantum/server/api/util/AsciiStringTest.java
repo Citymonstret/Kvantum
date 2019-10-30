@@ -61,7 +61,7 @@ class AsciiStringTest {
     @Test void subSequence() {
         final AsciiString asciiString = of("Hello World", false);
         final CharSequence subsequence = asciiString.subSequence(0, 5);
-        assertEquals("Hello", subsequence);
+        assertEquals("Hello", subsequence.toString());
     }
 
     @Test void testToString() {
@@ -86,13 +86,6 @@ class AsciiStringTest {
         final AsciiString asciiString = of("Hello World", false);
         assertTrue(asciiString.contains("Hello"));
         assertFalse(asciiString.contains("Obama"));
-    }
-
-    @Test void containsIgnoreCase() {
-        final AsciiString asciiString = of("Hello World", false);
-        assertTrue(asciiString.containsIgnoreCase("HELLO"));
-        assertTrue(asciiString.containsIgnoreCase("hello"));
-        assertTrue(asciiString.containsIgnoreCase("hElLo"));
     }
 
     @Test void equalsIgnoreCase() {
@@ -129,6 +122,17 @@ class AsciiStringTest {
     @Test void startsWith() {
         final AsciiString asciiString = of("Hello World", false);
         assertTrue(asciiString.startsWith("Hello"));
+    }
+
+    @Test void integerToHexString() {
+        assertEquals(AsciiString.of("0x7FFFFFFF"),
+            AsciiString.integerToHexString(Integer.MAX_VALUE));
+        assertEquals(AsciiString.of("0x0"), AsciiString.integerToHexString(0));
+        assertEquals(AsciiString.of("0x1EB7"), AsciiString.integerToHexString(7863));
+    }
+
+    @Test void toInteger() {
+        assertEquals(523, AsciiString.of("523").toInteger());
     }
 
 }
