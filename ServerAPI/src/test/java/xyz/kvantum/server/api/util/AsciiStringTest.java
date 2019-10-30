@@ -131,6 +131,15 @@ class AsciiStringTest {
         assertEquals(AsciiString.of("0x1EB7"), AsciiString.integerToHexString(7863));
     }
 
+    @Test void integerToHexStringWithoutPrefix() {
+        assertEquals(Integer.toHexString(0x7FFFFFFF),
+            AsciiString.integerToHexStringWithoutPrefix(Integer.MAX_VALUE).toString());
+        assertEquals(Integer.toHexString(0x0),
+            AsciiString.integerToHexStringWithoutPrefix(0).toString());
+        assertEquals(Integer.toHexString(7863),
+            AsciiString.integerToHexStringWithoutPrefix(7863).toString());
+    }
+
     @Test void toInteger() {
         assertEquals(523, AsciiString.of("523").toInteger());
     }

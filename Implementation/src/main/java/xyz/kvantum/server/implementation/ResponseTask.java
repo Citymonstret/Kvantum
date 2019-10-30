@@ -501,7 +501,7 @@ import static xyz.kvantum.server.implementation.KvantumServerHandler.KEEP_ALIVE;
 
                         actualLength += read;
 
-                        context.write(AsciiString.integerToHexString(read).getValue());
+                        context.write(AsciiString.integerToHexStringWithoutPrefix(read).getValue());
                         context.write(KvantumServerHandler.CRLF);
                         context.write(result);
                         context.write(KvantumServerHandler.CRLF);

@@ -37,10 +37,13 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused") public final class AsciiString
     implements CharSequence, AsciiStringable, Comparable<CharSequence> {
 
-    private static final char[] characters =
+    private static final char[] charactersUpper =
         new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private static final char[] charactersLower =
+        new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final Map<String, AsciiString> map = new HashMap<>();
-    private static final AsciiString HEX_ZERO = of("0x0");
+    private static final AsciiString HEX_ZERO_PREFIXED = of("0x0");
+    private static final AsciiString HEX_ZERO = of("0");
     public static final AsciiString empty = of("");
 
     private final byte[] value;
@@ -71,14 +74,33 @@ import java.util.stream.Collectors;
      */
     public static AsciiString integerToHexString(final int number) {
         if (number <= 0) {
-            return HEX_ZERO;
+            return HEX_ZERO_PREFIXED;
         }
         final int leadingZeros = Integer.numberOfLeadingZeros(number) >>> 2;
         final byte[] chars = new byte[10 - leadingZeros];
         chars[0] = '0';
         chars[1] = 'x';
         for (int i = leadingZeros; i < 8; i++) {
-            chars[9 - i] = (byte) characters[(number >>> ((i - leadingZeros) << 2)) & 0xF];
+            chars[9 - i] = (byte) charactersUpper[(number >>> ((i - leadingZeros) << 2)) & 0xF];
+        }
+        return of(chars);
+    }
+
+    /**
+     * Convert a positive integer to a String representation of the
+     * hexadecimal number, identical to the Strings produced by {@link Integer#toHexString(int)}
+     *
+     * @param number Positive integer
+     * @return Hex string
+     */
+    public static AsciiString integerToHexStringWithoutPrefix(final int number) {
+        if (number <= 0) {
+            return HEX_ZERO;
+        }
+        final int leadingZeros = Integer.numberOfLeadingZeros(number) >>> 2;
+        final byte[] chars = new byte[8 - leadingZeros];
+        for (int i = leadingZeros; i < 8; i++) {
+            chars[7 - i] = (byte) charactersLower[(number >>> ((i - leadingZeros) << 2)) & 0xF];
         }
         return of(chars);
     }
