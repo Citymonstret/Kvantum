@@ -135,10 +135,11 @@ import java.util.stream.Collectors;
     }
 
     public static AsciiString of(final String string, final boolean cache) {
-        if (map.containsKey(string)) {
-            return map.get(string);
+        AsciiString asciiString = map.get(string);
+        if (asciiString != null) {
+            return asciiString;
         }
-        final AsciiString asciiString = new AsciiString(string);
+        asciiString = new AsciiString(string);
         if (cache) {
             map.put(string, asciiString);
         }
