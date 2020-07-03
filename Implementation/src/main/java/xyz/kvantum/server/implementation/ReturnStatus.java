@@ -29,7 +29,7 @@ final class ReturnStatus extends Throwable {
 
     private static final String MESSAGE_FORMAT = "Status: %s";
 
-    @Getter private AsciiString status;
+    @Getter private final AsciiString status;
 
     @Setter @Getter private WorkerContext applicableContext;
 
@@ -44,6 +44,14 @@ final class ReturnStatus extends Throwable {
         super(String.format(MESSAGE_FORMAT, status), cause);
         this.status = status;
         this.applicableContext = applicableContext;
+    }
+
+    @Override public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
+
+    @Override public synchronized Throwable initCause(final Throwable cause) {
+        return this;
     }
 
 }
